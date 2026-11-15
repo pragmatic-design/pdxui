@@ -561,6 +561,11 @@ element or `null`.
 - A name the script declares itself is that declaration (#999). A `$signal` receives the part's
   element; a `@prop`, a `@model`, an import (#1066), a function or a constant keeps its meaning, the element is not bound
   to it, and a `:ref` on the element reaches it; without one, `PDX_PART_NAME_TAKEN` (info) says so.
+- The parts an `@internal` view draws are the parts of the component that imports it (#1110): that
+  component declares them, its manifest lists them, and a part only a view draws is not
+  `PDX_PART_MISSING`. The view declares none, and a `data-part` it draws that its owner does not declare
+  is `PDX_PART_UNDECLARED` on the owner. The owner's script does not hold such an element: reading the
+  name there is `PDX_PART_IN_VIEW`; the view reaches it with a `:ref`.
 
 #### Examples
 

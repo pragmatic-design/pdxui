@@ -119,6 +119,53 @@ describe('the template that renders an internal tag of the project', () => {
     });
 });
 
+describe('the parts an internal view draws are its owner\'s (#1110)', () => {
+    const VIEW = '<template><div data-part="grid"><span data-part="cell"></span></div></template>\n<script>\n@internal;\n</script>\n';
+    const owner = (parts: string, extra = '') => `<template><app-view></app-view></template>\n<script>\nimport './view.pdx';\n${parts}\n${extra}\n</script>\n`;
+    const compileOwner = (source: string) => {
+        const f = file('src/a/owner.pdx', source);
+        return compile(source, f, [], undefined, { readComponent: read }).warnings;
+    };
+
+    it('a part the owner declares and only its view draws is not missing, and the view raises nothing', () => {
+        file('src/a/view.pdx', VIEW);
+        expect(codes(compileOwner(owner('@part grid, cell;')))).not.toContain('PDX_PART_MISSING');
+        const view = file('src/a/view.pdx', VIEW);
+        expect(codes(compile(VIEW, view, [], undefined, { readComponent: read }).warnings)).not.toContain('PDX_PART_UNDECLARED');
+    });
+
+    it('a part the view draws and the owner does not declare is PDX_PART_UNDECLARED on the owner, naming the view', () => {
+        file('src/a/view.pdx', VIEW);
+        const w = compileOwner(owner('@part grid;')).filter((x) => x.code === 'PDX_PART_UNDECLARED');
+        expect(w).toHaveLength(1);
+        expect(w[0].message).toContain("'cell'");
+        expect(w[0].message).toContain('view.pdx');
+    });
+
+    it('the control: a part drawn by nobody is still PDX_PART_MISSING', () => {
+        file('src/a/view.pdx', VIEW);
+        const w = compileOwner(owner('@part grid, cell, toolbar;')).filter((x) => x.code === 'PDX_PART_MISSING');
+        expect(w.map((x) => x.message)).toEqual([expect.stringContaining("'toolbar'")]);
+    });
+
+    it('a view of a view draws parts of the same owner', () => {
+        file('src/a/view.pdx', '<template><div data-part="grid"><app-inner></app-inner></div></template>\n<script>\n@internal;\nimport \'./inner.pdx\';\n</script>\n');
+        file('src/a/inner.pdx', '<template><span data-part="cell"></span></template>\n<script>\n@internal;\n</script>\n');
+        expect(codes(compileOwner(owner('@part grid, cell;')))).toEqual([]);
+    });
+
+    it('the owner\'s script reading a part only its view draws is told it never holds the element', () => {
+        file('src/a/view.pdx', VIEW);
+        const w = compileOwner(owner('@part grid, cell;', 'function width() { return grid?.offsetWidth ?? 0; }')).find((x) => x.code === 'PDX_PART_IN_VIEW');
+        expect(w?.message).toContain("'grid'");
+        expect(w?.message).toContain('view.pdx');
+        // At the @part that names it: line 4 of the owner (template, <script>, the import, then @part).
+        expect(w?.line).toBe(4);
+        // Not read: nothing to say.
+        expect(codes(compileOwner(owner('@part grid, cell;')))).not.toContain('PDX_PART_IN_VIEW');
+    });
+});
+
 describe('a library component that imports its internal view', () => {
     it('is not told the tag is unresolved: its own import registers it', () => {
         // A consuming app knows the library by its exports, where an internal component is not.

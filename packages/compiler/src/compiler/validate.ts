@@ -12,7 +12,7 @@ import { checkFormRules, checkFormFieldNames } from './form-rules';
 import { DEFER_TRIGGERS, unknownDeferTriggers, unknownHydrateTriggers, parseDeferTriggers } from './defer-triggers';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
-import { skipNonCode, findClosing } from './tokenizer';
+import { skipNonCode, findClosing, maskNonCode } from './tokenizer';
 import { openingTagTexts, routeParams } from '../text-scan';
 import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
@@ -252,6 +252,11 @@ export interface ValidateOptions {
      * `@slot name: (…)` without `?`. With it, a use that does not fill one is PDX_SLOT_REQUIRED (#489).
      */
     requiredSlotsOf?: RequiredSlotsLookup;
+    /**
+     * The parts the `@internal` views this component imports draw, each with the view that draws it
+     * (#1110): they are this component's parts.
+     */
+    viewParts?: ReadonlyMap<string, string>;
     /**
      * Whether the project listens to one of this component's events above it — the resolver's
      * `eventHeardAbove`, bound to the component's tag. With it, an `@event(bubbles)` nothing hears
@@ -576,7 +581,14 @@ export function validate(
 
     // ─── Check 10d: the @part declarations and the data-part attributes (#134, #988, #999) ────
 
-    warnings.push(...checkParts(analysis.parts, ast, new Set(analysis.signals.map(s => s.name))));
+    // The script's code as the analyzer split it: the setup body, the effects, the lifecycle bodies.
+    const setupCode = maskNonCode([analysis.body, ...analysis.effects, ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy].join('\n'));
+    warnings.push(...checkParts(analysis.parts, ast, new Set(analysis.signals.map(s => s.name)), {
+        internal: analysis.internal === true,
+        drawnBy: options?.viewParts,
+        // Match: the name as a whole identifier, not a member (`x.grid`) — strings and comments masked.
+        scriptReads: (name) => new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`).test(setupCode),
+    }));
 
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
 

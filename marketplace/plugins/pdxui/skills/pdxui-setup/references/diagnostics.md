@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 114 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 115 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1142,6 +1142,14 @@ write:
 @guard 'admin';
 </script>
 ```
+
+### PDX_PART_IN_VIEW
+
+*warn* — The script reads a `@part` that only one of its `@internal` views draws (#1110).
+
+The parts an `@internal` view draws are its owner's: the owner declares them, and its manifest lists them. The elements are in the view, though, and the owner's part signal of that name never receives one: what the script reads there is always empty.
+
+**Fix.** Reach the element in the view, with a `:ref`, and pass what the owner needs as a prop or an event.
 
 ### PDX_PART_MISSING
 

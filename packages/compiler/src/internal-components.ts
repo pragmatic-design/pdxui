@@ -12,6 +12,8 @@ import type { ValidationWarning } from './compiler/validate';
 import { usesOf } from './compiler/validate-required-slots';
 import { deriveTag } from './compiler/codegen-shared';
 import { parseSFC } from './parser/sfc';
+import { parseTemplate } from './parser/template';
+import { dataPartCounts } from './compiler/validate-parts';
 
 /** The internal component a tag registers: the file that declares it. */
 export interface InternalComponent { tag: string; file: string }
@@ -68,6 +70,26 @@ export function importedInternals(script: string, filename: string, read: ReadCo
         if (!sameFolder(file, filename)) warnings.push(outside(tag, file, filename, `imports ${m[1]}`));
     }
     return { internals, warnings };
+}
+
+/**
+ * The parts the `@internal` views a script imports draw (#1110), each with the view that draws it —
+ * the first one, when two do — and the views those import in turn: all of them are the owner's parts.
+ */
+export function viewParts(script: string, filename: string, read: ReadComponent, seen = new Set<string>()): Map<string, string> {
+    const out = new Map<string, string>();
+    for (const m of script.matchAll(PDX_IMPORT)) {
+        const file = resolve(dirname(filename), m[1]);
+        if (seen.has(file)) continue;
+        seen.add(file);
+        const source = read(file);
+        if (source === null || !declaresInternal(source)) continue;
+        const sfc = parseSFC(source);
+        const name = file.replace(/\\/g, '/').split('/').pop()!;
+        for (const part of dataPartCounts(parseTemplate(sfc.template?.content ?? '')).keys()) if (!out.has(part)) out.set(part, name);
+        for (const [part, view] of viewParts(sfc.script?.content ?? '', file, read, seen)) if (!out.has(part)) out.set(part, view);
+    }
+    return out;
 }
 
 /**

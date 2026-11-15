@@ -125,6 +125,9 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_TAG_RESERVED':
             // Match: the `@tag` that names a pdx- tag — a component declares one.
             return find(source, script, /@tag\s+['"]pdx-/);
+        case 'PDX_PART_IN_VIEW':
+            // Match: the `@part` line that declares the name the message quotes (#1110).
+            return name ? find(source, script, new RegExp(`@part\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;
         case 'PDX_INTERNAL_NAMED_PUBLIC':
             // Match: the `@internal` line (#1102).
             return find(source, script, /@internal\b/);

@@ -147,6 +147,7 @@ const ELSEWHERE: Record<string, string> = {
     PDX_SHARED_LOADING: 'cross-file, carries the line of each route — cli check-command.test.ts',
     PDX_IGNORE_UNUSED: 'reported by pdx check only, which runs every check, at the comment — cli check-ignore.test.ts',
     PDX_TAG_COLLISION_RESOLVER: 'about two files, not a line in one',
+    PDX_PART_IN_VIEW: 'needs the @internal view on disk; its line, the @part that names it, is asserted in internal-component.test.ts',
     PDX_TAG_COLLISION: 'about two files, not a line in one',
     PDX_INLINE_BINDINGS_IGNORED: 'about the vite.config.ts, not a .pdx — inline-bindings-ignored.test.ts',
     PDX_EMPTY_SOURCE: 'an empty file has no line',
