@@ -6,7 +6,10 @@
     --pdx-kanban-column-width: 17rem;
     display: flex;
     gap: var(--pdx-space-md);
-    align-items: flex-start;
+    /* Every column as tall as the longest, and its list down to its bottom: the space under a
+       column's last card is where a card lands at its end (#1089). Columns sized to their cards
+       left that space outside every list, so a drop there did nothing. */
+    align-items: stretch;
     overflow-x: auto;
     padding-bottom: var(--pdx-space-2xs);
 }
@@ -57,6 +60,7 @@
     flex-direction: column;
     gap: var(--pdx-space-sm);
     min-height: 2.5rem;
+    flex: 1 1 auto;
 }
 
 .pdx-kanban-card {
