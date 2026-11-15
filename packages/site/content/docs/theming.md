@@ -35,8 +35,10 @@ Two attributes on `<html>`:
 `pdx-theme` picks the token set; `pdx-scheme` (`light`/`dark`) decides which branch of the
 `light-dark()` colors to use.
 
-Some themes also have **structural** behaviours — pill tabs, elevated cards, filled inputs, a
-bottom focus accent — for the variants that are a different shape rather than a different value.
+Some themes also have **structural** behaviours — their own pill tabs, elevated cards, filled inputs,
+a bottom focus accent — for the variants that are a different shape rather than a different value.
+A pill theme styles the `pills` variant of `pdx-tabs`; a tab bar that asks for `line` or `card` keeps
+that shape in every theme.
 They are tokens too (`--pdx-tab-indicator`, `--pdx-card-style`, `--pdx-input-style`,
 `--pdx-input-focus`), and under the default browser target the design CSS reads them with container
 style queries: a `pdx-theme` subtree gets its own, in the frame the theme changes, and there is

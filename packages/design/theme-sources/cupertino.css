@@ -104,7 +104,7 @@
 
 /* Tab: pill variant driven by [pdx-tab-style="pill"] in tabs.css.
    Apple HIG specifics: 32pt height, tighter segmented control sizing. */
-[pdx-tab-style="pill"]& .pdx-tabs {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tabs {
     border-radius: 0.5rem;   /* 8px — Apple segmented control outer */
     padding: 2px;
     gap: 2px;
@@ -113,7 +113,7 @@
        let the 32px-tall content of a tab run 4px past the control. */
     min-height: 2rem;
 }
-[pdx-tab-style="pill"]& .pdx-tab {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab {
     border-radius: 0.4375rem; /* 7px — 1px inset from container */
     font-size: 0.8125rem;     /* 13px — Apple segmented control font */
     /* The segment fills the 28px inside the 32px control. The pill variant's 2rem min-height would
@@ -121,7 +121,7 @@
     min-height: 0;
     height: calc(2rem - 4px);
 }
-[pdx-tab-style="pill"]& .pdx-tab[aria-selected="true"] {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab[aria-selected="true"] {
     color: var(--pdx-color-text);
 }
 

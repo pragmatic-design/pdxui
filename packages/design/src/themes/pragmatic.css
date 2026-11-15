@@ -81,9 +81,9 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* Tabs: pill variant — active tab with filled primary bg */
-[pdx-tab-style="pill"][pdx-theme="pragmatic"] .pdx-tabs:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { border-radius: 9999px; background: light-dark(oklch(0.96 0.006 235), oklch(0.18 0.008 235)); padding: 3px; }
-[pdx-tab-style="pill"][pdx-theme="pragmatic"] .pdx-tab:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { border-radius: 9999px; }
-[pdx-tab-style="pill"][pdx-theme="pragmatic"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+[pdx-tab-style="pill"][pdx-theme="pragmatic"] :where(pdx-tabs[variant="pills"]) .pdx-tabs:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { border-radius: 9999px; background: light-dark(oklch(0.96 0.006 235), oklch(0.18 0.008 235)); padding: 3px; }
+[pdx-tab-style="pill"][pdx-theme="pragmatic"] :where(pdx-tabs[variant="pills"]) .pdx-tab:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { border-radius: 9999px; }
+[pdx-tab-style="pill"][pdx-theme="pragmatic"] :where(pdx-tabs[variant="pills"]) .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
     background: var(--pdx-color-primary); color: white; font-weight: var(--pdx-weight-semibold);
 }
 
