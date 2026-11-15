@@ -25,8 +25,40 @@ export type ReadComponent = (file: string) => string | null;
 const INTERNAL_RUNE = /^[ \t]*@internal\s*;?[ \t]*$/m;
 // Match: `@tag 'x-y'`. Groups: [1]=the tag
 const TAG_RUNE = /^[ \t]*@tag\s+['"]([^'"]+)['"]/m;
-// Match: a static import of a relative `.pdx` file, bare or with bindings. Groups: [1]=the specifier
-const PDX_IMPORT = /^[ \t]*import\s+(?:[^'"]*?\s+from\s+)?['"](\.{1,2}\/[^'"]+\.pdx)['"]/gm;
+// Match: `import` followed by whitespace or `{`/`*`, at the start of a line. The rest of the statement is
+// read by relativePdxImports with indexOf, not by a pattern: a pattern over the clause backtracks.
+const IMPORT_START = /^[ \t]*import(?=[\s{*])/gm;
+// Match: a relative `.pdx` specifier.
+const RELATIVE_PDX = /^\.{1,2}\/[^'"]+\.pdx$/;
+
+/**
+ * The relative `.pdx` specifiers a script imports statically: `import './x.pdx'`, or with bindings,
+ * `import X from './x.pdx'`, `import {X}from './x.pdx'`, across lines. A dynamic `import()` is not one.
+ * Linear in the script's length: each statement is read up to its first quote.
+ */
+function relativePdxImports(script: string): string[] {
+    const out: string[] = [];
+    // The next quote of each kind at or after a position. The statements come in order, so a quote found
+    // past one is reused for the next: no search starts again from each line (many quote-less lines).
+    let single = -2, double = -2;
+    const next = (ch: string, from: number, known: number) => (known >= from || known === -1) ? known : script.indexOf(ch, from);
+    for (const m of script.matchAll(IMPORT_START)) {
+        const at = m.index + m[0].length;
+        single = next("'", at, single);
+        double = next('"', at, double);
+        const quote = single < 0 ? double : double < 0 ? single : Math.min(single, double);
+        if (quote < 0) continue;
+        const clause = script.slice(at, quote).trim();
+        // Bare, or a binding clause that ends with `from` (`{X}from`, `* as X from`, `X from`).
+        const isFrom = clause.endsWith('from') && !/[\w$]/.test(clause.charAt(clause.length - 5));
+        if (clause !== '' && (!isFrom || clause.includes(';'))) continue;
+        const close = script.indexOf(script[quote], quote + 1);
+        if (close < 0) continue;
+        const spec = script.slice(quote + 1, close);
+        if (RELATIVE_PDX.test(spec)) out.push(spec);
+    }
+    return out;
+}
 
 /** The script of a `.pdx` source, as the compiler's own SFC parser reads it, or ''. */
 function scriptOf(source: string): string {
@@ -61,33 +93,48 @@ export function sameFolder(a: string, b: string): boolean {
 export function importedInternals(script: string, filename: string, read: ReadComponent, prefix: string): { internals: InternalComponent[]; warnings: ValidationWarning[] } {
     const internals: InternalComponent[] = [];
     const warnings: ValidationWarning[] = [];
-    for (const m of script.matchAll(PDX_IMPORT)) {
-        const file = resolve(dirname(filename), m[1]);
+    for (const spec of relativePdxImports(script)) {
+        const file = resolve(dirname(filename), spec);
         const source = read(file);
         if (source === null || !declaresInternal(source)) continue;
         const tag = tagOfSource(source, file, prefix);
         internals.push({ tag, file });
-        if (!sameFolder(file, filename)) warnings.push(outside(tag, file, filename, `imports ${m[1]}`));
+        if (!sameFolder(file, filename)) warnings.push(outside(tag, file, filename, `imports ${spec}`));
     }
     return { internals, warnings };
+}
+
+/** An `@internal` view a component draws through, with its template and script. */
+export interface InternalView { file: string; template: string; script: string }
+
+/**
+ * The `@internal` views a script imports, and the views those import in turn, each once, in the order
+ * they are first imported: what they draw is the owner's (#1110). A file that cannot be read is skipped.
+ */
+export function internalViews(script: string, filename: string, read: ReadComponent, seen = new Set<string>()): InternalView[] {
+    const out: InternalView[] = [];
+    for (const spec of relativePdxImports(script)) {
+        const file = resolve(dirname(filename), spec);
+        if (seen.has(file)) continue;
+        seen.add(file);
+        const source = read(file);
+        if (source === null || !declaresInternal(source)) continue;
+        const sfc = parseSFC(source);
+        const view = { file, template: sfc.template?.content ?? '', script: sfc.script?.content ?? '' };
+        out.push(view, ...internalViews(view.script, file, read, seen));
+    }
+    return out;
 }
 
 /**
  * The parts the `@internal` views a script imports draw (#1110), each with the view that draws it —
  * the first one, when two do — and the views those import in turn: all of them are the owner's parts.
  */
-export function viewParts(script: string, filename: string, read: ReadComponent, seen = new Set<string>()): Map<string, string> {
+export function viewParts(script: string, filename: string, read: ReadComponent): Map<string, string> {
     const out = new Map<string, string>();
-    for (const m of script.matchAll(PDX_IMPORT)) {
-        const file = resolve(dirname(filename), m[1]);
-        if (seen.has(file)) continue;
-        seen.add(file);
-        const source = read(file);
-        if (source === null || !declaresInternal(source)) continue;
-        const sfc = parseSFC(source);
-        const name = file.replace(/\\/g, '/').split('/').pop()!;
-        for (const part of dataPartCounts(parseTemplate(sfc.template?.content ?? '')).keys()) if (!out.has(part)) out.set(part, name);
-        for (const [part, view] of viewParts(sfc.script?.content ?? '', file, read, seen)) if (!out.has(part)) out.set(part, view);
+    for (const view of internalViews(script, filename, read)) {
+        const name = view.file.replace(/\\/g, '/').split('/').pop()!;
+        for (const part of dataPartCounts(parseTemplate(view.template)).keys()) if (!out.has(part)) out.set(part, name);
     }
     return out;
 }

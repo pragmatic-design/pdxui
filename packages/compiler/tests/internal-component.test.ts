@@ -10,6 +10,7 @@ import { compile } from '../src/plugin';
 import { analyzeScript } from '../src/compiler/script-analyzer';
 import { ComponentResolver } from '../src/component-resolver';
 import { injectComponentImports } from '../src/plugin-utils';
+import { importedInternals } from '../src/internal-components';
 
 let root: string;
 
@@ -72,6 +73,24 @@ describe('the script that imports an internal component', () => {
         expect(w?.severity).toBe('error');
         expect(w?.message).toContain('b/other.pdx');
         expect(w?.message).toContain('a/inner.pdx');
+    });
+
+    it('reads every static form of the import, and not a dynamic import()', () => {
+        file('src/a/inner.pdx', INNER);
+        const forms = [
+            "import './inner.pdx';",
+            'import "./inner.pdx"',
+            "import Inner from './inner.pdx';",
+            "import {\n  type X,\n} from './inner.pdx';",
+            "import {X}from './inner.pdx';",
+            "  import * as I from '../a/inner.pdx';",
+        ];
+        const outer = join(root, 'src/a/outer.pdx').replace(/\\/g, '/');
+        const tags = (script: string) => importedInternals(script, outer, read, 'app').internals.map((x) => x.tag);
+        for (const form of forms) expect(tags(form), form).toEqual(['app-inner']);
+        for (const form of ["const m = import('./inner.pdx');", "import x; const s = './inner.pdx';", "// import './inner.pdx';"]) {
+            expect(tags(form), form).toEqual([]);
+        }
     });
 
     it('a public component imported from another folder is not internal — the control', () => {

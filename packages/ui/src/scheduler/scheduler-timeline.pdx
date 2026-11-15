@@ -1,0 +1,116 @@
+<template>
+  <div class="pdx-scheduler-timeline-probe" aria-hidden="true" :ref="probeEl"></div>
+  <div role="row" class="pdx-scheduler-timeline-head" aria-rowindex="1">
+    <div role="columnheader" class="pdx-scheduler-corner" aria-colindex="1">{{ uiString('scheduler', 'resource') }}</div>
+    @for (cols as vc; track vc.index) {
+      <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-colindex="vc.index + 2" :aria-label="vc.full"
+        :data-today="vc.today ? '' : null" :style="'--_scheduler-col:' + vc.index">{{ vc.text }}</div>
+    }
+  </div>
+  <div role="rowgroup" class="pdx-scheduler-timeline-body">
+    @for (shown as s; track s.row.key) {
+      <div role="row" class="pdx-scheduler-timeline-row" :aria-rowindex="s.index + 2" :aria-level="tree ? s.row.level : null"
+        :aria-posinset="tree ? s.row.posinset : null" :aria-setsize="tree ? s.row.setsize : null" :aria-expanded="s.row.parent ? (s.row.expanded ? 'true' : 'false') : null"
+        :style="'--_scheduler-top:' + s.top + 'px;--_scheduler-lanes:' + s.row.lanes + ';--_scheduler-level:' + s.row.level">
+        <div role="rowheader" class="pdx-scheduler-timeline-resource" data-part="rowHeader" aria-colindex="1" :data-row="s.index" data-col="0"
+          :tabindex="tabCell.row === s.index && tabCell.col === 0 ? 0 : -1">{{ s.row.resource?.label ?? uiString('scheduler', 'timeline') }}</div>
+        @for (cols as vc; track vc.index) {
+          <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.index" :data-col="vc.index + 1" :aria-colindex="vc.index + 2"
+            :data-off="off(s.row, vc.col) ? '' : null" :tabindex="tabCell.row === s.index && tabCell.col === vc.index + 1 ? 0 : -1" :style="'--_scheduler-col:' + vc.index">
+            @for (itemsInColumn(s.row, vc.index, firstColumn) as it; track it.id) {
+              <button type="button" class="pdx-scheduler-event pdx-scheduler-span" data-part="event" tabindex="-1" :data-id="it.event.id"
+                :style="'--_scheduler-from:' + (it.start - vc.index) + ';--_scheduler-length:' + (it.end - it.start) + ';--_scheduler-lane:' + it.lane + eventColorStyle(it.event, rules.resources, s.row.resource)"
+                :data-before="it.before ? '' : null" :data-after="it.after ? '' : null" :aria-label="spanName(it.event, s.row.resource)"
+                :data-movable="canDo(it.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(it.event, draft) ? '' : null">
+                @render event?.(it.event) @else { <span class="pdx-scheduler-event-title">{{ it.event.title }}</span> }
+                @if (canDo(it.event, 'resize', rules)) {
+                  @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
+                  @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
+                }
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (now !== null) {
+      <div class="pdx-scheduler-timeline-now" data-part="nowLine" aria-hidden="true" :style="'--_scheduler-at:' + now"></div>
+    }
+  </div>
+</template>
+
+<script>
+// pdx-scheduler's timeline view (#1020): each resource a row, its children under it, along the
+// period's slots, days or months. Its element IS the grid (or treegrid): the owner gives the tag the
+// role, counts, classes, part, style, ref and handlers, and windows the rows and columns; this file
+// draws the ones in view. Its probe is measured here, and the lane height and column width the theme
+// gives are sent up as `metrics`. Its parts are pdx-scheduler's (#1110).
+@internal;
+import { addDays, onDestroy } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { clockLabel, dayRange } from './labels';
+import { zonedParts, eventInstant } from './time';
+import { eventDates, isAllDay, isBusinessTime, isWorkingDay, type BusinessHours, type SchedulerEvent, type SchedulerResource } from './grid-model';
+import { itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
+import { eventColorStyle } from './event-style';
+import { canDo, isDraggedEvent, type MoveRules } from './event-state';
+import type { Draft } from './scheduler-drag';
+
+/** The rows in view: their index, their top in px, and the row. */
+@prop shown: { index: number; top: number; row: TimelineRow }[] = [];
+/** The columns in view: their index, the column, whether it is today, and its head's text and name. */
+@prop cols: { index: number; col: TimelineColumn; today: boolean; text: string; full: string }[] = [];
+/** The resources nest: the rows are a tree. */
+@prop tree: boolean = false;
+/** The cell the grid's one tab stop is on. */
+@prop tabCell: { row: number; col: number } = { row: 0, col: 0 };
+/** The first column drawn, from which an event that started before it is drawn. */
+@prop firstColumn: number = 0;
+/** Where the current time is along the timeline, in columns; null off the period. */
+@prop now: number | null = null;
+/** The timeline's scale: a year's months have no working hours. */
+@prop scale: 'day' | 'week' | 'month' | 'year' = 'week';
+/** The working hours of a resource without its own. */
+@prop businessHours: BusinessHours = {};
+/** The IANA time zone events are shown in. */
+@prop timeZone: string = '';
+/** The resolved locale dates and times are written in. */
+@prop locale: string = '';
+/** What the pointer may do with an event. */
+@prop rules: MoveRules = { disabled: false, readonly: false, resources: [] };
+/** What a pointer drag would make of an event, drawn in its place. */
+@prop draft: Draft | null = null;
+/** The owner's event snippet, passed on. */
+@slot event?: (event: SchedulerEvent);
+/** The theme's lane height and column width, in px, measured from the probe. */
+@event metrics: { lane: number; column: number };
+
+let probeEl = $signal<HTMLElement | null>(null);
+
+/** A cell outside the working hours of its row's resource: a slot off the hours, a day off. */
+function off(row: TimelineRow, c: TimelineColumn): boolean {
+  if (scale === 'year') return false;
+  const hours = row.resource?.businessHours ?? businessHours;
+  return c.minutes === null ? !isWorkingDay(c.date, hours) : !isBusinessTime(c.date, c.minutes, hours);
+}
+/** An event's name: its title, its start time (or «All day») and its days, the row's resource. */
+function spanName(e: SchedulerEvent, resource: SchedulerResource | null): string {
+  const d = eventDates(e, timeZone);
+  const days = dayRange(d.from, addDays(d.to, -1), locale);
+  const when = (isAllDay(e) ? uiString('scheduler', 'allDay') : clockLabel(zonedParts(eventInstant(e.start, timeZone), timeZone).minutes, locale)) + ', ' + days;
+  return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (resource ? ', ' + resource.label : '');
+}
+
+// A lane's height and a column's width are the theme's (`--pdx-scheduler-lane-height`,
+// `--pdx-scheduler-timeline-column`): the probe is sized by them, and measured again when they change.
+let last = { lane: 0, column: 0 };
+const probeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
+  const r = entry.target.getBoundingClientRect();
+  if (r.height > 0 && r.width > 0 && (r.height !== last.lane || r.width !== last.column)) {
+    last = { lane: r.height, column: r.width };
+    metrics(last);
+  }
+});
+$watch(probeEl, (probe) => { probeObserver?.disconnect(); if (probe) probeObserver?.observe(probe); });
+onDestroy(() => probeObserver?.disconnect());
+</script>

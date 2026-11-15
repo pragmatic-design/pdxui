@@ -25,49 +25,13 @@
       <pdx-scheduler-agenda :groups="agendaGroups" :today="todayDate" :label-id="periodId" :locale="loc" :resources="resources" :event="event"
         @click="onClick($event)"></pdx-scheduler-agenda>
     } @else if (view === 'timeline') {
-      <div class="pdx-scheduler-timeline" data-part="grid" :role="isTree ? 'treegrid' : 'grid'" :aria-labelledby="periodId" aria-readonly="true"
+      <pdx-scheduler-timeline class="pdx-scheduler-timeline" data-part="grid" :role="isTree ? 'treegrid' : 'grid'" :aria-labelledby="periodId" aria-readonly="true"
         :aria-rowcount="tlRows.length + 1" :aria-colcount="tlColumns.length + 1" :ref="gridEl"
         :style="'--_scheduler-cols:' + tlColumns.length + ';--_scheduler-height:' + tlWindow.height() + 'px'"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)">
-        <div class="pdx-scheduler-timeline-probe" aria-hidden="true" :ref="probeEl"></div>
-        <div role="row" class="pdx-scheduler-timeline-head" aria-rowindex="1">
-          <div role="columnheader" class="pdx-scheduler-corner" aria-colindex="1">{{ uiString('scheduler', 'resource') }}</div>
-          @for (tlCols as vc; track vc.index) {
-            <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-colindex="vc.index + 2" :aria-label="vc.full"
-              :data-today="vc.today ? '' : null" :style="'--_scheduler-col:' + vc.index">{{ vc.text }}</div>
-          }
-        </div>
-        <div role="rowgroup" class="pdx-scheduler-timeline-body">
-          @for (tlShown as s; track s.row.key) {
-            <div role="row" class="pdx-scheduler-timeline-row" :aria-rowindex="s.index + 2" :aria-level="isTree ? s.row.level : null"
-              :aria-posinset="isTree ? s.row.posinset : null" :aria-setsize="isTree ? s.row.setsize : null" :aria-expanded="s.row.parent ? (s.row.expanded ? 'true' : 'false') : null"
-              :style="'--_scheduler-top:' + s.top + 'px;--_scheduler-lanes:' + s.row.lanes + ';--_scheduler-level:' + s.row.level">
-              <div role="rowheader" class="pdx-scheduler-timeline-resource" data-part="rowHeader" aria-colindex="1" :data-row="s.index" data-col="0"
-                :tabindex="tabCell.row === s.index && tabCell.col === 0 ? 0 : -1">{{ s.row.resource?.label ?? uiString('scheduler', 'timeline') }}</div>
-              @for (tlCols as vc; track vc.index) {
-                <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.index" :data-col="vc.index + 1" :aria-colindex="vc.index + 2"
-                  :data-off="tlOff(s.row, vc.col) ? '' : null" :tabindex="tabCell.row === s.index && tabCell.col === vc.index + 1 ? 0 : -1" :style="'--_scheduler-col:' + vc.index">
-                  @for (itemsInColumn(s.row, vc.index, tlWindow.firstColumn()) as it; track it.id) {
-                    <button type="button" class="pdx-scheduler-event pdx-scheduler-span" data-part="event" tabindex="-1" :data-id="it.event.id"
-                      :style="'--_scheduler-from:' + (it.start - vc.index) + ';--_scheduler-length:' + (it.end - it.start) + ';--_scheduler-lane:' + it.lane + colorStyle(it.event, s.row.resource)"
-                      :data-before="it.before ? '' : null" :data-after="it.after ? '' : null" :aria-label="spanName(it.event, s.row.resource)"
-                      :data-movable="canMove(it.event) ? '' : null" :data-dragging="isDragged(it.event) ? '' : null">
-                      @render event?.(it.event) @else { <span class="pdx-scheduler-event-title">{{ it.event.title }}</span> }
-                      @if (canResize(it.event)) {
-                        @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                        @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-                      }
-                    </button>
-                  }
-                </div>
-              }
-            </div>
-          }
-          @if (tlNow !== null) {
-            <div class="pdx-scheduler-timeline-now" data-part="nowLine" aria-hidden="true" :style="'--_scheduler-at:' + tlNow"></div>
-          }
-        </div>
-      </div>
+        :shown="tlShown" :cols="tlCols" :tree="isTree" :tab-cell="tabCell" :first-column="tlWindow.firstColumn()" :now="tlNow" :scale="timelineScale"
+        :business-hours="businessHours" :time-zone="zone" :locale="loc" :rules="moveRules" :draft="draft" :event="event"
+        @metrics="metrics = $event.detail"
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)"></pdx-scheduler-timeline>
     } @else {
       <div class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
         :aria-rowcount="headerRows.length + 1 + slots.length" :aria-colcount="columns.length + 1"
@@ -180,13 +144,13 @@
 import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, today, useDropZone } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
-import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, eventInstant } from './time';
-import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
+import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts } from './time';
+import { buildColumns, buildSlots, buildHeaderRows, cellIndex, placeTimed, placeAllDay, isBusinessTime, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
 import { buildMonthWeeks, buildYearMonths, buildAgendaDays } from './calendar-model';
-import { timelineRows, timelineColumns, placeTimeline, axisPosition, itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
+import { timelineRows, timelineColumns, placeTimeline, axisPosition } from './timeline-model';
 import { timelineWindow } from './timeline-window';
 import { slotWindow } from './time-window';
-import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, weekdayName, timelineHeader } from './labels';
+import { periodLabel, dayHeader, clockLabel, spanLabel, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { conflicts, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft, type Gesture } from './scheduler-drag';
@@ -195,6 +159,7 @@ import { eventColorStyle, resourceLabels } from './event-style';
 import { DRAFT_ID, canDo, isDraggedEvent } from './event-state';
 import './scheduler-agenda.pdx';
 import './scheduler-month.pdx';
+import './scheduler-timeline.pdx';
 import './scheduler-year.pdx';
 import '@pdxui/design/components/scheduler';
 
@@ -293,8 +258,7 @@ let yearDay = $signal('');
 let now = $signal(Date.now());
 /** The timeline's parents the reader collapsed. */
 let collapsed = $signal<ReadonlySet<string>>(new Set());
-/** The timeline's hidden probe, and the lane height and column width it measures from the theme, in px. */
-let probeEl = $signal<HTMLElement | null>(null);
+/** The lane height and column width the timeline view measures from the theme, in px. */
 let metrics = $signal({ lane: 32, column: 80 });
 /** The time grid's hidden probe, and the slot height it measures from the theme, in px. */
 let slotProbeEl = $signal<HTMLElement | null>(null);
@@ -405,19 +369,6 @@ function allDayName(e: SchedulerEvent, c: Column): string {
 }
 /** An event's colour: its own, else the colour of the resource it is drawn for, else its first resource's. */
 function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string { return eventColorStyle(e, resources, resource); }
-/** A timeline cell outside the working hours of its row's resource: a slot off the hours, a day off. */
-function tlOff(row: TimelineRow, c: TimelineColumn): boolean {
-  if (timelineScale === 'year') return false;
-  const hours = row.resource?.businessHours ?? businessHours;
-  return c.minutes === null ? !isWorkingDay(c.date, hours) : !isBusinessTime(c.date, c.minutes, hours);
-}
-/** A timeline event's name: its title, its start time (or «All day») and its days, the row's resource. */
-function spanName(e: SchedulerEvent, resource: SchedulerResource | null): string {
-  const d = eventDates(e, zone);
-  const days = dayRange(d.from, addDays(d.to, -1), loc);
-  const when = (isAllDay(e) ? uiString('scheduler', 'allDay') : clockLabel(zonedParts(eventInstant(e.start, zone), zone).minutes, loc)) + ', ' + days;
-  return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (resource ? ', ' + resource.label : '');
-}
 
 // ─── The period ────────────────────────────────────────────────────────────────
 
@@ -713,14 +664,7 @@ const slotProbeObserver = typeof ResizeObserver === 'undefined' ? null : new Res
   if (h > 0 && h !== slotPx) slotPx = h;
 });
 $watch(slotProbeEl, (probe) => { slotProbeObserver?.disconnect(); if (probe) slotProbeObserver?.observe(probe); });
-// A lane's height and a column's width are the theme's (`--pdx-scheduler-lane-height`,
-// `--pdx-scheduler-timeline-column`): the probe is sized by them, and measured again when they change.
-const probeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
-  const r = entry.target.getBoundingClientRect();
-  if (r.height > 0 && r.width > 0 && (r.height !== metrics.lane || r.width !== metrics.column)) metrics = { lane: r.height, column: r.width };
-});
-$watch(probeEl, (probe) => { probeObserver?.disconnect(); if (probe) probeObserver?.observe(probe); });
 let clock: ReturnType<typeof setInterval> | undefined;
 onMount(() => { clock = setInterval(() => { now = Date.now(); }, 60_000); });
-onDestroy(() => { if (clock !== undefined) clearInterval(clock); probeObserver?.disconnect(); slotProbeObserver?.disconnect(); tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose(); });
+onDestroy(() => { if (clock !== undefined) clearInterval(clock); slotProbeObserver?.disconnect(); tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose(); });
 </script>
