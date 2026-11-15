@@ -11,6 +11,7 @@ import type { TemplateNode } from './parser/template';
 import type { ValidationWarning } from './compiler/validate';
 import { usesOf } from './compiler/validate-required-slots';
 import { deriveTag } from './compiler/codegen-shared';
+import { parseSFC } from './parser/sfc';
 
 /** The internal component a tag registers: the file that declares it. */
 export interface InternalComponent { tag: string; file: string }
@@ -25,12 +26,9 @@ const TAG_RUNE = /^[ \t]*@tag\s+['"]([^'"]+)['"]/m;
 // Match: a static import of a relative `.pdx` file, bare or with bindings. Groups: [1]=the specifier
 const PDX_IMPORT = /^[ \t]*import\s+(?:[^'"]*?\s+from\s+)?['"](\.{1,2}\/[^'"]+\.pdx)['"]/gm;
 
-/** The script of a `.pdx` source: the text between its `<script…>` and `</script>`, or ''. */
+/** The script of a `.pdx` source, as the compiler's own SFC parser reads it, or ''. */
 function scriptOf(source: string): string {
-    const open = /<script\b[^>]*>/.exec(source);
-    if (!open) return '';
-    const end = source.indexOf('</script>', open.index + open[0].length);
-    return source.slice(open.index + open[0].length, end === -1 ? source.length : end);
+    return parseSFC(source).script?.content ?? '';
 }
 
 /** Whether a `.pdx` source declares `@internal`. */
