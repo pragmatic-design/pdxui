@@ -173,6 +173,20 @@ test.describe('the scheduler receiving a drop from outside', () => {
         expect((await model(page)).at(-1)).toEqual(expect.objectContaining({ title: 'Site visit', start: '2026-09-24T12:00:00.000Z', end: '2026-09-24T13:00:00.000Z' }));
     });
 
+    test('in the month, a drop on a day asks external-drop for that whole day', async ({ page }) => {
+        // The month's grid is the view's own element since the split by view (#1020), and the drop zone
+        // registered on it is what receives the drop.
+        const s = await openExternal(page);
+        await s.evaluate((host) => { (host as unknown as { view: string }).view = 'month'; });
+        await expect(s.locator('[role="grid"].pdx-scheduler-month')).toHaveCount(1);
+        await record(page, ['external-drop', 'create']);
+        // From Monday 31 August: Thursday 24 September is week row 3, column 3. Midnight in Rome is 22:00 UTC.
+        await dropPuck(page, s, 3, 3);
+        const got = await events(page);
+        expect(got.map((e) => e.type)).toEqual(['external-drop', 'create']);
+        expect(got[0].detail).toEqual(expect.objectContaining({ start: '2026-09-23T22:00:00.000Z', end: '2026-09-24T22:00:00.000Z', allDay: true }));
+    });
+
     test('preventDefault() on external-drop leaves the events as they were', async ({ page }) => {
         const s = await openExternal(page);
         await record(page, ['external-drop', 'create', 'rejected'], ['external-drop']);

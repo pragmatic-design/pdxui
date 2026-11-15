@@ -14,45 +14,10 @@
       }
     </div>
     @if (view === 'month') {
-      <div class="pdx-scheduler-grid pdx-scheduler-month" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
+      <pdx-scheduler-month class="pdx-scheduler-grid pdx-scheduler-month" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
         :style="'--_scheduler-cols:' + perWeek + ';--_scheduler-lanes:' + dayMaxEvents" :ref="gridEl"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)">
-        <div role="row" class="pdx-scheduler-row pdx-scheduler-head">
-          @for (monthHeads as h; track h.key) {
-            <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-label="h.full">{{ h.short }}</div>
-          }
-        </div>
-        @for (monthWeeks as w, wi; track w.key) {
-          <div role="row" class="pdx-scheduler-row">
-            @for (w.days as d, di; track d) {
-              <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-day" data-part="slot" :data-row="wi" :data-col="di"
-                :data-outside="d.slice(0, 7) === refDate.slice(0, 7) ? null : ''" :data-today="d === todayDate ? '' : null" :aria-current="d === todayDate ? 'date' : null"
-                :tabindex="tabCell.row === wi && tabCell.col === di ? 0 : -1">
-                <span class="pdx-scheduler-day-number" aria-hidden="true">{{ dayHeader(d, loc).day }}</span>
-                <span class="pdx-sr-only">{{ dayHeader(d, loc).full }}</span>
-                @for (itemsAt(w, di) as it; track it.id) {
-                  <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" :data-line="it.bar ? null : ''" data-part="event" tabindex="-1" :data-id="it.event.id"
-                    :style="'--_scheduler-span:' + it.span + ';--_scheduler-lane:' + it.lane + colorStyle(it.event)" :data-movable="canMove(it.event) ? '' : null" :data-dragging="isDragged(it.event) ? '' : null"
-                    :data-before="it.before ? '' : null" :data-after="it.after ? '' : null" :aria-label="dayEventName(it.event, it.minutes, w, it.first, it.span)">
-                    @render event?.(it.event) @else {
-                      @if (!it.bar) { <span class="pdx-scheduler-event-time">{{ clockLabel(it.minutes ?? 0, loc) }}</span> }
-                      <span class="pdx-scheduler-event-title">{{ it.event.title }}</span>
-                    }
-                    @if (it.bar && canResize(it.event)) {
-                      @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                      @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-                    }
-                  </button>
-                }
-                @if (w.more[di] > 0) {
-                  <button type="button" class="pdx-scheduler-more" data-part="more" tabindex="-1" :data-date="d"
-                    :aria-label="format(uiString('scheduler', 'moreName'), { count: w.more[di], date: dayHeader(d, loc).full })">{{ format(uiString('scheduler', 'more'), { count: w.more[di] }) }}</button>
-                }
-              </div>
-            }
-          </div>
-        }
-      </div>
+        :weeks="monthWeeks" :heads="monthHeads" :ref-date="refDate" :today="todayDate" :tab-cell="tabCell" :locale="loc" :rules="moveRules" :draft="draft" :event="event"
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)"></pdx-scheduler-month>
     } @else if (view === 'year') {
       <pdx-scheduler-year :months="yearMonths" :cursor="yearCursor" :today="todayDate" :locale="loc" :ref="gridEl"
         @keydown="onYearKey($event)" @click="onYearClick($event)"></pdx-scheduler-year>
@@ -217,17 +182,19 @@ import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, eventInstant } from './time';
 import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
-import { buildMonthWeeks, buildYearMonths, buildAgendaDays, type MonthWeek } from './calendar-model';
+import { buildMonthWeeks, buildYearMonths, buildAgendaDays } from './calendar-model';
 import { timelineRows, timelineColumns, placeTimeline, axisPosition, itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
 import { timelineWindow } from './timeline-window';
 import { slotWindow } from './time-window';
 import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
-import { allowed, conflicts, type DropPoint, type Placement } from './drag-model';
+import { conflicts, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft, type Gesture } from './scheduler-drag';
 import { cellAt, pointOfCell } from './drop-point';
 import { eventColorStyle, resourceLabels } from './event-style';
+import { DRAFT_ID, canDo, isDraggedEvent } from './event-state';
 import './scheduler-agenda.pdx';
+import './scheduler-month.pdx';
 import './scheduler-year.pdx';
 import '@pdxui/design/components/scheduler';
 
@@ -235,8 +202,6 @@ type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'tim
 const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
 /** What a cell's Enter goes into: its events, and a month day's «+N». */
 const INNER = '[data-part="event"], [data-part="more"]';
-/** The id the range being created is drawn under while it is dragged. */
-const DRAFT_ID = 'pdx-scheduler-draft';
 type Range = { start: string; end: string; resource?: string | string[] };
 
 /** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. Written by the scheduler after a move, resize or create the app allowed. */
@@ -369,6 +334,8 @@ const headerRows = $derived(buildHeaderRows(columns, range.days, resources, grou
   corners: { time: uiString('scheduler', 'time'), resource: uiString('scheduler', 'resource') },
 }));
 const perWeek = $derived(weekends ? 7 : 5);
+/** What the pointer may do with an event, for this file and the views it draws them in. */
+const moveRules = $derived({ disabled, readonly, resources });
 const monthWeeks = $derived(view === 'month' ? buildMonthWeeks(range.days, perWeek, shown, zone, dayMaxEvents) : []);
 const monthHeads = $derived(monthWeeks.length ? monthWeeks[0].days.map((d) => ({ key: d, ...weekdayName(d, loc) })) : []);
 const yearMonths = $derived(view === 'year' ? buildYearMonths(range.start, weekStart, events, zone) : []);
@@ -422,7 +389,6 @@ function eventsAt(ci: number, ri: number): PlacedEvent[] {
   return above ? [...above, ...own] : own;
 }
 function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
-function itemsAt(w: MonthWeek, di: number) { return w.items.filter((it) => it.first === di); }
 function viewName(v: CalendarView): string { return v === 'days' ? format(uiString('scheduler', 'daysView'), { count: days }) : uiString('scheduler', v); }
 function offHours(c: Column, minutes: number): boolean { return !isBusinessTime(c.date, minutes, c.resource?.businessHours ?? businessHours); }
 function timeOf(p: PlacedEvent): string {
@@ -436,12 +402,6 @@ function timedName(p: PlacedEvent, c: Column): string {
 }
 function allDayName(e: SchedulerEvent, c: Column): string {
   return format(uiString('scheduler', 'eventName'), { title: e.title, when: uiString('scheduler', 'allDay') + ', ' + dayHeader(c.date, loc).full }) + where(c);
-}
-/** A month's event: its time (or «All day») and its days in this week, then its resources. */
-function dayEventName(e: SchedulerEvent, minutes: number | null, w: MonthWeek, first: number, span: number): string {
-  const when = (minutes === null ? uiString('scheduler', 'allDay') : clockLabel(minutes, loc)) + ', ' + dayRange(w.days[first], w.days[first + span - 1], loc);
-  const names = resourceNames(e);
-  return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (names ? ', ' + names : '');
 }
 /** An event's colour: its own, else the colour of the resource it is drawn for, else its first resource's. */
 function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string { return eventColorStyle(e, resources, resource); }
@@ -628,9 +588,9 @@ function placed(e: SchedulerEvent, p: Placement): SchedulerEvent {
   if (p.resource === undefined) delete next.resource; else next.resource = p.resource;
   return next;
 }
-function canMove(e: SchedulerEvent): boolean { return !disabled && e.id !== DRAFT_ID && allowed(e, 'move', resources, { readonly }); }
-function canResize(e: SchedulerEvent): boolean { return !disabled && e.id !== DRAFT_ID && allowed(e, 'resize', resources, { readonly }); }
-function isDragged(e: SchedulerEvent): boolean { return draft !== null && (e.id === draft.id || (draft.id === '' && e.id === DRAFT_ID)); }
+function canMove(e: SchedulerEvent): boolean { return canDo(e, 'move', moveRules); }
+function canResize(e: SchedulerEvent): boolean { return canDo(e, 'resize', moveRules); }
+function isDragged(e: SchedulerEvent): boolean { return isDraggedEvent(e, draft); }
 const rangeOf = (r: { start: string; end: string; resource?: string | string[] }): Range => (r.resource === undefined ? { start: r.start, end: r.end } : { start: r.start, end: r.end, resource: r.resource });
 
 /** The drop point under the viewport point (`x`, `y`), in the grid on screen; null outside its cells. */
