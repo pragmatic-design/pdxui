@@ -142,21 +142,31 @@ test.describe('the time grid draws the slots in view (#1085)', () => {
 });
 
 test.describe('the current-time line', () => {
-    test('is one line, across its day, at its minute of its slot', async ({ page }) => {
-        // Wednesday 23 September 2026, 09:15 in Rome (07:15 UTC, summer time): column 2, the 09:00
-        // slot (row 3 from 08:00, row 0 being the all-day row), half way down it.
-        await page.clock.setFixedTime(new Date('2026-09-23T07:15:00.000Z'));
-        await goToScenario(page, SCENARIO, THEME, { page: scenarioPage[SCENARIO], scheme: schemeFor(THEME) });
-        const scheduler = page.locator(`section:not([hidden]) ${root}`);
-        // The scenario turns the line off, so the visual baselines do not move with the clock.
-        await scheduler.evaluate((el) => { (el as unknown as { nowIndicator: boolean }).nowIndicator = true; });
-        const line = scheduler.locator('[data-part="nowLine"]');
-        await expect(line).toHaveCount(1);
-        const cell = await scheduler.locator('[data-row="3"][data-col="2"]').boundingBox();
-        const box = await line.boundingBox();
-        expect(cell && box, 'the line and its cell are drawn').toBeTruthy();
-        expect(Math.abs(box!.y - (cell!.y + cell!.height / 2)), `line at ${box!.y}, the slot ${cell!.y}–${cell!.y + cell!.height}`).toBeLessThanOrEqual(1.5);
-        expect(Math.abs(box!.x - cell!.x), 'the line starts at its day').toBeLessThanOrEqual(1.5);
-        expect(Math.abs(box!.width - cell!.width), 'the line spans its day').toBeLessThanOrEqual(1.5);
+    test('is one line, across its day, at its minute of its slot', async ({ browser }) => {
+        // A context of its own, closed with the test: a clock is installed on the whole context, and
+        // the certify fixture shares one context among a worker's tests and cannot take a clock off.
+        // Installed there, the fixed clock reached every later page of the worker, and a later test's
+        // page lost its execution context mid-evaluate (#1094).
+        const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+        try {
+            const page = await context.newPage();
+            // Wednesday 23 September 2026, 09:15 in Rome (07:15 UTC, summer time): column 2, the 09:00
+            // slot (row 3 from 08:00, row 0 being the all-day row), half way down it.
+            await page.clock.setFixedTime(new Date('2026-09-23T07:15:00.000Z'));
+            await goToScenario(page, SCENARIO, THEME, { page: scenarioPage[SCENARIO], scheme: schemeFor(THEME) });
+            const scheduler = page.locator(`section:not([hidden]) ${root}`);
+            // The scenario turns the line off, so the visual baselines do not move with the clock.
+            await scheduler.evaluate((el) => { (el as unknown as { nowIndicator: boolean }).nowIndicator = true; });
+            const line = scheduler.locator('[data-part="nowLine"]');
+            await expect(line).toHaveCount(1);
+            const cell = await scheduler.locator('[data-row="3"][data-col="2"]').boundingBox();
+            const box = await line.boundingBox();
+            expect(cell && box, 'the line and its cell are drawn').toBeTruthy();
+            expect(Math.abs(box!.y - (cell!.y + cell!.height / 2)), `line at ${box!.y}, the slot ${cell!.y}–${cell!.y + cell!.height}`).toBeLessThanOrEqual(1.5);
+            expect(Math.abs(box!.x - cell!.x), 'the line starts at its day').toBeLessThanOrEqual(1.5);
+            expect(Math.abs(box!.width - cell!.width), 'the line spans its day').toBeLessThanOrEqual(1.5);
+        } finally {
+            await context.close();
+        }
     });
 });
