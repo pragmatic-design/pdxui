@@ -50,15 +50,68 @@ function writeTarget(n: ts.Node): ts.Expression | null {
     return null;
 }
 
-/** CD-S2: a member written through a value that came from a $derived — directly or through locals. */
+/** The identifiers a binding declares: `a`, and every name of a destructuring. */
+function boundIdentifiers(name: ts.BindingName): ts.Identifier[] {
+    if (ts.isIdentifier(name)) return [name];
+    return name.elements.flatMap((e) => (ts.isOmittedExpression(e) ? [] : boundIdentifiers(e.name)));
+}
+
+/** The identifiers a list of statements declares at its own level: variables, functions, classes. */
+function statementBindings(statements: readonly ts.Statement[]): ts.Identifier[] {
+    const out: ts.Identifier[] = [];
+    for (const st of statements) {
+        if (ts.isVariableStatement(st)) for (const d of st.declarationList.declarations) out.push(...boundIdentifiers(d.name));
+        else if ((ts.isFunctionDeclaration(st) || ts.isClassDeclaration(st)) && st.name) out.push(st.name);
+    }
+    return out;
+}
+
+/** The identifiers one scope node declares for the code inside it. */
+function scopeBindings(scope: ts.Node): ts.Identifier[] {
+    if (ts.isSourceFile(scope) || ts.isBlock(scope) || ts.isModuleBlock(scope) || ts.isCaseClause(scope) || ts.isDefaultClause(scope)) {
+        return statementBindings(scope.statements);
+    }
+    if (ts.isFunctionLike(scope)) {
+        const own = (ts.isFunctionExpression(scope) || ts.isClassExpression(scope)) && scope.name ? [scope.name] : [];
+        return [...own, ...scope.parameters.flatMap((p) => boundIdentifiers(p.name))];
+    }
+    if ((ts.isForStatement(scope) || ts.isForOfStatement(scope) || ts.isForInStatement(scope))
+        && scope.initializer && ts.isVariableDeclarationList(scope.initializer)) {
+        return scope.initializer.declarations.flatMap((d) => boundIdentifiers(d.name));
+    }
+    if (ts.isCatchClause(scope) && scope.variableDeclaration) return boundIdentifiers(scope.variableDeclaration.name);
+    return [];
+}
+
+/**
+ * The identifier that declares `name` where `at` reads it: the nearest scope outward, the way the
+ * language resolves it. Undefined for a name no scope of the script declares (a global, an import).
+ */
+function declarationOf(name: string, at: ts.Node): ts.Identifier | undefined {
+    for (let scope: ts.Node | undefined = at.parent; scope; scope = scope.parent) {
+        const found = scopeBindings(scope).find((id) => id.text === name);
+        if (found) return found;
+    }
+    return undefined;
+}
+
+/**
+ * CD-S2: a member written through a value that came from a $derived — directly or through locals.
+ * By DECLARATION, not by name (#1066): the parameter `b` of one callback and the `const b` of a loop
+ * elsewhere are two variables, and only the one reached from the $derived is.
+ */
 function checkDerivedWrites(sf: ts.SourceFile, deriveds: Set<string>, at: (n: ts.Node) => number): ValidationWarning[] {
-    // name → the $derived it was reached from.
-    const from = new Map<string, string>([...deriveds].map(d => [d, d]));
+    // The declaring identifier → the $derived it was reached from. The $deriveds are the script's own.
+    const from = new Map<ts.Identifier, string>(statementBindings(sf.statements).filter((id) => deriveds.has(id.text)).map((id) => [id, id.text]));
+    const originOf = (id: ts.Identifier): string | undefined => {
+        const decl = declarationOf(id.text, id);
+        return decl ? from.get(decl) : undefined;
+    };
     const taint = (name: ts.BindingName, source: ts.Expression): boolean => {
         const root = rootOf(source);
-        const origin = root ? from.get(root.text) : undefined;
-        if (!origin || !ts.isIdentifier(name) || from.has(name.text)) return false;
-        from.set(name.text, origin);
+        const origin = root ? originOf(root) : undefined;
+        if (!origin || !ts.isIdentifier(name) || from.has(name)) return false;
+        from.set(name, origin);
         return true;
     };
     // To a fixed point: `const s = x.find(…)` then `for (const i of s.children)` is two steps.
@@ -85,7 +138,7 @@ function checkDerivedWrites(sf: ts.SourceFile, deriveds: Set<string>, at: (n: ts
         const target = writeTarget(n);
         if (target && (ts.isPropertyAccessExpression(target) || ts.isElementAccessExpression(target))) {
             const root = rootOf(target);
-            const origin = root ? from.get(root.text) : undefined;
+            const origin = root ? originOf(root) : undefined;
             if (origin) {
                 warnings.push({
                     code: 'PDX_DERIVED_WRITE',

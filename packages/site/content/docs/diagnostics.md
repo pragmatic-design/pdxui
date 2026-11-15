@@ -296,9 +296,9 @@ It finds whatever matches in the whole page — another instance included — an
 
 ### PDX_DUP_DECLARATION
 
-*error* — The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables.
+*error* — The same name declared twice at the top of the script: runes, `@prop`, imports, functions, classes, plain variables.
 
-The compiled component keeps one of them, and nothing says which. A signal is renamed in the output, so a `$signal` and a `function` of one name do not even clash as JavaScript would: the template sees whichever the component returns last.
+The compiled component keeps one of them, and nothing says which. A signal is renamed in the output, so a `$signal` and a `function` of one name do not even clash as JavaScript would: the template sees whichever the component returns last. An import and a declaration of its name do clash (#1066): the module does not load, with `Identifier has already been declared` from the browser instead of a line of the `.pdx`.
 
 **Fix.** Rename one, or remove the one you do not mean.
 
@@ -1179,7 +1179,7 @@ write:
 
 ### PDX_PART_NAME_TAKEN
 
-*info* — A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, a function, a constant), with no `:ref` on its element.
+*info* — A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, an import, a function, a constant), with no `:ref` on its element.
 
 A part's name is chosen by the styling contract, and the script's name keeps its meaning (#999): `@prop label` stays the label text where a part `label` would have replaced it with the element. The part is still the template's and the theme's — its `data-part`, the manifest — but the script does not read its element by that name, and with no `:ref` it does not reach it at all.
 

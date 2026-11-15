@@ -1355,9 +1355,11 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // once the template is read (codegen-new).
     // A name the script already declares is left to that declaration (#999): a `$signal` receives the
     // element; any other name keeps its meaning, and the part is the template's and the theme's only
-    // (PDX_PART_NAME_TAKEN, validate-parts.ts).
+    // (PDX_PART_NAME_TAKEN, validate-parts.ts). An import is a declaration too (#1066): a part signal
+    // of its name replaced it, and every call of the import called the element's signal.
+    const importedHere = new Set(importedNames);
     for (const name of parts) {
-        if (signals.some(s => s.name === name) || props.some(p => p.name === name) || exports.some(e => e.name === name)) continue;
+        if (signals.some(s => s.name === name) || props.some(p => p.name === name) || exports.some(e => e.name === name) || importedHere.has(name)) continue;
         signals.push({ name, initialExpr: 'null', part: true });
         exports.push({ name, kind: 'signal' });
         // As a `$signal` does: a component whose only declaration is a part would call it unimported.

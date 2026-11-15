@@ -38,8 +38,8 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
   one raises `PDX_PRIVATE_REF` (error). A prop, an event, a snippet and an import reach the template
   whatever they are called.
 - **The rest is TypeScript**, type-erased (file.md). A syntax error raises
-  `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, functions,
-  classes, variables) raise `PDX_DUP_DECLARATION`.
+  `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, imports,
+  functions, classes, variables) raise `PDX_DUP_DECLARATION`.
 - **Nothing is exported.** The script is the body of the component's setup, run once per instance.
   An `export` of a value raises `PDX_SCRIPT_EXPORT`, and the declaration is compiled without it; a
   type export is erased like any type. What other files share goes in a `.ts` module. A `@store`
@@ -559,7 +559,7 @@ element or `null`.
 - An array part follows every element that comes or goes at once, and is put back in document order
   in a microtask; a row that only moves keeps its place until an element comes or goes.
 - A name the script declares itself is that declaration (#999). A `$signal` receives the part's
-  element; a `@prop`, a `@model`, a function or a constant keeps its meaning, the element is not bound
+  element; a `@prop`, a `@model`, an import (#1066), a function or a constant keeps its meaning, the element is not bound
   to it, and a `:ref` on the element reaches it; without one, `PDX_PART_NAME_TAKEN` (info) says so.
 
 #### Examples

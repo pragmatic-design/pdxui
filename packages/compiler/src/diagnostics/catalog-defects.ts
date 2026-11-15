@@ -173,8 +173,8 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_DUP_DECLARATION: {
         severity: 'error', category: 'defect',
-        summary: 'The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables.',
-        explanation: 'The compiled component keeps one of them, and nothing says which. A signal is renamed in the output, so a `$signal` and a `function` of one name do not even clash as JavaScript would: the template sees whichever the component returns last.',
+        summary: 'The same name declared twice at the top of the script: runes, `@prop`, imports, functions, classes, plain variables.',
+        explanation: 'The compiled component keeps one of them, and nothing says which. A signal is renamed in the output, so a `$signal` and a `function` of one name do not even clash as JavaScript would: the template sees whichever the component returns last. An import and a declaration of its name do clash (#1066): the module does not load, with `Identifier has already been declared` from the browser instead of a line of the `.pdx`.',
         fix: 'Rename one, or remove the one you do not mean.',
         reproducedIn: `${T}duplicate-declarations.test.ts`,
     },
@@ -359,7 +359,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_PART_NAME_TAKEN: {
         severity: 'info', category: 'defect',
-        summary: 'A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, a function, a constant), with no `:ref` on its element.',
+        summary: 'A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, an import, a function, a constant), with no `:ref` on its element.',
         explanation: 'A part\'s name is chosen by the styling contract, and the script\'s name keeps its meaning (#999): `@prop label` stays the label text where a part `label` would have replaced it with the element. The part is still the template\'s and the theme\'s — its `data-part`, the manifest — but the script does not read its element by that name, and with no `:ref` it does not reach it at all.',
         fix: 'To reach the element, bind it with `:ref` to a `$signal` of another name. A `$signal` of the part\'s own name receives the element, as a part does. A part only a theme needs can stay as it is: the finding is information.',
         example: { bad: pdx('<span data-part="label">{{ label }}</span>', "@prop label: string = '';\n@part label;"), good: pdx('<span data-part="label" :ref="labelEl">{{ label }}</span>', "@prop label: string = '';\n@part label;\nlet labelEl = $signal<HTMLElement | null>(null);") },
