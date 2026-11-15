@@ -33,70 +33,14 @@
         @metrics="metrics = $event.detail"
         @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)"></pdx-scheduler-timeline>
     } @else {
-      <div class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
+      <pdx-scheduler-time-grid class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
         :aria-rowcount="headerRows.length + 1 + slots.length" :aria-colcount="columns.length + 1"
         :style="'--_scheduler-cols:' + columns.length + ';--_scheduler-heads:' + headerRows.length + ';--_scheduler-lanes:' + allDay.lanes + ';--_scheduler-slots:' + slots.length" :ref="gridEl"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)">
-        <div class="pdx-scheduler-slot-probe" aria-hidden="true" :ref="slotProbeEl"></div>
-        @for (headerRows as hr, hi; track hr.key) {
-          <div role="row" class="pdx-scheduler-row pdx-scheduler-head" :aria-rowindex="hi + 1">
-            <div role="columnheader" class="pdx-scheduler-corner"><span class="pdx-sr-only">{{ hr.corner }}</span></div>
-            @for (hr.cells as h; track h.key) {
-              <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-label="h.full"
-                :aria-colspan="h.span > 1 ? h.span : null" :style="'grid-column: span ' + h.span" :data-today="h.today ? '' : null">{{ h.text }}</div>
-            }
-          </div>
-        }
-        <div role="row" class="pdx-scheduler-row" data-part="allDayRow" :aria-rowindex="headerRows.length + 1">
-          <div role="rowheader" class="pdx-scheduler-time pdx-scheduler-allday-label">{{ uiString('scheduler', 'allDay') }}</div>
-          @for (columns as c, ci; track c.key) {
-            <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-allday" data-part="slot" data-row="0" :data-col="ci" :tabindex="tabCell.row === 0 && tabCell.col === ci ? 0 : -1" :style="'--_scheduler-col:' + ci">
-              @for (barsAt(ci) as b; track b.id) {
-                <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" tabindex="-1" :data-id="b.id"
-                  :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + colorStyle(b.event, c.resource)"
-                  :data-before="b.before ? '' : null" :data-after="b.after ? '' : null" :aria-label="allDayName(b.event, c)"
-                  :data-movable="canMove(b.event) ? '' : null" :data-dragging="isDragged(b.event) ? '' : null">
-                  @render event?.(b.event) @else { <span class="pdx-scheduler-event-title">{{ b.event.title }}</span> }
-                  @if (canResize(b.event)) {
-                    @if (!b.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                    @if (!b.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-                  }
-                </button>
-              }
-            </div>
-          }
-        </div>
-        @for (shownSlots as s; track s.m) {
-          <div role="row" class="pdx-scheduler-row" data-slot-row :aria-rowindex="headerRows.length + 2 + s.ri" :style="'--_scheduler-row:' + (headerRows.length + 2 + s.ri)">
-            <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="s.m % 60 === 0 ? '' : null" :data-first="s.ri === 0 ? '' : null">{{ clockLabel(s.m, loc) }}</div>
-            @for (columns as c, ci; track c.key) {
-              <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.ri + 1" :data-col="ci"
-                :data-off="offHours(c, s.m) ? '' : null" :data-hour="s.m % 60 === 0 ? '' : null"
-                :tabindex="tabCell.row === s.ri + 1 && tabCell.col === ci ? 0 : -1">
-                @for (eventsAt(ci, s.ri) as p; track p.id) {
-                  <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
-                    :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + colorStyle(p.event, c.resource)"
-                    :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)"
-                    :data-movable="canMove(p.event) ? '' : null" :data-dragging="isDragged(p.event) ? '' : null">
-                    @render event?.(p.event) @else {
-                      <span class="pdx-scheduler-event-title">{{ p.event.title }}</span>
-                      <span class="pdx-scheduler-event-time">{{ timeOf(p) }}</span>
-                    }
-                    @if (canResize(p.event)) {
-                      @if (!p.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                      @if (!p.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-                    }
-                  </button>
-                }
-              </div>
-            }
-          </div>
-        }
-        @for (nowLines as nl; track nl.col) {
-          <div class="pdx-scheduler-now" data-part="nowLine" aria-hidden="true"
-            :style="'grid-area:' + (headerRows.length + 2 + nl.row) + '/' + (nl.col + 2) + '/span 1/span 1;--_scheduler-offset:' + nl.offset"></div>
-        }
-      </div>
+        :header-rows="headerRows" :columns="columns" :bars="allDay.bars" :shown="shownSlots" :by-cell="byCell" :from-above="fromAbove" :first-slot="slotWin.first()"
+        :now-lines="nowLines" :tab-cell="tabCell" :start-minutes="startMinutes" :slot-minutes="slotMinutes" :business-hours="businessHours" :open-at="openSlot"
+        :locale="loc" :rules="moveRules" :draft="draft" :event="event"
+        @metrics="slotPx = $event.detail.slot"
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)"></pdx-scheduler-time-grid>
     }
   </div>
 </template>
@@ -145,20 +89,20 @@ import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, 
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts } from './time';
-import { buildColumns, buildSlots, buildHeaderRows, cellIndex, placeTimed, placeAllDay, isBusinessTime, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
+import { buildColumns, buildSlots, buildHeaderRows, cellIndex, placeTimed, placeAllDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours } from './grid-model';
 import { buildMonthWeeks, buildYearMonths, buildAgendaDays } from './calendar-model';
 import { timelineRows, timelineColumns, placeTimeline, axisPosition } from './timeline-model';
 import { timelineWindow } from './timeline-window';
 import { slotWindow } from './time-window';
-import { periodLabel, dayHeader, clockLabel, spanLabel, weekdayName, timelineHeader } from './labels';
+import { periodLabel, dayHeader, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { conflicts, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft, type Gesture } from './scheduler-drag';
 import { cellAt, pointOfCell } from './drop-point';
-import { eventColorStyle, resourceLabels } from './event-style';
-import { DRAFT_ID, canDo, isDraggedEvent } from './event-state';
+import { DRAFT_ID, canDo } from './event-state';
 import './scheduler-agenda.pdx';
 import './scheduler-month.pdx';
+import './scheduler-time-grid.pdx';
 import './scheduler-timeline.pdx';
 import './scheduler-year.pdx';
 import '@pdxui/design/components/scheduler';
@@ -260,8 +204,7 @@ let now = $signal(Date.now());
 let collapsed = $signal<ReadonlySet<string>>(new Set());
 /** The lane height and column width the timeline view measures from the theme, in px. */
 let metrics = $signal({ lane: 32, column: 80 });
-/** The time grid's hidden probe, and the slot height it measures from the theme, in px. */
-let slotProbeEl = $signal<HTMLElement | null>(null);
+/** The slot height the time grid view measures from the theme, in px. */
 let slotPx = $signal(36);
 /** What a pointer drag would make of an event, drawn in its place until it is dropped or dropped back. */
 let draft = $signal<Draft | null>(null);
@@ -330,6 +273,8 @@ const slotWin = slotWindow({
   slotHeight: () => slotPx,
   pinned: () => tabCell.row - 1,
 });
+/** The slot `scrollTo` is in, where the time grid opens. */
+const openSlot = $derived(slots.findIndex((m) => m >= parseClock(scrollTo)));
 const shownSlots = $derived(slotWin.rows().filter((ri) => ri < slots.length).map((ri) => ({ ri, m: slots[ri] })));
 /** The events that start above the drawn slots and reach into them, drawn from the first one. */
 const fromAbove = $derived(eventsFromAbove(byCell, slotWin.first(), new Set(slotWin.rows())));
@@ -347,28 +292,7 @@ const tlCols = $derived(tlWindow.columns().filter((vc) => vc.index < tlColumns.l
   return { index: vc.index, col, today: col.minutes === null && timelineScale !== 'year' && col.date === todayDate, ...timelineHeader(col, timelineScale, loc) };
 }));
 
-function eventsAt(ci: number, ri: number): PlacedEvent[] {
-  const own = byCell.get(ci + '|' + ri) ?? [];
-  const above = ri === slotWin.first() ? fromAbove.get(ci) : undefined;
-  return above ? [...above, ...own] : own;
-}
-function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
 function viewName(v: CalendarView): string { return v === 'days' ? format(uiString('scheduler', 'daysView'), { count: days }) : uiString('scheduler', v); }
-function offHours(c: Column, minutes: number): boolean { return !isBusinessTime(c.date, minutes, c.resource?.businessHours ?? businessHours); }
-function timeOf(p: PlacedEvent): string {
-  const start = startMinutes + (p.slot + p.offset) * slotMinutes;
-  return spanLabel(Math.round(start), Math.round(start + p.length * slotMinutes), loc);
-}
-function resourceNames(e: SchedulerEvent): string { return resourceLabels(e, resources); }
-function where(c: Column): string { return c.resource ? ', ' + c.resource.label : ''; }
-function timedName(p: PlacedEvent, c: Column): string {
-  return format(uiString('scheduler', 'eventName'), { title: p.event.title, when: timeOf(p) + ', ' + dayHeader(c.date, loc).full }) + where(c);
-}
-function allDayName(e: SchedulerEvent, c: Column): string {
-  return format(uiString('scheduler', 'eventName'), { title: e.title, when: uiString('scheduler', 'allDay') + ', ' + dayHeader(c.date, loc).full }) + where(c);
-}
-/** An event's colour: its own, else the colour of the resource it is drawn for, else its first resource's. */
-function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string { return eventColorStyle(e, resources, resource); }
 
 // ─── The period ────────────────────────────────────────────────────────────────
 
@@ -541,7 +465,6 @@ function placed(e: SchedulerEvent, p: Placement): SchedulerEvent {
 }
 function canMove(e: SchedulerEvent): boolean { return canDo(e, 'move', moveRules); }
 function canResize(e: SchedulerEvent): boolean { return canDo(e, 'resize', moveRules); }
-function isDragged(e: SchedulerEvent): boolean { return isDraggedEvent(e, draft); }
 const rangeOf = (r: { start: string; end: string; resource?: string | string[] }): Range => (r.resource === undefined ? { start: r.start, end: r.end } : { start: r.start, end: r.end, resource: r.resource });
 
 /** The drop point under the viewport point (`x`, `y`), in the grid on screen; null outside its cells. */
@@ -645,26 +568,9 @@ function timelineHome(): void {
 }
 // It opens there, and goes back there for another period or scale: the columns are not the same ones.
 $watch(tlColumns, () => timelineHome());
-$watch(gridEl, (grid) => {
-  if (!grid) return;
-  if (view === 'timeline') { timelineHome(); return; }
-  if (!isTimeGrid) return;
-  requestAnimationFrame(() => {
-    const first = slots.findIndex((m) => m >= parseClock(scrollTo));
-    // From the slot height, not from the row: the row may not be drawn yet (#1085). The header and
-    // all-day rows are sticky, so slot `first` sits right under them at `first` slots of scroll.
-    const slot = slotProbeEl?.getBoundingClientRect().height ?? 0;
-    if (first > 0 && slot > 0) grid.scrollTop = first * slot;
-  });
-});
-// A slot's height is the theme's (`--pdx-scheduler-slot-height`): the probe is sized by it, and
-// measured again when it changes.
-const slotProbeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
-  const h = entry.target.getBoundingClientRect().height;
-  if (h > 0 && h !== slotPx) slotPx = h;
-});
-$watch(slotProbeEl, (probe) => { slotProbeObserver?.disconnect(); if (probe) slotProbeObserver?.observe(probe); });
+// The time grid opens at `scrollTo` by itself (`open-at`), from the slot height its probe measures.
+$watch(gridEl, (grid) => { if (grid && view === 'timeline') timelineHome(); });
 let clock: ReturnType<typeof setInterval> | undefined;
 onMount(() => { clock = setInterval(() => { now = Date.now(); }, 60_000); });
-onDestroy(() => { if (clock !== undefined) clearInterval(clock); slotProbeObserver?.disconnect(); tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose(); });
+onDestroy(() => { if (clock !== undefined) clearInterval(clock); tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose(); });
 </script>
