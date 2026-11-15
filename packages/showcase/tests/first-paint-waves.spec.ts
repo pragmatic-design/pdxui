@@ -46,8 +46,15 @@ const preloads = (): string[] =>
  * comes down to 0.2 ms either way — measured flipping between runs. With a round trip, requests the
  * browser issued together overlap by construction, and one it could only issue after another has
  * finished starts a full round trip later. That is the network the count is ABOUT.
+ *
+ * And longer than the main thread can be busy (#1065). A request the page's code asks for late —
+ * at CPU 4× on a loaded runner, 72 and 150 ms after it could have — is still in the wave that code
+ * belongs to while the requests beside it are in flight; at 30 ms they were all in already, and the
+ * late one read as a round trip of its own. A request that WAITS for another still starts after that
+ * one has finished, a full round trip on, however long the round trip is: the controls below read 3
+ * where 3 are built. 300 ms is a slow mobile round trip, and twice the longest late start measured.
  */
-const LATENCY_MS = 30;
+const LATENCY_MS = 300;
 
 /**
  * `page`'s tag: the first screen is the JavaScript that was asked for before the landing page began
@@ -62,7 +69,7 @@ const LATENCY_MS = 30;
  * screen's, and at CPU 4× they read as a third wave. With the mark at the connect: 82 → 84, and at
  * 4× 218 → 229, after it every time.
  */
-async function jsWaves(page: Page, url: string, pageTag?: string, cpu = 1, data?: RegExp): Promise<{ waves: number; files: string[]; after: string[] }> {
+async function jsWaves(page: Page, url: string, pageTag?: string, cpu = 1, data?: RegExp): Promise<{ waves: number; files: string[]; after: string[]; timeline: string }> {
     await throttle(page, cpu);
     await delay(page, data);
     if (pageTag) await markMount(page, pageTag);
@@ -76,7 +83,7 @@ async function jsWaves(page: Page, url: string, pageTag?: string, cpu = 1, data?
  * `popstate`, with no hover, so no prefetch starts anything before the navigation does. What counts
  * is the JavaScript and the `data` requests asked for until `<pageTag>` connects.
  */
-async function navigationWaves(page: Page, from: string, to: string, pageTag: string, data: RegExp, cpu = 1): Promise<{ waves: number; files: string[]; after: string[] }> {
+async function navigationWaves(page: Page, from: string, to: string, pageTag: string, data: RegExp, cpu = 1): Promise<{ waves: number; files: string[]; after: string[]; timeline: string }> {
     await markMount(page, pageTag);
     await page.goto(from, { waitUntil: 'networkidle' });
     await throttle(page, cpu);
@@ -130,7 +137,7 @@ async function markMount(page: Page, tag: string): Promise<void> {
  * The waves of the JavaScript and the `data` requests on the browser's timeline, up to the moment
  * `<pageTag>` connected (all of them without a tag), and what started after it.
  */
-async function countUntilMount(page: Page, pageTag: string | undefined, data: RegExp | undefined): Promise<{ waves: number; files: string[]; after: string[] }> {
+async function countUntilMount(page: Page, pageTag: string | undefined, data: RegExp | undefined): Promise<{ waves: number; files: string[]; after: string[]; timeline: string }> {
     const paintedAt = pageTag
         ? await page.evaluate(() => (window as unknown as { __mountedAt?: number }).__mountedAt ?? Infinity)
         : Infinity;
@@ -148,14 +155,17 @@ async function countUntilMount(page: Page, pageTag: string | undefined, data: Re
 
     let waves = 0;
     let frontier = -Infinity;
+    const lines: string[] = [];
+    const t0 = spans[0]?.start ?? 0;
     for (const s of spans) {
         // No grace. Two requests issued together both start before the first of them FINISHES, so
         // they share a wave anyway. A 2 ms grace here would merge a module with the one that imports
         // it: it starts about 1 ms after its parent ends, and that IS a round trip.
-        if (s.start > frontier) waves++;
+        if (s.start > frontier) { waves++; lines.push(`wave ${waves}:`); }
         frontier = Math.max(frontier, s.end);
+        lines.push(`  ${Math.round(s.start - t0)}→${Math.round(s.end - t0)} ${s.file}`);
     }
-    return { waves, files: spans.map((s) => s.file), after };
+    return { waves, files: spans.map((s) => s.file), after, timeline: lines.join('\n') };
 }
 
 test('control — the counter reads three waves where three are built', async ({ page }) => {
@@ -212,13 +222,27 @@ test('a navigation to a route with a loader fetches its chunk and its data in tw
     // loader's own module beside the page's chunk (#119), and the loader's request when that module
     // is in: the code, then the data — two round trips. Three is the loader found only inside the
     // page's chunk. At CPU 4×, the throttled profile the cold first screen is measured on.
-    const { waves, files, after } = await navigationWaves(page, '/', '/tickets/1', 'app-ticket', /\/api\/tickets\/\d+$/, 4);
+    const { waves, files, after, timeline } = await navigationWaves(page, '/', '/tickets/1', 'app-ticket', /\/api\/tickets\/\d+$/, 4);
     expect(files.some((f) => /^ticket-/.test(f)), `the ticket chunk was not fetched — nothing is being measured: ${files.join(', ')}`)
         .toBe(true);
     expect(files, `the record was not fetched before the page mounted: ${files.join(', ')} (after: ${after.join(', ')})`)
         .toContain('1');
-    expect(waves, `a navigation to /tickets/1 costs ${waves} round-trips: ${files.join(', ')} (after the mount: ${after.join(', ')})`)
+    expect(waves, `a navigation to /tickets/1 costs ${waves} round-trips (after the mount: ${after.join(', ')}):\n${timeline}`)
         .toBeLessThanOrEqual(2);
+});
+
+test('control — a request the busy main thread starts late is still in its wave: a late start is not a round trip (#1065)', async ({ page }) => {
+    // CI read 3 waves for the navigation above once (#1065). Its trace has the record asked for 150 ms
+    // after its loader's module arrived — a module with no imports, whose loader fetches as soon as it
+    // is evaluated — and the page's own imports 72 ms late too: at CPU 4× the main thread was busy with
+    // the modules that had just arrived. Without the throttle the record leaves 2–16 ms after its
+    // module. Nothing was waited for; the requests were asked for late.
+    // Here: a.js asks for b.js, then holds the thread that 150 ms and asks for the data, which waits for
+    // nothing but a.js. It is the second wave — on a network where a round trip is longer than the
+    // thread was busy, which is what `LATENCY_MS` stands for.
+    await servedPage(page, "import('./b.js'); setTimeout(async () => { const t = performance.now(); while (performance.now() - t < 150); await fetch('/__waves/api/tickets/1'); window.__wavesDone = true; }, 0);");
+    const { waves, timeline } = await jsWaves(page, '/__waves/page.html', undefined, 1, /\/__waves\/api\/tickets\//);
+    expect(waves, `a request started 150 ms late read as ${waves} round-trips:\n${timeline}`).toBe(2);
 });
 
 test('the record\'s request does not wait for the page\'s chunk: the loader has a module of its own (#119, #974)', async ({ page }) => {
