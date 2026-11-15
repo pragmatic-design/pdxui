@@ -28,6 +28,21 @@ describe('a @part named like an import (#1066, 1)', () => {
     });
 });
 
+describe('a @part named like a @slot (#1112)', () => {
+    const script = '@slot row?: (x: string);\n@part row;';
+    const template = '<li data-part="row">@render row?.(\'a\') @else { a }</li>';
+
+    it('keeps the snippet: the setup does not return the part\'s signal under its name', () => {
+        const { code } = compile(pdx(template, script), 'test.pdx');
+        expect(code, 'the part\'s signal took the slot\'s name').not.toMatch(/\brow: __row\b/);
+        expect(code).not.toMatch(/\b__row\b/);
+    });
+
+    it('says so: PDX_PART_NAME_TAKEN', () => {
+        expect(codes(template, script)).toContain('PDX_PART_NAME_TAKEN');
+    });
+});
+
 describe('CD-S2 reads a name where it is declared (#1066, 2)', () => {
     const derived = "let source = $signal([{ id: 1, first: 0 }]);\nconst allDay = $derived({ bars: source });\n"
         + 'function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }\n';

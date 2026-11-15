@@ -1183,7 +1183,7 @@ write:
 
 ### PDX_PART_NAME_TAKEN
 
-*info* — A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, an import, a function, a constant), with no `:ref` on its element.
+*info* — A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, a slot, an import, a function, a constant), with no `:ref` on its element.
 
 A part's name is chosen by the styling contract, and the script's name keeps its meaning (#999): `@prop label` stays the label text where a part `label` would have replaced it with the element. The part is still the template's and the theme's — its `data-part`, the manifest — but the script does not read its element by that name, and with no `:ref` it does not reach it at all.
 
