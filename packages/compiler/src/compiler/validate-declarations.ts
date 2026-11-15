@@ -5,8 +5,8 @@
 // component does. The output cannot honour both, so it is an error, and it names both lines.
 //
 // The declarations are the component's own names: everything the top of the script declares — a
-// rune (`$signal`, `$derived`, `$store`), a plain `const`/`let`/`var`, a function, a class — and
-// `@prop`. A local of the same name inside a function is another scope, and not one.
+// rune (`$signal`, `$derived`, `$store`), a plain `const`/`let`/`var`, a function, a class, an import
+// — and `@prop`. A local of the same name inside a function is another scope, and not one.
 
 import ts from 'typescript';
 import type { SFCDescriptor } from '../parser/sfc';
@@ -52,6 +52,18 @@ function declarations(descriptor: SFCDescriptor, source: string): Declaration[] 
     const sf = parseableScript(script.content);
     const at = (node: ts.Node) => lineAt(script.start + node.getStart(sf));
     for (const st of sf.statements) {
+        // An import binds its names in the module, and the setup that declares one again does not load:
+        // `Identifier 'x' has already been declared` (#1066). A type-only import binds no value.
+        if (ts.isImportDeclaration(st) && st.importClause && !st.importClause.isTypeOnly) {
+            const clause = st.importClause;
+            const names: ts.Identifier[] = [];
+            if (clause.name) names.push(clause.name);
+            const bindings = clause.namedBindings;
+            if (bindings && ts.isNamespaceImport(bindings)) names.push(bindings.name);
+            if (bindings && ts.isNamedImports(bindings)) for (const el of bindings.elements) if (!el.isTypeOnly) names.push(el.name);
+            for (const id of names) found.push({ name: id.text, kind: 'import', line: at(id) });
+            continue;
+        }
         // A function, a class: plain declarations of the setup's scope. Next to a rune of the same
         // name the clash vanishes from the module (the signal is `__name`), and the auto-return's
         // duplicate key decides which one the template sees.

@@ -32,7 +32,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 |---|---|---|---|
 | `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; an `@store` `persist` that is not `'local'` or `'session'`. | any `@` declaration, `$signal`, `@store`, [script.md](script.md), [data.md](data.md) |
 | `PDX_RUNE_POSITION` | error | A `$` rune where the compiler does not read it: not the initialiser of a top-level declaration, or not a top-level statement. | `$signal`, `$derived`, `$store`, `$effect`, `$watch`, [script.md](script.md) |
-| `PDX_DUP_DECLARATION` | error | The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables. | [script.md](script.md) |
+| `PDX_DUP_DECLARATION` | error | The same name declared twice at the top of the script: runes, `@prop`, imports, functions, classes, plain variables. | [script.md](script.md) |
 | `PDX_SCRIPT_EXPORT` | error | An `export` of a value in a component script, which runs inside the component's setup. | [script.md](script.md) |
 | `PDX_PROP_NO_TYPE` | error | `@prop` without a type annotation. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_INVALID_TYPE` | warn | A `@prop`'s type annotation is malformed. | `@prop`, [script.md](script.md) |
@@ -57,7 +57,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_SLOT_REQUIRED` | error | A component used without a snippet it requires (#489). | `@slot`, [script.md](script.md); `@snippet`, [template.md](template.md) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not one of its models (#124). | `::name`, [template.md](template.md); `@model`, [script.md](script.md) |
 | `PDX_PART_MISSING` | error | A declared `@part` that no element of the template carries. | `@part`, [script.md](script.md) |
-| `PDX_PART_NAME_TAKEN` | info | A `@part` whose name the script declares as a prop, a model, a function or a constant, with no `:ref` on its element: that declaration keeps its meaning. | `@part`, [script.md](script.md) |
+| `PDX_PART_NAME_TAKEN` | info | A `@part` whose name the script declares as a prop, a model, an import, a function or a constant, with no `:ref` on its element: that declaration keeps its meaning. | `@part`, [script.md](script.md) |
 | `PDX_PART_UNDECLARED` | error | A `data-part` that names no `@part`. | `@part`, [script.md](script.md) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host`, [script.md](script.md) |
 | `PDX_MALFORMED_STATE` | error | `@state` written in a shape the compiler does not recognise. | `@state`, [script.md](script.md) |
