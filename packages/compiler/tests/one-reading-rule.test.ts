@@ -41,6 +41,7 @@ const EXAMPLES: Record<string, { decl: string; script?: string; page?: boolean }
     provide: { decl: '@provide Theme = { dark: true, accent: "blue" };', script: "import { Theme } from './theme';" },
     inject: null,
     tag: null,
+    internal: null,
     params: { decl: '@params { id: number, tab: string }', page: true },
     redirect: null,
     outlet: null,
@@ -101,7 +102,7 @@ describe('one reading rule: any declaration may span lines when it opens a block
     it('a declaration with no block in any of its forms is written on one line, and listed as such', () => {
         // The rule needs a block opened on the first line; these have none, so they never span lines.
         expect(Object.entries(EXAMPLES).filter(([, ex]) => ex === null).map(([n]) => n).sort())
-            .toEqual(['expose', 'guard', 'inject', 'layout', 'meta', 'outlet', 'part', 'redirect', 'scroll', 'tag', 'use']);
+            .toEqual(['expose', 'guard', 'inject', 'internal', 'layout', 'meta', 'outlet', 'part', 'redirect', 'scroll', 'tag', 'use']);
     });
 
     for (const name of declarations) {

@@ -201,7 +201,11 @@ The full vocabulary the analyzer accepts:
 
 `@prop` `@model` `@event` `@page` `@tag` `@guard` `@loader` `@store` `@form` `@fetch` `@action` `@slot` `@generic` `@title` `@meta`
 `@params` `@search` `@redirect` `@provide` `@inject` `@expose` `@part` `@host` `@state` `@variants` `@scroll`
-`@i18n` `@raw` `@layout` `@outlet` `@snippet` `@use`
+`@i18n` `@raw` `@layout` `@outlet` `@snippet` `@use` `@hydrate` `@internal`
+
+**`@internal;`** splits a large component by view: the view file says it, the component that renders
+it imports it from the same folder (`import './month-view.pdx';`, never auto-imported), and a template
+or script of another folder that reaches it is `PDX_INTERNAL_COMPONENT`.
 
 **`@page` holds every route field**: `@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };`
 — further paths are aliases; the options are `keepAlive`, `preload`, `prefetch`, `label`, `transition`,

@@ -28,6 +28,11 @@ The prefix is `app` unless the project names its own, `pdx({ prefix: 'shop' })` 
 alpha project's `pdx-` tags. A library component written in `.pdx` keeps its `pdx-` tag when your app
 compiles it from source: `@pdxui/ui`'s switch is `<pdx-switch>` under any prefix.
 
+A component that grows too large splits into **internal** views: each view file declares `@internal;`,
+and the component that renders it imports it from the same folder (`import './month-view.pdx';`).
+An internal component is never auto-imported, and a template or script of another folder that uses it
+is an error, `PDX_INTERNAL_COMPONENT`: its props are its owner's business, and can change with it.
+
 Each block is optional — a `.pdx` with just a `<template>` is a valid component — and one
 `<template>` and one `<script>` is the limit. **`<style>` you may write more than once**, which is how
 a component ships its own scoped CSS *and* the page-level CSS it owns. The next section says what the

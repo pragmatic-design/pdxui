@@ -31,7 +31,7 @@ function childLists(node: TemplateNode): (TemplateNode[] | undefined)[] {
 }
 
 /** Every use of a component in the template, in source order, with the snippets its tag holds. */
-function usesOf(ast: TemplateNode[]): Use[] {
+export function usesOf(ast: TemplateNode[]): Use[] {
     const uses: Use[] = [];
     const walk = (list: TemplateNode[] | undefined): void => {
         // The elements open in this run of nodes: a use for a component, null for a plain element.

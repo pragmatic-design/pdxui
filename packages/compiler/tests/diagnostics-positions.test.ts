@@ -24,6 +24,8 @@ interface Row {
     at: string;
     /** How the code is produced: compile() (default), or validate() with a resolver that knows no tag. */
     via?: 'compile' | 'validate-unknown-tags';
+    /** The file the source is compiled as, when the code depends on its name. Default: `x.pdx`. */
+    file?: string;
 }
 
 const BUTTON_PROPS = new Set(['variant', 'size', 'disabled', 'maxItems']);
@@ -59,6 +61,8 @@ const ROWS: Record<string, Row> = {
     PDX_ONE_WAY_EDITED_FIELD: { src: pdx('<p>{{ a }}</p>\n<input :value="a" />\n<input\n  :value="a" @input="a = $event.target.value" />', 'let a = $signal(1);'), at: ':value="a" @input' },
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
     PDX_TAG_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@tag \'pdx-badge\';'), at: "@tag 'pdx-badge';" },
+    PDX_INTERNAL_NAMED_PUBLIC: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@internal;'), at: '@internal;', file: 'pdx-x.pdx' },
+    PDX_INTERNAL_COMPONENT: { src: pdx('<p>x</p>\n  <app-inner></app-inner>', ''), at: '<app-inner>' },
     PDX_PROP_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-card :id="a"></app-card>\n  <app-card></app-card>', 'let a = $signal(1);'), at: '<app-card></app-card>' },
     PDX_NAME_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@prop label: string;\n@prop track: string;'), at: '@prop track' },
     PDX_SLOT_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-list>@snippet row(u) { <b>{{ u }}</b> }</app-list>\n  <app-list></app-list>', 'let a = $signal(1);'), at: '<app-list></app-list>' },
@@ -157,12 +161,14 @@ function produce(code: string, row: Row): ValidationWarning | undefined {
         const ws = validate(analysis, parseTemplate(d.template!.content), 'x.pdx', { isKnownTag: () => false });
         return positionWarnings(row.src, ws).find((w) => w.code === code);
     }
-    const r = compile(row.src, 'x.pdx', [], undefined, {
+    const r = compile(row.src, row.file ?? 'x.pdx', [], undefined, {
         propsOf: (tag) => (tag === 'pdx-button' ? BUTTON_PROPS : null),
         enumValues: (tag, prop) => (tag === 'pdx-button' && prop === 'size' ? ['sm', 'md', 'lg'] : null),
         modelsOf: (tag) => (tag === 'app-field' ? new Set(['value']) : null),
         requiredPropsOf: (tag) => (tag === 'app-card' ? new Set(['id']) : null),
         requiredSlotsOf: (tag) => (tag === 'app-list' ? new Set(['row']) : null),
+        // An internal component of another folder than the row's (#1102).
+        internalFileOf: (tag) => (tag === 'app-inner' ? '/elsewhere/inner.pdx' : null),
         eventHeardAbove: () => false,
     });
     return r.warnings.find((w) => w.code === code);

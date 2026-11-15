@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 112 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 114 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -791,6 +791,22 @@ A `.pdx` compiles with one render path, the inline one, in dev and in a build, s
 The node would be left out of the render, in dev and in a build — the inline path is the only one a `.pdx` compiles with. The warning makes a missing feature visible instead of silent.
 
 **Fix.** Open an issue naming the node type.
+
+### PDX_INTERNAL_COMPONENT
+
+*error* — A template outside its folder renders, or a script outside it imports, an `@internal` component (#1102).
+
+`@internal;` says that only the components of the file's own folder render it: a view of a larger component, split out of its file. Its props and events are that component's business and can change with it, and a library leaves it out of its manifest, exports and pages — so another folder's use is one nothing documents and nothing keeps working.
+
+**Fix.** Render the public component that owns it instead, or move the file that uses it into its folder; if it is meant for everyone, drop `@internal` and give it a public name.
+
+### PDX_INTERNAL_NAMED_PUBLIC
+
+*error* — A file named `pdx-…` declares `@internal` (#1102).
+
+In a library a `pdx-` file name is what makes a component public: its manifest, its exports, its site page and its certification list every `pdx-*` file. One file cannot be public by its name and internal by its script.
+
+**Fix.** Rename the file without the `pdx-` prefix, or drop `@internal`.
 
 ### PDX_INVALID_ENUM_VALUE
 

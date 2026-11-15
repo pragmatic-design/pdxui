@@ -125,6 +125,18 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_TAG_RESERVED':
             // Match: the `@tag` that names a pdx- tag — a component declares one.
             return find(source, script, /@tag\s+['"]pdx-/);
+        case 'PDX_INTERNAL_NAMED_PUBLIC':
+            // Match: the `@internal` line (#1102).
+            return find(source, script, /@internal\b/);
+        case 'PDX_INTERNAL_COMPONENT': {
+            // The import the message names (`imports ../a/x.pdx,`), else the tag it renders (`renders <x-y>`).
+            // Groups: [1]=the specifier
+            const spec = / imports (\S+?),/.exec(w.message)?.[1];
+            if (spec) return find(source, script, new RegExp(`['"]${escape(spec)}['"]`));
+            // Groups: [1]=the tag
+            const tag = /renders <([\w-]+)>/.exec(w.message)?.[1];
+            return tag ? find(source, template, new RegExp(`<${escape(tag)}\\b`)) : undefined;
+        }
         // Match: the declaration of that name, with or without its options, `(bubbles)` (#138) or
         // `(cancelable)` (#1035).
         case 'PDX_DUP_EVENT':

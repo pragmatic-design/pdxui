@@ -32,6 +32,7 @@ import {
     scanSlots, scanExportedShapes, declaredFunction, functionParameters, describeProp, assembleModule,
 } from './manifest-shared.mjs';
 import { analyzePdxFile } from './manifest-pdx.mjs';
+import { declaresInternal } from '@pdxui/compiler';
 
 const SRC = join(UI_ROOT, 'src');
 
@@ -70,6 +71,24 @@ function collectComponentFiles(dir) {
         const full = join(dir, item);
         if (statSync(full).isDirectory()) out.push(...collectComponentFiles(full));
         else if (/^pdx-.*\.(ts|pdx)$/.test(item)) out.push(full);
+    }
+    return out;
+}
+
+/**
+ * The `.pdx` files under `dir` that are neither public (`pdx-*`) nor declared `@internal` (#1102). A
+ * component's file name is what puts it in this manifest; one named otherwise is left out, and it has
+ * to say so in its script, or a component would drop out of the public surface in silence.
+ *
+ * @param {string} dir
+ * @returns {string[]}
+ */
+export function undeclaredPdxFiles(dir) {
+    const out = [];
+    for (const item of readdirSync(dir)) {
+        const full = join(dir, item);
+        if (statSync(full).isDirectory()) out.push(...undeclaredPdxFiles(full));
+        else if (item.endsWith('.pdx') && !item.startsWith('pdx-') && !declaresInternal(readFileSync(full, 'utf-8'))) out.push(full);
     }
     return out;
 }
@@ -682,6 +701,11 @@ function scanContexts(nodes, propNames) {
  */
 export function buildManifest() {
     const categories = parseCategories();
+    const undeclared = undeclaredPdxFiles(SRC);
+    if (undeclared.length) {
+        throw new Error(`[gen-manifest] ${undeclared.map((f) => relative(UI_ROOT, f).replace(/\\/g, '/')).join(', ')}: a .pdx not named pdx-… is no public component, `
+            + 'and its script does not say @internal. Name it pdx-<name>.pdx, or declare @internal; (#1102).');
+    }
     const files = collectComponentFiles(SRC).sort();
     const modules = [];
     let skipped = 0;
