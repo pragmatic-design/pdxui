@@ -461,6 +461,25 @@ export function useSortable<T = unknown>(
             el.style.transition = '';
         }
         foreignShift.clear();
+        markAfterLast(hoverContainer, null);
+    }
+
+    /**
+     * The insertion line after a sibling list's last item, or at its top when it is empty: there
+     * nothing moves to open a space, and the list's highlight alone said "in here" but not where
+     * (#1089). `drop-zone.css` draws `data-pdx-drop-edge="after-last"` at `--pdx-drop-at`, measured
+     * from the list's top. Null takes it off.
+     */
+    function markAfterLast(target: HTMLElement | null, at: number | null): void {
+        if (!target) return;
+        if (at === null) {
+            if (target.getAttribute('data-pdx-drop-edge') !== 'after-last') return;
+            target.removeAttribute('data-pdx-drop-edge');
+            target.style.removeProperty('--pdx-drop-at');
+            return;
+        }
+        target.setAttribute('data-pdx-drop-edge', 'after-last');
+        target.style.setProperty('--pdx-drop-at', `${at}px`);
     }
 
     /** The sibling list's items and their rects, un-shifted, read once when the pointer entered it. */
@@ -512,6 +531,13 @@ export function useSortable<T = unknown>(
             child.style.transition = animate ? `transform ${animDuration}ms ease` : '';
         }
         hoverIndex = index;
+        // At the end nothing has moved: the line says where the item lands.
+        if (axis === 'vertical' && index === foreignChildren.length) {
+            const last = foreignRects[foreignRects.length - 1];
+            markAfterLast(target, last ? last.bottom - target.getBoundingClientRect().top : 0);
+        } else {
+            markAfterLast(target, null);
+        }
     }
 
     /**

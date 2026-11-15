@@ -61,5 +61,8 @@
 [data-pdx-drop-edge="bottom"]::after { inset: auto 0 -1px 0; height: 2px; }
 [data-pdx-drop-edge="left"]::after   { inset: 0 auto 0 -1px; width: 2px; }
 [data-pdx-drop-edge="right"]::after  { inset: 0 -1px 0 auto; width: 2px; }
+/* After a list's last item (or at the top of an empty one), where nothing moves to show the place:
+   `--pdx-drop-at` is that item's bottom, from the list's top (useSortable writes it, #1089). */
+[data-pdx-drop-edge="after-last"]::after { inset: var(--pdx-drop-at, 0) 0 auto 0; height: 2px; }
 /* `center` means "inside, not between" — the highlight already says that, so no line. */
 [data-pdx-drop-edge="center"]::after { content: none; }

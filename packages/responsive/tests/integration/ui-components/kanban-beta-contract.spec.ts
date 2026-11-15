@@ -150,6 +150,38 @@ test('a pointer drag carries a card to another column', async ({ page }) => {
     await expect.poll(() => model(page)).toEqual(['b:todo', 'c:doing', 'a:done']);
 });
 
+// The space under a column's last card is where a card lands at its end (#1089). Doing holds one card
+// and stretches to the height of To do's two, so there is room under it.
+test('a drop under the last card of another column puts the card at its end', async ({ page }) => {
+    await mount(page);
+    const from = await card(page, 'a').boundingBox();
+    const last = await card(page, 'c').boundingBox();
+    if (!from || !last) throw new Error('no box');
+    await page.mouse.move(from.x + 20, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(last.x + 20, last.y + last.height + 20, { steps: 12 });
+    await page.mouse.up();
+    await expect.poll(() => model(page)).toEqual(['b:todo', 'c:doing', 'a:doing']);
+});
+
+test('while a card is carried past the last card of a column, a line marks the end, under that card', async ({ page }) => {
+    await mount(page);
+    const from = await card(page, 'a').boundingBox();
+    const last = await card(page, 'c').boundingBox();
+    if (!from || !last) throw new Error('no box');
+    await page.mouse.move(from.x + 20, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(last.x + 20, last.y + last.height + 20, { steps: 12 });
+    const line = await page.locator('#f [data-column="doing"] [data-part="list"]').evaluate((list) => {
+        const after = getComputedStyle(list, '::after');
+        return { edge: list.getAttribute('data-pdx-drop-edge'), top: list.getBoundingClientRect().top + parseFloat(after.top), height: parseFloat(after.height) };
+    });
+    await page.mouse.up();
+    expect(line.edge).toBe('after-last');
+    expect(line.height).toBe(2);
+    expect(Math.abs(line.top - (last.y + last.height)), `line at ${line.top}, the last card ends at ${last.y + last.height}`).toBeLessThanOrEqual(1);
+});
+
 test('a column over its limit says so in its count, and is marked', async ({ page }) => {
     await mount(page);
     await card(page, 'a').focus();
