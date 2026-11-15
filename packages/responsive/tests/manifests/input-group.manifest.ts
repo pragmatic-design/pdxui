@@ -6,6 +6,15 @@
  * guaranteed while migrating away from the monolith.
  */
 import type { ComponentManifest } from './_types';
+import { GLOW_THEMES } from './_themes.ts';
+
+/** The hovered button of the group has no glow, in a theme whose hover would give it one (#1086). */
+const noGlow = (theme: string) => ({
+    description: `${theme}: a hovered button in the group has no glow`,
+    selector: '[data-test="group"] [data-test="group-btn"] button',
+    trigger: 'hover' as const,
+    changes: { boxShadow: { op: 'is' as const, value: 'none' } },
+});
 
 export const inputGroup: ComponentManifest = {
     name: 'input-group',
@@ -110,6 +119,16 @@ export const inputGroup: ComponentManifest = {
                         ],
                     },
                 ],
+                states: [
+                    {
+                        // A theme's premium hover lift is a standalone button's: joined to the input, the
+                        // button would step out of the field (#1086).
+                        description: 'a hovered button stays joined to the input: no lift',
+                        selector: '[data-test="group"] [data-test="group-btn"] button',
+                        trigger: 'hover',
+                        changes: { transform: { op: 'is', value: 'none' } },
+                    },
+                ],
             },
             'input-group-3': {
                 composition: [
@@ -181,8 +200,12 @@ export const inputGroup: ComponentManifest = {
         // Material 3 filled field: the GROUP is the field (inset fill, bottom indicator, top-rounded),
         // and the input and button inside it carry none of that themselves.
         themeOverrides: {
+            // No glow either, in the themes whose hover adds one to a button with no shadow at rest
+            // (#1086). Material's own block below is spread over its entry.
+            ...Object.fromEntries(GLOW_THEMES.filter((t) => t !== 'material').map((theme) => [theme, { 'input-group': { states: [noGlow(theme)] } }])),
             material: {
                 'input-group': {
+                    states: [noGlow('material')],
                     standalone: [
                         {
                             selector: '[data-test="group"]',

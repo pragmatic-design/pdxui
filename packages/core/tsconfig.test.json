@@ -15,6 +15,10 @@
         // is an error and every value it hands back is implicitly any, which is the opposite of
         // what a type gate is for.
         "allowJs": true,
+        // The certification manifests some suites read import a module of values by its `.ts`
+        // name (`./_themes.ts`): the generator loads them under Node's type stripping, which
+        // resolves no extensionless path. Allowed because nothing is emitted.
+        "allowImportingTsExtensions": true,
         // The REPO root, because nothing is emitted and a test may legitimately
         // import a sibling package's source — the CLI's theme tests read the
         // builder's config. With `rootDir` at the package, TS6059 fires on every

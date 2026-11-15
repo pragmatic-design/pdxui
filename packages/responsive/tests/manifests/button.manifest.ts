@@ -333,9 +333,27 @@ export const button: ComponentManifest = {
                             trigger: 'hover',
                             changes: { mustDiffer: ['boxShadow'] },
                         },
+                        {
+                            // Standalone, the lift stays: a group turns it off (#1086), a lone button keeps it.
+                            description: 'playful: hover lifts a lone primary button by 1px',
+                            selector: '[data-test="primary"] button',
+                            trigger: 'hover',
+                            changes: { transform: { op: 'is', value: 'matrix(1, 0, 0, 1, 0, -1)' } },
+                        },
                     ],
                 },
             },
+            // The Pragmatic family's premium hover on a lone primary button: a 1px lift and a glow.
+            ...Object.fromEntries(['pragmatic', 'pragmatic-gold'].map((theme) => [theme, {
+                'button-variants': {
+                    states: [{
+                        description: `${theme}: hover lifts a lone primary button by 1px and adds a glow (#1086)`,
+                        selector: '[data-test="primary"] button',
+                        trigger: 'hover' as const,
+                        changes: { transform: { op: 'is' as const, value: 'matrix(1, 0, 0, 1, 0, -1)' }, mustDiffer: ['boxShadow' as const] },
+                    }],
+                },
+            }])),
             cyberpunk: {
                 'button-variants': {
                     standalone: [

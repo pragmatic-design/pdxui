@@ -43,6 +43,7 @@
  *   loading and disabled are static props → dedicated standalone scenarios (split-disabled), not stateRules.
  */
 import type { ComponentManifest } from './_types';
+import { GLOW_THEMES } from './_themes.ts';
 
 export const splitButton: ComponentManifest = {
     name: 'split-button',
@@ -216,6 +217,16 @@ export const splitButton: ComponentManifest = {
                         ],
                     },
                 ],
+                states: [
+                    {
+                        // A theme's premium hover lift is a standalone button's: the primary half would
+                        // step away from its chevron (#1086).
+                        description: 'the hovered primary half stays joined to the chevron: no lift',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                        trigger: 'hover',
+                        changes: { transform: { op: 'is', value: 'none' } },
+                    },
+                ],
             },
 
             // The menu open: the panel is portalled to the body, role="menu", visible after the click on the arrow.
@@ -244,6 +255,17 @@ export const splitButton: ComponentManifest = {
                 ],
             },
         },
+        // No glow either, in the themes whose hover adds one to a button with no shadow at rest (#1086).
+        themeOverrides: Object.fromEntries(GLOW_THEMES.map((theme) => [theme, {
+            'split-basic': {
+                states: [{
+                    description: `${theme}: the hovered primary half has no glow`,
+                    selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                    trigger: 'hover' as const,
+                    changes: { boxShadow: { op: 'is' as const, value: 'none' } },
+                }],
+            },
+        }])),
     },
 
     // ── Dim. 2: axe-core ──

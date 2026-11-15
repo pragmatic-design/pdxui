@@ -170,7 +170,7 @@ A theme's **frame** is 100% tokens; its **rich personality** is still partly per
 - **Colours**: all of them
 - **Scales**: spacing, radius, typography, shadows (5 levels), durations and easings, z-index
 - **Tonal elevation**: levels 2 and 3 are read by dialog/drawer/menu/toast to lift off the background — in dark, higher means lighter (Material 3); in light it stays near the base.
-- **Opt-in decoration** (value tokens, off by default, no JS): `--pdx-primary-gradient` (a gradient on primary), `--pdx-button-transform-hover` + `--pdx-button-shadow-hover` (the premium lift/glow). A card's accent edge is the `.pdx-card-accent-*` classes; a single or double focus ring is already a value of `--pdx-focus-ring`.
+- **Opt-in decoration** (value tokens, off by default, no JS): `--pdx-primary-gradient` (a gradient on primary), `--pdx-button-transform-hover` + `--pdx-button-shadow-hover` (the premium lift/glow, a lone button's: a button joined in a button group, an input group or a split button keeps its place, and `composition.css` turns both off there, #1086). A card's accent edge is the `.pdx-card-accent-*` classes; a single or double focus ring is already a value of `--pdx-focus-ring`.
 - **Base behaviour**: `input-style`, `button-radius`, `button/input-min-height`, `tab-indicator` (+ `size`), `card-style`, `focus-ring`, `density-factor`
 
 ### 🟡 Partly tokenised

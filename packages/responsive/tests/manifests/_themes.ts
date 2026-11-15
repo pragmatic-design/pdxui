@@ -61,6 +61,12 @@ export const FAMOUS_THEMES: string[] = THEME_META.filter((t) => t.famous).map((t
 /** Themes born in dark mode (replaces DARK_THEMES). */
 export const DARK_THEMES: string[] = THEME_META.filter((t) => t.defaultScheme === 'dark').map((t) => t.name);
 
+/**
+ * The themes whose hover gives a primary button a glow (`--pdx-button-shadow-hover` in its theme
+ * source) over no shadow at rest. Neumorphic sets one too, but its buttons are raised at rest.
+ */
+export const GLOW_THEMES: string[] = ['pragmatic', 'pragmatic-gold', 'playful', 'material', 'glass', 'editorial', 'cyberpunk'];
+
 /** A theme's canonical scheme. */
 export function schemeFor(theme: string): Scheme {
     return THEME_META.find((t) => t.name === theme)?.defaultScheme ?? 'light';
