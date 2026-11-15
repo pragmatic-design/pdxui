@@ -3,7 +3,7 @@
 // month's cell is a day; a timeline's cell is a column of a resource's row (column 0 is the resource's
 // name, not a time).
 
-import { zonedInstant } from './time';
+import { zonedInstant, zonedParts } from './time';
 import type { DropPoint } from './drag-model';
 import type { Column } from './grid-model';
 import type { MonthWeek } from './calendar-model';
@@ -33,6 +33,34 @@ export function pointOfCell(m: PointModel, row: number, col: number): DropPoint 
     const r = m.rows[row];
     if (!c || !r) return null;
     return { at: c.start, date: c.date, resource: r.resource?.id ?? null, allDay: c.minutes === null };
+}
+
+/**
+ * The cell a point is in, the inverse of pointOfCell: the time grid's column of its date and resource
+ * (the first of its date without one) and its slot, or the all-day row for a whole-day point; the
+ * month's day; the timeline's row of its resource and the column its instant falls in. Null where the
+ * grid on screen has no such cell: another period, an hour outside the visible ones.
+ */
+export function cellOfPoint(m: PointModel, p: DropPoint): { row: number; col: number } | null {
+    if (m.view === 'time') {
+        const col = m.columns.findIndex((c) => c.date === p.date && (p.resource === null || c.resource?.id === p.resource));
+        if (col < 0) return null;
+        if (p.allDay) return { row: 0, col };
+        const minutes = zonedParts(p.at, m.timeZone).minutes;
+        let slot = -1;
+        for (let i = 0; i < m.slots.length && m.slots[i] <= minutes; i++) slot = i;
+        return slot < 0 ? null : { row: slot + 1, col };
+    }
+    if (m.view === 'month') {
+        for (let row = 0; row < m.weeks.length; row++) {
+            const col = m.weeks[row].days.indexOf(p.date);
+            if (col >= 0) return { row, col };
+        }
+        return null;
+    }
+    const row = m.rows.findIndex((r) => (r.resource?.id ?? null) === p.resource);
+    const col = m.columns.findIndex((c) => p.at >= c.start && p.at < c.end);
+    return row < 0 || col < 0 ? null : { row, col: col + 1 };
 }
 
 /** The grid cell of `grid` under the viewport point (`x`, `y`): its row and column, from its data. */

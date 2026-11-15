@@ -2,12 +2,14 @@
 // do with it, and the name a month's event reads under: shared by the component and its @internal
 // views (#1020), which draw the events the component moves.
 
+import { addDays } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { allowed } from './drag-model';
-import { clockLabel, dayRange } from './labels';
+import { clockLabel, dayRange, spanLabel } from './labels';
 import { resourceLabels } from './event-style';
+import { eventInstant, zonedParts } from './time';
+import { eventDates, isAllDay, type SchedulerEvent, type SchedulerResource } from './grid-model';
 import type { Draft } from './scheduler-drag';
-import type { SchedulerEvent, SchedulerResource } from './grid-model';
 
 /** The id the range being created is drawn under while it is dragged. */
 export const DRAFT_ID = 'pdx-scheduler-draft';
@@ -23,6 +25,18 @@ export function canDo(e: SchedulerEvent, what: 'move' | 'resize', rules: MoveRul
 /** Whether the event is the one being dragged, or the range being created is. */
 export function isDraggedEvent(e: SchedulerEvent, draft: Draft | null): boolean {
     return draft !== null && (e.id === draft.id || (draft.id === '' && e.id === DRAFT_ID));
+}
+
+/**
+ * Where an event is, wherever it is: its time (or «All day») and its days, then its resources; what a
+ * keyboard move says at each step.
+ */
+export function eventWhen(e: SchedulerEvent, timeZone: string, locale: string, resources: readonly SchedulerResource[]): string {
+    const d = eventDates(e, timeZone);
+    const days = dayRange(d.from, addDays(d.to, -1), locale);
+    const minutes = (iso: string) => zonedParts(eventInstant(iso, timeZone), timeZone).minutes;
+    const names = resourceLabels(e, resources);
+    return (isAllDay(e) ? uiString('scheduler', 'allDay') : spanLabel(minutes(e.start), minutes(e.end), locale)) + ', ' + days + (names ? ', ' + names : '');
 }
 
 /** A month's event: its time (or «All day») and its days in this week, then its resources. */

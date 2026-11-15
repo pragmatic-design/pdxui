@@ -16,6 +16,7 @@
             <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" :data-line="it.bar ? null : ''" data-part="event" tabindex="-1" :data-id="it.event.id"
               :style="'--_scheduler-span:' + it.span + ';--_scheduler-lane:' + it.lane + eventColorStyle(it.event, rules.resources)"
               :data-movable="canDo(it.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(it.event, draft) ? '' : null"
+              :aria-describedby="hint && (canDo(it.event, 'move', rules) || canDo(it.event, 'resize', rules)) ? hint : null"
               :data-before="it.before ? '' : null" :data-after="it.after ? '' : null"
               :aria-label="monthEventName(it.event, it.minutes, w.days, it.first, it.span, locale, rules.resources)">
               @render event?.(it.event) @else {
@@ -68,6 +69,8 @@ import type { SchedulerEvent } from './grid-model';
 @prop rules: MoveRules = { disabled: false, readonly: false, resources: [] };
 /** What a pointer drag would make of an event, drawn in its place. */
 @prop draft: Draft | null = null;
+/** The id of the text that says how an event moves from the keyboard, which a movable event points at. */
+@prop hint: string = '';
 /** The owner's event snippet, passed on. */
 @slot event?: (event: SchedulerEvent);
 
