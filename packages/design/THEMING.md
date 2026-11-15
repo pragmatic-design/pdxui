@@ -33,7 +33,7 @@ A designer works at levels **1–2**. Level 3 is a *consumer*: when a component 
 | `--pdx-button-radius` | `0` · `0.5rem` · `9999px` (pill) |
 | `--pdx-input-style` | `outlined` · `filled` · `underlined` |
 | `--pdx-input-focus` | `ring` · `bottom` (the bottom accent of a focused field) |
-| `--pdx-tab-indicator` | `underline` · `pill` |
+| `--pdx-tab-indicator` | `underline` · `pill` (the theme styles the `pills` variant its own way; `line` and `card` keep their shape in every theme, #1090) |
 | `--pdx-card-style` | `bordered` · `elevated` · `flat` |
 | `--pdx-accordion-glyph` + `--pdx-accordion-transform-open` | the glyph, and how it rotates when open |
 | `--pdx-field-required-marker` | the `content` after a required field's label: `' *'` (unset) · any string · `none`. Inherited, so it can also be set on one form or one field; the control's `aria-required` is set whatever it is |
@@ -129,7 +129,7 @@ Options: `--language` (material, fluent, cupertino, neutral…), `--accent`, `--
 
 > ℹ️ **`neutral` is one name for two things, deliberately aligned:** the **shipped canvas theme** (`themes/neutral.css`, active even with no `[pdx-theme]`) and the **engine's default design language** (`pdx theme --language=neutral`), used to *generate* a theme from a brand colour. (The 13 shipped stylesheets are still hand-written; the engine does not generate the shipped themes yet.)
 
-The **Pragmatic** themes are a family sharing one design language: filled pill tabs, a `›` chevron breadcrumb, a "premium" hover with lift and glow, Inter/DM Sans.
+The **Pragmatic** themes are a family sharing one design language: their pills tabs fully round and filled with the primary (the `line` and `card` variants keep their shape), a `›` chevron breadcrumb, a "premium" hover with lift and glow, Inter/DM Sans.
 
 The **famous** themes (Material, Fluent, Cupertino) follow the official specs — update them by reading the original guidelines, not by eye.
 

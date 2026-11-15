@@ -80,9 +80,9 @@
 
 /* Tabs: pill with filled active — Pragmatic family signature */
 @pdx-theme pragmatic-gold {
-[pdx-tab-style="pill"]& .pdx-tabs { border-radius: 9999px; background: light-dark(oklch(0.96 0.008 85), oklch(0.18 0.008 85)); padding: 3px; }
-[pdx-tab-style="pill"]& .pdx-tab { border-radius: 9999px; }
-[pdx-tab-style="pill"]& .pdx-tab[aria-selected="true"] {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tabs { border-radius: 9999px; background: light-dark(oklch(0.96 0.008 85), oklch(0.18 0.008 85)); padding: 3px; }
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab { border-radius: 9999px; }
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab[aria-selected="true"] {
     background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); font-weight: var(--pdx-weight-semibold);
 }
 

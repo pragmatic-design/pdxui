@@ -269,6 +269,18 @@ export const tabs: ComponentManifest = {
                             { description: 'panel.top >= tablist.bottom', left: 'panel.top', op: '>=', right: 'tablist.bottom', tolerance: 2 },
                         ],
                     },
+                    {
+                        // The variant chooses the shape in every theme (#1090): line is not a pill, also in
+                        // the themes whose tab indicator is `pill`, which turned every variant into pills.
+                        // A pill's corners meet: their diameter is its height. Neumorphic's soft 16px corners
+                        // on a 40px tab are its line, not a pill.
+                        description: 'line: the active tab is not a pill',
+                        parent: 'section:not([hidden]) [data-test="tablist"]',
+                        children: { tab: 'section:not([hidden]) [data-test="tab-two"]' },
+                        relations: [
+                            { description: 'corner diameter < height', left: 'tab.borderBottomRightRadius + tab.borderBottomRightRadius', op: '<', right: 'tab.height' },
+                        ],
+                    },
                 ],
             },
             'tabs-bordered': {
@@ -284,6 +296,17 @@ export const tabs: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="tabs-bordered"]',
                         description: 'bordered tabs host has non-negative border radius',
                         radius: { all: { op: '>=', value: 0 } },
+                    },
+                ],
+                composition: [
+                    {
+                        // Bordered line keeps its shape in a pill theme too (#1090).
+                        description: 'bordered line: the active tab is not a pill',
+                        parent: 'section:not([hidden]) [data-test="tablist-bordered"]',
+                        children: { tab: 'section:not([hidden]) [data-test="tabb-a"]' },
+                        relations: [
+                            { description: 'corner diameter < height', left: 'tab.borderBottomRightRadius + tab.borderBottomRightRadius', op: '<', right: 'tab.height' },
+                        ],
                     },
                 ],
                 // Bordered is a custom state of the host (#289), what tabs.css selects; no class.

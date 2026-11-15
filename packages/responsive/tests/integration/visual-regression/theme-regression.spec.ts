@@ -113,6 +113,8 @@ test.describe('Input — variant structure', () => {
     }
 });
 
+// The pills variant's structure in the pill themes. Since #1090 a pill theme styles the pills variant
+// only: line and card keep their shape, so the page's first tab bar is not the one to measure.
 test.describe('Tab — pill vs underline structure', () => {
     const PILL_THEMES: Theme[] = ['pragmatic', 'cupertino', 'playful'];
 
@@ -121,7 +123,7 @@ test.describe('Tab — pill vs underline structure', () => {
             await navigateTo(page, '/components/tabs', theme);
 
             const check = await page.evaluate(() => {
-                const tabs = document.querySelector('.pdx-tabs');
+                const tabs = document.querySelector('pdx-tabs[variant="pills"] .pdx-tabs');
                 if (!tabs) return { ok: false, reason: 'no .pdx-tabs found' };
                 const cs = getComputedStyle(tabs);
                 const noBorder = cs.borderBottomStyle === 'none' || cs.borderBottomWidth === '0px';
@@ -137,7 +139,7 @@ test.describe('Tab — pill vs underline structure', () => {
             await navigateTo(page, '/components/tabs', theme);
 
             const hidden = await page.evaluate(() => {
-                const ind = document.querySelector('.pdx-tab-indicator');
+                const ind = document.querySelector('pdx-tabs[variant="pills"] .pdx-tab-indicator');
                 if (!ind) return true; // no indicator = fine
                 const cs = getComputedStyle(ind);
                 return cs.display === 'none';

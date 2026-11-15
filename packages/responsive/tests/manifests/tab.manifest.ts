@@ -114,32 +114,8 @@ export const tab: ComponentManifest = {
                     ],
                 },
             },
-            cupertino: {
-                'tab-basic': {
-                    standalone: [
-                        {
-                            selector: '[data-test="tabs"]',
-                            description: 'cupertino: segmented control has an inset background',
-                            backgroundColor: { op: 'isNot', value: 'rgba(0, 0, 0, 0)' },
-                        },
-                        {
-                            selector: '[data-test="tabs"]',
-                            description: 'cupertino: segmented control is compact, height <= 40px (32pt)',
-                            height: { op: '<=', value: 40 },
-                        },
-                        {
-                            selector: '[data-test="tabs"]',
-                            description: 'cupertino: segmented control is rounded, radius >= 6px (8pt)',
-                            radius: { all: { op: '>=', value: 6 } },
-                        },
-                        {
-                            selector: '[data-test="tab-active"]',
-                            description: 'cupertino: active segment is raised with a shadow',
-                            boxShadow: { op: 'isNot', value: 'none' },
-                        },
-                    ],
-                },
-            },
+            // Cupertino's segmented control and Playful's filled pill bar are their pills variant's look
+            // since #1090: these native tabs have no variant, and are line tabs in every theme.
             corporate: {
                 'tab-basic': {
                     standalone: [
@@ -147,22 +123,6 @@ export const tab: ComponentManifest = {
                             selector: '[data-test="tab-active"]',
                             description: 'corporate: active tab has a 3px underline',
                             border: { bottom: { width: { op: '>=', value: 3 } } },
-                        },
-                    ],
-                },
-            },
-            playful: {
-                'tab-basic': {
-                    standalone: [
-                        {
-                            selector: '[data-test="tabs"]',
-                            description: 'playful: pill container has an inset background',
-                            backgroundColor: { op: 'isNot', value: 'rgba(0, 0, 0, 0)' },
-                        },
-                        {
-                            selector: '[data-test="tab-active"]',
-                            description: 'playful: active tab is filled',
-                            backgroundColor: { op: 'isNot', value: 'rgba(0, 0, 0, 0)' },
                         },
                     ],
                 },

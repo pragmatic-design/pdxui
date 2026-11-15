@@ -69,12 +69,12 @@
 
 /* Tab: pill variant driven by [pdx-tab-style="pill"] in tabs.css.
    Playful specifics: larger radius, filled primary on active. */
-[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tabs:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { border-radius: var(--pdx-radius-xl); }
-[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tab:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+[pdx-tab-style="pill"][pdx-theme="playful"] :where(pdx-tabs[variant="pills"]) .pdx-tabs:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) { border-radius: var(--pdx-radius-xl); }
+[pdx-tab-style="pill"][pdx-theme="playful"] :where(pdx-tabs[variant="pills"]) .pdx-tab:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
     border-radius: var(--pdx-radius-lg);
     padding: var(--pdx-space-sm) var(--pdx-space-lg);
 }
-[pdx-tab-style="pill"][pdx-theme="playful"] .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+[pdx-tab-style="pill"][pdx-theme="playful"] :where(pdx-tabs[variant="pills"]) .pdx-tab[aria-selected="true"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
     background: var(--pdx-color-primary);
     color: var(--pdx-color-primary-text);
 }

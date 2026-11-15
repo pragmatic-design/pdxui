@@ -69,12 +69,12 @@
 /* Tab: pill variant driven by [pdx-tab-style="pill"] in tabs.css.
    Playful specifics: larger radius, filled primary on active. */
 @pdx-theme playful {
-[pdx-tab-style="pill"]& .pdx-tabs { border-radius: var(--pdx-radius-xl); }
-[pdx-tab-style="pill"]& .pdx-tab {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tabs { border-radius: var(--pdx-radius-xl); }
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab {
     border-radius: var(--pdx-radius-lg);
     padding: var(--pdx-space-sm) var(--pdx-space-lg);
 }
-[pdx-tab-style="pill"]& .pdx-tab[aria-selected="true"] {
+[pdx-tab-style="pill"]& :where(pdx-tabs[variant="pills"]) .pdx-tab[aria-selected="true"] {
     background: var(--pdx-color-primary);
     color: var(--pdx-color-primary-text);
 }

@@ -160,7 +160,9 @@ test.describe('pdx-form-template, wizard layout', () => {
     // wizard.css in before tabs.css, the wizards on a pill-style page (five themes) took the tabs' padding.
     // Measured on the rules, not the computed padding: which one wins depends on the order the page loaded
     // the two stylesheets in, and this page loads them in the order that hides it.
-    test('the pill tab style draws the tabs\' panels, not a wizard\'s', async ({ page }) => {
+    // Since #1090 the pill tab style draws no panel at all: a pill theme styles the pills variant's tabs,
+    // and leaves every panel, a native tabs' or a wizard's, to its own variant.
+    test('the pill tab style draws no panel, a tabs\' or a wizard\'s', async ({ page }) => {
         await page.evaluate(async () => {
             document.documentElement.setAttribute('pdx-tab-style', 'pill');
             await (window as unknown as Win).__gotcha.load('<pdx-tabs></pdx-tabs>'); // brings tabs.css
@@ -186,14 +188,14 @@ test.describe('pdx-form-template, wizard layout', () => {
             for (const sheet of Array.from(document.styleSheets)) walk(sheet.cssRules, false);
             return found;
         });
-        // Control: a native tab panel is drawn by the pill style, so the rules are on the page.
+        // A native tab panel: the pill style drew it before #1090, and fails this line on that code.
         await page.evaluate(() => {
             const p = document.createElement('div');
             p.setAttribute('data-tab-panel', '');
             p.id = 'native-panel';
             document.getElementById('f')!.appendChild(p);
         });
-        expect(await pillRulesSelecting('#native-panel')).not.toEqual([]);
+        expect(await pillRulesSelecting('#native-panel'), 'a pill tab style rule selects a tabs\' panel').toEqual([]);
         expect(await pillRulesSelecting('#t pdx-wizard > [data-wizard-step]'), 'a pill tab style rule selects a wizard panel').toEqual([]);
     });
 
