@@ -1,0 +1,46 @@
+<template>
+  <div class="pdx-scheduler-agenda" data-part="agendaList">
+    @if (groups.length === 0) {
+      <p class="pdx-scheduler-empty">{{ uiString('scheduler', 'noEvents') }}</p>
+    }
+    @for (groups as ad; track ad.date) {
+      <div class="pdx-scheduler-agenda-day" :data-today="ad.date === today ? '' : null">
+        <div class="pdx-scheduler-agenda-date" :id="labelId + '-' + ad.date">{{ dayHeader(ad.date, locale).full }}</div>
+        <ul class="pdx-scheduler-agenda-items" :aria-labelledby="labelId + '-' + ad.date">
+          @for (ad.items as it; track it.event.id) {
+            <li>
+              <button type="button" class="pdx-scheduler-agenda-event" data-part="event" :data-id="it.event.id" :style="eventColorStyle(it.event, resources)">
+                <span class="pdx-scheduler-agenda-time">{{ it.allDay ? uiString('scheduler', 'allDay') : spanLabel(it.start, it.end, locale) }}</span>
+                <span class="pdx-scheduler-agenda-title">@render event?.(it.event) @else { {{ it.event.title }} }</span>
+                @if (resourceLabels(it.event, resources)) { <span class="pdx-scheduler-agenda-resource">{{ resourceLabels(it.event, resources) }}</span> }
+              </button>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+// pdx-scheduler's agenda view (#1020): the period's events by day. Its owner computes the days and
+// handles the clicks, which bubble to it; its parts are pdx-scheduler's (#1110).
+@internal;
+import { uiString } from '../shared/i18n';
+import { dayHeader, spanLabel } from './labels';
+import { eventColorStyle, resourceLabels } from './event-style';
+import type { AgendaDay } from './calendar-model';
+import type { SchedulerEvent, SchedulerResource } from './grid-model';
+
+/** The period's days that have events, each with its events. */
+@prop groups: AgendaDay[] = [];
+/** Today's date (ISO), marked in the list. */
+@prop today: string = '';
+/** The id each day's heading is derived from, so its list is named by it. */
+@prop labelId: string = '';
+/** The resolved locale dates and times are written in. */
+@prop locale: string = '';
+@prop resources: SchedulerResource[] = [];
+/** The owner's event snippet, passed on. */
+@slot event?: (event: SchedulerEvent);
+</script>
