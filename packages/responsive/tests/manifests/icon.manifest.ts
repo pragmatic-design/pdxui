@@ -6,7 +6,7 @@
  * DOM STRUCTURE (light DOM, no shadow):
  *   <pdx-icon> (host) > <span data-part="root" class="pdx-icon-container"> > <svg>
  *   The class is how pdx.reset sees the root, and keeps a page's bare `span { border }` off it.
- *   icon.css draws the root (inline-flex, centred, `--pdx-icon-size` square); the effect writes only
+ *   icon.css draws the host (inline-flex, #1087) and the root (centred, `--pdx-icon-size` square); the effect writes only
  *   `--pdx-icon-size` on it (#291). The inner <svg> is normalised to width:100% / height:100% (it fills
  *   the root).
  *
@@ -85,10 +85,18 @@ export const icon: ComponentManifest = {
             'icon-decorative': {
                 standalone: [
                     {
-                        // The root is inline-flex (icon.css).
+                        // The host is a flex container (icon.css, #1087): as tall as its glyph, so the
+                        // glyph is centred where the host is. inline-flex, which a flex parent (as the
+                        // scenario's) makes flex.
+                        selector: 'section:not([hidden]) [data-test="icon-decorative"]',
+                        description: 'icon host is a flex container',
+                        display: { op: 'oneOf', value: ['inline-flex', 'flex'] },
+                    },
+                    {
+                        // The root is the host's flex item: its inline-flex computes to flex.
                         selector: 'section:not([hidden]) [data-test="icon-decorative"] [data-part="root"]',
-                        description: 'icon container is inline-flex',
-                        display: { op: 'is', value: 'inline-flex' },
+                        description: 'icon container is the host\'s flex item',
+                        display: { op: 'is', value: 'flex' },
                     },
                     {
                         // md (default) → 20px. A cautious bound: >= 12 (the smallest size, xs).

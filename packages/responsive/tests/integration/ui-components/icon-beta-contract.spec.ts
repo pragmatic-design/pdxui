@@ -29,11 +29,12 @@ test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=i
 test('the container is the root part, drawn by the stylesheet: no inline layout or animation', async ({ page }) => {
     await mount(page, '<pdx-icon id="i" name="check"></pdx-icon>', 1);
     await expect(root(page, '#i')).toHaveCount(1);
+    // The host is inline-flex (#1087), so the root is its flex item: its inline-flex computes to flex.
     const drawn = await root(page, '#i').evaluate((r) => {
         const cs = getComputedStyle(r);
-        return { display: cs.display, inline: (r as HTMLElement).style.cssText.match(/display|animation|align-items|line-height/g) ?? [] };
+        return { host: getComputedStyle(r.parentElement!).display, display: cs.display, inline: (r as HTMLElement).style.cssText.match(/display|animation|align-items|line-height/g) ?? [] };
     });
-    expect(drawn).toEqual({ display: 'inline-flex', inline: [] });
+    expect(drawn).toEqual({ host: 'inline-flex', display: 'flex', inline: [] });
 });
 
 test('spin is :state(spin), and the root turns; without it, no state and no animation', async ({ page }) => {
