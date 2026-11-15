@@ -15,6 +15,15 @@ export * from '@playwright/test';
 const PAGE_TIMEOUT = Number(process.env.PDX_SITE_PAGE_TIMEOUT ?? 60_000);
 
 export const test = base.extend({
+    // The site links its fonts from Google Fonts. The suite does not read them (#1114): a font the CDN
+    // once answered without its CORS header made a page log an error, and component-pages failed a
+    // change with no font in it. Its stylesheet is answered empty, so no font is asked for either, and
+    // every page lays out once, with the fallback fonts.
+    context: async ({ context }, use) => {
+        await context.route(/^https:\/\/fonts\.googleapis\.com\//, (route) => route.fulfill({ status: 200, contentType: 'text/css', body: '' }));
+        await context.route(/^https:\/\/fonts\.gstatic\.com\//, (route) => route.fulfill({ status: 204, body: '' }));
+        await use(context);
+    },
     // What Playwright's own `page` does outside its reuse mode, which this suite does not use: a
     // fixture that wrapped that one would wait for it under the test's timeout.
     page: [async ({ context }, use) => { await use(await context.newPage()); }, { scope: 'test', timeout: PAGE_TIMEOUT }],
