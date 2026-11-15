@@ -1,0 +1,49 @@
+<template>
+  <div class="pdx-scheduler-year">
+    @for (months as m; track m.key) {
+      <div class="pdx-scheduler-mini" data-part="yearMonth" role="grid" :aria-label="monthName(m.key, locale)" aria-readonly="true">
+        <div class="pdx-scheduler-mini-title" aria-hidden="true">{{ monthName(m.key, locale) }}</div>
+        <div role="row" class="pdx-scheduler-row">
+          @for (headsOf(m) as h; track h.key) {
+            <div role="columnheader" class="pdx-scheduler-mini-head" :aria-label="h.full">{{ h.narrow }}</div>
+          }
+        </div>
+        @for (m.weeks as w; track w[0].date) {
+          <div role="row" class="pdx-scheduler-row">
+            @for (w as d; track d.date) {
+              @if (d.inMonth) {
+                <div role="gridcell" class="pdx-scheduler-mini-day" data-part="slot" :data-date="d.date" :tabindex="d.date === cursor ? 0 : -1"
+                  :data-events="d.count > 0 ? '' : null" :data-today="d.date === today ? '' : null" :aria-current="d.date === today ? 'date' : null"
+                  :aria-label="format(uiString('scheduler', 'dayName'), { date: dayHeader(d.date, locale).full, count: d.count })">{{ dayHeader(d.date, locale).day }}</div>
+              } @else {
+                <div role="gridcell" class="pdx-scheduler-mini-day" data-outside></div>
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+// pdx-scheduler's year view (#1020): twelve months, the days with events marked. Its owner computes
+// the months and the tab stop, and handles the keys and clicks, which bubble to it; its parts are
+// pdx-scheduler's (#1110).
+@internal;
+import { uiString, format } from '../shared/i18n';
+import { dayHeader, monthName, weekdayName } from './labels';
+import type { YearMonth } from './calendar-model';
+
+/** The year's months, each with its weeks of days. */
+@prop months: YearMonth[] = [];
+/** The day the view's one tab stop is on (ISO). */
+@prop cursor: string = '';
+/** Today's date (ISO), marked. */
+@prop today: string = '';
+/** The resolved locale dates are written in. */
+@prop locale: string = '';
+
+/** A month's weekday heads, from its first week. */
+function headsOf(m: YearMonth) { return m.weeks[0].map((d) => ({ key: d.date, ...weekdayName(d.date, locale) })); }
+</script>
