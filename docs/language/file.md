@@ -96,6 +96,9 @@ explicitly. The prefix `pdx-` is reserved for the `@pdxui/*` packages.
   inside the package, with no `package.json` of its own (a demo, the package's own test harness),
   which names `prefix: 'pdx'` itself when it compiles the package's components.
 - Two files that derive one tag are `PDX_TAG_COLLISION`, as in alpha.
+- A library's public components are its `pdx-*` files. A file named otherwise is an internal one, and
+  says so with `@internal` ([script.md](script.md#internal), #1102): `scheduler/scheduler-month.pdx`
+  registers `<pdx-scheduler-month>`, which only the components of its folder render.
 - `pdx migrate` renames an existing application's `pdx-` tags in its templates, its CSS selectors and
   its `@tag` lines, and reports a tag it finds inside a string.
 

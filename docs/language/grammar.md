@@ -55,7 +55,7 @@ ScriptItem     ::= Declaration | RuneStatement | Statement
 Declaration    ::= ComponentDecl | RouteDecl | DataDecl | ModuleDecl
 
 ComponentDecl  ::= PropDecl | ModelDecl | EventDecl | SlotDecl | GenericDecl | StateDecl | PartDecl
-                 | HostDecl | ExposeDecl | ProvideDecl | InjectDecl | VariantsDecl | TagDecl | HydrateDecl
+                 | HostDecl | ExposeDecl | ProvideDecl | InjectDecl | VariantsDecl | TagDecl | HydrateDecl | InternalDecl
 ModuleDecl     ::= UseDecl | SnippetDecl | I18nDecl | RawScriptBlock                                    († `@mixin` removed — decisions.md 6)
 RouteDecl      ::= PageDecl | GuardDecl | LoaderDecl | LayoutDecl | OutletDecl | ScrollDecl | RedirectDecl
                  | ParamsDecl | SearchDecl | TitleDecl | MetaDecl
@@ -86,6 +86,7 @@ VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                
 VariantAxis    ::= Identifier S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? Word )? S? ";"
 VariantValue   ::= Word ( S? ":" S? StringLiteral )?                                                (β #986: every value of an axis names its native selector, or none does)
 TagDecl        ::= "@tag" S StringLiteral End
+InternalDecl   ::= "@internal" End                                                                  (β #1102: rendered only from its own folder)
 ```
 
 ### Module declarations

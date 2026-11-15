@@ -22,6 +22,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_TAG_COLLISION` | error | Two compiled `.pdx` files register the same tag (build error). | [The tag](file.md#the-tag) |
 | `PDX_TAG_RESERVED` | error | An application component's tag starts with `pdx-`, the @pdxui packages' prefix (#136). | [The tag](file.md#the-tag) |
 | `PDX_TAG_COLLISION_RESOLVER` | warn | Two component files derive the same tag; the second is not auto-importable. | [The tag](file.md#the-tag) |
+| `PDX_INTERNAL_COMPONENT` | error | A template outside its folder renders, or a script outside it imports, an `@internal` component (#1102). | [@internal](script.md#internal) |
+| `PDX_INTERNAL_NAMED_PUBLIC` | error | A file named `pdx-…` declares `@internal` (#1102). | [@internal](script.md#internal) |
 | `PDX_REMOVED_FORM` | error | A form the beta removed from the language, with the form that replaces it. | [One language, no levels](file.md#one-language-no-levels) |
 
 ## Script declarations and runes

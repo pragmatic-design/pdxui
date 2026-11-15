@@ -754,6 +754,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<p>{{ a }}</p>', "@tag 'app-badge';\nlet a = $signal(1);"),
         },
     },
+    PDX_INTERNAL_COMPONENT: {
+        severity: 'error', category: 'defect',
+        summary: 'A template outside its folder renders, or a script outside it imports, an `@internal` component (#1102).',
+        explanation: "`@internal;` says that only the components of the file's own folder render it: a view of a larger component, split out of its file. Its props and events are that component's business and can change with it, and a library leaves it out of its manifest, exports and pages — so another folder's use is one nothing documents and nothing keeps working.",
+        fix: 'Render the public component that owns it instead, or move the file that uses it into its folder; if it is meant for everyone, drop `@internal` and give it a public name.',
+        reproducedIn: `${T}internal-component.test.ts`,
+    },
+    PDX_INTERNAL_NAMED_PUBLIC: {
+        severity: 'error', category: 'defect',
+        summary: 'A file named `pdx-…` declares `@internal` (#1102).',
+        explanation: "In a library a `pdx-` file name is what makes a component public: its manifest, its exports, its site page and its certification list every `pdx-*` file. One file cannot be public by its name and internal by its script.",
+        fix: 'Rename the file without the `pdx-` prefix, or drop `@internal`.',
+        reproducedIn: `${T}internal-component.test.ts`,
+    },
     PDX_EMPTY_SOURCE: {
         severity: 'error', category: 'defect',
         summary: 'An empty `.pdx` file (build error).',

@@ -44,6 +44,7 @@ import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { writeRouteTypes } from './route-types';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
+import { importedInternals, checkInternalUses, type ReadComponent } from './internal-components';
 import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
@@ -559,6 +560,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                     alphaOf: (tag) => componentResolver.alphaOf(tag),
                     requiredPropsOf: (tag) => componentResolver.requiredPropsOf(tag),
                     requiredSlotsOf: (tag) => componentResolver.requiredSlotsOf(tag),
+                    readComponent: (file) => { try { return readFileSync(file, 'utf-8'); } catch { return null; } },
+                    internalFileOf: (tag) => componentResolver.internalFileOf(tag),
                     eventHeardAbove: (event, tag) => componentResolver.eventHeardAbove(event, tag),
                     importPathOf: (tag) => componentResolver.resolve(tag)?.importPath ?? null,
                 });
@@ -579,7 +582,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
 
                 // Auto-import: detect <pdx-*> tags and inject component imports
                 // Pass resolved template for <template src="..."> external templates
-                output = injectComponentImports(output, id, code, componentResolver, result.resolvedTemplate, shiftMap);
+                output = injectComponentImports(output, id, code, componentResolver, result.resolvedTemplate, shiftMap, result.internalTags);
 
                 // Tag collision detection: two .pdx files must not derive the same CE tag
                 const tagMatch = output.match(/component\('([\w-]+)'/);
@@ -713,6 +716,11 @@ export interface CompileResult {
     warnings: ValidationWarning[];
     /** Resolved template content (for external <template src="...">, or inline). Used by auto-import. */
     resolvedTemplate?: string;
+    /**
+     * The `@internal` components the script imports (#1102): their tags are registered by that
+     * import, so auto-import neither adds one nor calls them unresolved.
+     */
+    internalTags?: string[];
 }
 
 /**
@@ -798,6 +806,17 @@ export interface CompileOptions {
      * it, a use that does not fill one is PDX_SLOT_REQUIRED (#489).
      */
     requiredSlotsOf?: RequiredSlotsLookup;
+    /**
+     * Reads a component file the script imports (`import './x.pdx'`): with it, an `@internal` one
+     * imported from another folder is PDX_INTERNAL_COMPONENT (#1102). The plugin reads from disk.
+     */
+    readComponent?: ReadComponent;
+    /**
+     * The file that declares an internal component's tag, or null (the plugin passes the resolver's:
+     * the project's `@internal` files). With it, a template of another folder that renders the tag
+     * is PDX_INTERNAL_COMPONENT (#1102).
+     */
+    internalFileOf?: (tag: string) => string | null;
     /**
      * Whether the project listens to an event above a component (the plugin passes the resolver's
      * `eventHeardAbove`: the project's templates). With it, an `@event(bubbles)` nothing hears above
@@ -963,6 +982,14 @@ export function compile(
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);
         }
     }
+    // `@internal` components (#1102): imported, or rendered, from another folder than theirs.
+    const internalTags: string[] = [];
+    if (options?.readComponent) {
+        const imported = importedInternals(scriptContent, filename, options.readComponent, options.prefix ?? DEFAULT_TAG_PREFIX);
+        internalTags.push(...imported.internals.map((c) => c.tag));
+        allWarnings.push(...imported.warnings);
+    }
+    if (options?.internalFileOf) allWarnings.push(...checkInternalUses(ast, filename, options.internalFileOf));
     // What the styles say that the browser will not read.
     allWarnings.push(...validateStyles(descriptor.styles ?? [], source));
     // The variants the script declares against the @variant rules the styles write (#153).
@@ -1064,7 +1091,7 @@ export function compile(
     // Each finding points to where its code is explained.
     for (const w of warnings) w.url ??= diagnosticUrl(w.code);
 
-    return { code, map, warnings, resolvedTemplate: descriptor.template?.content };
+    return { code, map, warnings, resolvedTemplate: descriptor.template?.content, ...(internalTags.length ? { internalTags } : {}) };
 }
 
 /** Count newlines in source from `start` to `end` position. */

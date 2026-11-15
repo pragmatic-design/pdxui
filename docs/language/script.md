@@ -867,6 +867,58 @@ the same line, so the tag is auto-imported where a template uses it.
 
 alpha; `pdx-` reserved since beta (#136)
 
+### @internal
+
+#### Syntax
+
+```ebnf
+InternalDecl ::= "@internal" S? ";"?
+```
+
+The analyzer's form: `@internal;`
+
+#### Semantics
+
+A component only the components of its own folder render: a view of a larger component, split out of
+its file. It compiles like any other, under the tag its file name gives ([file.md](file.md#the-tag)),
+and its folder is its scope:
+
+- the component that renders it imports it, `import './scheduler-month.pdx';`. The component resolver
+  never auto-imports an internal tag, and a tag the script imports this way is not reported as
+  unresolved;
+- in a library it is part of no public surface. A library's public components are its `pdx-*` files,
+  which its manifest, exports, pages and certification list; an internal one is named without the
+  prefix (`scheduler-month.pdx` registers `<pdx-scheduler-month>`) and appears in none of them.
+
+#### Rules
+
+- A script in another folder that imports it, or a template in another folder that renders its tag (a
+  project component, which the resolver knows), raises `PDX_INTERNAL_COMPONENT` (#1102). A library's
+  internal component is in no export, so another package cannot reach it at all.
+- `@internal` in a file named `pdx-…` raises `PDX_INTERNAL_NAMED_PUBLIC`: in a library that name is
+  what makes a component public.
+- `@pdxui/ui`'s manifest generator refuses a `.pdx` under `src/` named without `pdx-` whose script
+  does not declare `@internal`: a component does not leave the public surface without saying so.
+
+#### Examples
+
+```pdx
+<template>
+  <ol class="month">
+    @for (weeks as w; track w.key) { <li>{{ w.label }}</li> }
+  </ol>
+</template>
+
+<script>
+@internal;
+@prop weeks: { key: string; label: string }[] = [];
+</script>
+```
+
+#### Since
+
+beta (#1102)
+
 ### @use
 
 #### Syntax

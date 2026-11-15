@@ -641,6 +641,8 @@ export function injectComponentImports(
     resolvedTemplate?: string,
     /** Told where whole lines go in (0-based line, how many), so a source map can move with them. */
     onInsert?: (line: number, count: number) => void,
+    /** The `@internal` components the script imports itself (#1102): registered by that import. */
+    importedInternal: readonly string[] = [],
 ): string {
     if (resolver.size === 0) return compiledCode;
 
@@ -674,6 +676,8 @@ export function injectComponentImports(
     for (const tag of [...usedTags]) {
         if (!new RegExp(`<${tag}\\b`, 'i').test(outsideDefer)) usedTags.delete(tag);
     }
+    // An internal component is registered by the script's own import of it, and by nothing else.
+    for (const tag of importedInternal) usedTags.delete(tag);
 
     // warnUnsaved (in @form or in a createForm written in script) asks through the in-app dialog,
     // which <pdx-overlay-outlet> draws. No template names it, and without it registered the

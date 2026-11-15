@@ -306,6 +306,8 @@ export interface ScriptAnalysis {
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
     customTag?: string;      // @tag 'app-custom-name' — overrides file-derived tag
+    /** `@internal;` (#1102): rendered only by the components of its own folder, never public. */
+    internal?: true;
     i18n?: I18nInfo;         // @i18n configuration block
     head: HeadInfo;          // @title/@meta head management
     provides: ProvideDecl[];  // @provide Token = expr;

@@ -33,6 +33,8 @@ export { compileSFC } from './compiler/codegen';
 /** The filename → custom element tag rule. The one rule: the CLI and the LSP call it. */
 export { deriveTag } from './compiler/codegen-shared';
 export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './compiler/tag-prefix';
+/** Whether a .pdx source declares `@internal` (#1102): what a library's manifest generator leaves out. */
+export { declaresInternal } from './internal-components';
 export { analyzeScript, inlineFormFields } from './compiler/script-analyzer';
 // A .pdx component with its doc comments (#1003): what the library's manifest generator reads.
 export { describeComponent, type ComponentDescription } from './describe-component';

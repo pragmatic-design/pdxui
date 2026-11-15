@@ -22,6 +22,7 @@ import { modelEventName } from './compiler/dts-generator';
 import type { AlphaEvents } from './language/alpha-events';
 import { signatureParamNames } from './language/slot-markup';
 import { outletSnippetParams } from './language/scoped-slot-outlet';
+import { declaresInternal } from './internal-components';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -29,6 +30,8 @@ export interface ComponentEntry {
     importPath: string;
     /** 'ui' = a component package (@pdxui/ui, @pdxui/router, any that declares customElements), 'project' = local .pdx file */
     source: 'ui' | 'project';
+    /** A project `.pdx` that declares `@internal` (#1102): never auto-imported, rendered only from its folder. */
+    internal?: true;
 }
 
 /** What a known component with no model answers: `::x` on it binds nothing back. */
@@ -158,6 +161,12 @@ export class ComponentResolver {
      * Kept SEPARATE from `has()` on purpose. Folding these into the import map would make the
      * compiler emit an import for a tag that has no module behind it.
      */
+    /** The file that declares an `@internal` project component's tag (#1102), or null. */
+    internalFileOf(tag: string): string | null {
+        const entry = this.map.get(tag.toLowerCase());
+        return entry?.internal ? entry.importPath : null;
+    }
+
     knownWithoutImport(tag: string): boolean {
         const t = tag.toLowerCase();
         if (this.map.has(t)) return true;
@@ -578,6 +587,8 @@ export class ComponentResolver {
         for (const tag of usedTags) {
             const entry = this.map.get(tag);
             if (!entry) continue;
+            // The component that renders an internal one imports it (#1102): explicit, and only from its folder.
+            if (entry.internal) continue;
 
             // Skip if already explicitly imported. Use an exact, quote-delimited match
             // so '@pdxui/ui/button-group' does NOT suppress '@pdxui/ui/button'.
@@ -620,13 +631,13 @@ export class ComponentResolver {
         });
     }
 
-    /** Quick scan for @tag 'name' in a .pdx file without full parsing. */
-    private _detectTag(filePath: string): string | null {
+    /** Quick scan of a .pdx file without full parsing: its `@tag 'name'`, and whether it is `@internal`. */
+    private _detectTag(filePath: string): { tag: string | null; internal: boolean } {
         try {
             const content = readFileSync(filePath, 'utf-8');
             const match = content.match(/@tag\s+['"]([^'"]+)['"]/);
-            return match ? match[1] : null;
-        } catch { return null; }
+            return { tag: match ? match[1] : null, internal: declaresInternal(content) };
+        } catch { return { tag: null, internal: false }; }
     }
 
     private _scanDir(dir: string, rootDir: string, depth = 0): void {
@@ -645,7 +656,7 @@ export class ComponentResolver {
                         // Skip special files (_layout, _error)
                         if (baseName.startsWith('_')) continue;
                         // Check for @tag override in script
-                        const declaredTag = this._detectTag(fullPath);
+                        const { tag: declaredTag, internal } = this._detectTag(fullPath);
                         const tag = declaredTag ?? deriveTag(normalizePath(fullPath), tagPrefixFor(fullPath, this._prefix, rootDir));
                         this.declaredTags.set(normalizePath(fullPath), declaredTag);
                         // Don't overwrite @pdxui/ui entries — library takes precedence
@@ -665,6 +676,7 @@ export class ComponentResolver {
                             tag,
                             importPath: normalizePath(fullPath),
                             source: 'project',
+                            ...(internal ? { internal: true as const } : {}),
                         });
                     }
                 } catch { /* skip unreadable */ }

@@ -204,6 +204,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     let paramsBlockText: string | null = null;
     let globalStore: GlobalStoreDirective | undefined;
     let customTag: string | undefined;
+    let internal = false;
     let i18nInfo: I18nInfo | undefined;
     const head: HeadInfo = { meta: [] };
     const provides: ProvideDecl[] = [];
@@ -891,6 +892,23 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
+        // ─── @internal; — a component only its own folder renders (#1102) ───
+        if (/^@internal\s*;?\s*$/.test(trimmed)) {
+            internal = true;
+            // In a library a `pdx-` file name is what makes a component public: one file cannot be both.
+            // The name is cut by hand: the compiler also runs in a browser (the builder), without node:path.
+            const file = _filename.slice(Math.max(_filename.lastIndexOf('/'), _filename.lastIndexOf('\\')) + 1);
+            if (file.startsWith('pdx-')) {
+                warnings.push({
+                    code: 'PDX_INTERNAL_NAMED_PUBLIC',
+                    severity: 'error',
+                    message: `${file} is declared @internal, but a file named pdx-… is a public component of its library: its manifest, exports and pages list it.`,
+                    hint: `Rename the file without the pdx- prefix (${file.slice(4)}), or drop @internal if the component is public.`,
+                });
+            }
+            continue;
+        }
+
         // ─── Route and head forms the beta removed (#277) ───
         // `@route { … }`, `@alias`, `@prefetch`, the script's `@transition`, `@meta { … }` and
         // `@head { … }`: `@page` is the one home of every route field, and `@title` and `@meta` write the
@@ -1402,6 +1420,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         route,
         globalStore,
         customTag,
+        ...(internal ? { internal: true as const } : {}),
         i18n: i18nInfo,
         head,
         provides,
