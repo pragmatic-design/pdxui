@@ -54,31 +54,8 @@
         }
       </div>
     } @else if (view === 'year') {
-      <div class="pdx-scheduler-year" :ref="gridEl" @keydown="onYearKey($event)" @click="onYearClick($event)">
-        @for (yearMonths as m; track m.key) {
-          <div class="pdx-scheduler-mini" data-part="yearMonth" role="grid" :aria-label="monthName(m.key, loc)" aria-readonly="true">
-            <div class="pdx-scheduler-mini-title" aria-hidden="true">{{ monthName(m.key, loc) }}</div>
-            <div role="row" class="pdx-scheduler-row">
-              @for (monthHeadsOf(m) as h; track h.key) {
-                <div role="columnheader" class="pdx-scheduler-mini-head" :aria-label="h.full">{{ h.narrow }}</div>
-              }
-            </div>
-            @for (m.weeks as w; track w[0].date) {
-              <div role="row" class="pdx-scheduler-row">
-                @for (w as d; track d.date) {
-                  @if (d.inMonth) {
-                    <div role="gridcell" class="pdx-scheduler-mini-day" data-part="slot" :data-date="d.date" :tabindex="d.date === yearCursor ? 0 : -1"
-                      :data-events="d.count > 0 ? '' : null" :data-today="d.date === todayDate ? '' : null" :aria-current="d.date === todayDate ? 'date' : null"
-                      :aria-label="format(uiString('scheduler', 'dayName'), { date: dayHeader(d.date, loc).full, count: d.count })">{{ dayHeader(d.date, loc).day }}</div>
-                  } @else {
-                    <div role="gridcell" class="pdx-scheduler-mini-day" data-outside></div>
-                  }
-                }
-              </div>
-            }
-          </div>
-        }
-      </div>
+      <pdx-scheduler-year :months="yearMonths" :cursor="yearCursor" :today="todayDate" :locale="loc" :ref="gridEl"
+        @keydown="onYearKey($event)" @click="onYearClick($event)"></pdx-scheduler-year>
     } @else if (view === 'agenda') {
       <pdx-scheduler-agenda :groups="agendaGroups" :today="todayDate" :label-id="periodId" :locale="loc" :resources="resources" :event="event"
         @click="onClick($event)"></pdx-scheduler-agenda>
@@ -240,17 +217,18 @@ import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, eventInstant } from './time';
 import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
-import { buildMonthWeeks, buildYearMonths, buildAgendaDays, type MonthWeek, type YearMonth } from './calendar-model';
+import { buildMonthWeeks, buildYearMonths, buildAgendaDays, type MonthWeek } from './calendar-model';
 import { timelineRows, timelineColumns, placeTimeline, axisPosition, itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
 import { timelineWindow } from './timeline-window';
 import { slotWindow } from './time-window';
-import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, monthName, weekdayName, timelineHeader } from './labels';
+import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { allowed, conflicts, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft, type Gesture } from './scheduler-drag';
 import { cellAt, pointOfCell } from './drop-point';
 import { eventColorStyle, resourceLabels } from './event-style';
 import './scheduler-agenda.pdx';
+import './scheduler-year.pdx';
 import '@pdxui/design/components/scheduler';
 
 type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
@@ -445,7 +423,6 @@ function eventsAt(ci: number, ri: number): PlacedEvent[] {
 }
 function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
 function itemsAt(w: MonthWeek, di: number) { return w.items.filter((it) => it.first === di); }
-function monthHeadsOf(m: YearMonth) { return m.weeks[0].map((d) => ({ key: d.date, ...weekdayName(d.date, loc) })); }
 function viewName(v: CalendarView): string { return v === 'days' ? format(uiString('scheduler', 'daysView'), { count: days }) : uiString('scheduler', v); }
 function offHours(c: Column, minutes: number): boolean { return !isBusinessTime(c.date, minutes, c.resource?.businessHours ?? businessHours); }
 function timeOf(p: PlacedEvent): string {

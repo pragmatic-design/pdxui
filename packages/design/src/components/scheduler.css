@@ -501,9 +501,9 @@ pdx-scheduler {
 /* ===== Agenda ===== */
 /* The days that have events, each a date over its list; an event is its time, its title, its resource. */
 
-/* The view's own element, an @internal component of pdx-scheduler (#1020): no box of its own, so the
-   list inside it lays out in the scheduler as it did before the split. */
-:where(pdx-scheduler-agenda) {
+/* The views' own elements, @internal components of pdx-scheduler (#1020): no box of their own, so
+   what is inside each lays out in the scheduler as it did before the split. */
+:where(pdx-scheduler-agenda, pdx-scheduler-year) {
     display: contents;
 }
 
