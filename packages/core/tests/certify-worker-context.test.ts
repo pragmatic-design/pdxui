@@ -57,6 +57,30 @@ describe('every certify spec reuses the worker context', () => {
     });
 });
 
+/**
+ * Whether `source` installs a clock without a context of its own. A clock is installed on the whole
+ * context, the shared context cannot take it off, and every later page of the worker kept the fixed
+ * clock: a text-fields page lost its execution context mid-evaluate (#1094).
+ */
+function clockOnSharedContext(source: string): boolean {
+    return /\.clock\.\w+\(/.test(source) && !/\bbrowser\.newContext\(/.test(source);
+}
+
+describe('a clock is never installed on the shared context (#1094)', () => {
+    it('the reader can fail', () => {
+        expect(clockOnSharedContext('await page.clock.setFixedTime(new Date());')).toBe(true);
+        expect(clockOnSharedContext('const c = await browser.newContext(); const p = await c.newPage(); await p.clock.install();')).toBe(false);
+        expect(clockOnSharedContext('await page.goto("/");')).toBe(false);
+    });
+
+    for (const [name, dir] of [['certify', SPECS], ['showcase', SHOWCASE_SPECS]] as const) {
+        it(`no ${name} spec installs a clock on the worker's shared context`, () => {
+            const wrong = readdirSync(dir).filter((f) => f.endsWith('.spec.ts') && clockOnSharedContext(readFileSync(join(dir, f), 'utf8')));
+            expect(wrong, 'a test with a clock opens its own context: browser.newContext(), closed with the test').toEqual([]);
+        });
+    }
+});
+
 describe('every showcase spec reuses the worker context', () => {
     // The showcase's build suite left 3,298 sockets in TIME_WAIT on its port, and `page.goto` was
     // refused there inside the full gate on Windows (#32). It takes the same fixture, through
