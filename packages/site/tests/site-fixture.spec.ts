@@ -29,7 +29,14 @@ function probe(root: string, name: string, env: Record<string, string>): Promise
         execFile(process.execPath, [CLI, 'test', '--config', 'tests/fixture-probe/playwright.config.ts'], {
             cwd: SITE,
             env: { ...process.env, PDX_SITE_PAGE_TIMEOUT: '6000', PDX_PROBE_OUT: out, PDX_PROBE_JSON: jsonFile, ...env },
-        }, () => {
+        }, (error, stdout, stderr) => {
+            // The report is written before the child exits, so a missing one is a child that ended
+            // before its test ran (#1099): say how, instead of an ENOENT that names only the file.
+            if (!existsSync(jsonFile)) {
+                const tail = (s: string) => s.trim().split('\n').slice(-20).join('\n');
+                done({ out, status: 'no-report', message: `the child run wrote no report (exit ${error?.code ?? 0}${error?.signal ? `, ${error.signal}` : ''}):\n${tail(stderr)}\n${tail(stdout)}` });
+                return;
+            }
             const json = JSON.parse(readFileSync(jsonFile, 'utf8'));
             const result = json.suites[0].specs[0].tests[0].results[0];
             done({ out, status: result.status, message: result.error?.message ?? '' });

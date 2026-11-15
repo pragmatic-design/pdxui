@@ -83,6 +83,13 @@ const OCCURRENCES = [
         },
     },
     {
+        issue: 1099, why: 'a child run of site-fixture.spec that wrote no report, in browser (site 3/3) (2026-11-15)',
+        failure: {
+            file: 'packages/site/tests/site-fixture.spec.ts', title: 'page creation has its own timeout, and a failure records the fixtures over 5 s',
+            error: "Error: ENOENT: no such file or directory, open '/tmp/pdx-site-fixture-3dEIMz/slow.json'",
+        },
+    },
+    {
         issue: 1027, why: 'remove-tree\'s grandchild case found dist/ free in the gate (2026-11-11)',
         failure: {
             file: 'packages/cli/tests/remove-tree.test.ts', title: 'on Windows, names a process outside the children that sits in the tree',
