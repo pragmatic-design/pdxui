@@ -347,6 +347,20 @@ export const datePicker: ComponentManifest = {
                             { description: 'calendar grid within panel', left: 'grid', op: 'contained-in', right: 'panel' },
                         ],
                     },
+                    {
+                        // The same inset at the top as at the side: the panel's padding and the calendar's
+                        // navigation row stacked at the top only, 25px against 13 (#1088). Within 2px: the
+                        // row centres its 32px buttons on the title, and fluent's title leaves 1.6px.
+                        description: 'the calendar sits in the panel with an even inset',
+                        parent: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
+                        children: {
+                            panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
+                            prev: 'section:not([hidden]) [data-test="dp-open"] .pdx-cal-nav-btn',
+                        },
+                        relations: [
+                            { description: 'top inset == side inset', left: 'prev.top - panel.top', op: '==', right: 'prev.left - panel.left', tolerance: 2 },
+                        ],
+                    },
                 ],
             },
 
