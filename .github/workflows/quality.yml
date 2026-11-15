@@ -72,11 +72,18 @@ jobs:
         run: pnpm lint --max-warnings=-1
 
   # The four packages with coverage thresholds, run ONCE, with coverage: the run is also the
-  # suite. `--no-bail`, in the script, so one package's failure cannot hide another's.
+  # suite. A runner each (#1082): one job ran all four in 375–577 s on 2026-11-14, the longest job
+  # of a pull request once certification was sharded. The root `coverage` script still runs the four
+  # together locally and is the source of the list; gate-coverage holds the matrix to it. A failed
+  # package cannot hide another: each has its own job, and `fail-fast: false` lets every one finish.
   coverage:
-    name: coverage (core · compiler · router · lsp)
+    name: coverage (${{ matrix.package }})
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [core, compiler, router, lsp]
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -86,17 +93,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Build (every package)
         run: pnpm build
-      - name: Suites with coverage thresholds
-        run: pnpm coverage
+      - name: Suite with coverage thresholds
+        run: pnpm --filter @pdxui/${{ matrix.package }} exec vitest run --coverage
       - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: coverage-report
-          path: |
-            packages/core/coverage
-            packages/compiler/coverage
-            packages/router/coverage
-            packages/lsp/coverage
+          name: coverage-report-${{ matrix.package }}
+          path: packages/${{ matrix.package }}/coverage
 
   # The rest of the unit half: `test:unit` without the four that `coverage` runs. The script only
   # EXCLUDES, so a package added tomorrow lands here.
