@@ -72,12 +72,15 @@ export function importedInternals(script: string, filename: string, read: ReadCo
     return { internals, warnings };
 }
 
+/** An `@internal` view a component draws through, with its template and script. */
+export interface InternalView { file: string; template: string; script: string }
+
 /**
- * The parts the `@internal` views a script imports draw (#1110), each with the view that draws it —
- * the first one, when two do — and the views those import in turn: all of them are the owner's parts.
+ * The `@internal` views a script imports, and the views those import in turn, each once, in the order
+ * they are first imported: what they draw is the owner's (#1110). A file that cannot be read is skipped.
  */
-export function viewParts(script: string, filename: string, read: ReadComponent, seen = new Set<string>()): Map<string, string> {
-    const out = new Map<string, string>();
+export function internalViews(script: string, filename: string, read: ReadComponent, seen = new Set<string>()): InternalView[] {
+    const out: InternalView[] = [];
     for (const m of script.matchAll(PDX_IMPORT)) {
         const file = resolve(dirname(filename), m[1]);
         if (seen.has(file)) continue;
@@ -85,9 +88,21 @@ export function viewParts(script: string, filename: string, read: ReadComponent,
         const source = read(file);
         if (source === null || !declaresInternal(source)) continue;
         const sfc = parseSFC(source);
-        const name = file.replace(/\\/g, '/').split('/').pop()!;
-        for (const part of dataPartCounts(parseTemplate(sfc.template?.content ?? '')).keys()) if (!out.has(part)) out.set(part, name);
-        for (const [part, view] of viewParts(sfc.script?.content ?? '', file, read, seen)) if (!out.has(part)) out.set(part, view);
+        const view = { file, template: sfc.template?.content ?? '', script: sfc.script?.content ?? '' };
+        out.push(view, ...internalViews(view.script, file, read, seen));
+    }
+    return out;
+}
+
+/**
+ * The parts the `@internal` views a script imports draw (#1110), each with the view that draws it —
+ * the first one, when two do — and the views those import in turn: all of them are the owner's parts.
+ */
+export function viewParts(script: string, filename: string, read: ReadComponent): Map<string, string> {
+    const out = new Map<string, string>();
+    for (const view of internalViews(script, filename, read)) {
+        const name = view.file.replace(/\\/g, '/').split('/').pop()!;
+        for (const part of dataPartCounts(parseTemplate(view.template)).keys()) if (!out.has(part)) out.set(part, name);
     }
     return out;
 }

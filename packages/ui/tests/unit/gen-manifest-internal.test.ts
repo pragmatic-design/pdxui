@@ -3,11 +3,13 @@
 // without anything saying so: the generator refuses it.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 // @ts-expect-error — plain .mjs build script, no type declarations by design
 import { undeclaredPdxFiles, buildManifest } from '../../scripts/gen-manifest.mjs';
+// @ts-expect-error — plain .mjs build script, no type declarations by design
+import { analyzePdxFile } from '../../scripts/manifest-pdx.mjs';
 
 let root: string;
 const write = (rel: string, content: string) => {
@@ -33,5 +35,17 @@ describe('a .pdx that is neither public nor internal', () => {
 
     it('the library has none, and its manifest builds', () => {
         expect(() => buildManifest()).not.toThrow();
+    });
+});
+
+describe('the roles an @internal view draws', () => {
+    it('are its owner\'s, through the views it imports in turn', () => {
+        write('x/pdx-x.pdx', '<template><div role="grid"><x-view></x-view></div></template>\n<script>\nimport \'./x-view.pdx\';\n</script>');
+        write('x/x-view.pdx', '<template><div role="rowgroup"><x-row></x-row></div></template>\n<script>\n@internal;\nimport \'./x-row.pdx\';\n</script>');
+        write('x/x-row.pdx', '<template><div role="row"></div></template>\n<script>\n@internal;\n</script>');
+        const file = join(root, 'x/pdx-x.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        const roles = mod.declarations[0].roles as string[];
+        expect(roles).toEqual(expect.arrayContaining(['grid', 'rowgroup', 'row']));
     });
 });

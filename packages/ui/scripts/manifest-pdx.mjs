@@ -4,7 +4,8 @@
 // TypeScript version produce the same declaration (tests/unit/gen-manifest-pdx.test.ts).
 
 import ts from 'typescript';
-import { describeComponent } from '@pdxui/compiler';
+import { existsSync, readFileSync } from 'node:fs';
+import { describeComponent, internalViews } from '@pdxui/compiler';
 import {
     normalizeEol, PROP_DESC, readDocComment, describeProp, scanRoles, withoutComments, scanSlots,
     scanExportedShapes, declaredFunction, functionParameters, assembleModule,
@@ -107,7 +108,12 @@ export function analyzePdxFile(file, text, categories) {
     }
 
     // Match: an HTML comment.
-    const template = d.template.replace(/<!--[\s\S]*?-->/g, (c) => c.replace(/[^\n]/g, ' '));
+    const withoutHtmlComments = (t) => t.replace(/<!--[\s\S]*?-->/g, (c) => c.replace(/[^\n]/g, ' '));
+    const template = withoutHtmlComments(d.template);
+    // The roles the @internal views it imports draw are its own, as their parts are (#1110).
+    const readSource = (f) => existsSync(f) ? normalizeEol(readFileSync(f, 'utf-8')) : null;
+    const viewRoles = internalViews(d.script, file, readSource).map(v => withoutHtmlComments(v.template) + '\n'
+        + withoutComments(ts.createSourceFile(`${v.file}.ts`, v.script, ts.ScriptTarget.Latest, true)));
     return [assembleModule({
         file, tag, category: categories[tag] || { category: 'Other', order: 999 },
         tags, description: component.description, props,
@@ -122,7 +128,7 @@ export function analyzePdxFile(file, text, categories) {
         }])),
         emitted: new Map(),
         emittedNames: [],
-        roles: scanRoles([template, withoutComments(body)].join('\n')),
+        roles: scanRoles([template, withoutComments(body), ...viewRoles].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,
