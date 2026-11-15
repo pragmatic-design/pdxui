@@ -332,24 +332,24 @@ export function createDefaultEditor(
                 (input as any)[k] = v;
             }
         }
-        requestAnimationFrame(() => { input.value = value != null ? Number(value) : null; });
+        // Set now, not in a frame: a frame that came after the first keys wrote the old value over
+        // what was typed (#1100). An editor not upgraded yet keeps it for its upgrade (lazy-tags.ts).
+        input.value = value != null ? Number(value) : null;
         // Its model event, `value-change` (#479): each write, so the grid's own Enter saves what was typed.
         onControlValue(input, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = input;
     } else if (colType === 'date') {
         const input = createLazy('pdx-date-picker') as any;
         input.size = 'sm';
-        requestAnimationFrame(() => { if (value) input.value = value; });
+        if (value) input.value = value;
         // Its model event, `value-change` (#481).
         onControlValue(input, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = input;
     } else if (colType === 'enum' && col.def.filterOptions) {
         const select = createLazy('pdx-select') as any;
         select.size = 'sm';
-        requestAnimationFrame(() => {
-            select.options = col.def.filterOptions;
-            select.value = value;
-        });
+        select.options = col.def.filterOptions;
+        select.value = value;
         // Its model event, `value-change` (#481).
         onControlValue(select, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = select;
@@ -357,7 +357,7 @@ export function createDefaultEditor(
         // Default: text input
         const input = createLazy('pdx-input') as any;
         input.size = 'sm';
-        requestAnimationFrame(() => { input.value = value != null ? String(value) : ''; });
+        input.value = value != null ? String(value) : '';
         onControlValue(input, 'pdx-input', (e) => e.detail?.value ?? input.value, (v) => onChange(v));
         editor = input;
     }
