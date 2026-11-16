@@ -652,6 +652,11 @@
       "types": "./dist/scheduler/pdx-scheduler.d.ts",
       "import": "./dist/scheduler/pdx-scheduler.js"
     },
+    "./flag": {
+      "development": "./src/flag/pdx-flag.pdx",
+      "types": "./dist/flag/pdx-flag.d.ts",
+      "import": "./dist/flag/pdx-flag.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -676,6 +681,7 @@
     "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly && node scripts/gen-pdx-dts.mjs",
     "manifest": "node scripts/gen-manifest.mjs",
     "icons": "node scripts/gen-icons.mjs",
+    "flags": "node scripts/gen-flags.mjs",
     "exports": "node scripts/gen-exports.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

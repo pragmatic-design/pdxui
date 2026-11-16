@@ -50,6 +50,7 @@ import { fieldList } from '../../../../manifests/field-list.manifest';
 import { fieldset } from '../../../../manifests/fieldset.manifest';
 import { fileUpload } from '../../../../manifests/file-upload.manifest';
 import { filterBuilder } from '../../../../manifests/filter-builder.manifest';
+import { flag } from '../../../../manifests/flag.manifest';
 import { formActions } from '../../../../manifests/form-actions.manifest';
 import { formField } from '../../../../manifests/form-field.manifest';
 import { formSection } from '../../../../manifests/form-section.manifest';
@@ -184,7 +185,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, appShell, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kanban, kbd, label, list, localizedInput, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scheduler, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, signaturePad, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, appShell, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, flag, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kanban, kbd, label, list, localizedInput, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scheduler, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, signaturePad, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -445,6 +446,9 @@ export const scenarioPage: Record<string, string> = {
     "file-upload-size-sm": "tier-3",
     "file-upload-size-lg": "tier-3",
     "filter-builder-empty": "tier-3",
+    "flag-named": "tier-1a",
+    "flag-decorative": "tier-1a",
+    "flag-sizes": "tier-1a",
     "form-actions-end": "tier-2",
     "form-actions-align-end": "tier-2",
     "form-actions-align-start": "tier-2",

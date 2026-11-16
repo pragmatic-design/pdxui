@@ -5,7 +5,7 @@ description: "PDX (@pdxui/ui) display atoms — button, button-group, icon, badg
 
 # UI · Atoms & display
 
-> Visual primitives and simple containers.  (16 components)  ·  catalogue generated from the library's custom-elements manifest.
+> Visual primitives and simple containers.  (17 components)  ·  catalogue generated from the library's custom-elements manifest.
 > Cross-cutting playbook, recipes and gotchas: the **`pdxui`** skill.
 > **Names.** Bind a prop by its kebab-case name, `:max-height="620"`, `:empty-title="t"`: the component
 > receives the camelCase prop (`maxHeight`). In a `.pdx` template the camelCase form, `:maxHeight`, compiles
@@ -25,6 +25,10 @@ Each page has the props, events, slots and API, the notes, and the examples of t
 - [`<pdx-carousel>`](references/pdx-carousel.md) — A swipeable slideshow.
 - [`<pdx-chip>`](references/pdx-chip.md) — Compact, optionally removable tag.
 - [`<pdx-divider>`](references/pdx-divider.md) — A plain or labeled separating line.
+- [`<pdx-flag>`](references/pdx-flag.md) — A country's or region's flag, 4:3, drawn as an image from its own SVG: a page loads the flags it
+shows, one small module each, not the set. Named by the region in the page's language, or hidden
+from assistive technology when `decorative` (the name is said beside it). A region it has no flag
+for draws nothing. The drawings are flag-icons' (MIT), taken by `scripts/gen-flags.mjs`.
 - [`<pdx-icon>`](references/pdx-icon.md) — Crisp SVG icons from a shared set.
 - [`<pdx-image>`](references/pdx-image.md) — Lazy, responsive image with placeholder.
 - [`<pdx-kbd>`](references/pdx-kbd.md) — Render keyboard keys and shortcuts.

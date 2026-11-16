@@ -1,0 +1,21 @@
+/* pdx-flag — a region's flag, 4:3 (#1091).
+   The image is --pdx-flag-size tall (the component writes it) and four thirds of it wide. A thin ring
+   of the theme's border keeps a white flag (Japan's, Finland's) from melting into a white surface; it
+   is an outline, so it adds nothing to the box. */
+
+:where(pdx-flag) {
+    display: inline-flex;
+    vertical-align: middle;
+    line-height: 0;
+}
+
+:where(pdx-flag) > [data-part="root"] {
+    display: block;
+    height: var(--pdx-flag-size, 20px);
+    width: calc(var(--pdx-flag-size, 20px) * 4 / 3);
+    object-fit: cover;
+    border-radius: 2px;
+    outline: 1px solid color-mix(in oklch, var(--pdx-color-border) 70%, transparent);
+    outline-offset: -1px;
+    user-select: none;
+}

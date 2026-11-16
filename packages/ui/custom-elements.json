@@ -12,7 +12,7 @@
           "name": "PdxAccordion",
           "tagName": "pdx-accordion",
           "category": "Overlay + Containers",
-          "order": 96,
+          "order": 97,
           "description": "Expandable sections with animated height, opened one at a time or several together, and navigated\nwith the arrow keys, Home and End.",
           "members": [
             {
@@ -212,7 +212,7 @@
           "name": "PdxAffix",
           "tagName": "pdx-affix",
           "category": "Layout",
-          "order": 74,
+          "order": 75,
           "description": "Makes an element sticky once the user scrolls past a threshold, and reports when it is.",
           "members": [
             {
@@ -329,7 +329,7 @@
           "name": "PdxAlertDialog",
           "tagName": "pdx-alert-dialog",
           "category": "Overlay + Containers",
-          "order": 92,
+          "order": 93,
           "description": "A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and\nCancel takes the focus first.",
           "members": [
             {
@@ -664,7 +664,7 @@
           "name": "PdxAppLayout",
           "tagName": "pdx-app-layout",
           "category": "Layout",
-          "order": 66,
+          "order": 67,
           "description": "An application shell that places a header, side bars, main content and a footer on a CSS grid that\ncollapses responsively.",
           "members": [
             {
@@ -974,7 +974,7 @@
           "name": "PdxAppShell",
           "tagName": "pdx-app-shell",
           "category": "Layout",
-          "order": 67,
+          "order": 68,
           "description": "An application's chrome, drawn from a navigation model: a rail of the reader's own entries — home,\nfavourites, recents — and a catalogue of every entry the app has, grouped and searchable, beside\nit. Entries the reader has no permission for are not drawn. A choice goes through the router when\none runs. Below 600px the rail is a modal drawer opened from the bar.\n\nThe app fills three slots: `brand` (the rail's head), `bar` (the top bar: title, search, the\nprofile menu) and `foot` (the rail's foot: environment, version); the page goes in the default slot.",
           "members": [
             {
@@ -1320,7 +1320,7 @@
           "name": "PdxAspectRatio",
           "tagName": "pdx-aspect-ratio",
           "category": "Layout",
-          "order": 75,
+          "order": 76,
           "description": "Keeps its content at a fixed aspect ratio, using the native CSS aspect-ratio.",
           "members": [
             {
@@ -1374,7 +1374,7 @@
           "name": "PdxAutoForm",
           "tagName": "pdx-auto-form",
           "category": "Data-bound",
-          "order": 106,
+          "order": 107,
           "description": "A form generated from field definitions or a form schema, so the same JSON that drives a data grid\nalso produces its edit form.",
           "members": [
             {
@@ -1604,7 +1604,7 @@
           "name": "PdxAutocomplete",
           "tagName": "pdx-autocomplete",
           "category": "Data-bound",
-          "order": 102,
+          "order": 103,
           "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
           "generics": [
             "T"
@@ -2925,7 +2925,7 @@
           "name": "PdxBanner",
           "tagName": "pdx-banner",
           "category": "Overlay + Containers",
-          "order": 98,
+          "order": 99,
           "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
           "members": [
             {
@@ -3130,7 +3130,7 @@
           "name": "PdxBlockUi",
           "tagName": "pdx-block-ui",
           "category": "Layout",
-          "order": 76,
+          "order": 77,
           "description": "A loading overlay that wraps content and, while blocked, stops interaction with it and covers it\nwith a semi-transparent overlay and a spinner.",
           "members": [
             {
@@ -3322,7 +3322,7 @@
           "name": "PdxBottomNav",
           "tagName": "pdx-bottom-nav",
           "category": "Navigation",
-          "order": 54,
+          "order": 55,
           "description": "A mobile tab bar fixed at the bottom of the screen, with three to five items that carry icons and\noptional badges.",
           "members": [
             {
@@ -3432,7 +3432,7 @@
           "name": "PdxBottomSheet",
           "tagName": "pdx-bottom-sheet",
           "category": "Overlay + Containers",
-          "order": 99,
+          "order": 100,
           "description": "A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to\nresize it and swipes down to dismiss it.",
           "members": [
             {
@@ -3764,7 +3764,7 @@
           "name": "PdxBreadcrumb",
           "tagName": "pdx-breadcrumb",
           "category": "Navigation",
-          "order": 60,
+          "order": 61,
           "description": "Navigation breadcrumbs, with overflow collapse and custom separators.",
           "generics": [
             "T extends { key: string; label: string }"
@@ -3910,7 +3910,7 @@
           "name": "PdxBulkActions",
           "tagName": "pdx-bulk-actions",
           "category": "Data-bound",
-          "order": 107,
+          "order": 108,
           "description": "A contextual action bar for a multi-selection: while items are selected it shows how many, a\nbutton per action and a clear button.",
           "members": [
             {
@@ -4508,7 +4508,7 @@
           "name": "PdxCalendar",
           "tagName": "pdx-calendar",
           "category": "Specialized Inputs",
-          "order": 34,
+          "order": 35,
           "description": "A standalone calendar grid in which the user selects a date, a range of dates or several dates,\nalso from the keyboard alone.",
           "members": [
             {
@@ -5013,7 +5013,7 @@
           "name": "PdxCard",
           "tagName": "pdx-card",
           "category": "Overlay + Containers",
-          "order": 97,
+          "order": 98,
           "description": "A structured card with header, body, footer and media slots, which can show a loading skeleton\nand be clickable or selectable.",
           "members": [
             {
@@ -5323,7 +5323,7 @@
           "name": "PdxCarousel",
           "tagName": "pdx-carousel",
           "category": "Data Display",
-          "order": 86,
+          "order": 87,
           "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
           "generics": [
             "T"
@@ -5727,7 +5727,7 @@
           "name": "PdxCascader",
           "tagName": "pdx-cascader",
           "category": "Specialized Inputs",
-          "order": 39,
+          "order": 40,
           "description": "A multi-level drill-down selector: each choice opens the next column of children, as in Country,\nthen Region, then City.",
           "generics": [
             "T extends { value: string; label: string }"
@@ -6142,7 +6142,7 @@
           "name": "PdxChart",
           "tagName": "pdx-chart",
           "category": "Data-bound",
-          "order": 112,
+          "order": 113,
           "description": "A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.",
           "members": [
             {
@@ -6685,7 +6685,7 @@
           "name": "PdxSparkline",
           "tagName": "pdx-sparkline",
           "category": "Data-bound",
-          "order": 113,
+          "order": 114,
           "description": "A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip\nor legend.",
           "members": [
             {
@@ -6853,7 +6853,7 @@
           "name": "PdxCheckboxGroup",
           "tagName": "pdx-checkbox-group",
           "category": "Specialized Inputs",
-          "order": 24,
+          "order": 25,
           "description": "A multi-selection across child `pdx-checkbox` elements, with one value for the form.",
           "members": [
             {
@@ -7695,7 +7695,7 @@
           "name": "PdxCol",
           "tagName": "pdx-col",
           "category": "Layout",
-          "order": 69,
+          "order": 70,
           "description": "A column of a 12-column grid, inside `pdx-row` or any flex container, whose span can change at\neach breakpoint.",
           "members": [
             {
@@ -7863,7 +7863,7 @@
           "name": "PdxColorPicker",
           "tagName": "pdx-color-picker",
           "category": "Specialized Inputs",
-          "order": 27,
+          "order": 28,
           "description": "Colour selection from a swatch trigger or an inline panel, with alpha channel and preset palettes,\noutput as hex, rgb or hsl.",
           "members": [
             {
@@ -8252,7 +8252,7 @@
           "name": "PdxCommand",
           "tagName": "pdx-command",
           "category": "Overlay + Containers",
-          "order": 100,
+          "order": 101,
           "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
           "generics": [
             "T extends { label: string }"
@@ -8484,7 +8484,7 @@
           "name": "PdxContextMenu",
           "tagName": "pdx-context-menu",
           "category": "Navigation",
-          "order": 59,
+          "order": 60,
           "description": "A right-click menu that opens at the cursor, and also on a long press on mobile or Shift+F10 from\nthe keyboard.",
           "generics": [
             "T extends { key?: string; label?: string; type?: string }"
@@ -8678,7 +8678,7 @@
           "name": "PdxDataGrid",
           "tagName": "pdx-data-grid",
           "category": "Data-bound",
-          "order": 104,
+          "order": 105,
           "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
           "generics": [
             "T"
@@ -9800,7 +9800,7 @@
           "name": "PdxDataSource",
           "tagName": "pdx-data-source",
           "category": "Data-bound",
-          "order": 103,
+          "order": 104,
           "description": "A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,\ntables and selects.",
           "members": [
             {
@@ -9976,7 +9976,7 @@
           "name": "PdxDatePicker",
           "tagName": "pdx-date-picker",
           "category": "Specialized Inputs",
-          "order": 36,
+          "order": 37,
           "description": "A date picker composed of a calendar and a time picker, with several selection modes, calendar\nsystems and presets.",
           "members": [
             {
@@ -10786,7 +10786,7 @@
           "name": "PdxDescriptionList",
           "tagName": "pdx-description-list",
           "category": "Data Display",
-          "order": 81,
+          "order": 82,
           "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
           "generics": [
             "T extends { label: string }"
@@ -11009,7 +11009,7 @@
           "name": "PdxDialog",
           "tagName": "pdx-dialog",
           "category": "Overlay + Containers",
-          "order": 91,
+          "order": 92,
           "summary": "Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.",
           "description": "Modal dialog with backdrop, focus trap and Escape-to-close.",
           "members": [
@@ -11511,7 +11511,7 @@
           "name": "PdxDrawer",
           "tagName": "pdx-drawer",
           "category": "Overlay + Containers",
-          "order": 93,
+          "order": 94,
           "description": "A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus\ntrap.",
           "members": [
             {
@@ -11836,7 +11836,7 @@
           "name": "PdxDropdownMenu",
           "tagName": "pdx-dropdown-menu",
           "category": "Navigation",
-          "order": 58,
+          "order": 59,
           "description": "A button that opens a floating menu built from an `items` array, navigable from the keyboard and\nclosed by an outside click or Escape.",
           "generics": [
             "T extends { key?: string; label?: string; type?: string }"
@@ -12091,7 +12091,7 @@
           "name": "PdxEditDrawer",
           "tagName": "pdx-edit-drawer",
           "category": "Data-bound",
-          "order": 108,
+          "order": 109,
           "description": "A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits\n`pdx-save` with the values.",
           "members": [
             {
@@ -12332,7 +12332,7 @@
           "name": "PdxEmptyState",
           "tagName": "pdx-empty-state",
           "category": "Data Display",
-          "order": 84,
+          "order": 85,
           "description": "A placeholder for an empty data view: an icon, a title and a description, with an optional action\nbutton.",
           "members": [
             {
@@ -12512,7 +12512,7 @@
           "name": "PdxEntityGrid",
           "tagName": "pdx-entity-grid",
           "category": "Data-bound",
-          "order": 109,
+          "order": 110,
           "description": "A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,\nand `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.",
           "members": [
             {
@@ -12796,7 +12796,7 @@
           "name": "PdxErrorBoundary",
           "tagName": "pdx-error-boundary",
           "category": "Infrastructure",
-          "order": 116,
+          "order": 117,
           "description": "Catches render errors and effect failures from its children and shows a fallback UI with retry.",
           "members": [
             {
@@ -12960,7 +12960,7 @@
           "name": "PdxFab",
           "tagName": "pdx-fab",
           "category": "Navigation",
-          "order": 64,
+          "order": 65,
           "description": "A floating action button that can open a speed dial of actions, in four directions and four layouts.",
           "members": [
             {
@@ -13326,7 +13326,7 @@
           "name": "PdxFieldGroup",
           "tagName": "pdx-field-group",
           "category": "Forms",
-          "order": 49,
+          "order": 50,
           "description": "Scopes the fields inside it to a nested object of the form, rendered inline, as a collapsible\npanel or behind a dialog.",
           "members": [
             {
@@ -13481,7 +13481,7 @@
           "name": "PdxFieldList",
           "tagName": "pdx-field-list",
           "category": "Forms",
-          "order": 50,
+          "order": 51,
           "description": "An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,\nand the values come back as an array.",
           "members": [
             {
@@ -13748,7 +13748,7 @@
           "name": "PdxFieldset",
           "tagName": "pdx-fieldset",
           "category": "Forms",
-          "order": 48,
+          "order": 49,
           "description": "A semantic form group on the native fieldset and legend, collapsible, with disabled propagation\nand an error state.",
           "members": [
             {
@@ -14050,7 +14050,7 @@
           "name": "PdxFileUpload",
           "tagName": "pdx-file-upload",
           "category": "Specialized Inputs",
-          "order": 28,
+          "order": 29,
           "description": "Drag-and-drop file upload with validation, image preview and size and count limits.",
           "members": [
             {
@@ -14452,7 +14452,7 @@
           "name": "PdxFilterBuilder",
           "tagName": "pdx-filter-builder",
           "category": "Data-bound",
-          "order": 105,
+          "order": 106,
           "description": "A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.",
           "members": [
             {
@@ -14572,6 +14572,141 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/flag/pdx-flag.pdx",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxFlag",
+          "tagName": "pdx-flag",
+          "category": "Atoms",
+          "order": 16,
+          "description": "A country's or region's flag, 4:3, drawn as an image from its own SVG: a page loads the flags it\nshows, one small module each, not the set. Named by the region in the page's language, or hidden\nfrom assistive technology when `decorative` (the name is said beside it). A region it has no flag\nfor draws nothing. The drawings are flag-icons' (MIT), taken by `scripts/gen-flags.mjs`.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "region",
+              "description": "The region, a two-letter subtag in either case: `IT`, `br`, `EU`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "region"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "The height: xs (12), sm (16), md (20), lg (24), xl (32), or a number of pixels.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "decorative",
+              "description": "Said beside it already: no name, and hidden from assistive technology.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "decorative"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "description": "Its name instead of the region's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "description": "The language of the region's name. Empty: the page's (`lang`), then the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "locale"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "region",
+              "fieldName": "region",
+              "description": "The region, a two-letter subtag in either case: `IT`, `br`, `EU`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "The height: xs (12), sm (16), md (20), lg (24), xl (32), or a number of pixels.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'md'"
+            },
+            {
+              "name": "decorative",
+              "fieldName": "decorative",
+              "description": "Said beside it already: no name, and hidden from assistive technology.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "Its name instead of the region's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "locale",
+              "fieldName": "locale",
+              "description": "The language of the region's name. Empty: the page's (`lang`), then the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The image of the flag, `--pdx-flag-size` tall and four thirds of it wide."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-flag-size"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "pdx-flag",
+          "declaration": {
+            "name": "PdxFlag",
+            "module": "src/flag/pdx-flag.pdx"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/form-actions/pdx-form-actions.ts",
       "declarations": [
         {
@@ -14580,7 +14715,7 @@
           "name": "PdxFormActions",
           "tagName": "pdx-form-actions",
           "category": "Forms",
-          "order": 46,
+          "order": 47,
           "description": "The submit and reset button bar of a form, wired to the form it sits in, with configurable\nlabels, alignment and a loading state.",
           "members": [
             {
@@ -14729,7 +14864,7 @@
           "name": "PdxFormField",
           "tagName": "pdx-form-field",
           "category": "Forms",
-          "order": 47,
+          "order": 48,
           "description": "Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA\nwiring between them and no validation of its own.",
           "members": [
             {
@@ -15144,7 +15279,7 @@
           "name": "PdxFormSection",
           "tagName": "pdx-form-section",
           "category": "Forms",
-          "order": 45,
+          "order": 46,
           "description": "Groups related fields of a form under a labelled heading, and can scope validation to its own\nfields.",
           "members": [
             {
@@ -15301,7 +15436,7 @@
           "name": "PdxFormTemplate",
           "tagName": "pdx-form-template",
           "category": "Forms",
-          "order": 44,
+          "order": 45,
           "description": "Renders a complete form from a FormSchema: each field type gets its control, validators run from\nthe schema and sections become fieldsets. With `layout: 'wizard'` the sections are the steps of a\n`pdx-wizard`, and a step with an error is not left.",
           "members": [
             {
@@ -15485,7 +15620,7 @@
           "name": "PdxForm",
           "tagName": "pdx-form",
           "category": "Forms",
-          "order": 43,
+          "order": 44,
           "description": "A form that provides its Form to the controls and form fields inside it and validates them, with\nsave modes and DataSource integration.",
           "members": [
             {
@@ -15899,7 +16034,7 @@
           "name": "PdxImage",
           "tagName": "pdx-image",
           "category": "Data Display",
-          "order": 85,
+          "order": 86,
           "description": "An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source\nbehind authentication.",
           "members": [
             {
@@ -16317,7 +16452,7 @@
           "name": "PdxInfiniteScroll",
           "tagName": "pdx-infinite-scroll",
           "category": "Data Display",
-          "order": 87,
+          "order": 88,
           "description": "Loads more data as the user scrolls to the bottom, paging a DataSource or firing\n`pdx-load-more` for manual control.",
           "members": [
             {
@@ -16524,7 +16659,7 @@
           "name": "PdxInlineEdit",
           "tagName": "pdx-inline-edit",
           "category": "Specialized Inputs",
-          "order": 42,
+          "order": 43,
           "description": "A value the user clicks to edit in place, in the editor its `type` calls for.",
           "members": [
             {
@@ -16918,7 +17053,7 @@
           "name": "PdxInputGroup",
           "tagName": "pdx-input-group",
           "category": "Specialized Inputs",
-          "order": 20,
+          "order": 21,
           "description": "Groups inputs, buttons and addons into one control with joined borders, passing its size and\ndisabled state to its children.",
           "members": [
             {
@@ -17613,7 +17748,7 @@
           "name": "PdxJsonEditor",
           "tagName": "pdx-json-editor",
           "category": "Data-bound",
-          "order": 110,
+          "order": 111,
           "description": "A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each\nobject or list of objects in a sub-modal of its own.",
           "members": [
             {
@@ -17695,7 +17830,7 @@
           "name": "PdxKanban",
           "tagName": "pdx-kanban",
           "category": "Data Display",
-          "order": 79,
+          "order": 80,
           "description": "A board of columns of cards. The column an item is in is its `column-field`, and the order inside a\ncolumn is the order of `items`. A card moves by the pointer, by the keyboard — Space or Enter picks it\nup, the arrows carry it, Space or Enter drops it, Escape cancels, each step announced — or by its Move\nmenu; each way asks `before-move` first, which the app can refuse with `preventDefault()`.",
           "generics": [
             "T extends { [field: string]: unknown }"
@@ -18300,7 +18435,7 @@
           "name": "PdxList",
           "tagName": "pdx-list",
           "category": "Data Display",
-          "order": 77,
+          "order": 78,
           "description": "A list bound to data, an array or a DataSource, with custom item templates, a loading overlay\nand an empty state.",
           "generics": [
             "T"
@@ -18598,7 +18733,7 @@
           "name": "PdxLocalizedInput",
           "tagName": "pdx-localized-input",
           "category": "Specialized Inputs",
-          "order": 26,
+          "order": 27,
           "description": "One text in several cultures, `{ [culture]: string }` — the shape of Pragmatic's LocalizedString. The\ncultures are tabs named in their own language, the current one first, a culture with no text marked\nin its tab's name; or, `layout=\"stacked\"`, every culture a labelled field. Each field carries its\nculture's `lang` and `dir`. `required` asks every culture, or with `required-scope=\"default\"` the\ndefault one; the form submits the value's JSON.",
           "members": [
             {
@@ -18937,7 +19072,7 @@
           "name": "PdxMaskedInput",
           "tagName": "pdx-masked-input",
           "category": "Specialized Inputs",
-          "order": 21,
+          "order": 22,
           "description": "An input that formats what the user types to a pattern, a built-in preset such as phone, card or\ndate, or a custom one.",
           "members": [
             {
@@ -19251,7 +19386,7 @@
           "name": "PdxMasonry",
           "tagName": "pdx-masonry",
           "category": "Layout",
-          "order": 70,
+          "order": 71,
           "description": "A masonry grid: items of different heights flow top to bottom down each column.",
           "members": [
             {
@@ -19348,7 +19483,7 @@
           "name": "PdxMention",
           "tagName": "pdx-mention",
           "category": "Specialized Inputs",
-          "order": 38,
+          "order": 39,
           "description": "A textarea where typing a trigger such as @ opens floating suggestions, to insert a mention.",
           "members": [
             {
@@ -19767,7 +19902,7 @@
           "name": "PdxMenu",
           "tagName": "pdx-menu",
           "category": "Navigation",
-          "order": 57,
+          "order": 58,
           "description": "A menu drawn in place from a list of items, with checkbox and radio items, submenus and keyboard\nnavigation, shown while it is open.",
           "generics": [
             "T extends { key?: string; label?: string; type?: string }"
@@ -20010,7 +20145,7 @@
           "name": "PdxMenubar",
           "tagName": "pdx-menubar",
           "category": "Navigation",
-          "order": 56,
+          "order": 57,
           "description": "A horizontal menu bar whose entries open dropdown submenus, as in File, Edit, View.",
           "members": [
             {
@@ -20179,7 +20314,7 @@
           "name": "PdxNavMenu",
           "tagName": "pdx-nav-menu",
           "category": "Navigation",
-          "order": 55,
+          "order": 56,
           "description": "A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a\ncollapsed icon-only mode.",
           "generics": [
             "T extends { key: string; label: string }"
@@ -20543,7 +20678,7 @@
           "name": "PdxNavbar",
           "tagName": "pdx-navbar",
           "category": "Navigation",
-          "order": 52,
+          "order": 53,
           "description": "A responsive app header holding the brand, the navigation links and the user's avatar with its\ndropdown.",
           "members": [
             {
@@ -20763,7 +20898,7 @@
           "name": "PdxNumberInput",
           "tagName": "pdx-number-input",
           "category": "Specialized Inputs",
-          "order": 18,
+          "order": 19,
           "description": "A number input the user steps by a step, or on the digit before the caret, with a sign toggle\nand locale formatting.",
           "members": [
             {
@@ -21322,7 +21457,7 @@
           "name": "PdxOtpInput",
           "tagName": "pdx-otp-input",
           "category": "Specialized Inputs",
-          "order": 22,
+          "order": 23,
           "description": "A one-time code input, one character per cell, that advances as the user types, spreads a pasted\ncode across the cells and steps back on Backspace.",
           "members": [
             {
@@ -21630,7 +21765,7 @@
           "name": "PdxOverlayOutlet",
           "tagName": "pdx-overlay-outlet",
           "category": "Infrastructure",
-          "order": 117,
+          "order": 118,
           "description": "Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog\nabove the last, trapping focus inside and closing the top one on Escape.",
           "members": [],
           "roles": [
@@ -21715,7 +21850,7 @@
           "name": "PdxPageHeader",
           "tagName": "pdx-page-header",
           "category": "Navigation",
-          "order": 61,
+          "order": 62,
           "description": "The standard header of a page: a breadcrumb, the title with an optional subtitle, and an area for\nthe page's actions.",
           "members": [
             {
@@ -21856,7 +21991,7 @@
           "name": "PdxPagination",
           "tagName": "pdx-pagination",
           "category": "Navigation",
-          "order": 63,
+          "order": 64,
           "description": "Page navigation with numbered buttons, previous/next and first/last, collapsing large ranges\nbehind an ellipsis.",
           "members": [
             {
@@ -22162,7 +22297,7 @@
           "name": "PdxPasswordInput",
           "tagName": "pdx-password-input",
           "category": "Specialized Inputs",
-          "order": 16,
+          "order": 17,
           "description": "A password field the user can reveal or hide, with an optional strength meter below it.",
           "members": [
             {
@@ -22512,7 +22647,7 @@
           "name": "PdxPopover",
           "tagName": "pdx-popover",
           "category": "Overlay + Containers",
-          "order": 90,
+          "order": 91,
           "description": "A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click\noutside or Escape.",
           "members": [
             {
@@ -22969,7 +23104,7 @@
           "name": "PdxProvide",
           "tagName": "pdx-provide",
           "category": "Infrastructure",
-          "order": 115,
+          "order": 116,
           "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
           "members": [
             {
@@ -23035,7 +23170,7 @@
           "name": "PdxRadioGroup",
           "tagName": "pdx-radio-group",
           "category": "Specialized Inputs",
-          "order": 23,
+          "order": 24,
           "description": "Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that\nmove and check, and the chosen value takes part in a form.",
           "members": [
             {
@@ -23513,7 +23648,7 @@
           "name": "PdxRating",
           "tagName": "pdx-rating",
           "category": "Specialized Inputs",
-          "order": 30,
+          "order": 31,
           "description": "A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value\ntakes part in a form.",
           "members": [
             {
@@ -23860,7 +23995,7 @@
           "name": "PdxRelationPicker",
           "tagName": "pdx-relation-picker",
           "category": "Data-bound",
-          "order": 111,
+          "order": 112,
           "description": "Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new\none to be created.",
           "members": [
             {
@@ -24017,7 +24152,7 @@
           "name": "PdxRelativeTime",
           "tagName": "pdx-relative-time",
           "category": "Data Display",
-          "order": 88,
+          "order": 89,
           "description": "Shows a time relative to now (\"3 hours ago\", \"in 2 days\"), locale-aware and kept up to date.",
           "members": [
             {
@@ -24166,7 +24301,7 @@
           "name": "PdxRichText",
           "tagName": "pdx-rich-text",
           "category": "Data-bound",
-          "order": 114,
+          "order": 115,
           "description": "A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.",
           "members": [
             {
@@ -24633,7 +24768,7 @@
           "name": "PdxRow",
           "tagName": "pdx-row",
           "category": "Layout",
-          "order": 68,
+          "order": 69,
           "description": "A responsive row that lays out pdx-col columns on a 12-column grid, with gutter, column count and\nalignment.",
           "members": [
             {
@@ -24763,7 +24898,7 @@
           "name": "PdxScheduler",
           "tagName": "pdx-scheduler",
           "category": "Data Display",
-          "order": 80,
+          "order": 81,
           "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day. With the mouse or a pen an event\nis dragged to another time, day or resource and resized by its edges, and a drag over empty slots\ncreates one; each asks `before-move`, `before-resize` or `before-create` first, which the app can\nrefuse, then writes `events`. From the keyboard, Space picks a focused event up: the arrows move it\na slot, a day or a resource, Shift and the arrows move its end, Alt, Shift and the arrows its start,\nSpace or Enter drops it, asking the same, and Escape puts it back, each step announced. Shift and the\narrows on an empty cell select slots or days, drawn as a drag over them draws them, and Enter creates\nan event there, asking `before-create`; Escape, or an arrow without Shift, drops the selection.\nWith a single pointer, an event's ⋯ offers «Move» and «Resize»: the event is picked up, and a click\non a slot puts it there, or ends it there, asking the same.\n`prevent-overlap` refuses a place that overlaps another event of the same resource, and says why in\n`rejected`.",
           "members": [
             {
@@ -25685,7 +25820,7 @@
           "name": "PdxScrollArea",
           "tagName": "pdx-scroll-area",
           "category": "Layout",
-          "order": 72,
+          "order": 73,
           "description": "A scrollable container that replaces the native scrollbars with styled, auto-hiding overlay\nscrollbars, vertical, horizontal or on both axes.",
           "members": [
             {
@@ -25888,7 +26023,7 @@
           "name": "PdxScrollSpy",
           "tagName": "pdx-scroll-spy",
           "category": "Layout",
-          "order": 73,
+          "order": 74,
           "description": "Highlights the navigation link of the section currently visible, as the user scrolls.",
           "members": [
             {
@@ -26024,7 +26159,7 @@
           "name": "PdxSearchInput",
           "tagName": "pdx-search-input",
           "category": "Specialized Inputs",
-          "order": 17,
+          "order": 18,
           "description": "A search field with a search icon, a clear button and Escape to clear, that emits the search after\na debounce or on Enter.",
           "members": [
             {
@@ -26357,7 +26492,7 @@
           "name": "PdxSegmented",
           "tagName": "pdx-segmented",
           "category": "Specialized Inputs",
-          "order": 32,
+          "order": 33,
           "description": "A radio-group style selector: the user picks one of its segments, marked by a sliding indicator.",
           "members": [
             {
@@ -26615,7 +26750,7 @@
           "name": "PdxSelect",
           "tagName": "pdx-select",
           "category": "Data-bound",
-          "order": 101,
+          "order": 102,
           "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
           "generics": [
             "T"
@@ -27353,7 +27488,7 @@
           "name": "PdxSidebar",
           "tagName": "pdx-sidebar",
           "category": "Navigation",
-          "order": 53,
+          "order": 54,
           "description": "A collapsible sidebar container for a pdx-nav-menu or any content, expanded, collapsed or mini\n(icon-only).",
           "members": [
             {
@@ -27506,7 +27641,7 @@
           "name": "PdxSignaturePad",
           "tagName": "pdx-signature-pad",
           "category": "Specialized Inputs",
-          "order": 31,
+          "order": 32,
           "description": "A signature the user draws with a pointer, or types as a name drawn in a script face, and the form\nreceives as a PNG data URL. Ctrl+Z takes the last stroke off, Delete clears it.",
           "members": [
             {
@@ -27878,7 +28013,7 @@
           "name": "PdxSlider",
           "tagName": "pdx-slider",
           "category": "Specialized Inputs",
-          "order": 29,
+          "order": 30,
           "description": "A slider the user drags or moves from the keyboard to pick a value, or a range with two thumbs,\nwith marks and value labels.",
           "members": [
             {
@@ -28359,7 +28494,7 @@
           "name": "PdxSortableList",
           "tagName": "pdx-sortable-list",
           "category": "Data Display",
-          "order": 78,
+          "order": 79,
           "description": "A list the user can put in another order, by dragging a row's handle or from the keyboard alone.\n\nIt emits `pdx-reorder` with the indices and never writes to `items`: the application applies the\nmove, so the array it owns stays the one source of truth.",
           "generics": [
             "T"
@@ -28692,7 +28827,7 @@
           "name": "PdxSplitButton",
           "tagName": "pdx-split-button",
           "category": "Navigation",
-          "order": 65,
+          "order": 66,
           "description": "A primary action button with a dropdown arrow that opens the secondary actions.",
           "members": [
             {
@@ -28954,7 +29089,7 @@
           "name": "PdxSplitter",
           "tagName": "pdx-splitter",
           "category": "Layout",
-          "order": 71,
+          "order": 72,
           "description": "A layout of resizable panes the user resizes by dragging the handles between them or from the\nkeyboard, with collapsible and nested panes.",
           "members": [
             {
@@ -29170,7 +29305,7 @@
           "name": "PdxStatistic",
           "tagName": "pdx-statistic",
           "category": "Data Display",
-          "order": 83,
+          "order": 84,
           "description": "Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.",
           "members": [
             {
@@ -29862,7 +29997,7 @@
           "name": "PdxTabs",
           "tagName": "pdx-tabs",
           "category": "Overlay + Containers",
-          "order": 95,
+          "order": 96,
           "description": "Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy\nmounting and closable tabs.",
           "members": [
             {
@@ -30155,7 +30290,7 @@
           "name": "PdxTagInput",
           "tagName": "pdx-tag-input",
           "category": "Specialized Inputs",
-          "order": 25,
+          "order": 26,
           "description": "A text field where the user enters several tags, shown as chips, with paste support and\nduplicates prevented.",
           "members": [
             {
@@ -30633,7 +30768,7 @@
           "name": "PdxTextarea",
           "tagName": "pdx-textarea",
           "category": "Specialized Inputs",
-          "order": 19,
+          "order": 20,
           "description": "A multi-line text input with auto-resize, a character or word count and validation states.",
           "members": [
             {
@@ -31155,7 +31290,7 @@
           "name": "PdxTimePicker",
           "tagName": "pdx-time-picker",
           "category": "Specialized Inputs",
-          "order": 35,
+          "order": 36,
           "description": "A segmented time input: the user sets the hour, minute, optional seconds and AM/PM with the\nkeyboard, the mouse wheel or typed digits, and the value is always `HH:mm` on the 24-hour clock.",
           "members": [
             {
@@ -31491,7 +31626,7 @@
           "name": "PdxTimeline",
           "tagName": "pdx-timeline",
           "category": "Data Display",
-          "order": 82,
+          "order": 83,
           "description": "A vertical or horizontal sequence of events, with status colors, icons and clickable items.",
           "generics": [
             "T extends { title: string }"
@@ -31778,7 +31913,7 @@
           "name": "PdxToast",
           "tagName": "pdx-toast",
           "category": "Overlay + Containers",
-          "order": 94,
+          "order": 95,
           "description": "A container that shows notification toasts from a global queue, in one of six screen positions,\npausing on hover and offering action buttons.",
           "members": [
             {
@@ -31886,7 +32021,7 @@
           "name": "PdxToggle",
           "tagName": "pdx-toggle",
           "category": "Specialized Inputs",
-          "order": 33,
+          "order": 34,
           "description": "A button the user presses on and off, its state exposed with `aria-pressed`.",
           "members": [
             {
@@ -32357,7 +32492,7 @@
           "name": "PdxToolbar",
           "tagName": "pdx-toolbar",
           "category": "Navigation",
-          "order": 62,
+          "order": 63,
           "description": "A toolbar of buttons, separators, groups and spacers that is one tab stop: the arrow keys, Home\nand End move between its controls.",
           "members": [
             {
@@ -32485,7 +32620,7 @@
           "name": "PdxTooltip",
           "tagName": "pdx-tooltip",
           "category": "Overlay + Containers",
-          "order": 89,
+          "order": 90,
           "description": "A tooltip that describes its trigger on hover or focus, in one of 12 placements, with show and\nhide delays.",
           "members": [
             {
@@ -32722,7 +32857,7 @@
           "name": "PdxTransfer",
           "tagName": "pdx-transfer",
           "category": "Specialized Inputs",
-          "order": 37,
+          "order": 38,
           "description": "A dual-list shuttle: the user moves items between a source list and a target list, with search,\nselect-all and disabled items, and the chosen values take part in a form.",
           "members": [
             {
@@ -33145,7 +33280,7 @@
           "name": "PdxTreeSelect",
           "tagName": "pdx-tree-select",
           "category": "Specialized Inputs",
-          "order": 41,
+          "order": 42,
           "description": "A select whose dropdown is a tree the user can search and expand, picking one node or several,\nwith children loaded lazily.",
           "generics": [
             "T extends { value: string; label: string }"
@@ -33559,7 +33694,7 @@
           "name": "PdxTree",
           "tagName": "pdx-tree",
           "category": "Specialized Inputs",
-          "order": 40,
+          "order": 41,
           "description": "A hierarchy the user navigates.",
           "generics": [
             "T"
@@ -33856,7 +33991,7 @@
           "name": "PdxWizard",
           "tagName": "pdx-wizard",
           "category": "Forms",
-          "order": 51,
+          "order": 52,
           "description": "A multi-step wizard with a stepper header, back/next navigation in linear or free mode, and a\nvalidation guard before moving on.",
           "members": [
             {

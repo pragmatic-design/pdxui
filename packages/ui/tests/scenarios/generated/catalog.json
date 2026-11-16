@@ -1570,6 +1570,29 @@
       ]
     },
     {
+      "name": "flag",
+      "tags": [
+        "pdx-flag"
+      ],
+      "tier": "1A",
+      "status": "wip",
+      "page": "tier-1a",
+      "scenarios": [
+        {
+          "id": "flag-named",
+          "title": "Flag — Named by its region"
+        },
+        {
+          "id": "flag-decorative",
+          "title": "Flag — Decorative, beside its name"
+        },
+        {
+          "id": "flag-sizes",
+          "title": "Flag — Sizes (sm / md / lg)"
+        }
+      ]
+    },
+    {
       "name": "form",
       "tags": [
         "pdx-form"
