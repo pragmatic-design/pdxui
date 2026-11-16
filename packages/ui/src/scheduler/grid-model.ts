@@ -40,6 +40,8 @@ export interface SchedulerEvent {
     seriesId?: string;
     /** An override: the original start of the occurrence it replaces, written like the series' `start`. */
     recurrenceId?: string;
+    /** Free text, which the built-in editor shows and edits. */
+    notes?: string;
     [field: string]: unknown;
 }
 

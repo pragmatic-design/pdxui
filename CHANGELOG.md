@@ -58,8 +58,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   not move a weekly 9:00; a rule with a part it does not do is drawn once. Moving or resizing an
   occurrence asks with `scope: 'occurrence'`: left so, it writes an override, an event with `seriesId`
   and `recurrenceId` (its series, and the start it replaces); set to `'series'` by the app, it moves
-  the whole series. Touch dragging, the built-in editor, and print and export come in the following
-  parts.
+  the whole series. The scheduler has its own editor, a dialog with the event's title, start and end,
+  all day, resource and `notes`: Enter or a double click on an event edits it, after `event-open`;
+  Enter on an empty slot and a create (a drag, Shift and the arrows) ask `before-create`, then open it
+  on the new event. Save asks `before-save` (`{ event, previous, isNew }`; refused, the editor stays
+  open), writes `events` and emits `save`, and `create` for a new one; Delete, and the Delete key on
+  an event, ask `before-remove`, then remove it (an occurrence goes to its series' `exdate`) and emit
+  `remove`. The editor names a missing title and an end before the start. `editor="none"` turns it off
+  and keeps the app's `event-open`, `slot-open` and an immediate create. Touch dragging, the
+  repetition editor, the editor's snippets, and print and export come in the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

@@ -65,6 +65,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // `selected` is said at each Shift+arrow over empty cells, `{when}` the range; `selectCancelled` when
     // Escape drops it. `menu` names an event's ⋯ button, `moveItem` and `resizeItem` its two choices;
     // `picked` / `pickedResize` are said when one of them picks the event up, for a click on a slot.
+    // `editEvent` names the built-in editor's dialog (`newEvent` a new one's); the `…Field`, `startDate`
+    // and the like label its controls; `titleRequired` and `endBeforeStart` are its errors; `saved` and
+    // `deleted` are said when a save or a delete is done.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
@@ -80,6 +83,11 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         menu: 'Change {title}', moveItem: 'Move', resizeItem: 'Resize',
         picked: '{title} picked up. Choose the slot to move it to, or press Escape.',
         pickedResize: '{title} picked up. Choose the slot it should end in, or press Escape.',
+        editEvent: 'Edit event', titleField: 'Title', startsField: 'Starts', endsField: 'Ends',
+        startDate: 'Start date', startTime: 'Start time', endDate: 'End date', endTime: 'End time', notesField: 'Notes',
+        save: 'Save', delete: 'Delete', cancel: 'Cancel',
+        titleRequired: 'Give the event a title.', endBeforeStart: 'The end must come after the start.',
+        saved: '{title} saved', deleted: '{title} deleted',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.

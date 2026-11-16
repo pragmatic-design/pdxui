@@ -41,6 +41,7 @@
         <div class="opt-row"><code>readonly</code><span>boolean</span><span>Nothing is moved, resized or created; an event or a resource can still allow it for itself</span></div>
         <div class="opt-row"><code>prevent-overlap</code><span>boolean</span><span>Refuse a place over another event of the same resource (false)</span></div>
         <div class="opt-row"><code>create-id</code><span>() =&gt; string</span><span>The id of an event the scheduler creates (<code>crypto.randomUUID()</code>)</span></div>
+        <div class="opt-row"><code>editor</code><span>'dialog' | 'none'</span><span>The built-in editor, a dialog: Enter or a double click on an event, Enter on an empty slot and a create open it (<code>'dialog'</code>); <code>'none'</code> leaves them to the app</span></div>
         <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'</span><span>The view on screen (<code>::view</code>)</span></div>
         <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all seven by default</span></div>
         <div class="opt-row"><code>timeline-scale</code><span>'day' | 'week' | 'month' | 'year'</span><span>The timeline's period and columns: a day of slots, a week or month of days, a year of months ('week')</span></div>
@@ -71,6 +72,8 @@
         <div class="opt-row"><code>before-create</code><span>{ start, end, resource, allDay, conflicts }</span><span>A drag over empty slots is about to create an event; refusable</span></div>
         <div class="opt-row"><code>external-drop</code><span>{ data, start, end, resource, allDay, conflicts }</span><span>A <code>useDrag</code> source of the app dropped on the grid; refusable, else an event from <code>data.title</code> and <code>data.duration</code> (minutes)</span></div>
         <div class="opt-row"><code>create</code><span>{ event }</span><span>An event was created and added to <code>events</code></span></div>
+        <div class="opt-row"><code>before-save</code> / <code>save</code><span>{ event, previous, isNew }</span><span>The editor's Save: asked first (<code>preventDefault()</code> refuses it, the editor stays open), then written</span></div>
+        <div class="opt-row"><code>before-remove</code> / <code>remove</code><span>{ event }</span><span>The editor's Delete, or the Delete key on an event: asked first, then removed (an occurrence of a series goes to its <code>exdate</code>)</span></div>
         <div class="opt-row"><code>rejected</code><span>{ action, event, to, reason, conflicts }</span><span>A change was refused: <code>overlap</code> by <code>prevent-overlap</code>, <code>prevented</code> by the app</span></div>
         <div class="opt-row"><code>view-change</code> / <code>date-change</code> / <code>events-change</code><span>{ value }</span><span>A model was written</span></div>
         <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
@@ -83,7 +86,9 @@
         <div class="opt-row"><code>Arrows</code><span></span><span>One slot, or day of the month, at a time; they stop at the edges. In the year, a day or a week, across months</span></div>
         <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last cell. In the year, the week's first and last day</span></div>
         <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
-        <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day; in the year, open the day</span></div>
+        <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day (with the editor, create there); in the year, open the day</span></div>
+        <div class="opt-row"><code>Enter</code><span></span><span>On an event: open it, and with the editor, edit it</span></div>
+        <div class="opt-row"><code>Delete</code><span></span><span>On an event: remove it, asking <code>before-remove</code> first</span></div>
         <div class="opt-row"><code>Space</code><span></span><span>On an event: pick it up; again, or <kbd>Enter</kbd>, to drop it where the arrows took it, asking <code>before-move</code> or <code>before-resize</code> first</span></div>
         <div class="opt-row"><code>Arrows</code><span></span><span>On a picked-up event: move it a slot, a day (a week up and down in the month) or a resource</span></div>
         <div class="opt-row"><code>Shift + arrows</code><span></span><span>On a picked-up event: move its end; with <kbd>Alt</kbd>, its start</span></div>

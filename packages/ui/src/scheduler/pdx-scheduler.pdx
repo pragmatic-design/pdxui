@@ -17,7 +17,7 @@
       <pdx-scheduler-month class="pdx-scheduler-grid pdx-scheduler-month" data-part="grid" role="grid" :aria-labelledby="periodId" :aria-describedby="createHint" aria-readonly="true"
         :style="'--_scheduler-cols:' + perWeek + ';--_scheduler-lanes:' + dayMaxEvents" :ref="gridEl"
         :weeks="monthWeeks" :heads="monthHeads" :ref-date="refDate" :today="todayDate" :tab-cell="tabCell" :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-month>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)" @dblclick="onDblClick($event)"></pdx-scheduler-month>
     } @else if (view === 'year') {
       <pdx-scheduler-year :months="yearMonths" :cursor="yearCursor" :today="todayDate" :locale="loc" :ref="gridEl"
         @keydown="onYearKey($event)" @click="onYearClick($event)"></pdx-scheduler-year>
@@ -31,7 +31,7 @@
         :shown="tlShown" :cols="tlCols" :tree="isTree" :tab-cell="tabCell" :first-column="tlWindow.firstColumn()" :now="tlNow" :scale="timelineScale"
         :business-hours="businessHours" :time-zone="zone" :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
         @metrics="metrics = $event.detail"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-timeline>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)" @dblclick="onDblClick($event)"></pdx-scheduler-timeline>
     } @else {
       <pdx-scheduler-time-grid class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" :aria-describedby="createHint" aria-readonly="true"
         :aria-rowcount="headerRows.length + 1 + slots.length" :aria-colcount="columns.length + 1"
@@ -40,10 +40,14 @@
         :now-lines="nowLines" :tab-cell="tabCell" :start-minutes="startMinutes" :slot-minutes="slotMinutes" :business-hours="businessHours" :open-at="openSlot"
         :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
         @metrics="slotPx = $event.detail.slot"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-time-grid>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)" @dblclick="onDblClick($event)"></pdx-scheduler-time-grid>
     }
     <span class="pdx-sr-only" :id="hintId">{{ uiString('scheduler', 'instructions') }}</span>
     <span class="pdx-sr-only" :id="createHintId">{{ uiString('scheduler', 'createInstructions') }}</span>
+    @if (editing) {
+      <pdx-scheduler-editor :draft="editing" :resources="resources" :zone="zone" :locale="loc"
+        @save="onEditorSave($event.detail.event)" @remove="onEditorDelete()" @discard="closeEditor()"></pdx-scheduler-editor>
+    }
   </div>
 </template>
 
@@ -116,6 +120,7 @@ import { cellAt, pointOfCell, type PointModel } from './drop-point';
 import { DRAFT_ID, canDo, eventWhen } from './event-state';
 import { edgePoint, keyGesture, keySelect, keyStep, type KeyGesture } from './keyboard-move';
 import './scheduler-agenda.pdx';
+import './scheduler-editor.pdx';
 import './scheduler-month.pdx';
 import './scheduler-time-grid.pdx';
 import './scheduler-timeline.pdx';
@@ -179,6 +184,8 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @prop preventOverlap: boolean = false;
 /** The id of an event the scheduler creates. */
 @prop createId: () => string = () => crypto.randomUUID();
+/** The built-in editor: `dialog` opens it on Enter or a double click on an event, on Enter on an empty slot, and on a create; `none` leaves those to the app (`event-open`, `slot-open`, `create`). */
+@prop editor: 'dialog' | 'none' = 'dialog';
 /** What an event draws; without it, its time and title. */
 @slot event?: (event: SchedulerEvent);
 /** An event is about to move, to another time, day or resource; `preventDefault()` refuses it. For an occurrence of a series, `scope` is 'occurrence' (it becomes an override in `events`); set it to 'series' to move the whole series. */
@@ -193,8 +200,16 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @event(cancelable) 'before-create': { start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] };
 /** Something the app made draggable with `useDrag` was dropped on the grid: its data and where (ISO, UTC); `preventDefault()` refuses it, else an event is created there from `data.title` and `data.duration` (minutes). */
 @event(cancelable) 'external-drop': { data: unknown; start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] };
-/** An event was created, by a drag over empty slots or a drop from outside, and added to `events`. */
+/** An event was created, by a drag over empty slots, the keyboard, the editor or a drop from outside, and added to `events`. */
 @event create: { event: SchedulerEvent };
+/** The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open. */
+@event(cancelable) 'before-save': { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean };
+/** The editor saved an event; `events` is already written. */
+@event save: { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean };
+/** An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. (Not `delete`, a reserved word, #1130.) */
+@event(cancelable) 'before-remove': { event: SchedulerEvent };
+/** An event was removed; `events` is already written (an occurrence of a series is added to its `exdate`). */
+@event remove: { event: SchedulerEvent };
 /** A move, resize or create was refused: by `prevent-overlap` (`overlap`) or by the app (`prevented`). */
 @event rejected: { action: 'move' | 'resize' | 'create'; event: SchedulerEvent | null; to: { start: string; end: string; resource?: string | string[] }; reason: 'overlap' | 'prevented'; conflicts: SchedulerEvent[] };
 /** An event was clicked, or Enter pressed on it. */
@@ -234,6 +249,10 @@ let draft = $signal<Draft | null>(null);
 let lift = $signal<{ event: SchedulerEvent; gesture: KeyGesture | null; resource: string | null; cell: { row: number; col: number }; origin: { row: number; col: number }; byMenu: boolean } | null>(null);
 /** The empty cells selected from the keyboard: the one Shift+arrows began on, and the one they reached. */
 let selection = $signal<{ anchor: { row: number; col: number }; cell: { row: number; col: number } } | null>(null);
+/** The event the built-in editor is open on, and whether it is a new one. */
+let editing = $signal<{ event: SchedulerEvent; isNew: boolean } | null>(null);
+/** What had the focus when the editor opened: it gets it back when the editor closes. */
+let editReturn: HTMLElement | null = null;
 
 const periodId = generatedId('pdx-scheduler-period');
 const hintId = generatedId('pdx-scheduler-hint');
@@ -419,6 +438,11 @@ function onKey(e: KeyboardEvent): void {
     const button = e.target instanceof HTMLElement && e.target.matches('[data-part="eventButton"]') ? e.target : null;
     const id = (button?.closest(EVENT) as HTMLElement | null)?.dataset.id;
     if (e.key === ' ' && id) { e.preventDefault(); liftEvent(id, row, col, null); return; }
+    // Enter edits an event the editor may change, after `event-open`; without the editor the button's
+    // own click is the `event-open`.
+    const ev = id ? eventById(id) : undefined;
+    if (e.key === 'Enter' && ev && canEdit(ev)) { e.preventDefault(); eventOpen({ event: ev }); openEditor(ev, false); return; }
+    if (e.key === 'Delete' && ev && canChange(ev)) { e.preventDefault(); if (deleteEvent(ev)) focusCell(row, col); return; }
     if (e.key === 'Escape') { e.preventDefault(); focusCell(row, col); }
     return;
   }
@@ -433,7 +457,15 @@ function onKey(e: KeyboardEvent): void {
     if (inner.length) {
       for (const button of inner) button.tabIndex = 0;
       inner[0].focus();
-    } else slotOpen(slotOf(row, col));
+    } else {
+      const here = slotOf(row, col);
+      slotOpen(here);
+      // With the editor, an empty slot's Enter creates there: asked first, then edited.
+      if (editor === 'dialog' && !readonly) {
+        createOver({ start: here.start, end: here.end, resource: here.resource, wholeDay: here.allDay }, uiString('scheduler', 'newEvent'),
+          (found) => beforeCreate({ start: here.start, end: here.end, resource: here.resource, allDay: here.allDay, conflicts: found }), true);
+      }
+    }
     return;
   }
   const target = gridKeyTarget(e, { row, col }, gridSize);
@@ -691,9 +723,10 @@ function refuse(action: 'move' | 'resize' | 'create', event: SchedulerEvent | nu
 
 /**
  * A new event over a range (instants in UTC; whole days when `wholeDay`), after asking: `ask` is the
- * app's `before-create` or `external-drop`. Written to `events`, then `create`.
+ * app's `before-create` or `external-drop`. With `edit`, the built-in editor opens on it and its Save
+ * writes it; without, it is written to `events` now, then `create`.
  */
-function createOver(r: { start: string; end: string; resource: string | null; wholeDay: boolean }, title: string, ask: (found: SchedulerEvent[]) => boolean): void {
+function createOver(r: { start: string; end: string; resource: string | null; wholeDay: boolean }, title: string, ask: (found: SchedulerEvent[]) => boolean, edit: boolean): void {
   const found = conflicts(expanded, null, r, zone);
   const to = rangeOf({ start: r.start, end: r.end, resource: r.resource ?? undefined });
   if (preventOverlap && found.length) return refuse('create', null, to, 'overlap', found);
@@ -702,9 +735,82 @@ function createOver(r: { start: string; end: string; resource: string | null; wh
   const made: SchedulerEvent = { id: createId(), title, start: r.wholeDay ? dayOf(r.start) : r.start, end: r.wholeDay ? dayOf(r.end) : r.end };
   if (r.wholeDay) made.allDay = true;
   if (r.resource !== null) made.resource = r.resource;
+  if (edit) { openEditor(made, true); return; }
   events = [...events, made];
   create({ event: made });
   announce(format(uiString('scheduler', 'created'), { title }));
+}
+
+// ─── The built-in editor ───────────────────────────────────────────────────────
+
+/** Whether the app may change the event at all: move it, resize it, edit it or delete it. */
+function canChange(e: SchedulerEvent): boolean { return canMove(e) || canResize(e); }
+/** Whether the built-in editor opens on the event. */
+function canEdit(e: SchedulerEvent): boolean { return editor === 'dialog' && canChange(e); }
+/** An occurrence the scheduler drew from a series, not an event of `events`. */
+function isOccurrence(e: SchedulerEvent): boolean { return e.seriesId !== undefined && !events.some((x) => x.id === e.id); }
+
+function openEditor(e: SchedulerEvent, isNew: boolean): void {
+  editReturn = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  editing = { event: e, isNew };
+}
+/** The editor closed: the focus goes back where it was, or to the grid's cell. */
+function closeEditor(focusId?: string): void {
+  editing = null;
+  const back = editReturn;
+  editReturn = null;
+  if (focusId) focusEvent(focusId, active ?? tabCell);
+  else if (back?.isConnected) queueMicrotask(() => back.focus());
+  else focusCell(tabCell.row, tabCell.col);
+}
+
+/**
+ * The editor's Save: `before-save` first, which may refuse it (the editor stays open); then `events`
+ * is written — a new event added, an occurrence of a series made an override of its own, any other
+ * replaced — and `save` (and `create` for a new one) is emitted.
+ */
+function onEditorSave(next: SchedulerEvent): void {
+  const ed = editing;
+  if (!ed) return;
+  const previous = ed.isNew ? null : ed.event;
+  const to = rangeOf(next);
+  const found = conflicts(expanded, ed.isNew ? null : ed.event.id, next, zone);
+  if (preventOverlap && found.length) { refuse(ed.isNew ? 'create' : 'move', previous, to, 'overlap', found); return; }
+  if (!beforeSave({ event: next, previous, isNew: ed.isNew })) { announce(format(uiString('scheduler', 'refused'), { title: next.title })); return; }
+  let written = next;
+  if (ed.isNew) events = [...events, next];
+  else if (isOccurrence(ed.event)) { written = { ...next, id: createId() }; events = [...events, written]; }
+  else events = events.map((x) => (x.id === next.id ? next : x));
+  save({ event: written, previous, isNew: ed.isNew });
+  if (ed.isNew) create({ event: written });
+  announce(format(uiString('scheduler', 'saved'), { title: written.title }));
+  closeEditor(ed.isNew || written !== next ? written.id : undefined);
+}
+
+/**
+ * Remove event `e`, asking `before-remove` first: out of `events`, or for an occurrence of a series,
+ * its start added to the series' `exdate`. True when it is done.
+ */
+function deleteEvent(e: SchedulerEvent): boolean {
+  if (!beforeRemove({ event: e })) { announce(format(uiString('scheduler', 'refused'), { title: e.title })); return false; }
+  if (isOccurrence(e)) {
+    events = events.map((x) => (x.id === e.seriesId ? { ...x, exdate: [...(x.exdate ?? []), e.recurrenceId ?? e.start] } : x));
+  } else events = events.filter((x) => x.id !== e.id);
+  remove({ event: e });
+  announce(format(uiString('scheduler', 'deleted'), { title: e.title }));
+  return true;
+}
+function onEditorDelete(): void {
+  const ed = editing;
+  if (ed && deleteEvent(ed.event)) { editReturn = null; closeEditor(); }
+}
+
+/** A double click on an event edits it. */
+function onDblClick(e: MouseEvent): void {
+  if (disabled || lift) return;
+  const host = e.target instanceof Element ? e.target.closest(EVENT) as HTMLElement | null : null;
+  const ev = host ? eventById(host.dataset.id ?? '') : undefined;
+  if (ev && canEdit(ev)) openEditor(ev, false);
 }
 
 /**
@@ -721,7 +827,7 @@ function dropFromOutside(data: unknown, x: number, y: number): void {
   const end = p.allDay ? zonedInstant(addDays(p.date, 1), 0, zone) : p.at + minutes * 60_000;
   const r = { start: new Date(p.at).toISOString(), end: new Date(end).toISOString(), resource: p.resource, wholeDay: p.allDay };
   const title = typeof info.title === 'string' && info.title ? info.title : uiString('scheduler', 'newEvent');
-  createOver(r, title, (found) => externalDrop({ data, start: r.start, end: r.end, resource: r.resource, allDay: r.wholeDay, conflicts: found }));
+  createOver(r, title, (found) => externalDrop({ data, start: r.start, end: r.end, resource: r.resource, allDay: r.wholeDay, conflicts: found }), false);
 }
 const dropZone = useDropZone(() => (view === 'year' || view === 'agenda' ? null : gridEl), { onDrop: (data, at) => dropFromOutside(data, at.x, at.y) });
 
@@ -736,7 +842,7 @@ type GestureEnd = { kind: 'create' } | { kind: 'move'; event: SchedulerEvent } |
 function commitGesture(g: GestureEnd, d: Draft): string | null {
   if (g.kind === 'create') {
     const r = { start: d.start, end: d.end, resource: typeof d.resource === 'string' ? d.resource : null, wholeDay: d.allDay === true };
-    createOver(r, uiString('scheduler', 'newEvent'), (found) => beforeCreate({ start: r.start, end: r.end, resource: r.resource, allDay: r.wholeDay, conflicts: found }));
+    createOver(r, uiString('scheduler', 'newEvent'), (found) => beforeCreate({ start: r.start, end: r.end, resource: r.resource, allDay: r.wholeDay, conflicts: found }), editor === 'dialog');
     return null;
   }
   const e = g.event;

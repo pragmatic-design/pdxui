@@ -898,3 +898,52 @@ pdx-scheduler {
 :state(disabled) > .pdx-scheduler .pdx-scheduler-event {
     cursor: default;
 }
+
+/* ===== The built-in editor ===== */
+/* The dialog's fields in one column; a start or an end is a date and, unless the event lasts all day, a
+   time, side by side and wrapping on a narrow screen; the actions at the end, Delete apart from the rest. */
+
+.pdx-scheduler-editor {
+    display: grid;
+    gap: var(--pdx-space-md);
+}
+
+.pdx-scheduler-editor-when {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.pdx-scheduler-editor-when > legend {
+    margin-bottom: var(--pdx-space-2xs);
+    padding: 0;
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+}
+
+.pdx-scheduler-editor-error {
+    flex-basis: 100%;
+    margin: 0;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-danger-ink);
+}
+
+/* Two groups: Delete at the start, Cancel and Save at the end. The buttons are display: contents, so
+   the groups, not the buttons, are what the row lays out. */
+.pdx-scheduler-editor-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--pdx-space-sm);
+    width: 100%;
+}
+
+.pdx-scheduler-editor-group {
+    display: flex;
+    gap: var(--pdx-space-sm);
+}

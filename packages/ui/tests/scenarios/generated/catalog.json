@@ -2713,6 +2713,10 @@
           "title": "Scheduler — A day by room"
         },
         {
+          "id": "scheduler-editor",
+          "title": "Scheduler — The built-in editor"
+        },
+        {
           "id": "scheduler-recurring",
           "title": "Scheduler — A recurring event"
         },

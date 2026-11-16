@@ -1,0 +1,148 @@
+<template>
+  <pdx-dialog :open="true" :title="draft.isNew ? uiString('scheduler', 'newEvent') : uiString('scheduler', 'editEvent')" @open-change="onOpenChange($event)">
+    <div class="pdx-scheduler-editor">
+      <pdx-form-field :label="uiString('scheduler', 'titleField')" :error="titleError" :show-error="titleError !== ''">
+        <pdx-input ::value="title"></pdx-input>
+      </pdx-form-field>
+      <pdx-switch ::checked="allDay" :label="uiString('scheduler', 'allDay')"></pdx-switch>
+      <fieldset class="pdx-scheduler-editor-when">
+        <legend>{{ uiString('scheduler', 'startsField') }}</legend>
+        <pdx-date-picker ::value="startDate" :locale="locale" :ariaLabel="uiString('scheduler', 'startDate')" :clearable="false"></pdx-date-picker>
+        @if (!allDay) { <pdx-time-picker ::value="startTime" :locale="locale" :ariaLabel="uiString('scheduler', 'startTime')"></pdx-time-picker> }
+      </fieldset>
+      <fieldset class="pdx-scheduler-editor-when" :aria-describedby="endError ? endErrorId : null">
+        <legend>{{ uiString('scheduler', 'endsField') }}</legend>
+        <pdx-date-picker ::value="endDate" :locale="locale" :ariaLabel="uiString('scheduler', 'endDate')" :clearable="false"></pdx-date-picker>
+        @if (!allDay) { <pdx-time-picker ::value="endTime" :locale="locale" :ariaLabel="uiString('scheduler', 'endTime')"></pdx-time-picker> }
+        @if (endError) { <p class="pdx-scheduler-editor-error" :id="endErrorId">{{ endError }}</p> }
+      </fieldset>
+      @if (resourceOptions.length) {
+        <pdx-form-field :label="uiString('scheduler', 'resource')">
+          <pdx-select :options="resourceOptions" ::value="resource" :multiple="multiple"></pdx-select>
+        </pdx-form-field>
+      }
+      <pdx-form-field :label="uiString('scheduler', 'notesField')">
+        <pdx-textarea ::value="notes" :rows="3"></pdx-textarea>
+      </pdx-form-field>
+    </div>
+    <div slot="footer" class="pdx-scheduler-editor-actions">
+      <div class="pdx-scheduler-editor-group">
+        @if (!draft.isNew) { <pdx-button variant="danger" @click="remove({})">{{ uiString('scheduler', 'delete') }}</pdx-button> }
+      </div>
+      <div class="pdx-scheduler-editor-group">
+        <pdx-button variant="outline" @click="discard({})">{{ uiString('scheduler', 'cancel') }}</pdx-button>
+        <pdx-button variant="primary" @click="trySave()">{{ uiString('scheduler', 'save') }}</pdx-button>
+      </div>
+    </div>
+  </pdx-dialog>
+</template>
+
+<script>
+// pdx-scheduler's built-in editor of an event (#1020, part 9): a dialog with its title, its start and
+// end (a date, and a time unless it lasts all day), its resource and its notes. It reads an event and
+// writes one back in the form the event was written in; what to do with it — ask before-save, write
+// `events`, say so — is the owner's, which hears `save`, `remove` and `discard`. Its parts are
+// pdx-scheduler's (#1110).
+@internal;
+import { addDays, generatedId } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import { eventInstant, parseClock, zonedInstant, zonedParts } from './time';
+import { formatLike } from './drag-model';
+import { isAllDay, type SchedulerEvent, type SchedulerResource } from './grid-model';
+
+/** The event edited, and whether it is a new one. */
+@prop draft: { event: SchedulerEvent; isNew: boolean } = { event: { id: '', title: '', start: '', end: '' }, isNew: true };
+/** The resources an event may belong to. */
+@prop resources: SchedulerResource[] = [];
+/** The zone the times are shown and read in. */
+@prop zone: string = 'UTC';
+/** The resolved locale of the pickers. */
+@prop locale: string = '';
+/** The event as the editor's fields made it, when Save is pressed and they are right. */
+@event save: { event: SchedulerEvent };
+/** Delete was pressed. */
+@event remove: {};
+/** Cancel, Escape or the close button: nothing changes. Not `cancel`, the native dialog's own event. */
+@event discard: {};
+
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+const pad = (n: number) => String(n).padStart(2, '0');
+const clock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
+const endErrorId = generatedId('pdx-scheduler-editor-end');
+
+let title = $signal('');
+let allDay = $signal(false);
+let startDate = $signal('');
+let startTime = $signal('09:00');
+let endDate = $signal('');
+let endTime = $signal('10:00');
+let resource = $signal<string | string[] | null>(null);
+let notes = $signal('');
+let tried = $signal(false);
+
+/** Every resource and its children, as the select's options. */
+const resourceOptions = $derived(flatten(resources));
+/** A list of resources takes many; one, one. */
+const multiple = $derived(Array.isArray(draft.event.resource));
+const titleError = $derived(tried && title.trim() === '' ? uiString('scheduler', 'titleRequired') : '');
+const endError = $derived(tried && !(range().end > range().start) ? uiString('scheduler', 'endBeforeStart') : '');
+
+function flatten(list: readonly SchedulerResource[]): { value: string; label: string }[] {
+  return list.flatMap((r) => [{ value: r.id, label: r.label }, ...flatten(r.children ?? [])]);
+}
+
+// The fields from the event, each time another one is edited.
+$watch(draft, (d) => {
+  const e = d.event;
+  const whole = isAllDay(e);
+  const s = zonedParts(eventInstant(e.start, zone), zone);
+  const end = zonedParts(eventInstant(e.end, zone), zone);
+  title = e.title;
+  allDay = whole;
+  startDate = s.date;
+  startTime = whole ? '09:00' : clock(s.minutes);
+  // An all-day event's end is the day after its last: the editor shows the last day.
+  endDate = whole ? addDays(end.date, -1) : end.date;
+  endTime = whole ? '10:00' : clock(end.minutes);
+  resource = e.resource ?? null;
+  notes = typeof e.notes === 'string' ? e.notes : '';
+  tried = false;
+}, { immediate: true });
+
+/** The fields' range, as instants; an all-day range runs to the midnight after its last day. */
+function range(): { start: number; end: number } {
+  if (allDay) return { start: zonedInstant(startDate, 0, zone), end: zonedInstant(addDays(endDate, 1), 0, zone) };
+  return { start: zonedInstant(startDate, parseClock(startTime), zone), end: zonedInstant(endDate, parseClock(endTime), zone) };
+}
+
+/** The event the fields make, its start and end written as the edited one's were (a wall time for one that was a date). */
+function made(): SchedulerEvent {
+  const e = draft.event;
+  const r = range();
+  const like = (value: string) => (DATE_ONLY.test(value) ? `${value}T00:00` : value);
+  const next: SchedulerEvent = { ...e, title: title.trim() };
+  if (allDay) {
+    next.start = startDate;
+    next.end = addDays(endDate, 1);
+    next.allDay = true;
+  } else {
+    next.start = formatLike(like(e.start), r.start, zone);
+    next.end = formatLike(like(e.end), r.end, zone);
+    delete next.allDay;
+  }
+  const chosen = Array.isArray(resource) ? resource : resource ?? undefined;
+  if (chosen === undefined || (Array.isArray(chosen) && chosen.length === 0)) delete next.resource; else next.resource = chosen;
+  if (notes.trim()) next.notes = notes; else delete next.notes;
+  return next;
+}
+
+function trySave(): void {
+  tried = true;
+  if (title.trim() === '' || !(range().end > range().start)) return;
+  save({ event: made() });
+}
+
+function onOpenChange(e: CustomEvent<{ value: boolean }>): void {
+  if (!e.detail.value) discard({});
+}
+</script>
