@@ -14,17 +14,11 @@
     @for (columns as c, ci; track c.key) {
       <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-allday" data-part="slot" data-row="0" :data-col="ci" :tabindex="tabCell.row === 0 && tabCell.col === ci ? 0 : -1" :style="'--_scheduler-col:' + ci">
         @for (barsAt(ci) as b; track b.id) {
-          <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" tabindex="-1" :data-id="b.id"
+          <pdx-scheduler-event class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" :data-id="b.id"
             :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + eventColorStyle(b.event, rules.resources, c.resource)"
-            :data-before="b.before ? '' : null" :data-after="b.after ? '' : null" :aria-label="allDayName(b.event, c)"
+            :data-before="b.before ? '' : null" :data-after="b.after ? '' : null"
             :data-movable="canDo(b.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(b.event, draft) ? '' : null"
-            :aria-describedby="hint && (canDo(b.event, 'move', rules) || canDo(b.event, 'resize', rules)) ? hint : null">
-            @render event?.(b.event) @else { <span class="pdx-scheduler-event-title">{{ b.event.title }}</span> }
-            @if (canDo(b.event, 'resize', rules)) {
-              @if (!b.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-              @if (!b.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-            }
-          </button>
+            :item="b.event" :name="allDayName(b.event, c)" :before="b.before" :after="b.after" :rules="rules" :hint="hint" :event="event"></pdx-scheduler-event>
         }
       </div>
     }
@@ -37,20 +31,11 @@
           :data-off="offHours(c, s.m) ? '' : null" :data-hour="s.m % 60 === 0 ? '' : null"
           :tabindex="tabCell.row === s.ri + 1 && tabCell.col === ci ? 0 : -1">
           @for (eventsAt(ci, s.ri) as p; track p.id) {
-            <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
+            <pdx-scheduler-event class="pdx-scheduler-event" data-part="event" :data-id="p.id"
               :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + eventColorStyle(p.event, rules.resources, c.resource)"
-              :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)"
+              :data-before="p.before ? '' : null" :data-after="p.after ? '' : null"
               :data-movable="canDo(p.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(p.event, draft) ? '' : null"
-              :aria-describedby="hint && (canDo(p.event, 'move', rules) || canDo(p.event, 'resize', rules)) ? hint : null">
-              @render event?.(p.event) @else {
-                <span class="pdx-scheduler-event-title">{{ p.event.title }}</span>
-                <span class="pdx-scheduler-event-time">{{ timeOf(p) }}</span>
-              }
-              @if (canDo(p.event, 'resize', rules)) {
-                @if (!p.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                @if (!p.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-              }
-            </button>
+              :item="p.event" :name="timedName(p, c)" :time="timeOf(p)" :before="p.before" :after="p.after" :rules="rules" :hint="hint" :event="event"></pdx-scheduler-event>
           }
         </div>
       }
@@ -77,6 +62,7 @@ import { isBusinessTime, type AllDayBar, type BusinessHours, type Column, type H
 import { eventColorStyle } from './event-style';
 import { canDo, isDraggedEvent, type MoveRules } from './event-state';
 import type { Draft } from './scheduler-drag';
+import './scheduler-event.pdx';
 
 /** The header rows: the days, or the days and their resources. */
 @prop headerRows: HeaderRow[] = [];

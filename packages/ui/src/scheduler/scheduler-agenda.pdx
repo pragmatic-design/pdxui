@@ -8,8 +8,8 @@
         <div class="pdx-scheduler-agenda-date" :id="labelId + '-' + ad.date">{{ dayHeader(ad.date, locale).full }}</div>
         <ul class="pdx-scheduler-agenda-items" :aria-labelledby="labelId + '-' + ad.date">
           @for (ad.items as it; track it.event.id) {
-            <li>
-              <button type="button" class="pdx-scheduler-agenda-event" data-part="event" :data-id="it.event.id" :style="eventColorStyle(it.event, resources)">
+            <li data-part="event" :data-id="it.event.id">
+              <button type="button" class="pdx-scheduler-agenda-event" data-part="eventButton" :style="eventColorStyle(it.event, resources)">
                 <span class="pdx-scheduler-agenda-time">{{ it.allDay ? uiString('scheduler', 'allDay') : spanLabel(it.start, it.end, locale) }}</span>
                 <span class="pdx-scheduler-agenda-title">@render event?.(it.event) @else { {{ it.event.title }} }</span>
                 @if (resourceLabels(it.event, resources)) { <span class="pdx-scheduler-agenda-resource">{{ resourceLabels(it.event, resources) }}</span> }

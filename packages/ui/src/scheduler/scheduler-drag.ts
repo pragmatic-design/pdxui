@@ -117,7 +117,8 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
         down(e) {
             if (e.button !== 0 || e.pointerType === 'touch' || gesture) return;
             const target = e.target instanceof Element ? e.target : null;
-            if (!target) return;
+            // An event's ⋯ opens its menu: a press there is not a drag.
+            if (!target || target.closest('[data-part="eventMenu"]')) return;
             const handle = target.closest('[data-part="resizeHandle"]') as HTMLElement | null;
             const button = target.closest('[data-part="event"][data-id]') as HTMLElement | null;
             const point = host.pointAt(e.clientX, e.clientY);

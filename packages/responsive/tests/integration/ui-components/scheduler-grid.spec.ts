@@ -46,11 +46,12 @@ test.describe('the scheduler grid', () => {
         const slot = scheduler.locator('[data-row="5"][data-col="1"]');
         await slot.focus();
         await page.keyboard.press('Enter');
-        await expect(scheduler.locator('[data-id="review"]')).toBeFocused();
+        await expect(scheduler.locator('[data-id="review"] [data-part="eventButton"]')).toBeFocused();
         await page.keyboard.press('Escape');
         await expect(slot).toBeFocused();
         await expect(slot).toHaveAttribute('tabindex', '0');
-        await expect(scheduler.locator('[data-id="review"]')).toHaveAttribute('tabindex', '-1');
+        await expect(scheduler.locator('[data-id="review"] [data-part="eventButton"]')).toHaveAttribute('tabindex', '-1');
+        await expect(scheduler.locator('[data-id="review"] [data-part="eventMenu"]')).toHaveAttribute('tabindex', '-1');
     });
 
     test('Enter on an empty slot, or a click on it, emits slot-open with its time', async ({ page }) => {

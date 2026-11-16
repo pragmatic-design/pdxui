@@ -160,16 +160,16 @@ export function checkParts(parts: readonly string[], ast: TemplateNode[], signal
             });
         }
     }
-    // A view's parts are declared by its owner, which checks them against the views it imports.
-    if (!internal) {
-        for (const name of counts.keys()) {
-            if (declared.has(name)) continue;
-            warnings.push({
-                code: 'PDX_PART_UNDECLARED', severity: 'error',
-                message: `data-part '${name}' names no part the script declares.`,
-                hint: `Declare it: @part ${name};`,
-            });
-        }
+    // A view's parts, and those of the views it imports, are declared by its owner, which checks them
+    // against every view under it.
+    if (internal) return warnings;
+    for (const name of counts.keys()) {
+        if (declared.has(name)) continue;
+        warnings.push({
+            code: 'PDX_PART_UNDECLARED', severity: 'error',
+            message: `data-part '${name}' names no part the script declares.`,
+            hint: `Declare it: @part ${name};`,
+        });
     }
     for (const [name, view] of drawnBy) {
         if (declared.has(name)) continue;

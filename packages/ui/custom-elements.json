@@ -24764,7 +24764,7 @@
           "tagName": "pdx-scheduler",
           "category": "Data Display",
           "order": 80,
-          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day. With the mouse or a pen an event\nis dragged to another time, day or resource and resized by its edges, and a drag over empty slots\ncreates one; each asks `before-move`, `before-resize` or `before-create` first, which the app can\nrefuse, then writes `events`. From the keyboard, Space picks a focused event up: the arrows move it\na slot, a day or a resource, Shift and the arrows move its end, Alt, Shift and the arrows its start,\nSpace or Enter drops it, asking the same, and Escape puts it back, each step announced. Shift and the\narrows on an empty cell select slots or days, drawn as a drag over them draws them, and Enter creates\nan event there, asking `before-create`; Escape, or an arrow without Shift, drops the selection.\n`prevent-overlap` refuses a place that overlaps another event of the same resource, and says why in\n`rejected`.",
+          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day. With the mouse or a pen an event\nis dragged to another time, day or resource and resized by its edges, and a drag over empty slots\ncreates one; each asks `before-move`, `before-resize` or `before-create` first, which the app can\nrefuse, then writes `events`. From the keyboard, Space picks a focused event up: the arrows move it\na slot, a day or a resource, Shift and the arrows move its end, Alt, Shift and the arrows its start,\nSpace or Enter drops it, asking the same, and Escape puts it back, each step announced. Shift and the\narrows on an empty cell select slots or days, drawn as a drag over them draws them, and Enter creates\nan event there, asking `before-create`; Escape, or an arrow without Shift, drops the selection.\nWith a single pointer, an event's ⋯ offers «Move» and «Resize»: the event is picked up, and a click\non a slot puts it there, or ends it there, asking the same.\n`prevent-overlap` refuses a place that overlaps another event of the same resource, and says why in\n`rejected`.",
           "members": [
             {
               "kind": "field",
@@ -25413,7 +25413,15 @@
             },
             {
               "name": "event",
-              "description": "An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown, `[data-movable]` one that can be dragged, `[data-dragging]` the one being dragged."
+              "description": "An event, the box that holds its button, its edges and its ⋯; `[data-before]` / `[data-after]` mark one that goes on past the piece shown, `[data-movable]` one that can be dragged, `[data-dragging]` the one being dragged."
+            },
+            {
+              "name": "eventButton",
+              "description": "An event's button: its name, what the `event` snippet draws; a click or Enter opens it."
+            },
+            {
+              "name": "eventMenu",
+              "description": "An event's ⋯ button, which opens «Move» and «Resize»: shown on hover and focus, always for a coarse pointer."
             },
             {
               "name": "resizeHandle",

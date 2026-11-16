@@ -63,7 +63,8 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // is said when Space picks an event up, `{when}` its time, days and resources; `cancelled` when
     // Escape puts it back. `createInstructions` describes the grid where events can be created;
     // `selected` is said at each Shift+arrow over empty cells, `{when}` the range; `selectCancelled` when
-    // Escape drops it.
+    // Escape drops it. `menu` names an event's ⋯ button, `moveItem` and `resizeItem` its two choices;
+    // `picked` / `pickedResize` are said when one of them picks the event up, for a click on a slot.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
@@ -76,6 +77,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         lifted: '{title} lifted. {when}.', cancelled: 'Move cancelled. {title} is back.',
         createInstructions: 'Shift and the arrow keys select empty slots, Enter creates an event over them, and Escape cancels.',
         selected: '{when} selected.', selectCancelled: 'Selection cancelled.',
+        menu: 'Change {title}', moveItem: 'Move', resizeItem: 'Resize',
+        picked: '{title} picked up. Choose the slot to move it to, or press Escape.',
+        pickedResize: '{title} picked up. Choose the slot it should end in, or press Escape.',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.

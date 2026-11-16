@@ -18,17 +18,11 @@
           <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.index" :data-col="vc.index + 1" :aria-colindex="vc.index + 2"
             :data-off="off(s.row, vc.col) ? '' : null" :tabindex="tabCell.row === s.index && tabCell.col === vc.index + 1 ? 0 : -1" :style="'--_scheduler-col:' + vc.index">
             @for (itemsInColumn(s.row, vc.index, firstColumn) as it; track it.id) {
-              <button type="button" class="pdx-scheduler-event pdx-scheduler-span" data-part="event" tabindex="-1" :data-id="it.event.id"
+              <pdx-scheduler-event class="pdx-scheduler-event pdx-scheduler-span" data-part="event" :data-id="it.event.id"
                 :style="'--_scheduler-from:' + (it.start - vc.index) + ';--_scheduler-length:' + (it.end - it.start) + ';--_scheduler-lane:' + it.lane + eventColorStyle(it.event, rules.resources, s.row.resource)"
-                :data-before="it.before ? '' : null" :data-after="it.after ? '' : null" :aria-label="spanName(it.event, s.row.resource)"
+                :data-before="it.before ? '' : null" :data-after="it.after ? '' : null"
                 :data-movable="canDo(it.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(it.event, draft) ? '' : null"
-                :aria-describedby="hint && (canDo(it.event, 'move', rules) || canDo(it.event, 'resize', rules)) ? hint : null">
-                @render event?.(it.event) @else { <span class="pdx-scheduler-event-title">{{ it.event.title }}</span> }
-                @if (canDo(it.event, 'resize', rules)) {
-                  @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                  @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-                }
-              </button>
+                :item="it.event" :name="spanName(it.event, s.row.resource)" :before="it.before" :after="it.after" :rules="rules" :hint="hint" :event="event"></pdx-scheduler-event>
             }
           </div>
         }
@@ -56,6 +50,7 @@ import { itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline
 import { eventColorStyle } from './event-style';
 import { canDo, isDraggedEvent, type MoveRules } from './event-state';
 import type { Draft } from './scheduler-drag';
+import './scheduler-event.pdx';
 
 /** The rows in view: their index, their top in px, and the row. */
 @prop shown: { index: number; top: number; row: TimelineRow }[] = [];

@@ -13,21 +13,13 @@
           <span class="pdx-scheduler-day-number" aria-hidden="true">{{ dayHeader(d, locale).day }}</span>
           <span class="pdx-sr-only">{{ dayHeader(d, locale).full }}</span>
           @for (itemsAt(w, di) as it; track it.id) {
-            <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" :data-line="it.bar ? null : ''" data-part="event" tabindex="-1" :data-id="it.event.id"
+            <pdx-scheduler-event class="pdx-scheduler-event pdx-scheduler-bar" :data-line="it.bar ? null : ''" data-part="event" :data-id="it.event.id"
               :style="'--_scheduler-span:' + it.span + ';--_scheduler-lane:' + it.lane + eventColorStyle(it.event, rules.resources)"
               :data-movable="canDo(it.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(it.event, draft) ? '' : null"
-              :aria-describedby="hint && (canDo(it.event, 'move', rules) || canDo(it.event, 'resize', rules)) ? hint : null"
               :data-before="it.before ? '' : null" :data-after="it.after ? '' : null"
-              :aria-label="monthEventName(it.event, it.minutes, w.days, it.first, it.span, locale, rules.resources)">
-              @render event?.(it.event) @else {
-                @if (!it.bar) { <span class="pdx-scheduler-event-time">{{ clockLabel(it.minutes ?? 0, locale) }}</span> }
-                <span class="pdx-scheduler-event-title">{{ it.event.title }}</span>
-              }
-              @if (it.bar && canDo(it.event, 'resize', rules)) {
-                @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
-                @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
-              }
-            </button>
+              :item="it.event" :name="monthEventName(it.event, it.minutes, w.days, it.first, it.span, locale, rules.resources)"
+              :time="it.bar ? '' : clockLabel(it.minutes ?? 0, locale)" :time-first="true" :edges="it.bar"
+              :before="it.before" :after="it.after" :rules="rules" :hint="hint" :event="event"></pdx-scheduler-event>
           }
           @if (w.more[di] > 0) {
             <button type="button" class="pdx-scheduler-more" data-part="more" tabindex="-1" :data-date="d"
@@ -52,6 +44,7 @@ import { canDo, isDraggedEvent, monthEventName, type MoveRules } from './event-s
 import type { MonthWeek } from './calendar-model';
 import type { Draft } from './scheduler-drag';
 import type { SchedulerEvent } from './grid-model';
+import './scheduler-event.pdx';
 
 /** The month's weeks, each with its days and its events laid out in lanes. */
 @prop weeks: MonthWeek[] = [];

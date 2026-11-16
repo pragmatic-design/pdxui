@@ -1,0 +1,61 @@
+<template>
+  <button type="button" class="pdx-scheduler-event-button" data-part="eventButton" tabindex="-1" :aria-label="name"
+    :aria-describedby="hint && (movable || canDo(item, 'resize', rules)) ? hint : null">
+    @render event?.(item) @else {
+      @if (time && timeFirst) { <span class="pdx-scheduler-event-time">{{ time }}</span> }
+      <span class="pdx-scheduler-event-title">{{ item.title }}</span>
+      @if (time && !timeFirst) { <span class="pdx-scheduler-event-time">{{ time }}</span> }
+    }
+  </button>
+  @if (resizable) {
+    @if (!before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
+    @if (!after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
+  }
+  @if (movable || resizable) {
+    <pdx-dropdown-menu class="pdx-scheduler-event-menu" :items="menuItems" placement="bottom-end">
+      <button slot="trigger" type="button" class="pdx-scheduler-event-menu-button" data-part="eventMenu" tabindex="-1"
+        :aria-label="format(uiString('scheduler', 'menu'), { title: item.title })">⋯</button>
+    </pdx-dropdown-menu>
+  }
+</template>
+
+<script>
+// One event of pdx-scheduler (#1020, part 7c), as the time grid, the month and the timeline draw it. Its
+// element IS the event, the `event` part: the view gives the tag its class, part, id, position and
+// state. Inside it, the event's button carries its name and what the owner's snippet draws; the edges
+// of a resizable event are handles; and an event that can be moved or resized has a ⋯ menu, «Move» and
+// «Resize», the single-pointer way to do what a drag does (WCAG 2.2 2.5.7). The owner hears the
+// menu's choice. Its parts are pdx-scheduler's (#1110).
+@internal;
+import { uiString, format } from '../shared/i18n';
+import { canDo, type MoveRules } from './event-state';
+import type { SchedulerEvent } from './grid-model';
+
+/** The event. */
+@prop item: SchedulerEvent = { id: '', title: '', start: '', end: '' };
+/** The event's accessible name: its title, time, days and resources. */
+@prop name: string = '';
+/** The time the default content shows; empty, none. */
+@prop time: string = '';
+/** The time before the title, not after it. */
+@prop timeFirst: boolean = false;
+/** The pointer resizes the event here by its edges: false for a month's timed event, a line. */
+@prop edges: boolean = true;
+/** The event goes on before the piece drawn: no start handle. */
+@prop before: boolean = false;
+/** The event goes on after the piece drawn: no end handle. */
+@prop after: boolean = false;
+/** What the pointer may do with an event. */
+@prop rules: MoveRules = { disabled: false, readonly: false, resources: [] };
+/** The id of the text that says how an event moves from the keyboard. */
+@prop hint: string = '';
+/** The owner's event snippet, passed on. */
+@slot event?: (event: SchedulerEvent);
+
+const movable = $derived(canDo(item, 'move', rules));
+const resizable = $derived(edges && canDo(item, 'resize', rules));
+const menuItems = $derived([
+  ...(movable ? [{ key: 'move', label: uiString('scheduler', 'moveItem') }] : []),
+  ...(resizable ? [{ key: 'resize', label: uiString('scheduler', 'resizeItem') }] : []),
+]);
+</script>

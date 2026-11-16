@@ -55,7 +55,12 @@ test.describe('the scheduler month', () => {
         const thursday = scheduler.locator('[data-row="3"][data-col="3"]');
         await thursday.focus();
         await page.keyboard.press('Enter');
-        await expect(scheduler.locator('[data-id="t1"]')).toBeFocused();
+        await expect(scheduler.locator('[data-id="t1"] [data-part="eventButton"]')).toBeFocused();
+        // Each event's button, then its ⋯; the «+N» last.
+        await page.keyboard.press('Tab');
+        await expect(scheduler.locator('[data-id="t1"] [data-part="eventMenu"]')).toBeFocused();
+        await page.keyboard.press('Tab');
+        await expect(scheduler.locator('[data-id="t2"] [data-part="eventButton"]')).toBeFocused();
         await page.keyboard.press('Tab');
         await page.keyboard.press('Tab');
         await expect(scheduler.getByRole('button', { name: '2 more events, Thursday, September 24, 2026' })).toBeFocused();

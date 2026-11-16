@@ -17,7 +17,7 @@
       <pdx-scheduler-month class="pdx-scheduler-grid pdx-scheduler-month" data-part="grid" role="grid" :aria-labelledby="periodId" :aria-describedby="createHint" aria-readonly="true"
         :style="'--_scheduler-cols:' + perWeek + ';--_scheduler-lanes:' + dayMaxEvents" :ref="gridEl"
         :weeks="monthWeeks" :heads="monthHeads" :ref-date="refDate" :today="todayDate" :tab-cell="tabCell" :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)"></pdx-scheduler-month>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-month>
     } @else if (view === 'year') {
       <pdx-scheduler-year :months="yearMonths" :cursor="yearCursor" :today="todayDate" :locale="loc" :ref="gridEl"
         @keydown="onYearKey($event)" @click="onYearClick($event)"></pdx-scheduler-year>
@@ -31,7 +31,7 @@
         :shown="tlShown" :cols="tlCols" :tree="isTree" :tab-cell="tabCell" :first-column="tlWindow.firstColumn()" :now="tlNow" :scale="timelineScale"
         :business-hours="businessHours" :time-zone="zone" :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
         @metrics="metrics = $event.detail"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)"></pdx-scheduler-timeline>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-timeline>
     } @else {
       <pdx-scheduler-time-grid class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" :aria-describedby="createHint" aria-readonly="true"
         :aria-rowcount="headerRows.length + 1 + slots.length" :aria-colcount="columns.length + 1"
@@ -40,7 +40,7 @@
         :now-lines="nowLines" :tab-cell="tabCell" :start-minutes="startMinutes" :slot-minutes="slotMinutes" :business-hours="businessHours" :open-at="openSlot"
         :locale="loc" :rules="moveRules" :draft="draft" :hint="hintId" :event="event"
         @metrics="slotPx = $event.detail.slot"
-        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)"></pdx-scheduler-time-grid>
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="onPointerDown($event)" @pdx-select.capture="onMenu($event)"></pdx-scheduler-time-grid>
     }
     <span class="pdx-sr-only" :id="hintId">{{ uiString('scheduler', 'instructions') }}</span>
     <span class="pdx-sr-only" :id="createHintId">{{ uiString('scheduler', 'createInstructions') }}</span>
@@ -67,6 +67,8 @@
  * Space or Enter drops it, asking the same, and Escape puts it back, each step announced. Shift and the
  * arrows on an empty cell select slots or days, drawn as a drag over them draws them, and Enter creates
  * an event there, asking `before-create`; Escape, or an arrow without Shift, drops the selection.
+ * With a single pointer, an event's ⋯ offers «Move» and «Resize»: the event is picked up, and a click
+ * on a slot puts it there, or ends it there, asking the same.
  * `prevent-overlap` refuses a place that overlaps another event of the same resource, and says why in
  * `rejected`.
  *
@@ -82,7 +84,9 @@
  * @csspart rowHeader - A resource's name at the start of its timeline row; a parent's carries the row's `aria-expanded`.
  * @csspart allDayRow - The row of all-day events.
  * @csspart slot - A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year, a resource's slot, day or month in the timeline.
- * @csspart event - An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown, `[data-movable]` one that can be dragged, `[data-dragging]` the one being dragged.
+ * @csspart event - An event, the box that holds its button, its edges and its ⋯; `[data-before]` / `[data-after]` mark one that goes on past the piece shown, `[data-movable]` one that can be dragged, `[data-dragging]` the one being dragged.
+ * @csspart eventButton - An event's button: its name, what the `event` snippet draws; a click or Enter opens it.
+ * @csspart eventMenu - An event's ⋯ button, which opens «Move» and «Resize»: shown on hover and focus, always for a coarse pointer.
  * @csspart resizeHandle - An edge of an event that resizes it, `[data-edge="start"]` or `[data-edge="end"]`.
  * @csspart more - A month day's «+N», the events that did not fit; it opens the day.
  * @csspart yearMonth - A month of the year view, a `role="grid"` of its own.
@@ -105,11 +109,11 @@ import { timelineWindow } from './timeline-window';
 import { slotWindow } from './time-window';
 import { periodLabel, dayHeader, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
-import { conflicts, type DropPoint, type Placement } from './drag-model';
+import { conflicts, moveEvent, resizeEvent, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft } from './scheduler-drag';
 import { cellAt, pointOfCell, type PointModel } from './drop-point';
 import { DRAFT_ID, canDo, eventWhen } from './event-state';
-import { keyGesture, keySelect, keyStep, type KeyGesture } from './keyboard-move';
+import { edgePoint, keyGesture, keySelect, keyStep, type KeyGesture } from './keyboard-move';
 import './scheduler-agenda.pdx';
 import './scheduler-month.pdx';
 import './scheduler-time-grid.pdx';
@@ -119,8 +123,10 @@ import '@pdxui/design/components/scheduler';
 
 type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
 const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
-/** What a cell's Enter goes into: its events, and a month day's «+N». */
-const INNER = '[data-part="event"], [data-part="more"]';
+/** What a cell's Enter goes into: its events' buttons and their ⋯, and a month day's «+N». */
+const INNER = '[data-part="eventButton"], [data-part="eventMenu"], [data-part="more"]';
+/** An event, the box its button and its ⋯ are in, which carries its id. */
+const EVENT = '[data-part="event"][data-id]';
 type Range = { start: string; end: string; resource?: string | string[] };
 
 /** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. Written by the scheduler after a move, resize or create the app allowed. */
@@ -196,7 +202,7 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @event 'slot-open': { start: string; end: string; resource: string | null; allDay: boolean };
 /** The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year. */
 @event 'period-change': { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string };
-@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, rowHeader, allDayRow, slot, event, resizeHandle, more, yearMonth, agendaList, nowLine;
+@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, rowHeader, allDayRow, slot, event, eventButton, eventMenu, resizeHandle, more, yearMonth, agendaList, nowLine;
 @state disabled = !!disabled;
 @state dragging = draft !== null && lift === null && selection === null;
 @state lifted = lift !== null;
@@ -224,7 +230,7 @@ let draft = $signal<Draft | null>(null);
  * The event picked up from the keyboard: as it was, the gesture its first arrow chose, and the resource
  * and cell it is drawn in now; `origin` is the cell it was picked up in.
  */
-let lift = $signal<{ event: SchedulerEvent; gesture: KeyGesture | null; resource: string | null; cell: { row: number; col: number }; origin: { row: number; col: number } } | null>(null);
+let lift = $signal<{ event: SchedulerEvent; gesture: KeyGesture | null; resource: string | null; cell: { row: number; col: number }; origin: { row: number; col: number }; byMenu: boolean } | null>(null);
 /** The empty cells selected from the keyboard: the one Shift+arrows began on, and the one they reached. */
 let selection = $signal<{ anchor: { row: number; col: number }; cell: { row: number; col: number } } | null>(null);
 
@@ -404,9 +410,11 @@ function onKey(e: KeyboardEvent): void {
   const col = Number(cell.dataset.col);
   if (e.target !== cell) {
     // Inside a cell: Space picks an event up; Escape gives the grid its keys back; Tab moves between
-    // the cell's events.
-    const button = e.target instanceof HTMLElement && e.target.matches('[data-part="event"][data-id]') ? e.target : null;
-    if (e.key === ' ' && button) { e.preventDefault(); liftEvent(button, row, col); return; }
+    // the cell's events and their ⋯. An event's ⋯ keeps its own keys: they open its menu.
+    if (e.target instanceof Element && e.target.closest('pdx-dropdown-menu')) return;
+    const button = e.target instanceof HTMLElement && e.target.matches('[data-part="eventButton"]') ? e.target : null;
+    const id = (button?.closest(EVENT) as HTMLElement | null)?.dataset.id;
+    if (e.key === ' ' && id) { e.preventDefault(); liftEvent(id, row, col, null); return; }
     if (e.key === 'Escape') { e.preventDefault(); focusCell(row, col); }
     return;
   }
@@ -434,12 +442,13 @@ function onKey(e: KeyboardEvent): void {
 function onClick(e: MouseEvent): void {
   // The click a drag ends with is the drag's, not a click on what it was dropped on.
   if (disabled || drag.swallowClick()) return;
+  if (lift?.byMenu) { placePicked(cellOf(e.target)); return; }
   if (lift) { endLift(false); return; }
   if (selection) dropSelection();
   const button = e.target instanceof Element ? e.target.closest(INNER) as HTMLElement | null : null;
   if (button?.dataset.part === 'more') { openDay(button.dataset.date ?? ''); return; }
   if (button) {
-    const ev = eventById(button.dataset.id ?? '');
+    const ev = eventById((button.closest(EVENT) as HTMLElement | null)?.dataset.id ?? '');
     if (ev) eventOpen({ event: ev });
     return;
   }
@@ -457,9 +466,12 @@ function onClick(e: MouseEvent): void {
 function onFocusOut(e: FocusEvent): void {
   const t = e.target instanceof HTMLElement ? e.target : null;
   if (!t?.matches(INNER)) return;
+  const cell = cellOf(t);
   const next = e.relatedTarget instanceof HTMLElement ? e.relatedTarget : null;
-  if (next?.matches(INNER) && next.parentElement === t.parentElement) return;
-  for (const button of t.parentElement?.querySelectorAll<HTMLElement>(INNER) ?? []) button.tabIndex = -1;
+  if (next?.matches(INNER) && cellOf(next) === cell) return;
+  // Into an event's open menu, which is built on <body>: the focus comes back to its ⋯.
+  if (next?.closest('[role="menu"]')) return;
+  for (const button of cell?.querySelectorAll<HTMLElement>(INNER) ?? []) button.tabIndex = -1;
 }
 
 // The year: one tab stop over its days, the arrows by day and week, Enter or a click opens the day.
@@ -515,6 +527,8 @@ function pointAt(x: number, y: number): DropPoint | null {
   return cell ? pointOfCell(model, cell.row, cell.col) : null;
 }
 function onPointerDown(e: PointerEvent): void {
+  // An event picked from its ⋯ waits for the click that places it.
+  if (lift?.byMenu) return;
   if (lift) endLift(false);
   if (selection) dropSelection();
   drag.down(e);
@@ -522,22 +536,57 @@ function onPointerDown(e: PointerEvent): void {
 
 // ─── The keyboard: lift, step, drop ────────────────────────────────────────────
 
-/** Focus the event `id`, in `cell` when a piece of it is there: it is drawn again at every step. */
+/** Focus the button of event `id`, in `cell` when a piece of it is there: it is drawn again at every step. */
 function focusEvent(id: string, cell: { row: number; col: number }): void {
   queueMicrotask(() => {
-    const css = `[data-part="event"][data-id="${CSS.escape(id)}"]`;
+    const css = `[data-part="event"][data-id="${CSS.escape(id)}"] [data-part="eventButton"]`;
     const el = (gridEl?.querySelector(`[data-row="${cell.row}"][data-col="${cell.col}"] ${css}`) ?? gridEl?.querySelector(css)) as HTMLElement | null;
     el?.focus();
   });
 }
-/** Space on an event in cell (`row`, `col`): picked up where it is, drawn as dragged. */
-function liftEvent(button: HTMLElement, row: number, col: number): void {
-  const ev = eventById(button.dataset.id ?? '');
+/**
+ * Event `id` in cell (`row`, `col`) picked up where it is, drawn as dragged: by Space (`gesture` null,
+ * the first arrow chooses), or by its ⋯ (`move` or `end`), when a click on a slot also places it.
+ */
+function liftEvent(id: string, row: number, col: number, gesture: 'move' | 'end' | null): void {
+  const ev = eventById(id);
   const model = pointModel();
   if (!ev || !model || (!canMove(ev) && !canResize(ev))) return;
-  lift = { event: ev, gesture: null, resource: pointOfCell(model, row, col)?.resource ?? null, cell: { row, col }, origin: { row, col } };
+  lift = { event: ev, gesture, resource: pointOfCell(model, row, col)?.resource ?? null, cell: { row, col }, origin: { row, col }, byMenu: gesture !== null };
   draft = { id: ev.id, start: ev.start, end: ev.end, resource: ev.resource };
-  announce(format(uiString('scheduler', 'lifted'), { title: ev.title, when: eventWhen(ev, zone, loc, resources) }));
+  const said = gesture === null ? format(uiString('scheduler', 'lifted'), { title: ev.title, when: eventWhen(ev, zone, loc, resources) })
+    : format(uiString('scheduler', gesture === 'move' ? 'picked' : 'pickedResize'), { title: ev.title });
+  announce(said);
+}
+/** A choice in an event's ⋯: «Move» or «Resize» picks it up, for a click on a slot or the arrows. */
+function onMenu(e: CustomEvent<{ key: string }>): void {
+  if (disabled) return;
+  const host = e.target instanceof Element ? e.target.closest(EVENT) as HTMLElement | null : null;
+  const cell = cellOf(host);
+  if (!host || !cell || (e.detail.key !== 'move' && e.detail.key !== 'resize')) return;
+  if (lift) endLift(false);
+  if (selection) dropSelection();
+  const id = host.dataset.id ?? '';
+  const row = Number(cell.dataset.row);
+  const col = Number(cell.dataset.col);
+  liftEvent(id, row, col, e.detail.key === 'move' ? 'move' : 'end');
+  focusEvent(id, { row, col });
+}
+/**
+ * A click while an event picked from its ⋯ waits: on a cell, the event moves to start there, or ends
+ * there, through the same way as a drop; anywhere else it is put back.
+ */
+function placePicked(target: HTMLElement | null): void {
+  const l = lift;
+  const model = pointModel();
+  const at = target ? { row: Number(target.dataset.row), col: Number(target.dataset.col) } : null;
+  const point = at && model ? pointOfCell(model, at.row, at.col) : null;
+  if (!l || !at || !point || l.gesture === null) { endLift(false); return; }
+  draft = { id: l.event.id, ...(l.gesture === 'move'
+    ? moveEvent(l.event, { point: edgePoint(l.event, 'start', l.resource, zone) }, point, zone)
+    : resizeEvent(l.event, 'end', point, slotMinutes * 60_000, zone)) };
+  lift = { ...l, cell: at };
+  endLift(true);
 }
 /**
  * A key while an event is lifted: an arrow steps it, the first arrow choosing what it does (move, or
