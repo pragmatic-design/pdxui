@@ -642,6 +642,13 @@ exports[`observed attributes > are the ones each component has always observed 1
   "pdx-filter-builder": [
     "logic",
   ],
+  "pdx-flag": [
+    "decorative",
+    "label",
+    "locale",
+    "region",
+    "size",
+  ],
   "pdx-form": [
     "autocomplete",
     "form-class",

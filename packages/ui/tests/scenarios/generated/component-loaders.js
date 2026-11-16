@@ -51,6 +51,7 @@ export const LOADERS = new Map([
     ['pdx-fieldset', () => import('@pdxui/ui/fieldset')],
     ['pdx-file-upload', () => import('@pdxui/ui/file-upload')],
     ['pdx-filter-builder', () => import('@pdxui/ui/filter-builder')],
+    ['pdx-flag', () => import('@pdxui/ui/flag')],
     ['pdx-form', () => import('@pdxui/ui/form')],
     ['pdx-form-actions', () => import('@pdxui/ui/form-actions')],
     ['pdx-form-field', () => import('@pdxui/ui/form-field')],

@@ -21,6 +21,7 @@ import './input/pdx-input';
 import './checkbox/pdx-checkbox';
 import './radio/pdx-radio';
 import './switch-toggle/pdx-switch.pdx';
+import './flag/pdx-flag.pdx';
 
 // Tier 1B: Specialized Inputs
 import './password-input/pdx-password-input';

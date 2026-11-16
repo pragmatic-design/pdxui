@@ -38,6 +38,8 @@ const TAGS = ALL_TAGS.filter(t => !(t in EXCLUDED));
 const PROPS: Record<string, Record<string, unknown>> = {
     'pdx-menu': { items: [{ key: 'new', label: 'New' }, { key: 'open', label: 'Open' }] },
     'pdx-json-editor': { schema: { label: 'Pet', fields: [{ k: 'name', label: 'Name' }] } },
+    // A flag with no region draws nothing (#1091).
+    'pdx-flag': { region: 'IT' },
 };
 
 async function open(page: Page): Promise<void> {

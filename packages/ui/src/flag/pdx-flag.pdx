@@ -1,0 +1,66 @@
+<template>
+  @if (src) {
+    <img class="pdx-flag" data-part="root" :src="src" :alt="decorative ? '' : name" :aria-hidden="decorative ? 'true' : null"
+      :style="'--pdx-flag-size:' + px + 'px'" draggable="false" />
+  }
+</template>
+
+<script>
+/**
+ * A country's or region's flag, 4:3, drawn as an image from its own SVG: a page loads the flags it
+ * shows, one small module each, not the set. Named by the region in the page's language, or hidden
+ * from assistive technology when `decorative` (the name is said beside it). A region it has no flag
+ * for draws nothing. The drawings are flag-icons' (MIT), taken by `scripts/gen-flags.mjs`.
+ *
+ * @csspart root - The image of the flag, `--pdx-flag-size` tall and four thirds of it wide.
+ */
+import '@pdxui/design/components/flag';
+import { resolveLocale } from '../shared/locale';
+import { FLAG_LOADERS } from './flag-loaders';
+
+/** The region, a two-letter subtag in either case: `IT`, `br`, `EU`. */
+@prop region: string = '';
+/** The height: xs (12), sm (16), md (20), lg (24), xl (32), or a number of pixels. */
+@prop size: string = 'md';
+/** Said beside it already: no name, and hidden from assistive technology. */
+@prop decorative: boolean = false;
+/** Its name instead of the region's. */
+@prop label: string = '';
+/** The language of the region's name. Empty: the page's (`lang`), then the browser's. */
+@prop locale: string = '';
+@part root;
+@host el;
+
+const SIZES: Record<string, number> = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 };
+/**
+ * Each region's flag as a `blob:` URL, made once and shared by every pdx-flag of it. Not a data URL:
+ * the runtime's URL policy admits raster data URLs only for an image, and a `blob:` one is admitted —
+ * an SVG drawn by an <img> runs nothing either way.
+ */
+const urls = new Map<string, string>();
+function urlOf(c: string, svg: string): string {
+  let u = urls.get(c);
+  if (!u) { u = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })); urls.set(c, u); }
+  return u;
+}
+
+let src = $signal('');
+
+const code = $derived(region.trim().toLowerCase());
+const px = $derived(SIZES[size] ?? (Number(size) > 0 ? Number(size) : 20));
+const name = $derived(label || regionName(code, resolveLocale(el, locale)));
+
+/** The region's name in `loc`, from Intl; only asked for a region there is a flag for, a valid subtag. */
+function regionName(c: string, loc: string): string {
+  if (!FLAG_LOADERS[c]) return '';
+  return new Intl.DisplayNames([loc], { type: 'region' }).of(c.toUpperCase()) ?? c.toUpperCase();
+}
+
+// The flag of the region shown, loaded when it is; a flag that arrives after the region changed is not drawn.
+$watch(code, (c) => {
+  src = '';
+  const load = FLAG_LOADERS[c];
+  if (!load) return;
+  void load().then((m) => { if (code === c) src = urlOf(c, m.default); });
+}, { immediate: true });
+</script>

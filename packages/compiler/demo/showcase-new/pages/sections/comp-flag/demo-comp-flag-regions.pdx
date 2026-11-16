@@ -1,0 +1,17 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Regions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Each flag is named by its region, in the page's language.</p>
+    <div class="demo-row">
+      <pdx-flag region="IT"></pdx-flag>
+      <pdx-flag region="DE"></pdx-flag>
+      <pdx-flag region="FR"></pdx-flag>
+      <pdx-flag region="ES"></pdx-flag>
+      <pdx-flag region="GB"></pdx-flag>
+      <pdx-flag region="US"></pdx-flag>
+      <pdx-flag region="BR"></pdx-flag>
+      <pdx-flag region="JP"></pdx-flag>
+      <pdx-flag region="EU"></pdx-flag>
+    </div>
+  </section>
+</template>

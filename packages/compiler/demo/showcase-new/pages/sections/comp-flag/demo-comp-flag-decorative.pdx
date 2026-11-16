@@ -1,0 +1,15 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Beside a name</h2>
+    <p class="pdx-txt-small pdx-ink-muted">When the name is written next to it, the flag is <code>decorative</code>: a screen reader reads the name once.</p>
+    <div class="demo-stack">
+      <span class="lang"><pdx-flag region="IT" decorative></pdx-flag> Italiano</span>
+      <span class="lang"><pdx-flag region="DE" decorative></pdx-flag> Deutsch</span>
+      <span class="lang"><pdx-flag region="BR" decorative></pdx-flag> Português (Brasil)</span>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .lang { display: inline-flex; align-items: center; gap: var(--pdx-space-sm); }
+</style>

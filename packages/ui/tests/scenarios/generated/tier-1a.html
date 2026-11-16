@@ -37,6 +37,7 @@
         import '@pdxui/ui/chip';
         import '@pdxui/ui/divider';
         import '@pdxui/ui/dropdown-menu';
+        import '@pdxui/ui/flag';
         import '@pdxui/ui/icon/pdx-icon';
         import '@pdxui/ui/kbd';
         import '@pdxui/ui/spinner';
@@ -70,6 +71,9 @@
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-custom"]');
                 if (host && typeof host.show === 'function') host.show();
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
+        "flag-named": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
+        "flag-decorative": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
+        "flag-sizes": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
         "icon-decorative": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
         "icon-semantic": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
         "icon-sizes": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
@@ -80,7 +84,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-avatar","pdx-avatar-group","pdx-badge","pdx-button","pdx-button-group","pdx-chip","pdx-divider","pdx-dropdown-menu","pdx-icon","pdx-kbd","pdx-spinner","pdx-split-button"];
+        const __tags = ["pdx-avatar","pdx-avatar-group","pdx-badge","pdx-button","pdx-button-group","pdx-chip","pdx-divider","pdx-dropdown-menu","pdx-flag","pdx-icon","pdx-kbd","pdx-spinner","pdx-split-button"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -681,6 +685,31 @@
                     disabled
                     items='[{"key":"new","label":"New"}]'>
                 </pdx-dropdown-menu>
+    </section>
+
+    <section data-scenario="flag-named">
+        <h3>Flag — Named by its region</h3>
+        <div class="row">
+                    <pdx-flag data-test="flag-it" region="IT" locale="en"></pdx-flag>
+                    <pdx-flag data-test="flag-jp" region="JP" locale="en"></pdx-flag>
+                    <pdx-flag data-test="flag-br" region="BR" locale="en"></pdx-flag>
+                </div>
+    </section>
+
+    <section data-scenario="flag-decorative">
+        <h3>Flag — Decorative, beside its name</h3>
+        <div class="row">
+                    <span data-test="flag-label"><pdx-flag data-test="flag-de" region="DE" decorative></pdx-flag> Deutsch</span>
+                </div>
+    </section>
+
+    <section data-scenario="flag-sizes">
+        <h3>Flag — Sizes (sm / md / lg)</h3>
+        <div class="row">
+                    <pdx-flag data-test="flag-sm" region="FR" size="sm" locale="en"></pdx-flag>
+                    <pdx-flag data-test="flag-md" region="FR" size="md" locale="en"></pdx-flag>
+                    <pdx-flag data-test="flag-lg" region="FR" size="lg" locale="en"></pdx-flag>
+                </div>
     </section>
 
     <section data-scenario="icon-decorative">

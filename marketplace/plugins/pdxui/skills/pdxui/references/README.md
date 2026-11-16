@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 121 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 122 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -159,6 +159,10 @@ Visual primitives and simple containers.
 - `<pdx-carousel>` — A swipeable slideshow.
 - `<pdx-chip>` — Compact, optionally removable tag.
 - `<pdx-divider>` — A plain or labeled separating line.
+- `<pdx-flag>` — A country's or region's flag, 4:3, drawn as an image from its own SVG: a page loads the flags it
+shows, one small module each, not the set. Named by the region in the page's language, or hidden
+from assistive technology when `decorative` (the name is said beside it). A region it has no flag
+for draws nothing. The drawings are flag-icons' (MIT), taken by `scripts/gen-flags.mjs`.
 - `<pdx-icon>` — Crisp SVG icons from a shared set.
 - `<pdx-image>` — Lazy, responsive image with placeholder.
 - `<pdx-kbd>` — Render keyboard keys and shortcuts.
