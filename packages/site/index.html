@@ -41,8 +41,10 @@
         installNoSwipeBack();
         installDragClickGuard();
         // The site's own components (pdx-code, pdx-demo, …) — registered explicitly
-        // (they are not in @pdxui/ui, so they are not auto-imported).
-        import.meta.glob('./src/components/**/*.pdx', { eager: true });
+        // (they are not in @pdxui/ui, so they are not auto-imported). Not the two that read the UI
+        // manifest: the component page imports them, so the manifest loads with it, not with every
+        // page (#1067; tests/entry-budget.spec.ts holds it out of the entry).
+        import.meta.glob(['./src/components/**/*.pdx', '!./src/components/pdx-api-tables.pdx', '!./src/components/pdx-props-playground.pdx'], { eager: true });
         // The app shell.
         import './src/app.pdx';
         // No import of the routes: the compiler's route table names each @page and imports it the
