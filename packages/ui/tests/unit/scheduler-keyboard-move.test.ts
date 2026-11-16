@@ -1,7 +1,7 @@
 // The keyboard way to move and resize an event (#1020, part 7): which gesture an arrow makes, the cell
 // an event's edge is in, and where one step takes it, in each view's own axis.
 import { describe, it, expect } from 'vitest';
-import { keyGesture, keyStep, type KeyStep } from '../../src/scheduler/keyboard-move';
+import { keyGesture, keySelect, keyStep, type KeyStep } from '../../src/scheduler/keyboard-move';
 import { cellOfPoint, pointOfCell, type PointModel } from '../../src/scheduler/drop-point';
 import { buildColumns, buildSlots, type SchedulerEvent } from '../../src/scheduler/grid-model';
 import { buildMonthWeeks } from '../../src/scheduler/calendar-model';
@@ -115,5 +115,53 @@ describe('keyStep in the timeline', () => {
         expect(keyStep(line, size, audit, opts('end', 'ArrowDown', 'a'))).toBeNull();
         const monday = ev('mon', '2026-09-21', '2026-09-22', { resource: 'a' });
         expect(keyStep(line, size, monday, opts('move', 'ArrowLeft', 'a'))).toBeNull();
+    });
+});
+
+// Shift+arrows over empty cells select a range to create an event over (part 7b): from the cell the
+// selection began on to the one the keys reached, both included, as a drag over them would.
+describe('keySelect', () => {
+    const sel = (anchor: { row: number; col: number }, cell: { row: number; col: number }, k: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') =>
+        ({ anchor, cell, key: k, step: HALF, timeZone: ROME });
+
+    it('in the time grid Down takes in the next slot, Up gives it back; the range is in UTC', () => {
+        const one = keySelect(week, weekSize, sel({ row: 1, col: 0 }, { row: 1, col: 0 }, 'ArrowDown'));
+        expect(one).toEqual({ cell: { row: 2, col: 0 }, range: { start: '2026-09-21T06:00:00.000Z', end: '2026-09-21T07:00:00.000Z', resource: null, allDay: false } });
+        expect(keySelect(week, weekSize, sel({ row: 1, col: 0 }, { row: 2, col: 0 }, 'ArrowUp'))?.range.end).toBe('2026-09-21T06:30:00.000Z');
+    });
+
+    it('above the cell it began on, the range runs from the reached slot to the first one', () => {
+        expect(keySelect(week, weekSize, sel({ row: 3, col: 0 }, { row: 3, col: 0 }, 'ArrowUp'))?.range).toEqual({ start: '2026-09-21T06:30:00.000Z', end: '2026-09-21T07:30:00.000Z', resource: null, allDay: false });
+    });
+
+    it('a timed selection does not go up into the all-day row, nor past the grid; the all-day row goes sideways only', () => {
+        expect(keySelect(week, weekSize, sel({ row: 1, col: 0 }, { row: 1, col: 0 }, 'ArrowUp'))).toBeNull();
+        expect(keySelect(week, weekSize, sel({ row: 1, col: 0 }, { row: 1, col: 0 }, 'ArrowLeft'))).toBeNull();
+        expect(keySelect(week, weekSize, sel({ row: 0, col: 2 }, { row: 0, col: 2 }, 'ArrowDown'))).toBeNull();
+        expect(keySelect(week, weekSize, sel({ row: 0, col: 2 }, { row: 0, col: 2 }, 'ArrowRight'))?.range).toEqual({ start: '2026-09-22T22:00:00.000Z', end: '2026-09-24T22:00:00.000Z', resource: null, allDay: true });
+    });
+
+    it('with resources side by side, it does not reach into another resource\'s column', () => {
+        const rooms = [{ id: 'a', label: 'Room A' }, { id: 'b', label: 'Room B' }];
+        const byDate: PointModel = { view: 'time', columns: buildColumns(days(21, 2), rooms, 'date'), slots: buildSlots(480, 1080, 30), timeZone: ROME };
+        expect(keySelect(byDate, { rows: 21, cols: 4 }, sel({ row: 1, col: 0 }, { row: 1, col: 0 }, 'ArrowRight'))).toBeNull();
+        expect(keySelect(byDate, { rows: 21, cols: 4 }, sel({ row: 1, col: 0 }, { row: 1, col: 0 }, 'ArrowDown'))?.range.resource).toBe('a');
+    });
+
+    it('in the month Right takes in the next day, Down the same day a week later', () => {
+        const month: PointModel = { view: 'month', weeks: buildMonthWeeks([...['2026-08-31'], ...days(1, 30), ...['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04']], 7, [], ROME, 3), timeZone: ROME };
+        // Wednesday 2 September is row 0, column 2.
+        expect(keySelect(month, { rows: 5, cols: 7 }, sel({ row: 0, col: 2 }, { row: 0, col: 2 }, 'ArrowRight'))).toEqual({ cell: { row: 0, col: 3 }, range: { start: '2026-09-01T22:00:00.000Z', end: '2026-09-03T22:00:00.000Z', resource: null, allDay: true } });
+        expect(keySelect(month, { rows: 5, cols: 7 }, sel({ row: 0, col: 2 }, { row: 0, col: 2 }, 'ArrowDown'))?.range.end).toBe('2026-09-09T22:00:00.000Z');
+    });
+
+    it('in the timeline it goes along the time of its resource\'s row, never to another row or the resource column', () => {
+        const rooms = [{ id: 'a', label: 'Room A' }, { id: 'b', label: 'Room B' }];
+        const cols = timelineColumns('week', days(21, 7), { timeZone: ROME, startMinutes: 0, endMinutes: 1440, slotMinutes: 30 });
+        const line: PointModel = { view: 'timeline', columns: cols, rows: placeTimeline([], timelineRows(rooms, new Set()), cols, ROME) };
+        const size = { rows: 2, cols: cols.length + 1 };
+        expect(keySelect(line, size, sel({ row: 1, col: 1 }, { row: 1, col: 1 }, 'ArrowRight'))?.range).toEqual({ start: '2026-09-20T22:00:00.000Z', end: '2026-09-22T22:00:00.000Z', resource: 'b', allDay: true });
+        expect(keySelect(line, size, sel({ row: 1, col: 1 }, { row: 1, col: 1 }, 'ArrowUp'))).toBeNull();
+        expect(keySelect(line, size, sel({ row: 1, col: 1 }, { row: 1, col: 1 }, 'ArrowLeft'))).toBeNull();
     });
 });

@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 498 keys in 82 components.
+> Generated from the sources. 501 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -387,6 +387,7 @@ placeholders, filled at render: keep them in the translation.
 | `scheduler` | `allDay` | `All day` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `cancelled` | `Move cancelled. {title} is back.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `created` | `{title} created` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `createInstructions` | `Shift and the arrow keys select empty slots, Enter creates an event over them, and Escape cancels.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `day` | `Day` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `dayName` | `{date}, {count, plural, =0 {no events} one {# event} other {# events}}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `daysView` | `{count} days` | `@pdxui/ui/src/shared/i18n.ts` |
@@ -406,6 +407,8 @@ placeholders, filled at render: keep them in the translation.
 | `scheduler` | `refused` | `{title} not changed` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `resized` | `{title} resized` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `resource` | `Resource` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `selectCancelled` | `Selection cancelled.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `selected` | `{when} selected.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `time` | `Time` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `timeline` | `Timeline` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `today` | `Today` | `@pdxui/ui/src/shared/i18n.ts` |

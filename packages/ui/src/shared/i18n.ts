@@ -61,7 +61,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // a day of the year view with `{count}` events; `noEvents` is the agenda with nothing in its period.
     // `instructions` is the off-screen text a movable event points at with aria-describedby; `lifted`
     // is said when Space picks an event up, `{when}` its time, days and resources; `cancelled` when
-    // Escape puts it back.
+    // Escape puts it back. `createInstructions` describes the grid where events can be created;
+    // `selected` is said at each Shift+arrow over empty cells, `{when}` the range; `selectCancelled` when
+    // Escape drops it.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
@@ -72,6 +74,8 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         refused: '{title} not changed', overlapRefused: '{title} not changed: it would overlap {count, plural, one {# event} other {# events}}',
         instructions: 'Press Space to pick the event up, the arrow keys to move it, Shift and the arrow keys to move its end, Alt, Shift and the arrow keys to move its start, Space or Enter to drop it, and Escape to cancel.',
         lifted: '{title} lifted. {when}.', cancelled: 'Move cancelled. {title} is back.',
+        createInstructions: 'Shift and the arrow keys select empty slots, Enter creates an event over them, and Escape cancels.',
+        selected: '{when} selected.', selectCancelled: 'Selection cancelled.',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.
