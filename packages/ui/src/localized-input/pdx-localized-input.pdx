@@ -37,7 +37,18 @@
             :defaultValue="mountedTextOf(culture)" :value="textOf(culture)" :placeholder="placeholderOf(culture)" :disabled="disabled" :readonly="readonly"
             :aria-label="nameOf(culture)" :aria-invalid="error ? 'true' : null" @input="write(culture, $event)" />
         }
+        @if (expandable && !stacked) {
+          <button type="button" class="pdx-localized-expand" data-part="expandButton" :disabled="disabled" aria-haspopup="dialog"
+            :aria-label="uiString('localized-input', 'allLanguages')" :title="uiString('localized-input', 'allLanguages')" @click="expanded = true"><pdx-icon name="maximize" size="sm"></pdx-icon></button>
+        }
       </div>
+    }
+    @if (expandable && !stacked) {
+      <pdx-dialog class="pdx-localized-dialog" :open="expanded" :title="fieldName" size="lg" @open-change="onExpandedChange($event)">
+        <pdx-localized-input layout="stacked" :cultures="cultures" :regions="regions" :flags="flags" :multiline="multiline" :rows="rows"
+          :label="fieldName" :default-culture="defaultCulture" :disabled="disabled" :readonly="readonly"
+          :value="value" @value-change="onDialogValue($event)"></pdx-localized-input>
+      </pdx-dialog>
     }
   </div>
 </template>
@@ -57,6 +68,7 @@
  * @csspart tab - A culture's tab, named in its own language.
  * @csspart cultureButton - The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.
  * @csspart marker - The dot of a culture with no text.
+ * @csspart expandButton - `expandable`: the button in the field's suffix that opens every culture in a dialog.
  * @csspart panel - A culture's panel (a tabpanel), or its row when stacked.
  * @csspart field - A culture's input or textarea.
  *
@@ -85,6 +97,8 @@ import '@pdxui/design/components/localized-input';
 @prop flags: boolean = false;
 /** The region whose flag a culture shows, by culture (`{ en: 'GB' }`): for a bare language, which has none, or to choose another. */
 @prop regions: Record<string, string> = {};
+/** A button in the field's suffix, «All languages», opens a dialog with every culture as a labelled field (tabs and flag layouts). */
+@prop expandable: boolean = false;
 /** A textarea per culture instead of an input. */
 @prop multiline: boolean = false;
 /** The textarea's rows, when `multiline`. */
@@ -100,7 +114,7 @@ import '@pdxui/design/components/localized-input';
 /** A custom validity message: the field is invalid while it is set. */
 @prop error: string = '';
 @prop name: string = '';
-@part root, tabs, tab, cultureButton, marker, panel, field;
+@part root, tabs, tab, cultureButton, marker, panel, field, expandButton;
 @state incomplete = missing(value, cultures).length > 0;
 @state invalid = !!error;
 @state disabled = !!disabled;
@@ -166,6 +180,13 @@ function onCultureMenu(e: CustomEvent<{ key: string }>): void {
   chosen = e.detail.key;
   cultureMenuEl?.close();
 }
+
+/** `expandable`: whether the dialog of every culture is open. */
+let expanded = $signal(false);
+/** The dialog opened or closed: Escape, the close button, the backdrop. It returns the focus itself. */
+function onExpandedChange(e: CustomEvent<{ value: boolean }>): void { expanded = e.detail.value; }
+/** An edit in the dialog's field: the same value, at once — the dialog's field is a view of this one. */
+function onDialogValue(e: CustomEvent<{ value: LocalizedText | null }>): void { value = e.detail.value; }
 
 /** The tablist's keys: the arrows, Home and End move the focus and the selection with it. */
 function onTabKey(e: KeyboardEvent, culture: string): void {

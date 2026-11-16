@@ -6457,7 +6457,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-lziom]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Localized Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-localized-input&gt;</code> — one text in several cultures, <code>{ [culture]: string }</code>, the shape\\n      of a LocalizedString: tabs named in each language, missing cultures marked, each field with its own\\n      <code>lang</code> and <code>dir</code>.</p>  <app-demo-comp-localized-input-basic class="demo-section"></app-demo-comp-localized-input-basic>  <app-demo-comp-localized-input-stacked class="demo-section"></app-demo-comp-localized-input-stacked>  <app-demo-comp-localized-input-flags class="demo-section"></app-demo-comp-localized-input-flags>  <app-demo-comp-localized-input-flag-layout class="demo-section"></app-demo-comp-localized-input-flag-layout>  <app-demo-comp-localized-input-form class="demo-section"></app-demo-comp-localized-input-form>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>{ [culture]: string } | null</span><span>The text by culture; the form submits its JSON</span></div> <div class="opt-row"><code>cultures</code><span>string[]</span><span>The culture codes; the current locale\\'s comes first</span></div> <div class="opt-row"><code>default-culture</code><span>string</span><span>The culture <code>required-scope="default"</code> asks, and the placeholder of an empty one</span></div> <div class="opt-row"><code>required</code> / <code>required-scope</code><span>boolean / \\'all\\' | \\'default\\'</span><span>Every culture, or the default one</span></div> <div class="opt-row"><code>layout</code><span>\\'tabs\\' | \\'stacked\\' | \\'flag\\'</span><span>One culture at a time, all, or one field whose flag prefix is a menu of the cultures</span></div> <div class="opt-row"><code>flags</code><span>boolean</span><span>A decorative flag before each culture\\'s name</span></div> <div class="opt-row"><code>regions</code><span>{ [culture]: string }</span><span>The flag\\'s region for a culture: for a bare language, which has none, or to choose another</span></div> <div class="opt-row"><code>multiline</code> / <code>rows</code><span>boolean / number</span><span>A textarea per culture</span></div> <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field\\'s name; each culture\\'s field is "label (language)"</span></div> <div class="opt-row"><code>disabled</code> / <code>readonly</code> / <code>error</code><span></span><span>As every field</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3> <div class="options-table"><div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div> <div class="opt-row"><code>:state(incomplete)</code><span></span><span>Some culture has no text</span></div> <div class="opt-row"><code>:state(invalid | disabled | readonly)</code><span></span><span>As every field</span></div> <div class="opt-row"><code>[data-part="tab"] / [data-part="marker"] / [data-part="field"]</code><span></span><span>A culture\\'s tab, its missing dot, its field</span></div> <div class="opt-row"><code>[data-part="cultureButton"]</code><span></span><span>The flag layout\\'s prefix, a menu button</span></div></div></section></div>'));
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Localized Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-localized-input&gt;</code> — one text in several cultures, <code>{ [culture]: string }</code>, the shape\\n      of a LocalizedString: tabs named in each language, missing cultures marked, each field with its own\\n      <code>lang</code> and <code>dir</code>.</p>  <app-demo-comp-localized-input-basic class="demo-section"></app-demo-comp-localized-input-basic>  <app-demo-comp-localized-input-stacked class="demo-section"></app-demo-comp-localized-input-stacked>  <app-demo-comp-localized-input-flags class="demo-section"></app-demo-comp-localized-input-flags>  <app-demo-comp-localized-input-flag-layout class="demo-section"></app-demo-comp-localized-input-flag-layout>  <app-demo-comp-localized-input-expandable class="demo-section"></app-demo-comp-localized-input-expandable>  <app-demo-comp-localized-input-form class="demo-section"></app-demo-comp-localized-input-form>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>{ [culture]: string } | null</span><span>The text by culture; the form submits its JSON</span></div> <div class="opt-row"><code>cultures</code><span>string[]</span><span>The culture codes; the current locale\\'s comes first</span></div> <div class="opt-row"><code>default-culture</code><span>string</span><span>The culture <code>required-scope="default"</code> asks, and the placeholder of an empty one</span></div> <div class="opt-row"><code>required</code> / <code>required-scope</code><span>boolean / \\'all\\' | \\'default\\'</span><span>Every culture, or the default one</span></div> <div class="opt-row"><code>layout</code><span>\\'tabs\\' | \\'stacked\\' | \\'flag\\'</span><span>One culture at a time, all, or one field whose flag prefix is a menu of the cultures</span></div> <div class="opt-row"><code>flags</code><span>boolean</span><span>A decorative flag before each culture\\'s name</span></div> <div class="opt-row"><code>regions</code><span>{ [culture]: string }</span><span>The flag\\'s region for a culture: for a bare language, which has none, or to choose another</span></div> <div class="opt-row"><code>expandable</code><span>boolean</span><span>A button in the field\\'s suffix opens every culture in a dialog (tabs and flag layouts)</span></div> <div class="opt-row"><code>multiline</code> / <code>rows</code><span>boolean / number</span><span>A textarea per culture</span></div> <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field\\'s name; each culture\\'s field is "label (language)"</span></div> <div class="opt-row"><code>disabled</code> / <code>readonly</code> / <code>error</code><span></span><span>As every field</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3> <div class="options-table"><div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div> <div class="opt-row"><code>:state(incomplete)</code><span></span><span>Some culture has no text</span></div> <div class="opt-row"><code>:state(invalid | disabled | readonly)</code><span></span><span>As every field</span></div> <div class="opt-row"><code>[data-part="tab"] / [data-part="marker"] / [data-part="field"]</code><span></span><span>A culture\\'s tab, its missing dot, its field</span></div> <div class="opt-row"><code>[data-part="cultureButton"]</code><span></span><span>The flag layout\\'s prefix, a menu button</span></div> <div class="opt-row"><code>[data-part="expandButton"]</code><span></span><span>The <code>expandable</code> suffix that opens the dialog</span></div></div></section></div>'));
 component('app-comp-localized-input', {
   props: {},
   setup(ctx) {
@@ -24061,6 +24061,49 @@ const cultures = ['en', 'it', 'de', 'fr'];
     let __el6w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el6w_cultures)) return; __el6w_cultures = __b; assignBoundProperty(__el6, "cultures", __b); });
     bindTwoWay(__el6, 'value', ctx.name);
     bindInterpolation(__t8,()=>JSON.stringify(ctx.name()));
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-localized-input/demo-comp-localized-input-expandable.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, bindInterpolation, bindTwoWay, component, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-nqszjz");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-nqszjz"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-nqszjz]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); max-width: 440px; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">All languages</h2> <p class="pdx-txt-small pdx-ink-muted"><code>expandable</code> puts a button in the field\\'s suffix that opens every culture in a dialog: one labelled field each, with its flag when <code>flags</code> is set, its <code>lang</code> and <code>dir</code>, the missing ones marked. An edit there is the value at once; Escape or the close button closes it, and the focus goes back to the button.</p> <div class="demo-stack"><pdx-localized-input label="Product name" expandable flags></pdx-localized-input> <pdx-localized-input label="Description" layout="flag" expandable multiline></pdx-localized-input> <p class="pdx-txt-small pdx-ink-muted">value: <code><!----></code></p></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild;const __el9=__el8.nextSibling.nextSibling;const __el10=__el9.nextSibling.nextSibling;const __el11=__el10.firstChild.nextSibling;const __t12=__el11.firstChild;return [__el8,__el9,__t12];};
+component('app-demo-comp-localized-input-expandable', {
+  props: {},
+  setup(ctx) {
+    const __name = signal({ en: 'Desk lamp', it: 'Lampada da scrivania' }, { name: 'demo-comp-localized-input-expandable:name' });
+const cultures = ['en', 'it', 'de-DE', 'ar'];
+    
+    const regions = { en: 'GB', it: 'IT' };
+    
+    
+    const description = { en: 'A lamp for the desk, with a dimmer.' };
+    ctx.el.setAttribute('data-pdx-nqszjz', '');
+    return { cultures, regions, name: __name, description };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el8,__el9,__t12]=__walk0(__frag);
+    let __el8w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el8w_cultures)) return; __el8w_cultures = __b; assignBoundProperty(__el8, "cultures", __b); });
+    let __el8w_regions = {}; effect(() => { const __b = ctx.regions; if (Object.is(__b, __el8w_regions)) return; __el8w_regions = __b; assignBoundProperty(__el8, "regions", __b); });
+    bindTwoWay(__el8, 'value', ctx.name);
+    let __el9w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el9w_cultures)) return; __el9w_cultures = __b; assignBoundProperty(__el9, "cultures", __b); });
+    let __el9w_regions = {}; effect(() => { const __b = ctx.regions; if (Object.is(__b, __el9w_regions)) return; __el9w_regions = __b; assignBoundProperty(__el9, "regions", __b); });
+    let __el9w_value = {}; effect(() => { const __b = ctx.description; if (Object.is(__b, __el9w_value)) return; __el9w_value = __b; assignBoundProperty(__el9, "value", __b); });
+    bindInterpolation(__t12,()=>JSON.stringify(ctx.name()));
     return __frag;
   })(),
 });

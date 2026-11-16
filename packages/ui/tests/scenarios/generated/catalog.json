@@ -2066,6 +2066,14 @@
           "title": "Localized input — Flag layout"
         },
         {
+          "id": "localized-input-expandable",
+          "title": "Localized input — Expandable"
+        },
+        {
+          "id": "localized-input-dialog",
+          "title": "Localized input — All languages dialog"
+        },
+        {
           "id": "localized-input-disabled",
           "title": "Localized input — Disabled"
         }

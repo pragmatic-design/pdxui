@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">All languages</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>expandable</code> puts a button in the field's suffix that opens every culture in a dialog: one labelled field each, with its flag when <code>flags</code> is set, its <code>lang</code> and <code>dir</code>, the missing ones marked. An edit there is the value at once; Escape or the close button closes it, and the focus goes back to the button.</p>
+    <div class="demo-stack">
+      <pdx-localized-input label="Product name" expandable flags :cultures="cultures" :regions="regions" ::value="name"></pdx-localized-input>
+      <pdx-localized-input label="Description" layout="flag" expandable multiline :cultures="cultures" :regions="regions" :value="description"></pdx-localized-input>
+      <p class="pdx-txt-small pdx-ink-muted">value: <code>{{ JSON.stringify(name) }}</code></p>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it', 'de-DE', 'ar'];
+const regions = { en: 'GB', it: 'IT' };
+let name = $signal({ en: 'Desk lamp', it: 'Lampada da scrivania' });
+const description = { en: 'A lamp for the desk, with a dimmer.' };
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); max-width: 440px; }
+</style>

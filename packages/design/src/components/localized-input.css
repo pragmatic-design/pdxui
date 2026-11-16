@@ -176,12 +176,78 @@
     margin-inline-start: 0;
 }
 
+/* ===== expandable: «All languages», a button in the field's suffix ===== */
+/* The mirror of the flag layout's prefix: joined to the field at its end, the field's end corners
+   square. It stretches to the field's height, a textarea's included. */
+
+.pdx-localized-panel:has(> .pdx-localized-expand) {
+    display: flex;
+    align-items: stretch;
+}
+
+.pdx-localized-panel:has(> .pdx-localized-expand)[hidden] {
+    display: none;
+}
+
+.pdx-localized-panel:has(> .pdx-localized-expand) > [data-part="field"] {
+    flex: 1;
+    min-width: 0;
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+}
+
+.pdx-localized-expand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--pdx-space-sm);
+    margin-inline-start: calc(-1 * var(--pdx-border-width));
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    border-start-end-radius: var(--pdx-radius-md);
+    border-end-end-radius: var(--pdx-radius-md);
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font: inherit;
+    cursor: pointer;
+}
+
+.pdx-localized-expand:hover {
+    color: var(--pdx-color-text);
+}
+
+.pdx-localized-expand:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+    position: relative;
+}
+
+[pdx-input-style="filled"] .pdx-localized-expand {
+    border: none;
+    border-top: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid transparent;
+    border-bottom: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid var(--pdx-color-border-strong);
+    border-inline-start: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    border-start-end-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-inset);
+    margin-inline-start: 0;
+}
+
+[pdx-input-style="underlined"] .pdx-localized-expand {
+    border: none;
+    border-top: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid transparent;
+    border-bottom: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid var(--pdx-color-border);
+    border-radius: 0;
+    background: transparent;
+    margin-inline-start: 0;
+}
+
 /* ===== States ===== */
 
 :state(disabled) > .pdx-localized-input {
     opacity: var(--pdx-opacity-disabled);
 }
 
-:state(disabled) > .pdx-localized-input :is(.pdx-localized-tab, .pdx-localized-culture-button) {
+:state(disabled) > .pdx-localized-input :is(.pdx-localized-tab, .pdx-localized-culture-button, .pdx-localized-expand) {
     cursor: not-allowed;
 }
