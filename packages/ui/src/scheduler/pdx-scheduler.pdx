@@ -980,12 +980,15 @@ const pressOutside = (e: PointerEvent) => {
 onMount(() => {
   clock = setInterval(() => { now = Date.now(); }, 60_000);
   document.addEventListener('pointerdown', pressOutside, true);
+  // Kept for good, non-passive: a finger that lifted an event drags it instead of scrolling (part 11b).
+  el.addEventListener('touchmove', drag.holdScroll, { passive: false });
   window.addEventListener('beforeprint', beforePrint);
   window.addEventListener('afterprint', afterPrint);
 });
 onDestroy(() => {
   if (clock !== undefined) clearInterval(clock);
   document.removeEventListener('pointerdown', pressOutside, true);
+  el.removeEventListener('touchmove', drag.holdScroll);
   window.removeEventListener('beforeprint', beforePrint);
   window.removeEventListener('afterprint', afterPrint);
   tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose();

@@ -7,9 +7,16 @@
 // draft through `preview`; on release it hands the draft to `commit`, which asks the app and writes
 // the events; Escape gives the event back. The click that follows a drag is swallowed.
 //
-// Mouse and pen. On touch the browser takes a moving finger for a scroll before a long press could
-// start a drag; touch comes with the mobile part, and the single-pointer way (pick up, tap where)
-// with the keyboard part.
+// Mouse and pen drag at once. A finger is the scroll's first (#1020, part 11b, the owner's decision): a
+// short tap is a click, a finger that moves before LONG_PRESS scrolls the grid, and one held still
+// that long lifts the event (or the edge), which then follows the finger. From the lift on, the
+// touchmove that would start the browser's scroll is prevented (`holdScroll`), and a long press's
+// context menu with it. Creating over empty slots stays the mouse's, the keyboard's and the editor's.
+//
+// `holdScroll` is a touchmove listener the host keeps on itself for good, not one added at the press:
+// Chromium decides at touchstart whether a touch waits for a non-passive listener before it scrolls,
+// and one added during the press came too late — measured, no touchmove reached the page and the
+// browser cancelled the pointer to scroll.
 
 import { createRange, moveEvent, resizeEvent, type DropPoint, type Placement } from './drag-model';
 import type { SchedulerEvent } from './grid-model';
@@ -41,6 +48,10 @@ export interface DragHost {
 
 /** How far, in px, a press moves before it is a drag and not a click. */
 const THRESHOLD = 4;
+/** How long, in ms, a finger is held still before it lifts an event. */
+const LONG_PRESS = 500;
+/** How far, in px, a finger may drift during the long press before it is taken for a scroll. */
+const SLOP = 8;
 
 export interface SchedulerDrag {
     /** The grid's `pointerdown`. */
@@ -49,6 +60,8 @@ export interface SchedulerDrag {
     swallowClick(): boolean;
     /** Stop a gesture in progress, drawing nothing. */
     cancel(): void;
+    /** A non-passive touchmove listener for the host to keep: no scroll under a lifted event. */
+    holdScroll(e: TouchEvent): void;
 }
 
 export function schedulerDrag(host: DragHost): SchedulerDrag {
@@ -57,6 +70,30 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
     let active = false;
     let draft: Draft | null = null;
     let swallow = false;
+    /** The gesture is a finger's, which lifts after a long press. */
+    let touch = false;
+    let lifting: ReturnType<typeof setTimeout> | undefined;
+    /**
+     * The node the finger came down on. A touch's events all go to it, and the lifted event is drawn
+     * anew: once it is out of the document, its touchmove reaches neither the host nor the window, so
+     * it is held here too.
+     */
+    let touched: Element | null = null;
+    const holdTouched = (e: Event) => { if (touch && active && e.cancelable) e.preventDefault(); };
+
+    const holdMenu = (e: Event) => { e.preventDefault(); };
+
+    /** The long press is held: lift the event where the finger is. */
+    function lift(): void {
+        lifting = undefined;
+        if (!gesture) return;
+        active = true;
+        navigator.vibrate?.(10);
+        const p = host.pointAt(origin.x, origin.y);
+        if (!p) return;
+        draft = draftAt(gesture, p);
+        host.preview(draft, gesture);
+    }
 
     function draftAt(g: Gesture, p: DropPoint): Draft {
         const tz = host.timeZone();
@@ -71,6 +108,12 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
         window.removeEventListener('pointerup', onUp);
         window.removeEventListener('pointercancel', onCancel);
         window.removeEventListener('keydown', onKey, true);
+        window.removeEventListener('contextmenu', holdMenu, true);
+        touched?.removeEventListener('touchmove', holdTouched);
+        touched = null;
+        if (lifting !== undefined) clearTimeout(lifting);
+        lifting = undefined;
+        touch = false;
         gesture = null;
         active = false;
         draft = null;
@@ -80,7 +123,10 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
     function onMove(e: PointerEvent): void {
         if (!gesture) return;
         if (!active) {
-            if (Math.hypot(e.clientX - origin.x, e.clientY - origin.y) < THRESHOLD) return;
+            const moved = Math.hypot(e.clientX - origin.x, e.clientY - origin.y);
+            // A finger that moves before the long press is a scroll: the gesture is over.
+            if (touch) { if (moved > SLOP) end(); return; }
+            if (moved < THRESHOLD) return;
             active = true;
         }
         e.preventDefault();
@@ -115,7 +161,8 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
 
     return {
         down(e) {
-            if (e.button !== 0 || e.pointerType === 'touch' || gesture) return;
+            if (e.button !== 0 || gesture) return;
+            const finger = e.pointerType === 'touch';
             const target = e.target instanceof Element ? e.target : null;
             // An event's ⋯ opens its menu: a press there is not a drag.
             if (!target || target.closest('[data-part="eventMenu"]')) return;
@@ -134,7 +181,7 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
                     gesture = { kind: 'move', event, grab: point };
                 }
             } else {
-                if (!target.closest('[role="gridcell"]') || !host.canCreate()) return;
+                if (finger || !target.closest('[role="gridcell"]') || !host.canCreate()) return;
                 gesture = { kind: 'create', anchor: point };
             }
             origin = { x: e.clientX, y: e.clientY };
@@ -143,6 +190,13 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
             window.addEventListener('pointerup', onUp);
             window.addEventListener('pointercancel', onCancel);
             window.addEventListener('keydown', onKey, true);
+            if (finger) {
+                touch = true;
+                lifting = setTimeout(lift, LONG_PRESS);
+                window.addEventListener('contextmenu', holdMenu, true);
+                touched = target;
+                touched.addEventListener('touchmove', holdTouched, { passive: false });
+            }
         },
         swallowClick() {
             const s = swallow;
@@ -150,5 +204,9 @@ export function schedulerDrag(host: DragHost): SchedulerDrag {
             return s;
         },
         cancel: end,
+        holdScroll(e) {
+            // Once a finger has lifted an event, it drags it: the browser does not scroll under it.
+            if (touch && active && e.cancelable) e.preventDefault();
+        },
     };
 }

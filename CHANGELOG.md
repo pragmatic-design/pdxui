@@ -89,7 +89,9 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   gets the whole scheduler too (`:state(printing)` while it prints). On a narrow scheduler (a container
   query on its own width, under 40rem) the views are a menu, a button named by the view on screen
   (`viewMenu`), «Export» is its icon, and the bar takes two rows instead of four; the view chosen stays
-  the view. Touch dragging comes in the following part.
+  the view. With a finger, a short tap opens an event, a finger that moves scrolls the grid, and a long
+  press (500 ms) lifts the event or an edge, which then follows the finger and is dropped where it is
+  let go, asking `before-move` / `before-resize` as the mouse does.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.
