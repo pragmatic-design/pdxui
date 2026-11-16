@@ -41,9 +41,13 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   `before-create`, `external-drop`, all refusable with `preventDefault()` — then writes `events`,
   which is now a model (`::events`). `prevent-overlap` refuses a place over another event of the same
   resource and says so in `rejected`; the scheduler's `readonly`, and an event's or a resource's
-  `readonly`, `draggable` and `resizable`, say who may change what. Escape drops a dragged event back. Touch dragging,
-  the keyboard and single-pointer ways, recurrence, the built-in editor, and print and export come in
-  the following parts.
+  `readonly`, `draggable` and `resizable`, say who may change what. Escape drops a dragged event back.
+  From the keyboard, Space picks a focused event up: the arrows move it a slot, a day or a resource,
+  Shift and the arrows move its end, Alt, Shift and the arrows its start, Space or Enter drops it
+  through the same `before-move` or `before-resize`, Escape puts it back, and each step is announced;
+  a movable event's description says so. Touch dragging, creating from the keyboard, the
+  single-pointer way, recurrence, the built-in editor, and print and export come in the following
+  parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

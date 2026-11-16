@@ -82,7 +82,10 @@
         <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last cell. In the year, the week's first and last day</span></div>
         <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
         <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day; in the year, open the day</span></div>
-        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell; during a pointer drag, drop the event back where it was</span></div>
+        <div class="opt-row"><code>Space</code><span></span><span>On an event: pick it up; again, or <kbd>Enter</kbd>, to drop it where the arrows took it, asking <code>before-move</code> or <code>before-resize</code> first</span></div>
+        <div class="opt-row"><code>Arrows</code><span></span><span>On a picked-up event: move it a slot, a day (a week up and down in the month) or a resource</span></div>
+        <div class="opt-row"><code>Shift + arrows</code><span></span><span>On a picked-up event: move its end; with <kbd>Alt</kbd>, its start</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell; a picked-up event, or one dragged by the pointer, back where it was</span></div>
         <div class="opt-row"><code>Enter · Space</code><span></span><span>On a timeline resource with children: open or close it</span></div>
         <div class="opt-row"><code>→ · ←</code><span></span><span>On a timeline resource: open a closed parent, close an open one, or from a child go to its parent</span></div>
       </div>

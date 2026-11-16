@@ -17,7 +17,8 @@
           <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" tabindex="-1" :data-id="b.id"
             :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + eventColorStyle(b.event, rules.resources, c.resource)"
             :data-before="b.before ? '' : null" :data-after="b.after ? '' : null" :aria-label="allDayName(b.event, c)"
-            :data-movable="canDo(b.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(b.event, draft) ? '' : null">
+            :data-movable="canDo(b.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(b.event, draft) ? '' : null"
+            :aria-describedby="hint && (canDo(b.event, 'move', rules) || canDo(b.event, 'resize', rules)) ? hint : null">
             @render event?.(b.event) @else { <span class="pdx-scheduler-event-title">{{ b.event.title }}</span> }
             @if (canDo(b.event, 'resize', rules)) {
               @if (!b.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
@@ -39,7 +40,8 @@
             <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
               :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + eventColorStyle(p.event, rules.resources, c.resource)"
               :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)"
-              :data-movable="canDo(p.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(p.event, draft) ? '' : null">
+              :data-movable="canDo(p.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(p.event, draft) ? '' : null"
+              :aria-describedby="hint && (canDo(p.event, 'move', rules) || canDo(p.event, 'resize', rules)) ? hint : null">
               @render event?.(p.event) @else {
                 <span class="pdx-scheduler-event-title">{{ p.event.title }}</span>
                 <span class="pdx-scheduler-event-time">{{ timeOf(p) }}</span>
@@ -108,6 +110,8 @@ import type { Draft } from './scheduler-drag';
 @prop rules: MoveRules = { disabled: false, readonly: false, resources: [] };
 /** What a pointer drag would make of an event, drawn in its place. */
 @prop draft: Draft | null = null;
+/** The id of the text that says how an event moves from the keyboard, which a movable event points at. */
+@prop hint: string = '';
 /** The owner's event snippet, passed on. */
 @slot event?: (event: SchedulerEvent);
 /** The theme's slot height, in px, measured from the probe. */

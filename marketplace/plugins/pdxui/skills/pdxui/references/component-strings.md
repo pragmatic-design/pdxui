@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 495 keys in 82 components.
+> Generated from the sources. 498 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -385,12 +385,15 @@ placeholders, filled at render: keep them in the translation.
 | `router` | `retry` | `Try again` | `@pdxui/router/src/outlet.ts` |
 | `scheduler` | `agenda` | `Agenda` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `allDay` | `All day` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `cancelled` | `Move cancelled. {title} is back.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `created` | `{title} created` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `day` | `Day` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `dayName` | `{date}, {count, plural, =0 {no events} one {# event} other {# events}}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `daysView` | `{count} days` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `eventName` | `{title}, {when}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `instructions` | `Press Space to pick the event up, the arrow keys to move it, Shift and the arrow keys to move its end, Alt, Shift and the arrow keys to move its start, Space or Enter to drop it, and Escape to cancel.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `label` | `Scheduler` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `lifted` | `{title} lifted. {when}.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `month` | `Month` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `more` | `+{count} more` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `moreName` | `{count, plural, one {# more event} other {# more events}}, {date}` | `@pdxui/ui/src/shared/i18n.ts` |
