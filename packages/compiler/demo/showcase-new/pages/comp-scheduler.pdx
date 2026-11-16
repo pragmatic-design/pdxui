@@ -42,6 +42,7 @@
         <div class="opt-row"><code>prevent-overlap</code><span>boolean</span><span>Refuse a place over another event of the same resource (false)</span></div>
         <div class="opt-row"><code>create-id</code><span>() =&gt; string</span><span>The id of an event the scheduler creates (<code>crypto.randomUUID()</code>)</span></div>
         <div class="opt-row"><code>editor</code><span>'dialog' | 'none'</span><span>The built-in editor, a dialog: Enter or a double click on an event, Enter on an empty slot and a create open it (<code>'dialog'</code>); <code>'none'</code> leaves them to the app</span></div>
+        <div class="opt-row"><code>exports</code><span>('csv' | 'xlsx' | 'ics')[]</span><span>The formats the bar's «Export» menu offers: the period's events as CSV or Excel, one row each; <code>events</code> as iCalendar, a series with its rule. Empty hides the menu</span></div>
         <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'</span><span>The view on screen (<code>::view</code>)</span></div>
         <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all seven by default</span></div>
         <div class="opt-row"><code>timeline-scale</code><span>'day' | 'week' | 'month' | 'year'</span><span>The timeline's period and columns: a day of slots, a week or month of days, a year of months ('week')</span></div>
@@ -75,10 +76,21 @@
         <div class="opt-row"><code>before-save</code> / <code>save</code><span>{ event, previous, isNew, scope? }</span><span>The editor's Save: asked first (<code>preventDefault()</code> refuses it, the editor stays open), then written. On an occurrence, <code>scope</code> is what the reader chose: <code>'occurrence'</code> writes an override, <code>'series'</code> changes the series</span></div>
         <div class="opt-row"><code>before-remove</code> / <code>remove</code><span>{ event, scope? }</span><span>The editor's Delete, or the Delete key on an event: asked first, then removed. On an occurrence, <code>'occurrence'</code> adds it to the series' <code>exdate</code>, <code>'series'</code> removes the series</span></div>
         <div class="opt-row"><code>rejected</code><span>{ action, event, to, reason, conflicts }</span><span>A change was refused: <code>overlap</code> by <code>prevent-overlap</code>, <code>prevented</code> by the app</span></div>
+        <div class="opt-row"><code>exported</code><span>{ format, count }</span><span>A file went out, from the menu or a method</span></div>
+        <div class="opt-row"><code>before-import</code> / <code>imported</code><span>{ events, skipped }</span><span><code>importIcs</code>: asked first (<code>events</code> may be changed, <code>preventDefault()</code> refuses), then added to <code>events</code>, an event of the same id replaced; <code>skipped</code> is what the file had that the scheduler cannot draw, with the reason</span></div>
         <div class="opt-row"><code>view-change</code> / <code>date-change</code> / <code>events-change</code><span>{ value }</span><span>A model was written</span></div>
         <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
         <div class="opt-row"><code>&#64;snippet editorFields(e, set)</code><span></span><span>Fields the app adds to the editor, under Notes; <code>set(patch)</code> merges into the event Save writes (<code>undefined</code> leaves a key out). Validate in <code>before-save</code></span></div>
         <div class="opt-row"><code>&#64;snippet editorContent(e, actions)</code><span></span><span>The app's editor in place of the built-in fields and buttons: <code>actions.save(next)</code>, <code>actions.remove()</code>, <code>actions.cancel()</code>. The scheduler keeps the dialog, the occurrence / series question, <code>before-save</code> / <code>before-remove</code> and writing <code>events</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>Returns</span><span>Description</span></div>
+        <div class="opt-row"><code>exportCsv(save = true)</code><span>Blob</span><span>The period's events as a CSV file, one row each, saved as <code>scheduler-&lt;first&gt;_&lt;last&gt;.csv</code> unless <code>save</code> is false</span></div>
+        <div class="opt-row"><code>exportXlsx(save = true)</code><span>Blob</span><span>The same rows as an Excel workbook</span></div>
+        <div class="opt-row"><code>exportIcs(save = true)</code><span>Blob</span><span><code>events</code> as iCalendar: a series with its <code>RRULE</code> and <code>EXDATE</code>, an override with its <code>RECURRENCE-ID</code>, a wall time with its zone's <code>VTIMEZONE</code></span></div>
+        <div class="opt-row"><code>importIcs(text)</code><span>{ events, skipped } | null</span><span>An iCalendar file's events added to <code>events</code>, after <code>before-import</code>; null when it was refused</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>

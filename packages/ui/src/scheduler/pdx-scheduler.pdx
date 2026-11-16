@@ -12,6 +12,11 @@
           }
         </div>
       }
+      @if (exportItems.length) {
+        <pdx-dropdown-menu class="pdx-scheduler-export" :items="exportItems" placement="bottom-end" @pdx-select="onExport($event)">
+          <button slot="trigger" type="button" class="pdx-scheduler-button" data-part="exportButton" :disabled="disabled">{{ uiString('scheduler', 'export') }}</button>
+        </pdx-dropdown-menu>
+      }
     </div>
     @if (view === 'month') {
       <pdx-scheduler-month class="pdx-scheduler-grid pdx-scheduler-month" data-part="grid" role="grid" :aria-labelledby="periodId" :aria-describedby="createHint" aria-readonly="true"
@@ -83,6 +88,7 @@
  * @csspart next - The button to the next period.
  * @csspart period - The period on screen, which names the grid.
  * @csspart viewSwitcher - The view buttons, shown when `views` offers more than one.
+ * @csspart exportButton - The bar's «Export» button, which opens the formats `exports` offers.
  * @csspart grid - The `role="grid"` of the time slots, of the month's days, or of the timeline's rows (a `treegrid` when resources nest), which scrolls.
  * @csspart columnHeader - A day's or a resource's header, a weekday's in the month, a slot's, day's or month's in the timeline.
  * @csspart rowHeader - A resource's name at the start of its timeline row; a parent's carries the row's `aria-expanded`.
@@ -102,7 +108,7 @@
  * @cssstate lifted - An event is picked up from the keyboard.
  * @cssstate selecting - Empty slots or days are selected from the keyboard, to create an event over.
  */
-import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, today, useDropZone } from '@pdxui/core';
+import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, saveBlob, toCsv, toXlsx, today, useDropZone } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts } from './time';
@@ -119,6 +125,8 @@ import { schedulerDrag, type Draft } from './scheduler-drag';
 import { cellAt, pointOfCell, type PointModel } from './drop-point';
 import { DRAFT_ID, canDo, eventWhen } from './event-state';
 import { edgePoint, keyGesture, keySelect, keyStep, type KeyGesture } from './keyboard-move';
+import { exportName, exportTable, type ExportFormat } from './scheduler-export';
+import { parseIcs, toIcs, type IcsSkipped } from './ics';
 import './scheduler-agenda.pdx';
 import './scheduler-editor.pdx';
 import './scheduler-month.pdx';
@@ -129,6 +137,8 @@ import '@pdxui/design/components/scheduler';
 
 type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
 const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
+/** The «Export» menu's formats and their labels. */
+const EXPORT_LABELS: Record<ExportFormat, 'exportCsv' | 'exportXlsx' | 'exportIcs'> = { csv: 'exportCsv', xlsx: 'exportXlsx', ics: 'exportIcs' };
 /** What a cell's Enter goes into: its events' buttons and their ⋯, and a month day's «+N». */
 const INNER = '[data-part="eventButton"], [data-part="eventMenu"], [data-part="more"]';
 /** An event, the box its button and its ⋯ are in, which carries its id. */
@@ -186,6 +196,8 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @prop createId: () => string = () => crypto.randomUUID();
 /** The built-in editor: `dialog` opens it on Enter or a double click on an event, on Enter on an empty slot, and on a create; `none` leaves those to the app (`event-open`, `slot-open`, `create`). */
 @prop editor: 'dialog' | 'none' = 'dialog';
+/** The formats the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar. Empty hides it. */
+@prop exports: ('csv' | 'xlsx' | 'ics')[] = ['csv', 'xlsx', 'ics'];
 /** What an event draws; without it, its time and title. */
 @slot event?: (event: SchedulerEvent);
 /** Fields the app adds to the built-in editor, under Notes: `set(patch)` merges its values into the event Save writes (a key set to `undefined` is left out). Validate in `before-save`. */
@@ -222,12 +234,19 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @event 'slot-open': { start: string; end: string; resource: string | null; allDay: boolean };
 /** The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year. */
 @event 'period-change': { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string };
-@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, rowHeader, allDayRow, slot, event, eventButton, eventMenu, resizeHandle, more, yearMonth, agendaList, nowLine;
+/** A file went out, from the bar's menu or a method: its format and how many events it holds. (Not `export`, a reserved word, #1130.) */
+@event exported: { format: 'csv' | 'xlsx' | 'ics'; count: number };
+/** `importIcs` is about to add a file's events: `events` may be changed or replaced, `skipped` says what the file had that the scheduler cannot draw, and why; `preventDefault()` refuses them. */
+@event(cancelable) 'before-import': { events: SchedulerEvent[]; skipped: IcsSkipped[] };
+/** A file's events were added to `events`, an event of the same id replaced. (Not `import`, a reserved word.) */
+@event imported: { events: SchedulerEvent[]; skipped: IcsSkipped[] };
+@part root, toolbar, prev, todayButton, next, period, viewSwitcher, exportButton, grid, columnHeader, rowHeader, allDayRow, slot, event, eventButton, eventMenu, resizeHandle, more, yearMonth, agendaList, nowLine;
 @state disabled = !!disabled;
 @state dragging = draft !== null && lift === null && selection === null;
 @state lifted = lift !== null;
 @state selecting = selection !== null;
 @host el;
+@expose exportCsv, exportXlsx, exportIcs, importIcs;
 
 let gridEl = $signal<HTMLElement | null>(null);
 /**
@@ -271,6 +290,8 @@ const range = $derived(viewRange(view, refDate, rangeOptions));
 const periodView = $derived(view === 'timeline' ? timelineScale : view);
 const periodText = $derived(periodLabel(periodView, range.days, loc, refDate));
 const shownViews = $derived(views.filter((v) => VIEWS.includes(v)));
+/** The bar's «Export» menu: the formats `exports` offers, each once. */
+const exportItems = $derived([...new Set(exports)].filter((f) => f in EXPORT_LABELS).map((f) => ({ key: f, label: uiString('scheduler', EXPORT_LABELS[f]) })));
 /** The events the views draw: `events`, with the one being dragged in its new place, or the range being created. */
 /** The events in the period, each series as its occurrences there (`seriesId`, `recurrenceId`, an id of their own). */
 const expanded = $derived(expandEvents(events, { from: zonedInstant(range.start, 0, zone), to: zonedInstant(range.end, 0, zone) }, zone));
@@ -947,4 +968,54 @@ onDestroy(() => {
   document.removeEventListener('pointerdown', pressOutside, true);
   tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose();
 });
+
+// ─── Export and import (#1020, part 10b) ───
+
+/** The period's events as the file's rows, under the editor's names for them. */
+function periodTable(): ReturnType<typeof exportTable> {
+  return exportTable(expanded, { from: zonedInstant(range.start, 0, zone), to: zonedInstant(range.end, 0, zone) }, resources, zone, {
+    title: uiString('scheduler', 'titleField'), start: uiString('scheduler', 'startColumn'), end: uiString('scheduler', 'endColumn'),
+    resource: uiString('scheduler', 'resource'), notes: uiString('scheduler', 'notesField'),
+  });
+}
+/** `blob` saved under the period's name, unless `save` is false; `exported` says it went out. */
+function deliver(blob: Blob, format: ExportFormat, count: number, save: boolean): Blob {
+  if (save) saveBlob(blob, exportName(range, format));
+  exported({ format, count });
+  return blob;
+}
+/** The period's events as a CSV file, one row each, saved unless `save` is false. */
+function exportCsv(save = true): Blob {
+  const t = periodTable();
+  return deliver(new Blob([toCsv(t.rows, t.columns)], { type: 'text/csv;charset=utf-8' }), 'csv', t.rows.length, save);
+}
+/** The period's events as an Excel workbook, one row each, saved unless `save` is false. */
+function exportXlsx(save = true): Blob {
+  const t = periodTable();
+  return deliver(toXlsx(t.rows, t.columns), 'xlsx', t.rows.length, save);
+}
+/** `events` as an iCalendar file — a series with its rule, an override with its RECURRENCE-ID — saved unless `save` is false. */
+function exportIcs(save = true): Blob {
+  return deliver(new Blob([toIcs(events, { timeZone: zone })], { type: 'text/calendar;charset=utf-8' }), 'ics', events.length, save);
+}
+function onExport(e: CustomEvent<{ key: string }>): void {
+  if (e.detail.key === 'csv') exportCsv();
+  else if (e.detail.key === 'xlsx') exportXlsx();
+  else if (e.detail.key === 'ics') exportIcs();
+}
+/**
+ * The iCalendar file `text` added to `events`, asking `before-import` first, which may change the
+ * events or refuse them: an event of the same id is replaced, the others added, and `imported` is
+ * emitted. What it added and what it skipped, or null when it was refused.
+ */
+function importIcs(text: string): { events: SchedulerEvent[]; skipped: IcsSkipped[] } | null {
+  const detail = parseIcs(text, { timeZone: zone });
+  if (!beforeImport(detail)) return null;
+  const incoming = new Map(detail.events.map((x) => [x.id, x]));
+  const kept = events.map((x) => incoming.get(x.id) ?? x);
+  const known = new Set(events.map((x) => x.id));
+  events = [...kept, ...detail.events.filter((x) => !known.has(x.id))];
+  imported({ events: detail.events, skipped: detail.skipped });
+  return { events: detail.events, skipped: detail.skipped };
+}
 </script>
