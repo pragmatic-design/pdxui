@@ -21,6 +21,8 @@ export interface TimelineWindowOptions {
     metrics: () => { lane: number; column: number };
     /** The tab stop's row and column (among the time columns, from 0). */
     pinned: () => { row: number; col: number };
+    /** Every row and column, not the window: while the scheduler prints, the paper has no scroll (#1020, part 10c). */
+    all: () => boolean;
 }
 
 export interface TimelineWindow {
@@ -56,10 +58,13 @@ export function timelineWindow(o: TimelineWindowOptions): TimelineWindow {
         horizontal: true,
         overscan: 2,
     });
+    /** Items 0 … count-1, each where the virtualizer would place it. */
+    const every = (count: number, rect: (i: number) => { start: number; size: number }): VirtualItem[] =>
+        Array.from({ length: count }, (_, index) => { const r = rect(index); return { index, start: r.start, size: r.size, offsetStart: r.start }; });
     return {
-        rows: computed(() => including(rowsV.items(), o.pinned().row, o.rows().length, rowsV.itemRect)),
-        columns: computed(() => including(colsV.items(), o.pinned().col, o.columns(), colsV.itemRect)),
-        firstColumn: computed(() => colsV.items()[0]?.index ?? 0),
+        rows: computed(() => (o.all() ? every(o.rows().length, rowsV.itemRect) : including(rowsV.items(), o.pinned().row, o.rows().length, rowsV.itemRect))),
+        columns: computed(() => (o.all() ? every(o.columns(), colsV.itemRect) : including(colsV.items(), o.pinned().col, o.columns(), colsV.itemRect))),
+        firstColumn: computed(() => (o.all() ? 0 : colsV.items()[0]?.index ?? 0)),
         height: rowsV.totalSize,
         rowRect: rowsV.itemRect,
         columnRect: colsV.itemRect,

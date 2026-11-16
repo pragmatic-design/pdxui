@@ -21,6 +21,8 @@ export interface SlotWindowOptions {
     slotHeight: () => number;
     /** The slot of the tab stop, or -1 when it is not on a slot (the all-day row). */
     pinned: () => number;
+    /** Every slot, not the window: while the scheduler prints, the paper has no scroll (#1020, part 10c). */
+    all: () => boolean;
 }
 
 export interface SlotWindow {
@@ -38,8 +40,9 @@ export function slotWindow(o: SlotWindowOptions): SlotWindow {
         getScrollElement: o.grid,
         overscan: 4,
     });
-    const first = computed(() => v.items()[0]?.index ?? 0);
+    const first = computed(() => (o.all() ? 0 : v.items()[0]?.index ?? 0));
     const rows = computed(() => {
+        if (o.all()) return Array.from({ length: o.count() }, (_, i) => i);
         const shown = v.items().map((it) => it.index);
         const pin = o.pinned();
         if (pin < 0 || pin >= o.count() || shown.includes(pin)) return shown;

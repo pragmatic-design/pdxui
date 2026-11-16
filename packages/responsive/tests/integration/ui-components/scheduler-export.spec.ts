@@ -55,7 +55,7 @@ test.describe('the bar\'s Export menu', () => {
         const s = await open(page);
         await record(page, ['exported']);
         await s.getByRole('button', { name: 'Export' }).click();
-        await expect(page.getByRole('menuitem')).toHaveText(['CSV (.csv)', 'Excel (.xlsx)', 'iCalendar (.ics)']);
+        await expect(page.getByRole('menuitem')).toHaveText(['CSV (.csv)', 'Excel (.xlsx)', 'iCalendar (.ics)', 'Print']);
         const download = page.waitForEvent('download');
         await page.getByRole('menuitem', { name: 'CSV (.csv)' }).click();
         const file = await download;

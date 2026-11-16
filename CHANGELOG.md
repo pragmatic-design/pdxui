@@ -83,7 +83,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   RECURRENCE-ID, a wall time with its zone's VTIMEZONE. `importIcs(text)` reads a file back, a zone that
   is not an IANA one from the file's own VTIMEZONE; it asks `before-import` (`{ events, skipped }`, the
   events may be changed or refused), replaces an event of the same id, adds the others and emits
-  `imported`. `exported` says what went out. Touch dragging and print come in the following parts.
+  `imported`. `exported` says what went out. `print()`, and «Print» in the menu, prints the view and
+  period on screen whole — every slot, row and column the windowing leaves out on screen, no scroll, the
+  period as its title, events in ink — with the scheduler alone on the page; the browser's own print
+  gets the whole scheduler too (`:state(printing)` while it prints). Touch dragging comes in the
+  following part.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

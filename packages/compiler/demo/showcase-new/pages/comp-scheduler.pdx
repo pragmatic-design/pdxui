@@ -42,7 +42,7 @@
         <div class="opt-row"><code>prevent-overlap</code><span>boolean</span><span>Refuse a place over another event of the same resource (false)</span></div>
         <div class="opt-row"><code>create-id</code><span>() =&gt; string</span><span>The id of an event the scheduler creates (<code>crypto.randomUUID()</code>)</span></div>
         <div class="opt-row"><code>editor</code><span>'dialog' | 'none'</span><span>The built-in editor, a dialog: Enter or a double click on an event, Enter on an empty slot and a create open it (<code>'dialog'</code>); <code>'none'</code> leaves them to the app</span></div>
-        <div class="opt-row"><code>exports</code><span>('csv' | 'xlsx' | 'ics')[]</span><span>The formats the bar's «Export» menu offers: the period's events as CSV or Excel, one row each; <code>events</code> as iCalendar, a series with its rule. Empty hides the menu</span></div>
+        <div class="opt-row"><code>exports</code><span>('csv' | 'xlsx' | 'ics' | 'print')[]</span><span>What the bar's «Export» menu offers: the period's events as CSV or Excel, one row each; <code>events</code> as iCalendar, a series with its rule; printing the view. Empty hides the menu</span></div>
         <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'</span><span>The view on screen (<code>::view</code>)</span></div>
         <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all seven by default</span></div>
         <div class="opt-row"><code>timeline-scale</code><span>'day' | 'week' | 'month' | 'year'</span><span>The timeline's period and columns: a day of slots, a week or month of days, a year of months ('week')</span></div>
@@ -91,6 +91,7 @@
         <div class="opt-row"><code>exportXlsx(save = true)</code><span>Blob</span><span>The same rows as an Excel workbook</span></div>
         <div class="opt-row"><code>exportIcs(save = true)</code><span>Blob</span><span><code>events</code> as iCalendar: a series with its <code>RRULE</code> and <code>EXDATE</code>, an override with its <code>RECURRENCE-ID</code>, a wall time with its zone's <code>VTIMEZONE</code></span></div>
         <div class="opt-row"><code>importIcs(text)</code><span>{ events, skipped } | null</span><span>An iCalendar file's events added to <code>events</code>, after <code>before-import</code>; null when it was refused</span></div>
+        <div class="opt-row"><code>print()</code><span>Promise&lt;void&gt;</span><span>The view and period on screen printed whole — every slot, row and column, no scroll, the period as its title, events in ink — and the scheduler alone on the page. The browser's own print gets the whole scheduler too, in its page</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>

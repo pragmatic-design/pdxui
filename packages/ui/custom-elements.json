@@ -24995,11 +24995,11 @@
             {
               "kind": "field",
               "name": "exports",
-              "description": "The formats the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar. Empty hides it.",
+              "description": "What the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar, and printing the view. Empty hides it.",
               "type": {
-                "text": "('csv' | 'xlsx' | 'ics')[]"
+                "text": "('csv' | 'xlsx' | 'ics' | 'print')[]"
               },
-              "default": "['csv', 'xlsx', 'ics']"
+              "default": "['csv', 'xlsx', 'ics', 'print']"
             },
             {
               "kind": "field",
@@ -25075,6 +25075,12 @@
                 }
               ],
               "description": "The iCalendar file `text` added to `events`, asking `before-import` first, which may change the\nevents or refuse them: an event of the same id is replaced, the others added, and `imported` is\nemitted. What it added and what it skipped, or null when it was refused."
+            },
+            {
+              "kind": "method",
+              "name": "print",
+              "parameters": [],
+              "description": "The view and period on screen printed whole — every slot, row and column, no scroll, the period as\nits title — and the scheduler alone on the page. The page is redrawn before the browser's print is\nasked for: window.print() blocks, and what the runtime redraws in a microtask would not be drawn yet."
             }
           ],
           "models": [
@@ -25617,6 +25623,10 @@
             {
               "name": "selecting",
               "description": "Empty slots or days are selected from the keyboard, to create an event over."
+            },
+            {
+              "name": "printing",
+              "description": "The page is being printed: every slot, row and column is drawn."
             }
           ],
           "cssProperties": [
