@@ -134,6 +134,15 @@ component('pdx-toggle-group', {
         label: prop(''),
     },
     setup(ctx) {
+        /**
+         * A toggle's value: its `value` property, which a template's `:value` binding writes without an
+         * attribute, or else the attribute markup wrote.
+         */
+        function valueOf(t: Element): string {
+            const v = (t as Element & { value?: unknown }).value;
+            return typeof v === 'string' && v ? v : t.getAttribute('value') || '';
+        }
+
         function getValues(): string[] {
             const v = ctx.value() as string;
             if (!v) return [];
@@ -177,7 +186,7 @@ component('pdx-toggle-group', {
             requestAnimationFrame(() => {
                 const toggles = Array.from(el.querySelectorAll('pdx-toggle'));
                 for (const t of toggles) {
-                    const tVal = t.getAttribute('value') || '';
+                    const tVal = valueOf(t);
                     // Set pressed state
                     if (vals.includes(tVal)) {
                         t.setAttribute('pressed', '');
@@ -191,7 +200,7 @@ component('pdx-toggle-group', {
                     t.toggleAttribute('radio', single);
                 }
                 const enabled = toggles.filter((t) => !t.hasAttribute('disabled'));
-                const stop = single ? (enabled.find((t) => vals.includes(t.getAttribute('value') || '')) ?? enabled[0]) : undefined;
+                const stop = single ? (enabled.find((t) => vals.includes(valueOf(t))) ?? enabled[0]) : undefined;
                 for (const t of toggles) {
                     const btn = t.querySelector('button');
                     if (!btn) continue;
@@ -209,7 +218,7 @@ component('pdx-toggle-group', {
             function onChildToggle(e: Event) {
                 const toggle = (e.target as HTMLElement).closest('pdx-toggle');
                 if (!toggle || toggle === el) return;
-                const val = toggle.getAttribute('value') || '';
+                const val = valueOf(toggle);
                 if (val) handleToggle(val);
             }
             el.addEventListener('pressed-change', onChildToggle, true);
@@ -253,7 +262,7 @@ component('pdx-toggle-group', {
                 // In a radio group the arrows select what they reach, through the path a click takes.
                 // Whether it is chosen is the group's value, written now: the toggle's `pressed`
                 // attribute follows it a frame later, and keys can come faster than frames.
-                if (ctx.type() !== 'multiple' && !isPressed(items[next].getAttribute('value') || '')) btn?.click();
+                if (ctx.type() !== 'multiple' && !isPressed(valueOf(items[next]))) btn?.click();
             }
         }
 

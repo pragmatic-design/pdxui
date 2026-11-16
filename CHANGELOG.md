@@ -1636,6 +1636,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `pdx-toggle-group` reads a toggle's `value` property, not only its attribute. A template that binds
+  it, `<pdx-toggle :value="day.code">`, writes the property and no attribute: such toggles were never
+  pressed by the group's value, and a click on one changed nothing.
+
 - `pdx-time-picker`'s AM/PM segment on a 12-hour clock is a valid spinbutton: its `aria-valuenow` was
   the word «AM» or «PM», which assistive technology reads as no value and axe rejects
   (`aria-valid-attr-value`). It is now 0 or 1, from `aria-valuemin` 0 to `aria-valuemax` 1, with the
