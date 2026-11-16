@@ -1,21 +1,32 @@
 <template>
-  <div class="pdx-localized-input" data-part="root" role="group" :aria-label="fieldName">
-    @if (!stacked) {
+  <div class="pdx-localized-input" data-part="root" role="group" :aria-label="fieldName" :data-layout="layout">
+    @if (tabbed) {
       <div class="pdx-localized-tabs" data-part="tabs" role="tablist" :aria-label="uiString('localized-input', 'languages')">
         @for (shown as culture; track culture) {
           <button type="button" class="pdx-localized-tab" data-part="tab" role="tab" :id="idOf('tab', culture)" :lang="culture"
             :aria-selected="String(culture === active)" :aria-controls="idOf('panel', culture)"
             :tabindex="culture === active ? 0 : -1" :disabled="disabled" :aria-label="tabNameOf(culture)"
-            @click="select(culture)" @keydown="onTabKey($event, culture)">{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker" data-part="marker" aria-hidden="true"></span>}</button>
+            @click="select(culture)" @keydown="onTabKey($event, culture)">@if (flags && flagOf(culture)) {<pdx-flag class="pdx-localized-flag" :region="flagOf(culture)" size="sm" decorative></pdx-flag>}{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker" data-part="marker" aria-hidden="true"></span>}</button>
         }
       </div>
     }
+    @if (flagLayout) {
+      <pdx-dropdown-menu class="pdx-localized-culture-menu" :items="cultureItems" placement="bottom-start" @pdx-check="onCultureMenu($event)" :ref="cultureMenuEl">
+        <button slot="trigger" type="button" class="pdx-localized-culture-button" data-part="cultureButton" :disabled="disabled"
+          :aria-label="format(uiString('localized-input', 'language'), { language: tabNameOf(active) })">@if (flagOf(active)) {<pdx-flag class="pdx-localized-flag" :region="flagOf(active)" size="sm" decorative></pdx-flag>} @else {<span class="pdx-localized-culture-code">{{ codeOf(active) }}</span>}@if (missingOf(active)) {<span class="pdx-localized-marker" data-part="marker" aria-hidden="true"></span>}</button>
+        @snippet item(it) {
+          @if (flagOf(it.key)) {<pdx-flag class="pdx-localized-flag" :region="flagOf(it.key)" size="sm" decorative></pdx-flag>} @else if (anyFlag) {<span class="pdx-localized-flag-space" aria-hidden="true"></span>}
+          <span class="pdx-menu-item-label">{{ it.label }}@if (missingOf(it.key)) {<span class="pdx-sr-only">, {{ uiString('localized-input', 'missing') }}</span>}</span>
+          @if (missingOf(it.key)) {<span class="pdx-localized-marker" aria-hidden="true"></span>}
+        }
+      </pdx-dropdown-menu>
+    }
     @for (shown as culture; track culture) {
       <div :class="stacked ? 'pdx-localized-row' : 'pdx-localized-panel'" data-part="panel" :id="idOf('panel', culture)"
-        :role="stacked ? null : 'tabpanel'" :aria-labelledby="stacked ? null : idOf('tab', culture)"
+        :role="tabbed ? 'tabpanel' : null" :aria-labelledby="tabbed ? idOf('tab', culture) : null"
         :hidden="!stacked && culture !== active">
         @if (stacked) {
-          <span class="pdx-localized-row-label" aria-hidden="true" :lang="culture">{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker"></span>}</span>
+          <span class="pdx-localized-row-label" aria-hidden="true" :lang="culture">@if (flags && flagOf(culture)) {<pdx-flag class="pdx-localized-flag" :region="flagOf(culture)" size="sm" decorative></pdx-flag>}{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker"></span>}</span>
         }
         @if (multiline) {
           <textarea class="pdx-input" data-part="field" :lang="culture" :dir="directionOf(culture)" :rows="rows"
@@ -35,13 +46,16 @@
 /**
  * One text in several cultures, `{ [culture]: string }` — the shape of Pragmatic's LocalizedString. The
  * cultures are tabs named in their own language, the current one first, a culture with no text marked
- * in its tab's name; or, `layout="stacked"`, every culture a labelled field. Each field carries its
- * culture's `lang` and `dir`. `required` asks every culture, or with `required-scope="default"` the
- * default one; the form submits the value's JSON.
+ * in its tab's name; or, `layout="stacked"`, every culture a labelled field; or, `layout="flag"`, one
+ * field whose prefix, the active culture's flag, opens a menu of the cultures. `flags` draws a culture's
+ * flag beside its name, decorative: the region is the culture's subtag or `regions`' entry, and a bare
+ * language with neither shows none. Each field carries its culture's `lang` and `dir`. `required` asks
+ * every culture, or with `required-scope="default"` the default one; the form submits the value's JSON.
  *
  * @csspart root - The field, `role="group"` named by the label.
  * @csspart tabs - The tablist of the cultures.
  * @csspart tab - A culture's tab, named in its own language.
+ * @csspart cultureButton - The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.
  * @csspart marker - The dot of a culture with no text.
  * @csspart panel - A culture's panel (a tabpanel), or its row when stacked.
  * @csspart field - A culture's input or textarea.
@@ -53,7 +67,8 @@
  */
 import { generatedId, getLocale } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { missing, isComplete, withText, orderCultures, cultureName, directionOf, type LocalizedText, type RequiredScope } from './localized-text';
+import { missing, isComplete, withText, orderCultures, cultureName, directionOf, regionOf, type LocalizedText, type RequiredScope } from './localized-text';
+import type { MenuItem } from '../menu/pdx-menu';
 import '@pdxui/design/components/localized-input';
 
 /** The text, by culture code. A culture with no entry, or an empty one, is missing; the form submits the JSON. */
@@ -64,8 +79,12 @@ import '@pdxui/design/components/localized-input';
 @prop defaultCulture: string = '';
 /** all (the default): `required` asks every culture; default: only the default culture. */
 @prop requiredScope: 'all' | 'default' = 'all';
-/** tabs (the default): one culture at a time; stacked: every culture a field. */
-@prop layout: 'tabs' | 'stacked' = 'tabs';
+/** tabs (the default): one culture at a time; stacked: every culture a field; flag: one field, its prefix a menu of the cultures. */
+@prop layout: 'tabs' | 'stacked' | 'flag' = 'tabs';
+/** A flag before each culture's name, in its tab or row. */
+@prop flags: boolean = false;
+/** The region whose flag a culture shows, by culture (`{ en: 'GB' }`): for a bare language, which has none, or to choose another. */
+@prop regions: Record<string, string> = {};
 /** A textarea per culture instead of an input. */
 @prop multiline: boolean = false;
 /** The textarea's rows, when `multiline`. */
@@ -81,7 +100,7 @@ import '@pdxui/design/components/localized-input';
 /** A custom validity message: the field is invalid while it is set. */
 @prop error: string = '';
 @prop name: string = '';
-@part root, tabs, tab, marker, panel, field;
+@part root, tabs, tab, cultureButton, marker, panel, field;
 @state incomplete = missing(value, cultures).length > 0;
 @state invalid = !!error;
 @state disabled = !!disabled;
@@ -94,6 +113,8 @@ const id = generatedId('pdx-localized-input');
 let chosen = $signal('');
 
 const stacked = $derived(layout === 'stacked');
+const flagLayout = $derived(layout === 'flag');
+const tabbed = $derived(!stacked && !flagLayout);
 const shown = $derived(orderCultures(cultures, locale()));
 const active = $derived(shown.includes(chosen) ? chosen : (shown[0] ?? ''));
 const fieldName = $derived(ariaLabel || label || uiString('localized-input', 'label'));
@@ -124,6 +145,27 @@ function write(culture: string, e: Event): void {
 }
 
 function select(culture: string): void { chosen = culture; }
+
+/** The region whose flag `culture` shows, `''` for none. */
+function flagOf(culture: string): string { return regionOf(culture, regions ?? {}); }
+/** The flag layout's prefix for a culture with no flag: its language subtag, upper case. */
+function codeOf(culture: string): string { return culture.split(/[-_]/)[0].toUpperCase(); }
+
+/** Whether some culture shows a flag: then one with none keeps a flag's room in the menu, so the names line up. */
+const anyFlag = $derived(shown.some((c) => flagOf(c) !== ''));
+/** The flag layout's menu: one radio item per culture, named in its own language, the active one checked. */
+const cultureItems = $derived(shown.map((c): MenuItem => ({ key: c, label: cultureName(c), type: 'radio', radioGroup: 'culture', checked: c === active, lang: c })));
+/** The flag layout's menu, closed once a culture is chosen. */
+let cultureMenuEl = $signal<(HTMLElement & { close(): void }) | null>(null);
+/**
+ * A culture chosen in the menu. A radio item leaves pdx-menu open (a menu of options may take several);
+ * here choosing the culture is the menu's whole job, so it closes, and close() returns the focus to the
+ * button.
+ */
+function onCultureMenu(e: CustomEvent<{ key: string }>): void {
+  chosen = e.detail.key;
+  cultureMenuEl?.close();
+}
 
 /** The tablist's keys: the arrows, Home and End move the focus and the selection with it. */
 function onTabKey(e: KeyboardEvent, culture: string): void {

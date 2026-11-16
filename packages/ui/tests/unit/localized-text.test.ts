@@ -2,7 +2,7 @@
 // shape of Pragmatic's LocalizedString. Which cultures are missing, whether the value is complete for
 // `required`, writing one culture, and how a culture is named and written (its native name, its direction).
 import { describe, it, expect } from 'vitest';
-import { missing, isComplete, withText, cultureName, directionOf, orderCultures } from '../../src/localized-input/localized-text';
+import { missing, isComplete, withText, cultureName, directionOf, orderCultures, regionOf } from '../../src/localized-input/localized-text';
 
 describe('missing', () => {
     it('is every culture with no text, a blank one included, in the given order', () => {
@@ -45,6 +45,18 @@ describe('a culture, named and written', () => {
         expect(cultureName('it')).toBe('italiano');
         expect(cultureName('fr-CA')).toMatch(/^français/);
         expect(cultureName('zz-not-a-tag')).toBe('zz-not-a-tag');
+    });
+    it('has the region of its subtag, or of `regions`, and none for a bare language left unmapped (#1091)', () => {
+        expect(regionOf('it-IT', {})).toBe('IT');
+        expect(regionOf('pt-BR', {})).toBe('BR');
+        expect(regionOf('zh-Hant-TW', {})).toBe('TW');
+        expect(regionOf('en', { en: 'GB' })).toBe('GB');
+        expect(regionOf('en', {}), 'a bare language is never given a guessed country').toBe('');
+        // `regions` names the culture's flag even when it has a subtag: an author's choice wins.
+        expect(regionOf('ca-ES', { 'ca-ES': 'es' })).toBe('ES');
+        // A numeric region (Latin America) has no flag.
+        expect(regionOf('es-419', {})).toBe('');
+        expect(regionOf('zz-not-a-tag', {})).toBe('');
     });
     it('is written right to left for Arabic, Hebrew and Persian, left to right otherwise', () => {
         expect(directionOf('ar')).toBe('rtl');

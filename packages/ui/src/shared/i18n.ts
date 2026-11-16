@@ -38,7 +38,8 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     list: { empty: 'No items' },
     // `field` names one culture's field, `{label}` the field's and `{language}` the culture's own name;
     // `missing` follows a culture's name, in its tab, while it has no text.
-    'localized-input': { label: 'Text', languages: 'Languages', field: '{label} ({language})', missing: 'missing' },
+    // `language` names the flag layout's prefix, the menu of the cultures; `{language}` is the active one's name.
+    'localized-input': { label: 'Text', languages: 'Languages', field: '{label} ({language})', missing: 'missing', language: 'Language: {language}' },
     // A move said out loud: `{title}` is the card, `{column}` the column's label, `{position}` and
     // `{total}` its place in it, counted from 1. `count` / `countLimit` are the column's header count.
     // `move` names a card's Move menu button; the menu's entries are `up`…`moveTo`.

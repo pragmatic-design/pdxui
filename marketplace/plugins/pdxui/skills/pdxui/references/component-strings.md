@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 551 keys in 82 components.
+> Generated from the sources. 552 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -302,6 +302,7 @@ placeholders, filled at render: keep them in the translation.
 | `list` | `empty` | `No items` | `@pdxui/ui/src/shared/i18n.ts` |
 | `localized-input` | `field` | `{label} ({language})` | `@pdxui/ui/src/shared/i18n.ts` |
 | `localized-input` | `label` | `Text` | `@pdxui/ui/src/shared/i18n.ts` |
+| `localized-input` | `language` | `Language: {language}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `localized-input` | `languages` | `Languages` | `@pdxui/ui/src/shared/i18n.ts` |
 | `localized-input` | `missing` | `missing` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `label` | `Mentions` | `@pdxui/ui/src/shared/i18n.ts` |

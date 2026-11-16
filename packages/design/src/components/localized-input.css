@@ -72,12 +72,116 @@
     color: var(--pdx-color-muted);
 }
 
+/* A culture's flag beside its name (`flags`), in a tab, a row label or the flag layout's menu. */
+.pdx-localized-flag {
+    flex-shrink: 0;
+}
+
+/* A culture with no flag, in a menu where others have one: a small flag's room (16px tall, 4:3), so
+   the names line up. */
+.pdx-localized-flag-space {
+    flex-shrink: 0;
+    width: calc(16px * 4 / 3);
+}
+
+/* ===== layout="flag": one field, its prefix the active culture's flag ===== */
+/* The prefix joins the field as an input addon does: the theme's border and radius, the field's
+   start corners square, the prefix's end border under the field's. The prefix stretches to the
+   field's height, a textarea's included. */
+
+.pdx-localized-input[data-layout="flag"] {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0;
+}
+
+.pdx-localized-culture-menu {
+    display: flex;
+}
+
+.pdx-localized-culture-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: 0 var(--pdx-space-sm);
+    border: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-start-start-radius: var(--pdx-radius-md);
+    border-end-start-radius: var(--pdx-radius-md);
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    background: var(--pdx-color-inset);
+    color: var(--pdx-color-muted);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    cursor: pointer;
+}
+
+.pdx-localized-culture-button:hover {
+    color: var(--pdx-color-text);
+}
+
+.pdx-localized-culture-button:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+    position: relative;
+}
+
+.pdx-localized-culture-code {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.pdx-localized-input[data-layout="flag"] > .pdx-localized-panel {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+}
+
+.pdx-localized-input[data-layout="flag"] > .pdx-localized-panel[hidden] {
+    display: none;
+}
+
+.pdx-localized-input[data-layout="flag"] > .pdx-localized-panel > [data-part="field"] {
+    flex: 1;
+    min-width: 0;
+    margin-inline-start: calc(-1 * var(--pdx-border-width));
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+/* The prefix takes the field's shape in the other input styles (inputs.css, `[pdx-input-style]`):
+   filled — the field's fill and bottom line, its top corner rounded; underlined — the bottom line
+   only. A thin divider separates it from the field, which keeps its own bottom line and focus. A
+   transparent top border as wide as the bottom line keeps the flag on the field's middle: with the
+   line alone (2px in some themes) the flag sat a pixel high. */
+[pdx-input-style="filled"] .pdx-localized-culture-button {
+    border: none;
+    border-top: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid transparent;
+    border-bottom: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid var(--pdx-color-border-strong);
+    border-inline-end: var(--pdx-border-width) solid var(--pdx-color-border);
+    border-radius: 0;
+    border-start-start-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-inset);
+}
+
+[pdx-input-style="underlined"] .pdx-localized-culture-button {
+    border: none;
+    border-top: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid transparent;
+    border-bottom: var(--pdx-control-border-width, var(--pdx-input-border-width, var(--pdx-border-width))) solid var(--pdx-color-border);
+    border-radius: 0;
+    background: transparent;
+}
+
+:is([pdx-input-style="filled"], [pdx-input-style="underlined"]) .pdx-localized-input[data-layout="flag"] > .pdx-localized-panel > [data-part="field"] {
+    margin-inline-start: 0;
+}
+
 /* ===== States ===== */
 
 :state(disabled) > .pdx-localized-input {
     opacity: var(--pdx-opacity-disabled);
 }
 
-:state(disabled) > .pdx-localized-input .pdx-localized-tab {
+:state(disabled) > .pdx-localized-input :is(.pdx-localized-tab, .pdx-localized-culture-button) {
     cursor: not-allowed;
 }

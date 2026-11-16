@@ -7,7 +7,9 @@ One text in several languages, a tab each.
 | `cultures` | — | string[] | `[]` | The cultures to edit, as codes (`en`, `it`, `fr-CA`). The current locale's comes first when it is one of them. |
 | `defaultCulture` | `defaultculture` | string | `''` | The culture `required-scope="default"` asks for, and whose text an empty culture shows as its placeholder. Empty: the first culture. |
 | `requiredScope` | `requiredscope` | 'all' \| 'default' | `'all'` | all (the default): `required` asks every culture; default: only the default culture. |
-| `layout` | `layout` | 'tabs' \| 'stacked' | `'tabs'` | tabs (the default): one culture at a time; stacked: every culture a field. |
+| `layout` | `layout` | 'tabs' \| 'stacked' \| 'flag' | `'tabs'` | tabs (the default): one culture at a time; stacked: every culture a field; flag: one field, its prefix a menu of the cultures. |
+| `flags` | `flags` | boolean | `false` | A flag before each culture's name, in its tab or row. |
+| `regions` | — | Record<string, string> | `{}` | The region whose flag a culture shows, by culture (`{ en: 'GB' }`): for a bare language, which has none, or to choose another. |
 | `multiline` | `multiline` | boolean | `false` | A textarea per culture instead of an input. |
 | `rows` | `rows` | number | `3` | The textarea's rows, when `multiline`. |
 | `label` | `label` | string | `''` | The field's name: the group's, and in each culture's field name. Empty: «Text». |
@@ -25,7 +27,7 @@ One text in several languages, a tab each.
 
 **States:** `:state(incomplete)` — Some culture has no text.; `:state(invalid)` — `error` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.
 
-**Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="tabs"]` — The tablist of the cultures.; `[data-part="tab"]` — A culture's tab, named in its own language.; `[data-part="marker"]` — The dot of a culture with no text.; `[data-part="panel"]` — A culture's panel (a tabpanel), or its row when stacked.; `[data-part="field"]` — A culture's input or textarea.
+**Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="tabs"]` — The tablist of the cultures.; `[data-part="tab"]` — A culture's tab, named in its own language.; `[data-part="cultureButton"]` — The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.; `[data-part="marker"]` — The dot of a culture with no text.; `[data-part="panel"]` — A culture's panel (a tabpanel), or its row when stacked.; `[data-part="field"]` — A culture's input or textarea.
 
 
 #### Examples
@@ -48,6 +50,25 @@ are checked against the manifest above._
 ```html
 <div class="demo-stack">
   <pdx-localized-input label="Description" layout="stacked" multiline :cultures="cultures" :value="description"></pdx-localized-input>
+</div>
+```
+
+**Flags** — `flags` puts a culture's flag before its name. The region is the culture's own (`pt-BR` → Brazil); a bare language has none, so `regions` names it (`{ en: 'GB' }`). A culture with neither shows no flag: the field never guesses a country for a language. The flag is decorative: the culture's name stays what a screen reader says. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  <pdx-localized-input label="Product name" flags :cultures="cultures" :regions="regions" :value="name"></pdx-localized-input>
+  <pdx-localized-input label="Description" layout="stacked" flags :cultures="cultures" :regions="regions" :value="name"></pdx-localized-input>
+</div>
+```
+
+**Flag layout** — `layout="flag"` is the compact form: one field, and before it the active culture's flag, a menu button that switches the culture. The dot on the flag marks a culture with no text, and the menu marks each one that has none. A culture with no flag shows its code. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  <pdx-localized-input label="Product name" layout="flag" :cultures="cultures" :regions="regions" ::value="name"></pdx-localized-input>
+  <pdx-localized-input label="Description" layout="flag" multiline :cultures="cultures" :regions="regions" :value="description"></pdx-localized-input>
+  <p class="pdx-txt-small pdx-ink-muted">value: <code>{{ JSON.stringify(name) }}</code></p>
 </div>
 ```
 

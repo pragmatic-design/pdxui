@@ -1,0 +1,22 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Flag layout</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>layout="flag"</code> is the compact form: one field, and before it the active culture's flag, a menu button that switches the culture. The dot on the flag marks a culture with no text, and the menu marks each one that has none. A culture with no flag shows its code.</p>
+    <div class="demo-stack">
+      <pdx-localized-input label="Product name" layout="flag" :cultures="cultures" :regions="regions" ::value="name"></pdx-localized-input>
+      <pdx-localized-input label="Description" layout="flag" multiline :cultures="cultures" :regions="regions" :value="description"></pdx-localized-input>
+      <p class="pdx-txt-small pdx-ink-muted">value: <code>{{ JSON.stringify(name) }}</code></p>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it', 'de-DE', 'eo'];
+const regions = { en: 'GB', it: 'IT' };
+let name = $signal({ en: 'Desk lamp', it: 'Lampada da scrivania' });
+const description = { en: 'A lamp for the desk, with a dimmer.' };
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); max-width: 440px; }
+</style>

@@ -841,6 +841,7 @@ exports[`observed attributes > are the ones each component has always observed 1
     "defaultculture",
     "disabled",
     "error",
+    "flags",
     "label",
     "layout",
     "multiline",

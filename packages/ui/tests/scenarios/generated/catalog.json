@@ -2058,6 +2058,14 @@
           "title": "Localized input — Stacked"
         },
         {
+          "id": "localized-input-flags",
+          "title": "Localized input — Flags"
+        },
+        {
+          "id": "localized-input-flag-layout",
+          "title": "Localized input — Flag layout"
+        },
+        {
           "id": "localized-input-disabled",
           "title": "Localized input — Disabled"
         }
