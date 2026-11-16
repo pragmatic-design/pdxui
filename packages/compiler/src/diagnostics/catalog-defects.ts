@@ -233,6 +233,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: '`@event saved: number;` — a lowercase name, a colon, a payload type.',
         example: { bad: pdx('<p>x</p>', '@event (saved): number;'), good: pdx('<p>x</p>', '@event saved: number;') },
     },
+    PDX_EVENT_NAME_RESERVED: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@event` whose emitter would be a reserved word of JavaScript.',
+        explanation: 'The emitter is a function of the setup named after the event: `@event delete` would write `const delete = …`, a module that does not parse, and `delete({ … })` in the script is the delete operator, not a call. The event is not declared.',
+        fix: 'Name the event for what happened, in a word that is not reserved: `remove` or `deleted`, `imported`, `created`.',
+        example: { bad: pdx('<p>x</p>', '@event delete: { id: string };'), good: pdx('<p>x</p>', '@event remove: { id: string };') },
+    },
     PDX_DUP_EVENT: {
         severity: 'error', category: 'defect',
         summary: 'The same `@event` declared twice.',

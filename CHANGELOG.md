@@ -1661,6 +1661,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- An `@event` whose emitter would be a reserved word of JavaScript — `@event delete`, `@event 'import'`,
+  `@event new` — is `PDX_EVENT_NAME_RESERVED` (error), named, with a name to use instead. It compiled to
+  `const delete = …`, a module that does not parse, and the compiler stopped on `PDX_TS_UNSUPPORTED`
+  blaming code the author never wrote.
+
 - `pdx-scheduler` reads a dragged pointer on the cell under it, not on the cell an event drawn over it
   belongs to. An end dragged a slot down was redrawn under the pointer, and the next move read the
   event's own start cell: the end flipped on every move, and where it was dropped depended on how
