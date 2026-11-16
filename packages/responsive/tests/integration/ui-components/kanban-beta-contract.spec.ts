@@ -6,7 +6,7 @@
 // A refused move leaves `items` as it was. The count says the limit a column is over.
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const COLUMNS = JSON.stringify([
     { key: 'todo', label: 'To do' },
@@ -21,9 +21,9 @@ const ITEMS = JSON.stringify([
 
 /** Put a board in a fresh <div id="f"> with the columns and items above, and wait for it to render. */
 async function mount(page: Page, attrs = ''): Promise<void> {
-    await page.evaluate(async ({ columns, items, attrs }) => {
-        const markup = `<pdx-kanban label="Sprint" ${attrs}></pdx-kanban>`;
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    const html = `<pdx-kanban label="Sprint" ${attrs}></pdx-kanban>`;
+    await loadMarkup(page, html);
+    await page.evaluate(({ columns, items, markup }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -32,7 +32,7 @@ async function mount(page: Page, attrs = ''): Promise<void> {
         board.columns = JSON.parse(columns);
         board.items = JSON.parse(items);
         document.body.appendChild(f);
-    }, { columns: COLUMNS, items: ITEMS, attrs });
+    }, { columns: COLUMNS, items: ITEMS, markup: html });
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
 

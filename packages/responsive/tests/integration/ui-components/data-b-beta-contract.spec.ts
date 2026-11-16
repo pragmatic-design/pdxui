@@ -4,12 +4,12 @@
 // and set size (A3); disabled is a state; its pieces are parts. pdx-chart and pdx-sparkline: the
 // role, name, focus and keys declared on the host, their pieces parts. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <div id="f"> and wait two frames for the components to build. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -57,7 +57,7 @@ test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=d
 
 test.describe('pdx-tree', () => {
     test('its row listeners are delegated: 200 nodes add no more listeners than 2', async ({ page }) => {
-        await page.evaluate(() => (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load('<pdx-tree></pdx-tree>'));
+        await loadMarkup(page, '<pdx-tree></pdx-tree>');
         const few = await listenersFor(page, 2);
         const many = await listenersFor(page, 200);
         expect(many, `2 nodes: ${few} listeners, 200 nodes: ${many}`).toBe(few);

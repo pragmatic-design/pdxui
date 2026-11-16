@@ -4,14 +4,14 @@
 // with `show()`, `close()` and `toggle()`, `closeAll()` gone; and a close gives the focus back to the
 // element that had it when the menu opened. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const ITEMS = '[{"key":"cut","label":"Cut"},{"type":"separator","key":"s"},{"type":"label","key":"l","label":"More"},{"key":"copy","label":"Copy"}]';
 
 /** Put `html` in a fresh <div id="f"> and wait for it to render. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

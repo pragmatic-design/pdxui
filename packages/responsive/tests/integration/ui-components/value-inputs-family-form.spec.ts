@@ -3,7 +3,7 @@
 // together in one FormData, and one form.reset() puts every one back to the value it mounted with.
 // Each is measured alone in its own spec; this is the form an app writes, with all three in it.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const SCHEMA = { label: 'Profile', fields: [{ k: 'name', label: 'Name' }] };
 
@@ -12,22 +12,22 @@ const SCHEMA = { label: 'Profile', fields: [{ k: 'name', label: 'Name' }] };
  * connected — what a reset puts back is the value a component mounted with (#135) — and wait for it.
  */
 async function mount(page: Page): Promise<void> {
-    await page.evaluate(async (schema) => {
-        const markup = `<form>
+    const html = `<form>
             <pdx-toggle-group name="style" type="multiple" label="Style" value="b">
                 <pdx-toggle value="b">Bold</pdx-toggle><pdx-toggle value="i">Italic</pdx-toggle>
             </pdx-toggle-group>
             <pdx-rich-text name="body" output="html" label="Body" value="<p>Hello</p>"></pdx-rich-text>
             <pdx-json-editor name="profile"></pdx-json-editor>
         </form>`;
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ schema, markup }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
         f.innerHTML = markup;
         Object.assign(f.querySelector('pdx-json-editor')!, { schema, value: { name: 'Ada' } });
         document.body.appendChild(f);
-    }, SCHEMA);
+    }, { schema: SCHEMA, markup: html });
     await expect(page.locator('#f pdx-json-editor [data-part="entry"]').first()).toBeVisible();
 }
 

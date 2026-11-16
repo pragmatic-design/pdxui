@@ -8,7 +8,7 @@
 //   - A4, while a lazy branch loads, the tree is `aria-busy` and the host `:state(loading)`.
 // Measured in Chromium: `:state()` and the accessible description are not happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const TREE = [
     { value: 'eng', label: 'Engineering', children: [
@@ -20,8 +20,8 @@ const TREE = [
 
 /** Put `html` in a fresh <div id="f">, give every tree-select `options`, and wait for them to render. */
 async function mount(page: Page, html: string, options: unknown[] = TREE): Promise<void> {
-    await page.evaluate(async ({ markup, opts }) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ markup, opts }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

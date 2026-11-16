@@ -2,7 +2,7 @@
 // delegated to its body (a grid of 200 rows adds no more listeners than a grid of 2), and a click, a
 // checkbox, a double click, an action and a drag still do what they did. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const frames = (page: Page, n = 2) => page.evaluate((count) => new Promise((r) => {
     let left = count;
@@ -12,8 +12,8 @@ const frames = (page: Page, n = 2) => page.evaluate((count) => new Promise((r) =
 
 /** A fresh <div id="f"> holding `html`, with the components it names loaded. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -76,7 +76,7 @@ test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=d
 
 test.describe('pdx-data-grid', () => {
     test('its row events are delegated: 200 rows add no more listeners than 2', async ({ page }) => {
-        await page.evaluate(() => (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load('<pdx-data-grid></pdx-data-grid>'));
+        await loadMarkup(page, '<pdx-data-grid></pdx-data-grid>');
         // A first grid, not counted: what a page sets up once — a module the grid loads, its global
         // listeners — is set up by it.
         await listenersFor(page, 2);

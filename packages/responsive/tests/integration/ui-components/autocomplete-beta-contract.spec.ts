@@ -9,14 +9,14 @@
 // Measured in Chromium: `:state()`, the accessible description and the computed border are not
 // happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const FRUIT = ['Apple', 'Apricot', 'Avocado', 'Banana', 'Blackberry', 'Cherry'];
 
 /** Put `html` in a fresh <div id="f">, give every autocomplete `suggestions`, and wait for them to render. */
 async function mount(page: Page, html: string, suggestions: unknown[] = FRUIT): Promise<void> {
-    await page.evaluate(async ({ markup, items }) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ markup, items }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

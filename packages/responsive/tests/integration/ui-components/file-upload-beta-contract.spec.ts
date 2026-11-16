@@ -9,12 +9,12 @@
 // the FormData a native form would, two File entries for two files, and `form.reset()` restores it.
 // Measured in Chromium: `:state()`, FormData of a custom element, the accessible name and description.
 import { test, expect, type Page, type Route } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <div id="f">, give every transfer `items`, and wait for it to draw. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

@@ -6,12 +6,12 @@
 //     aria-invalid, so it takes the field's whole wiring.
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <div id="f"> and wait for its components to render. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -71,8 +71,8 @@ test('pdx-focus, pdx-blur and pdx-ready reach a listener on the host, and do not
         document.body.addEventListener('pdx-ready', () => w.heard.push('body:ready'));
         document.body.addEventListener('pdx-focus', () => w.heard.push('body:focus'));
     });
-    await page.evaluate(async () => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load('<pdx-rich-text></pdx-rich-text>');
+    await loadMarkup(page, '<pdx-rich-text></pdx-rich-text>');
+    await page.evaluate(() => {
         const w = window as unknown as { heard: string[] };
         const el = document.createElement('pdx-rich-text');
         el.setAttribute('label', 'Notes');

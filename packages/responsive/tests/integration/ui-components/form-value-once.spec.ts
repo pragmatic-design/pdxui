@@ -10,7 +10,7 @@
 // inputs and cannot count the duplicate. Every assertion is `toEqual([...])`, never `contains`:
 // "contains the chosen value" is exactly what a duplicated or stale list also satisfies.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 async function open(page: Page): Promise<void> {
     // An unknown case: the page removes every section and leaves a blank body, with the whole
@@ -20,9 +20,9 @@ async function open(page: Page): Promise<void> {
 
 /** Put `html` in a fresh <form id="f"> and wait for its components to build. */
 async function form(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         // The page registers only what a case builds; this markup is the spec's own.
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
         document.getElementById('f')?.remove();
         const f = document.createElement('form');
         f.id = 'f';
@@ -201,8 +201,8 @@ test.describe('radios', () => {
     });
 
     test('two forms with the same radio name do not uncheck each other', async ({ page }) => {
-        await page.evaluate(async () => {
-            await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load('<pdx-radio>');
+        await loadMarkup(page, '<pdx-radio>');
+        await page.evaluate(() => {
             for (const id of ['f1', 'f2']) {
                 const f = document.createElement('form');
                 f.id = id;

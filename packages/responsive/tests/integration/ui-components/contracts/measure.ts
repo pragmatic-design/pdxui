@@ -90,6 +90,17 @@ export async function openPage(page: Page, url: string, opts: OpenOptions = {}):
     await waitForReady(page, opts.label ?? url, () => page.goto(url, { waitUntil: opts.waitUntil ?? 'load' }), opts);
 }
 
+/**
+ * Register the components `markup` uses, on a page that has the gotchas harness, before a spec
+ * inserts it. In an evaluate of its own, never inside the one that inserts the markup (#1123):
+ * awaited together, Chromium answered that evaluate with "Promise was collected" on an unrelated
+ * change, and Playwright reported it as a navigation that never happened.
+ * `packages/core/tests/mount-loader-shared.test.ts` holds every spec to this one call.
+ */
+export async function loadMarkup(page: Page, markup: string): Promise<void> {
+    await page.evaluate((m) => (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(m), markup);
+}
+
 /** Navigate to a specific scenario + theme (+ optional scheme) on its generated tier page */
 export async function goToScenario(page: Page, scenario: string, theme: string, opts: GoToOptions) {
     let url = `${HOST}/generated/${opts.page}.html?scenario=${scenario}&theme=${theme}`;

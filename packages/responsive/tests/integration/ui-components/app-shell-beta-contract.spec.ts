@@ -8,7 +8,7 @@
 // as `createRouter` does.
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const ITEMS = [
     { key: 'work', label: 'Work', items: [
@@ -24,9 +24,9 @@ const HOME = { key: 'home', label: 'Dashboard', href: '/', icon: 'home' };
 
 /** Put a shell in a fresh <div id="f">, with the model above, and wait for it to render. */
 async function mount(page: Page, attrs = ''): Promise<void> {
-    await page.evaluate(async ({ items, home, attrs }) => {
-        const markup = `<pdx-app-shell storage-key="t-shell" ${attrs}><span slot="brand">PDX</span><span slot="bar" data-test="title">Title</span><p data-test="page">Page</p></pdx-app-shell>`;
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    const html = `<pdx-app-shell storage-key="t-shell" ${attrs}><span slot="brand">PDX</span><span slot="bar" data-test="title">Title</span><p data-test="page">Page</p></pdx-app-shell>`;
+    await loadMarkup(page, html);
+    await page.evaluate(({ items, home, markup }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -36,7 +36,7 @@ async function mount(page: Page, attrs = ''): Promise<void> {
         shell.home = home;
         shell.defaultFavourites = ['tickets'];
         document.body.appendChild(f);
-    }, { items: ITEMS, home: HOME, attrs });
+    }, { items: ITEMS, home: HOME, markup: html });
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
 
