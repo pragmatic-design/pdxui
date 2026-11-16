@@ -73,7 +73,7 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // many, `onDays` a weekly rule's weekdays, `repeatEnds` / `endsAfter` / `endsOn` / `times` /
     // `repeatUntil` when it stops. `export` names the bar's menu and `exportCsv` / `exportXlsx` /
     // `exportIcs` its formats, `print` its last item; `startColumn` and `endColumn` head an exported
-    // file's columns.
+    // file's columns. `viewMenu` names the narrow bar's menu of views by the view on screen.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
@@ -100,7 +100,7 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         unitDays: 'days', unitWeeks: 'weeks', unitMonths: 'months', unitYears: 'years', onDays: 'On',
         repeatEnds: 'Ends', endsAfter: 'After', endsOn: 'On', times: 'Times', repeatUntil: 'End repeat',
         export: 'Export', exportCsv: 'CSV (.csv)', exportXlsx: 'Excel (.xlsx)', exportIcs: 'iCalendar (.ics)',
-        startColumn: 'Start', endColumn: 'End', print: 'Print',
+        startColumn: 'Start', endColumn: 'End', print: 'Print', viewMenu: 'View: {view}',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.

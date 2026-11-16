@@ -25548,7 +25548,11 @@
             },
             {
               "name": "viewSwitcher",
-              "description": "The view buttons, shown when `views` offers more than one."
+              "description": "The view buttons, shown when `views` offers more than one and the scheduler is wide."
+            },
+            {
+              "name": "viewMenu",
+              "description": "The views as a menu, a button named by the view on screen: in place of the view buttons when the scheduler is narrow."
             },
             {
               "name": "exportButton",

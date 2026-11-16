@@ -86,8 +86,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   `imported`. `exported` says what went out. `print()`, and «Print» in the menu, prints the view and
   period on screen whole — every slot, row and column the windowing leaves out on screen, no scroll, the
   period as its title, events in ink — with the scheduler alone on the page; the browser's own print
-  gets the whole scheduler too (`:state(printing)` while it prints). Touch dragging comes in the
-  following part.
+  gets the whole scheduler too (`:state(printing)` while it prints). On a narrow scheduler (a container
+  query on its own width, under 40rem) the views are a menu, a button named by the view on screen
+  (`viewMenu`), «Export» is its icon, and the bar takes two rows instead of four; the view chosen stays
+  the view. Touch dragging comes in the following part.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 550 keys in 82 components.
+> Generated from the sources. 551 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -461,6 +461,7 @@ placeholders, filled at render: keep them in the translation.
 | `scheduler` | `unitMonths` | `months` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `unitWeeks` | `weeks` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `unitYears` | `years` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `viewMenu` | `View: {view}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `views` | `View` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `week` | `Week` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `wholeSeries` | `The whole series` | `@pdxui/ui/src/shared/i18n.ts` |

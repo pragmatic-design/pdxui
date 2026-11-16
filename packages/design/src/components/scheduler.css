@@ -10,6 +10,8 @@
 pdx-scheduler {
     display: block;
     min-width: 0;
+    /* What the bar fits is the scheduler's width, not the screen's (#1020, part 11a). */
+    container: pdx-scheduler / inline-size;
 }
 
 .pdx-scheduler {
@@ -49,6 +51,49 @@ pdx-scheduler {
     display: flex;
     flex-wrap: wrap;
     gap: var(--pdx-space-2xs);
+}
+
+/* The views as a menu, a button named by the view on screen: for a narrow scheduler only. */
+.pdx-scheduler-view-menu {
+    display: none;
+}
+
+/* «Export» is its word when there is room, its icon when there is not; the word stays its name. */
+.pdx-scheduler-export-icon {
+    display: none;
+}
+
+/* Narrow (#1020, part 11a): the views go into their menu, and the bar takes two rows — the buttons,
+   then the period across the width — instead of four. The view chosen stays the view. */
+@container pdx-scheduler (width < 40rem) {
+    .pdx-scheduler-views {
+        display: none;
+    }
+
+    .pdx-scheduler-view-menu {
+        display: inline-block;
+        margin-inline-start: auto;
+    }
+
+    .pdx-scheduler-period {
+        order: 1;
+        flex-basis: 100%;
+    }
+
+    .pdx-scheduler-export-icon {
+        display: inline;
+    }
+
+    /* Visually hidden, still the button's name (as .pdx-sr-only). */
+    .pdx-scheduler-export-label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+    }
 }
 
 .pdx-scheduler-button {
