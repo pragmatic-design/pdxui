@@ -58,6 +58,15 @@ export function takeSample(): Sample {
 const round = (n: number, digits = 2): number => Math.round(n * 10 ** digits) / 10 ** digits;
 const MB = 1024 * 1024;
 
+/** Under this share of the wall time with its loop busy, a process was waiting, its event loop idle. */
+export const LOOP_BUSY = 0.3;
+/**
+ * Under this share of the wall time on the CPU, a process whose loop was busy was held off it; at or
+ * over, it was working on it. A share, not the whole CPU: under the gate's parallel suites a process
+ * that never yielded was granted 60% of one (#1133).
+ */
+export const ON_CPU = 0.3;
+
 /** What the process did from `start` to `end`. */
 export function describeSample(start: Sample, end: Sample): SampleReport {
     const wallMs = Math.max(end.at - start.at, 0.001);
@@ -69,8 +78,8 @@ export function describeSample(start: Sample, end: Sample): SampleReport {
     const heap = getHeapStatistics();
     let reading: string;
     if (gcMs > wallMs / 2) reading = 'collecting garbage';
-    else if (loopBusy < 0.3) reading = 'waiting, its event loop idle';
-    else if (cpuShare < 0.3) reading = 'held off the CPU: not scheduled, or in a synchronous wait';
+    else if (loopBusy < LOOP_BUSY) reading = 'waiting, its event loop idle';
+    else if (cpuShare < ON_CPU) reading = 'held off the CPU: not scheduled, or in a synchronous wait';
     else reading = 'working on the CPU';
     return {
         wallMs: Math.round(wallMs),
