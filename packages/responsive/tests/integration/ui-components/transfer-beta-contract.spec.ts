@@ -9,7 +9,7 @@
 // invalid by the field.
 // Measured in Chromium: `:state()`, the accessible name and description are not happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const ITEMS = [
     { value: 'r', label: 'Read' },
@@ -19,8 +19,8 @@ const ITEMS = [
 
 /** Put `html` in a fresh <div id="f">, give every transfer `items`, and wait for them to render. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async ({ markup, items }) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ markup, items }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

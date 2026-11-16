@@ -3,12 +3,12 @@
 // `label` or an `autocomplete` set wins, and without `mask` nothing changes. Measured in a browser: the
 // group's accessible name and what the form submits are not happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <form id="f"> and wait for its cells to build. */
 async function form(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('form');
         f.id = 'f';

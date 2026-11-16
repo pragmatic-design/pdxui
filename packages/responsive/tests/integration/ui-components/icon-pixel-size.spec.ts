@@ -4,12 +4,12 @@
 // pdx-split-button 14/16, pdx-description-list 14/16/18, pdx-command and pdx-bulk-actions 15, pdx-entity-grid
 // 16 — and each was drawn at 20. A number is now that many pixels. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <div id="f"> and wait for the components to build. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

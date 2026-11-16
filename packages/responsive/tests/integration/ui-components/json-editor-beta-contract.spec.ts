@@ -9,7 +9,7 @@
 //     that one sub-field, and the error described it alone.
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const SCHEMA = {
     label: 'Profile',
@@ -25,8 +25,8 @@ const SCHEMA = {
  * connected — the value a form reset puts back is the one it mounted with (#135) — and wait for it.
  */
 async function mount(page: Page, html: string, value: unknown = { name: 'Ada', age: 36 }): Promise<void> {
-    await page.evaluate(async ({ markup, schema, value }) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ markup, schema, value }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

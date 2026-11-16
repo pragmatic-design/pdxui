@@ -8,12 +8,12 @@
 //   - A2, inside a pdx-form-field in error the swatch is described by the message.
 // Measured in Chromium: `:state()`, the accessible name and description are not happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 /** Put `html` in a fresh <div id="f">, give every picker `props` before it draws, and wait for it. */
 async function mount(page: Page, html: string, props: Record<string, unknown> = {}): Promise<void> {
-    await page.evaluate(async ({ markup, values }) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate(({ markup, values }) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

@@ -3,7 +3,7 @@
 // the A-rules hold through the grid they render (A3, A4 for the picker; A3, A5 for the entity grid).
 // Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const frames = (page: Page, n = 4) => page.evaluate((count) => new Promise((r) => {
     let left = count;
@@ -13,8 +13,8 @@ const frames = (page: Page, n = 4) => page.evaluate((count) => new Promise((r) =
 
 /** A fresh <div id="f"> holding `html`, with the components it names loaded. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';

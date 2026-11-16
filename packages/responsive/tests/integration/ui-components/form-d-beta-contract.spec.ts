@@ -2,7 +2,7 @@
 // pdx-wizard, so A6 holds once: the current step is aria-current="step", the step says «n of N», and a
 // step with an error is not left. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const frames = (page: Page, n = 3) => page.evaluate((count) => new Promise((r) => {
     let left = count;
@@ -10,7 +10,7 @@ const frames = (page: Page, n = 3) => page.evaluate((count) => new Promise((r) =
     requestAnimationFrame(tick);
 }), n);
 
-type Win = { __gotcha: { load(m: string): Promise<void> }; __events: unknown[] };
+type Win = { __events: unknown[] };
 
 const SCHEMA = {
     layout: 'wizard',
@@ -28,9 +28,9 @@ const SCHEMA = {
 
 /** A pdx-form-template on the wizard schema, in a fresh <div id="f">. */
 async function mountWizard(page: Page): Promise<void> {
-    await page.evaluate(async (schema) => {
+    await loadMarkup(page, '<pdx-form-template></pdx-form-template>');
+    await page.evaluate((schema) => {
         const w = window as unknown as Win;
-        await w.__gotcha.load('<pdx-form-template></pdx-form-template>');
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -57,9 +57,8 @@ test.describe('pdx-form-template, a collapsible section (#847)', () => {
     // Its toggle was a <legend role="button"> with a click listener: no tabindex and no keys, so Tab went
     // past it and a collapsed section's fields could not be reached without a mouse.
     test('its toggle is a button in the legend: Tab reaches it, Enter and Space collapse and expand the section', async ({ page }) => {
-        await page.evaluate(async () => {
-            const w = window as unknown as Win;
-            await w.__gotcha.load('<pdx-form-template></pdx-form-template>');
+        await loadMarkup(page, '<pdx-form-template></pdx-form-template>');
+        await page.evaluate(() => {
             document.getElementById('f')?.remove();
             const f = document.createElement('div');
             f.id = 'f';
@@ -163,10 +162,8 @@ test.describe('pdx-form-template, wizard layout', () => {
     // Since #1090 the pill tab style draws no panel at all: a pill theme styles the pills variant's tabs,
     // and leaves every panel, a native tabs' or a wizard's, to its own variant.
     test('the pill tab style draws no panel, a tabs\' or a wizard\'s', async ({ page }) => {
-        await page.evaluate(async () => {
-            document.documentElement.setAttribute('pdx-tab-style', 'pill');
-            await (window as unknown as Win).__gotcha.load('<pdx-tabs></pdx-tabs>'); // brings tabs.css
-        });
+        await page.evaluate(() => document.documentElement.setAttribute('pdx-tab-style', 'pill'));
+        await loadMarkup(page, '<pdx-tabs></pdx-tabs>'); // brings tabs.css
         await mountWizard(page);
         // The pill style is `[pdx-tab-style="pill"] X` under baseline-2024 and, under baseline-2026, X inside
         // `@container style(--pdx-tab-…: pill)`: a rule is the pill style's when either says pill.

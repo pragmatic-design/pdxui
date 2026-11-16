@@ -4,7 +4,7 @@
 // and clickable are states; a clickable item's click and keys are one listener on the list. Measured in
 // Chromium.
 import { test, expect, type Page } from './contracts/fixture';
-import { openPage } from './contracts/measure';
+import { openPage, loadMarkup } from './contracts/measure';
 
 const frames = (page: Page, n = 3) => page.evaluate((count) => new Promise((r) => {
     let left = count;
@@ -14,8 +14,8 @@ const frames = (page: Page, n = 3) => page.evaluate((count) => new Promise((r) =
 
 /** A fresh <div id="f"> holding `html`, with the components it names loaded. */
 async function mount(page: Page, html: string): Promise<void> {
-    await page.evaluate(async (markup) => {
-        await (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load(markup);
+    await loadMarkup(page, html);
+    await page.evaluate((markup) => {
         document.getElementById('f')?.remove();
         const f = document.createElement('div');
         f.id = 'f';
@@ -87,7 +87,7 @@ test.describe('pdx-timeline', () => {
     });
 
     test('a clickable item\'s click and keys are one listener on the list: 200 events add no more than 2', async ({ page }) => {
-        await page.evaluate(() => (window as unknown as { __gotcha: { load(m: string): Promise<void> } }).__gotcha.load('<pdx-timeline></pdx-timeline>'));
+        await loadMarkup(page, '<pdx-timeline></pdx-timeline>');
         const few = await listenersFor(page, 2);
         const many = await listenersFor(page, 200);
         expect(many, `2 events: ${few} listeners, 200 events: ${many}`).toBe(few);
