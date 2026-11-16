@@ -5,7 +5,8 @@
       <code>&lt;pdx-scheduler&gt;</code> — events in time: a day, a week or a run of days on a grid of time slots, with an
       all-day row, the current time and the working hours marked and a column per resource when it has them; a month,
       a year, an agenda of the period, or a timeline of resources in rows. Every grid is a keyboard grid with one tab stop, and every event is announced
-      with its time, day and resource.
+      with its time, day and resource. Events repeat (a subset of RFC 5545), are edited in a built-in dialog, export to CSV, Excel and
+      iCalendar and print whole; on a narrow screen the views fold into a menu, and a finger drags after a long press.
     </p>
 
     <!-- ═══ A week ═══ -->
@@ -19,6 +20,12 @@
 
     <!-- ═══ Drag, resize, create ═══ -->
     <app-demo-comp-scheduler-drag class="demo-section"></app-demo-comp-scheduler-drag>
+
+    <!-- ═══ The editor ═══ -->
+    <app-demo-comp-scheduler-editor class="demo-section"></app-demo-comp-scheduler-editor>
+
+    <!-- ═══ Export, import, print ═══ -->
+    <app-demo-comp-scheduler-export class="demo-section"></app-demo-comp-scheduler-export>
 
     <!-- ═══ Timeline ═══ -->
     <app-demo-comp-scheduler-timeline class="demo-section"></app-demo-comp-scheduler-timeline>
