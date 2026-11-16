@@ -947,3 +947,44 @@ pdx-scheduler {
     display: flex;
     gap: var(--pdx-space-sm);
 }
+
+/* ===== On paper (#1020, part 10c) ===== */
+/* The view and period on screen, whole: the component draws every slot, row and column while it is
+   printed (:state(printing)), and here nothing scrolls. The bar keeps the period, which names what is
+   printed; an event is its tint as ink, a border, and its text. print() puts the scheduler alone on
+   the page: whatever neither holds it nor is in it is left out. */
+
+@media print {
+    :root[data-pdx-print-only] body :not(:has([data-pdx-print-target]), [data-pdx-print-target], [data-pdx-print-target] *) {
+        display: none !important;
+    }
+
+    .pdx-scheduler-grid,
+    .pdx-scheduler-agenda,
+    .pdx-scheduler-timeline {
+        max-height: none;
+        overflow: visible;
+    }
+
+    /* The timeline's columns share the page's width instead of scrolling past it. */
+    .pdx-scheduler-timeline {
+        --pdx-scheduler-timeline-column: 0px;
+    }
+
+    .pdx-scheduler-toolbar > :not([data-part="period"]) {
+        display: none;
+    }
+
+    .pdx-scheduler [data-part="event"] {
+        background: none;
+        border: 1px solid var(--_scheduler-tint);
+        border-left-width: 3px;
+        box-shadow: none;
+    }
+
+    .pdx-scheduler [data-part="eventMenu"],
+    .pdx-scheduler [data-part="resizeHandle"],
+    .pdx-scheduler [data-part="nowLine"] {
+        display: none;
+    }
+}

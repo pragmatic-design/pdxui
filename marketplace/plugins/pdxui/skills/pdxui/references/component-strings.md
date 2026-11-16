@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 549 keys in 82 components.
+> Generated from the sources. 550 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -432,6 +432,7 @@ placeholders, filled at render: keep them in the translation.
 | `scheduler` | `picked` | `{title} picked up. Choose the slot to move it to, or press Escape.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `pickedResize` | `{title} picked up. Choose the slot it should end in, or press Escape.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `previous` | `Previous period` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `print` | `Print` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `refused` | `{title} not changed` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `repeatEnds` | `Ends` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `repeatNever` | `Never` | `@pdxui/ui/src/shared/i18n.ts` |

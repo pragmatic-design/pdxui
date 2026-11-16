@@ -107,6 +107,7 @@
  * @cssstate dragging - An event is being moved, resized or created with the pointer.
  * @cssstate lifted - An event is picked up from the keyboard.
  * @cssstate selecting - Empty slots or days are selected from the keyboard, to create an event over.
+ * @cssstate printing - The page is being printed: every slot, row and column is drawn.
  */
 import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, saveBlob, toCsv, toXlsx, today, useDropZone } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
@@ -138,7 +139,7 @@ import '@pdxui/design/components/scheduler';
 type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
 const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
 /** The «Export» menu's formats and their labels. */
-const EXPORT_LABELS: Record<ExportFormat, 'exportCsv' | 'exportXlsx' | 'exportIcs'> = { csv: 'exportCsv', xlsx: 'exportXlsx', ics: 'exportIcs' };
+const EXPORT_LABELS: Record<ExportFormat | 'print', 'exportCsv' | 'exportXlsx' | 'exportIcs' | 'print'> = { csv: 'exportCsv', xlsx: 'exportXlsx', ics: 'exportIcs', print: 'print' };
 /** What a cell's Enter goes into: its events' buttons and their ⋯, and a month day's «+N». */
 const INNER = '[data-part="eventButton"], [data-part="eventMenu"], [data-part="more"]';
 /** An event, the box its button and its ⋯ are in, which carries its id. */
@@ -196,8 +197,8 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @prop createId: () => string = () => crypto.randomUUID();
 /** The built-in editor: `dialog` opens it on Enter or a double click on an event, on Enter on an empty slot, and on a create; `none` leaves those to the app (`event-open`, `slot-open`, `create`). */
 @prop editor: 'dialog' | 'none' = 'dialog';
-/** The formats the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar. Empty hides it. */
-@prop exports: ('csv' | 'xlsx' | 'ics')[] = ['csv', 'xlsx', 'ics'];
+/** What the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar, and printing the view. Empty hides it. */
+@prop exports: ('csv' | 'xlsx' | 'ics' | 'print')[] = ['csv', 'xlsx', 'ics', 'print'];
 /** What an event draws; without it, its time and title. */
 @slot event?: (event: SchedulerEvent);
 /** Fields the app adds to the built-in editor, under Notes: `set(patch)` merges its values into the event Save writes (a key set to `undefined` is left out). Validate in `before-save`. */
@@ -245,8 +246,9 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @state dragging = draft !== null && lift === null && selection === null;
 @state lifted = lift !== null;
 @state selecting = selection !== null;
+@state printing = printMode;
 @host el;
-@expose exportCsv, exportXlsx, exportIcs, importIcs;
+@expose exportCsv, exportXlsx, exportIcs, importIcs, print;
 
 let gridEl = $signal<HTMLElement | null>(null);
 /**
@@ -276,6 +278,8 @@ let selection = $signal<{ anchor: { row: number; col: number }; cell: { row: num
 let editing = $signal<{ event: SchedulerEvent; isNew: boolean; series?: SchedulerEvent } | null>(null);
 /** What had the focus when the editor opened: it gets it back when the editor closes. */
 let editReturn: HTMLElement | null = null;
+/** The scheduler is being printed: every slot, row and column is drawn, the paper having no scroll. */
+let printMode = $signal(false);
 
 const periodId = generatedId('pdx-scheduler-period');
 const hintId = generatedId('pdx-scheduler-hint');
@@ -348,6 +352,7 @@ const slotWin = slotWindow({
   count: () => slots.length,
   slotHeight: () => slotPx,
   pinned: () => tabCell.row - 1,
+  all: () => printMode,
 });
 /** The slot `scrollTo` is in, where the time grid opens. */
 const openSlot = $derived(slots.findIndex((m) => m >= parseClock(scrollTo)));
@@ -361,6 +366,7 @@ const tlWindow = timelineWindow({
   columns: () => tlColumns.length,
   metrics: () => metrics,
   pinned: () => ({ row: tabCell.row, col: tabCell.col - 1 }),
+  all: () => printMode,
 });
 const tlShown = $derived(tlWindow.rows().filter((vr) => vr.index < tlRows.length).map((vr) => ({ index: vr.index, top: vr.start, row: tlRows[vr.index] })));
 const tlCols = $derived(tlWindow.columns().filter((vc) => vc.index < tlColumns.length).map((vc) => {
@@ -962,10 +968,14 @@ const pressOutside = (e: PointerEvent) => {
 onMount(() => {
   clock = setInterval(() => { now = Date.now(); }, 60_000);
   document.addEventListener('pointerdown', pressOutside, true);
+  window.addEventListener('beforeprint', beforePrint);
+  window.addEventListener('afterprint', afterPrint);
 });
 onDestroy(() => {
   if (clock !== undefined) clearInterval(clock);
   document.removeEventListener('pointerdown', pressOutside, true);
+  window.removeEventListener('beforeprint', beforePrint);
+  window.removeEventListener('afterprint', afterPrint);
   tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose();
 });
 
@@ -1002,6 +1012,30 @@ function onExport(e: CustomEvent<{ key: string }>): void {
   if (e.detail.key === 'csv') exportCsv();
   else if (e.detail.key === 'xlsx') exportXlsx();
   else if (e.detail.key === 'ics') exportIcs();
+  else if (e.detail.key === 'print') void print();
+}
+
+// ─── Print (#1020, part 10c) ───
+
+/** The page is about to print, by print() or the browser's own: draw everything the windowing leaves out. */
+const beforePrint = () => { printMode = true; };
+/** The print is over: back to the window, and the page whole again. */
+const afterPrint = () => {
+  printMode = false;
+  document.documentElement.removeAttribute('data-pdx-print-only');
+  el.removeAttribute('data-pdx-print-target');
+};
+/**
+ * The view and period on screen printed whole — every slot, row and column, no scroll, the period as
+ * its title — and the scheduler alone on the page. The page is redrawn before the browser's print is
+ * asked for: window.print() blocks, and what the runtime redraws in a microtask would not be drawn yet.
+ */
+async function print(): Promise<void> {
+  document.documentElement.setAttribute('data-pdx-print-only', '');
+  el.setAttribute('data-pdx-print-target', '');
+  printMode = true;
+  await new Promise((done) => requestAnimationFrame(done));
+  window.print();
 }
 /**
  * The iCalendar file `text` added to `events`, asking `before-import` first, which may change the
