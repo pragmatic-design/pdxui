@@ -90,6 +90,10 @@ import { followLink } from '../lib/follow-link';
 import { onMount, effect } from '@pdxui/core';
 import { getComponent, byCategory } from '../lib/manifest';
 import { contentOf, a11yOf, shortName } from '../lib/component-content';
+// The two components that read the UI manifest: imported here, not by index.html's eager glob, so
+// the manifest is in this page's chunks and not in the entry (#1067).
+import '../components/pdx-api-tables.pdx';
+import '../components/pdx-props-playground.pdx';
 
 // Galleries (full reactive demos), loaded lazily per component: the ported showcase pages
 // (generated into ../demos/) and the pages written for the site (../demos-authored/), which are

@@ -16,18 +16,21 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 
 /**
- * gzip kB the entry chunk may weigh. Measured at 782 kB, 182.5 kB gzip — the runtime, the router
- * and its route table, the shell, and the UI manifest (custom-elements.json, ~420 kB unminified,
- * read by the nav and the component pages). No route: each is its own chunk (#303; with the
+ * gzip kB the entry chunk may weigh. First measured at 782 kB, 182.5 kB gzip — the runtime, the
+ * router and its route table, the shell, and then the UI manifest (custom-elements.json, read by the
+ * component pages). No route: each is its own chunk (#303; with the
  * routes imported eagerly it was 1008 kB, 240 kB gzip). The budget leaves ~25% for growth and is
  * still well below either regression it guards: the routes back in the entry are ~58 kB gzip more,
  * TypeScript ~900 kB.
  *
- * 228 → 232 with pdx-scheduler (#1020, owner's decision): main stood at ~227.7, and the entry grows
- * with every component through the manifest alone — the scheduler's entry in it is 2.07 kB gzip, its
- * code is not in the entry. Moving the manifest out of the entry is #1067.
+ * 228 → 232 with pdx-scheduler (#1020, owner's decision): main stood at ~227.7, and the entry grew
+ * with every component through the manifest alone.
+ *
+ * 232 → 152 with #1067: the two components that read the manifest are no longer registered by the
+ * entry, and the manifest (533.6 kB, 92.3 kB gzip) is a chunk the component pages load. Measured at
+ * 357.5 kB, 121.25 kB gzip; the budget keeps the same ~25% for growth.
  */
-const ENTRY_BUDGET_KB = 232;
+const ENTRY_BUDGET_KB = 152;
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 
@@ -82,6 +85,26 @@ test('no route is in the entry chunk — the route table loads each one', () => 
     // Control: the table is there, naming them — so the assertion above is not passing on an entry
     // that lost the router altogether.
     expect(routes.filter(tag => !code.includes(`tag:"${tag}"`)), 'routes the entry\'s route table does not name').toEqual([]);
+});
+
+test('the UI manifest is not in the entry chunk — the pages that read it load it (#1067)', () => {
+    // A component's description is in the manifest and nowhere else the site ships: in the entry, it
+    // is the whole manifest in the entry, and every component grows the first download. The nav needs
+    // only names and categories.
+    const manifest = JSON.parse(readFileSync(fileURLToPath(new URL('../../ui/custom-elements.json', import.meta.url)), 'utf8')) as
+        { modules: { declarations: { tagName?: string; description?: string }[] }[] };
+    // The first 60 characters of a long description: JSON escapes nothing in them (no quote, no newline).
+    const marks = manifest.modules.map((m) => m.declarations[0]?.description ?? '')
+        .filter((d) => d.length > 120).map((d) => d.slice(0, 60)).filter((d) => !/["\\\n]/.test(d));
+    expect(marks.length, 'no long descriptions found: the manifest this test reads has changed').toBeGreaterThan(20);
+    const html = readFileSync(join(dist, 'index.html'), 'utf8');
+    const src = html.match(/<script[^>]+type="module"[^>]+src="\/?([^"]+\.js)"/)![1];
+    const entry = readFileSync(join(dist, src), 'utf8');
+    expect(marks.filter((d) => entry.includes(d)).length, 'component descriptions in the entry chunk').toBe(0);
+    // Control: the manifest is shipped, in a chunk of its own the component pages load.
+    const shipped = readdirSync(join(dist, 'assets')).filter((f) => f.endsWith('.js'))
+        .some((f) => readFileSync(join(dist, 'assets', f), 'utf8').includes(marks[0]));
+    expect(shipped, 'the manifest is in no chunk at all').toBe(true);
 });
 
 test('the compiler and TypeScript are not in the entry chunk', () => {
