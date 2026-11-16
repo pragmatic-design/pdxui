@@ -11,10 +11,14 @@
             <button type="button" class="pdx-scheduler-button" :aria-pressed="v === view ? 'true' : 'false'" :disabled="disabled" @click="pick(v)">{{ viewName(v) }}</button>
           }
         </div>
+        <pdx-dropdown-menu class="pdx-scheduler-view-menu" :items="viewItems" placement="bottom-end" @pdx-select="onViewMenu($event)">
+          <button slot="trigger" type="button" class="pdx-scheduler-button" data-part="viewMenu" :disabled="disabled"
+            :aria-label="format(uiString('scheduler', 'viewMenu'), { view: viewName(view) })">{{ viewName(view) }} ▾</button>
+        </pdx-dropdown-menu>
       }
       @if (exportItems.length) {
         <pdx-dropdown-menu class="pdx-scheduler-export" :items="exportItems" placement="bottom-end" @pdx-select="onExport($event)">
-          <button slot="trigger" type="button" class="pdx-scheduler-button" data-part="exportButton" :disabled="disabled">{{ uiString('scheduler', 'export') }}</button>
+          <button slot="trigger" type="button" class="pdx-scheduler-button" data-part="exportButton" :disabled="disabled"><span class="pdx-scheduler-export-icon" aria-hidden="true">⤓</span><span class="pdx-scheduler-export-label">{{ uiString('scheduler', 'export') }}</span></button>
         </pdx-dropdown-menu>
       }
     </div>
@@ -87,7 +91,8 @@
  * @csspart todayButton - The button back to today.
  * @csspart next - The button to the next period.
  * @csspart period - The period on screen, which names the grid.
- * @csspart viewSwitcher - The view buttons, shown when `views` offers more than one.
+ * @csspart viewSwitcher - The view buttons, shown when `views` offers more than one and the scheduler is wide.
+ * @csspart viewMenu - The views as a menu, a button named by the view on screen: in place of the view buttons when the scheduler is narrow.
  * @csspart exportButton - The bar's «Export» button, which opens the formats `exports` offers.
  * @csspart grid - The `role="grid"` of the time slots, of the month's days, or of the timeline's rows (a `treegrid` when resources nest), which scrolls.
  * @csspart columnHeader - A day's or a resource's header, a weekday's in the month, a slot's, day's or month's in the timeline.
@@ -241,7 +246,7 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @event(cancelable) 'before-import': { events: SchedulerEvent[]; skipped: IcsSkipped[] };
 /** A file's events were added to `events`, an event of the same id replaced. (Not `import`, a reserved word.) */
 @event imported: { events: SchedulerEvent[]; skipped: IcsSkipped[] };
-@part root, toolbar, prev, todayButton, next, period, viewSwitcher, exportButton, grid, columnHeader, rowHeader, allDayRow, slot, event, eventButton, eventMenu, resizeHandle, more, yearMonth, agendaList, nowLine;
+@part root, toolbar, prev, todayButton, next, period, viewSwitcher, viewMenu, exportButton, grid, columnHeader, rowHeader, allDayRow, slot, event, eventButton, eventMenu, resizeHandle, more, yearMonth, agendaList, nowLine;
 @state disabled = !!disabled;
 @state dragging = draft !== null && lift === null && selection === null;
 @state lifted = lift !== null;
@@ -296,6 +301,8 @@ const periodText = $derived(periodLabel(periodView, range.days, loc, refDate));
 const shownViews = $derived(views.filter((v) => VIEWS.includes(v)));
 /** The bar's «Export» menu: the formats `exports` offers, each once. */
 const exportItems = $derived([...new Set(exports)].filter((f) => f in EXPORT_LABELS).map((f) => ({ key: f, label: uiString('scheduler', EXPORT_LABELS[f]) })));
+/** The views as the narrow bar's menu offers them. */
+const viewItems = $derived(shownViews.map((v) => ({ key: v, label: viewName(v) })));
 /** The events the views draw: `events`, with the one being dragged in its new place, or the range being created. */
 /** The events in the period, each series as its occurrences there (`seriesId`, `recurrenceId`, an id of their own). */
 const expanded = $derived(expandEvents(events, { from: zonedInstant(range.start, 0, zone), to: zonedInstant(range.end, 0, zone) }, zone));
@@ -387,6 +394,11 @@ function moved(): void {
 function step(direction: 1 | -1): void { date = stepPeriod(view, refDate, direction, rangeOptions); moved(); }
 function goToday(): void { date = today(); moved(); }
 function pick(v: CalendarView): void { if (v !== view) { view = v; moved(); } }
+/** A view picked in the narrow bar's menu. */
+function onViewMenu(e: CustomEvent<{ key: string }>): void {
+  const v = shownViews.find((x) => x === e.detail.key);
+  if (v) pick(v);
+}
 /** A day opened from the month's «+N» or the year: the first time-grid view offered, on that day, focused. */
 function openDay(d: string): void {
   const to = shownViews.find((v) => v === 'day') ?? shownViews.find((v) => v === 'week' || v === 'days') ?? 'day';
