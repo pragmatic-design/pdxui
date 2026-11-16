@@ -53,11 +53,17 @@ function uiSubpathAliases(): { find: string | RegExp; replacement: string }[] {
         // nothing imports it here.
         if (!dev?.endsWith('.ts') && !dev?.endsWith('.pdx')) continue;
         if (key.includes('*')) {
-            const [before, after] = `@pdxui/ui${key.slice(1)}`.split('*');
+            // A pattern export has exactly one `*`, in the key and in the target (Node's rule): split on
+            // it and put the capture where it stood. Anything else is not a pattern this can map.
+            const keyParts = `@pdxui/ui${key.slice(1)}`.split('*');
+            const targetParts = resolve(here, '../..', dev.replace(/^\.\//, '')).split('*');
+            if (keyParts.length !== 2 || targetParts.length !== 2) {
+                throw new Error(`[scenarios] the export ${key} → ${dev} is not a pattern with one "*"`);
+            }
             const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
             patterns.push({
-                find: new RegExp(`^${escape(before)}(.+)${escape(after)}$`),
-                replacement: resolve(here, '../..', dev.replace(/^\.\//, '')).replace('*', '$1'),
+                find: new RegExp(`^${escape(keyParts[0])}(.+)${escape(keyParts[1])}$`),
+                replacement: targetParts.join('$1'),
             });
             continue;
         }
