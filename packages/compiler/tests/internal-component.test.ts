@@ -173,6 +173,13 @@ describe('the parts an internal view draws are its owner\'s (#1110)', () => {
         expect(codes(compileOwner(owner('@part grid, cell;')))).toEqual([]);
     });
 
+    it('the view in between raises nothing for the parts the view it imports draws: they are the owner\'s too', () => {
+        const middle = '<template><div data-part="grid"><app-inner></app-inner></div></template>\n<script>\n@internal;\nimport \'./inner.pdx\';\n</script>\n';
+        const view = file('src/a/view.pdx', middle);
+        file('src/a/inner.pdx', '<template><span data-part="cell"></span></template>\n<script>\n@internal;\n</script>\n');
+        expect(codes(compile(middle, view, [], undefined, { readComponent: read }).warnings)).not.toContain('PDX_PART_UNDECLARED');
+    });
+
     it('the owner\'s script reading a part only its view draws is told it never holds the element', () => {
         file('src/a/view.pdx', VIEW);
         const w = compileOwner(owner('@part grid, cell;', 'function width() { return grid?.offsetWidth ?? 0; }')).find((x) => x.code === 'PDX_PART_IN_VIEW');
