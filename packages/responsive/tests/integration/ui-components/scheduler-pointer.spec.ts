@@ -86,6 +86,23 @@ test.describe('the scheduler with the pointer, a week', () => {
         expect(got[1].detail).toEqual(expect.objectContaining({ edge: 'end', to: { start: '2026-09-22T10:00', end: '2026-09-22T13:30' } }));
     });
 
+    // The point is read against the cell under it, not the cell an event drawn over it belongs to: an
+    // end dragged a slot down is redrawn under the pointer, and the next move read Stand-up's own start
+    // cell, so the end flipped between 09:30 and 10:00 on every move and the drop depended on their
+    // number (#1020, part 11b, found with touch).
+    for (const steps of [5, 6, 7]) {
+        test(`an end dragged into the next slot ends there, in ${steps} moves`, async ({ page }) => {
+            const s = await open(page, 'scheduler-week');
+            const edge = await center(s.locator('[data-id="standup"] [data-part="resizeHandle"][data-edge="end"]'));
+            const to = await center(cell(s, 4, 0));
+            await page.mouse.move(edge.x, edge.y);
+            await page.mouse.down();
+            await page.mouse.move(edge.x, to.y, { steps });
+            await page.mouse.up();
+            expect((await model(page)).find((e) => e.id === 'standup')?.end).toBe('2026-09-21T10:00');
+        });
+    }
+
     test('a drag over empty slots creates an event there', async ({ page }) => {
         const s = await open(page, 'scheduler-week');
         await record(page, ['before-create', 'create', 'slot-open']);
@@ -200,8 +217,13 @@ test.describe('the scheduler with the pointer, timeline and month', () => {
     test('in the timeline a drag carries an event to another resource', async ({ page }) => {
         const s = await open(page, 'scheduler-timeline');
         await record(page, ['move']);
-        // The audit, Room A (row 1) from Tuesday, to Room B (row 2) on Wednesday (column 3).
-        await dragTo(page, await center(s.locator('[data-id="audit"]')), await center(cell(s, 2, 3)));
+        // The audit, Room A (row 1) from Tuesday 12:00, to Room B (row 2) a day later: pressed on its
+        // Tuesday part (column 2), let go in Wednesday's cell (column 3). The pointer is read on the cell
+        // under it, so the press is where the day is counted from (#1020, part 11b): pressed on the bar's
+        // middle, over Wednesday, and let go on Wednesday, it would change resource and not day.
+        const tuesday = (await cell(s, 1, 2).boundingBox())!;
+        const bar = await center(s.locator('[data-id="audit"]'));
+        await dragTo(page, { x: tuesday.x + tuesday.width * 0.75, y: bar.y }, await center(cell(s, 2, 3)));
         const [moved] = await events(page);
         expect(moved.detail.to).toEqual({ start: '2026-09-23T12:00', end: '2026-09-24T12:00', resource: 'b' });
     });

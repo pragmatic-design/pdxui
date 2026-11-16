@@ -89,7 +89,9 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   gets the whole scheduler too (`:state(printing)` while it prints). On a narrow scheduler (a container
   query on its own width, under 40rem) the views are a menu, a button named by the view on screen
   (`viewMenu`), «Export» is its icon, and the bar takes two rows instead of four; the view chosen stays
-  the view. Touch dragging comes in the following part.
+  the view. With a finger, a short tap opens an event, a finger that moves scrolls the grid, and a long
+  press (500 ms) lifts the event or an edge, which then follows the finger and is dropped where it is
+  let go, asking `before-move` / `before-resize` as the mouse does.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.
@@ -1658,6 +1660,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   and `+=` are unchanged. (#187)
 
 ### Fixes
+
+- `pdx-scheduler` reads a dragged pointer on the cell under it, not on the cell an event drawn over it
+  belongs to. An end dragged a slot down was redrawn under the pointer, and the next move read the
+  event's own start cell: the end flipped on every move, and where it was dropped depended on how
+  many moves there were. A move counts from the cell pressed, not from the event's start cell.
 
 - A typed `@slot` counts as declared for `PDX_UNDECLARED_REF`: a component may test the snippet its
   parent passes (`@if (row)`) or hand it on to a child (`:row="row"`) without an error that said the
