@@ -13,7 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { takeSample, describeSample, recordLine, recordLines, failureLines, SLOW_TEST_MS } from './setup/slow-test-sample';
+import { takeSample, describeSample, recordLine, recordLines, failureLines, SLOW_TEST_MS, ON_CPU } from './setup/slow-test-sample';
 
 /** Keeps the event loop busy, on the CPU, for `ms`. */
 function spin(ms: number): void {
@@ -30,7 +30,9 @@ describe('the sample', () => {
         const r = describeSample(start, takeSample());
         expect(r.wallMs).toBeGreaterThanOrEqual(590);
         expect(r.loopBusy, 'the event loop was busy the whole time').toBeGreaterThan(0.8);
-        expect(r.cpuShare, 'the process was on the CPU the whole time').toBeGreaterThan(0.6);
+        // What the sample reads as work, not how much CPU the machine granted: under the pre-push's
+        // parallel suites a loop that never yielded got 60% of one, and `> 0.6` failed (#1133).
+        expect(r.cpuShare, 'the process was on the CPU, as the reading counts it').toBeGreaterThanOrEqual(ON_CPU);
         expect(r.reading).toBe('working on the CPU');
     });
 
