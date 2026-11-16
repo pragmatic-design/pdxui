@@ -519,6 +519,8 @@ export const scenarioPage: Record<string, string> = {
     "list-named": "tier-5b",
     "localized-input-tabs": "tier-3c",
     "localized-input-stacked": "tier-3c",
+    "localized-input-flags": "tier-3c",
+    "localized-input-flag-layout": "tier-3c",
     "localized-input-disabled": "tier-3c",
     "masked-input-basic": "tier-1c",
     "masked-input-disabled": "tier-1c",

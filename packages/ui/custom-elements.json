@@ -18734,7 +18734,7 @@
           "tagName": "pdx-localized-input",
           "category": "Specialized Inputs",
           "order": 27,
-          "description": "One text in several cultures, `{ [culture]: string }` — the shape of Pragmatic's LocalizedString. The\ncultures are tabs named in their own language, the current one first, a culture with no text marked\nin its tab's name; or, `layout=\"stacked\"`, every culture a labelled field. Each field carries its\nculture's `lang` and `dir`. `required` asks every culture, or with `required-scope=\"default\"` the\ndefault one; the form submits the value's JSON.",
+          "description": "One text in several cultures, `{ [culture]: string }` — the shape of Pragmatic's LocalizedString. The\ncultures are tabs named in their own language, the current one first, a culture with no text marked\nin its tab's name; or, `layout=\"stacked\"`, every culture a labelled field; or, `layout=\"flag\"`, one\nfield whose prefix, the active culture's flag, opens a menu of the cultures. `flags` draws a culture's\nflag beside its name, decorative: the region is the culture's subtag or `regions`' entry, and a bare\nlanguage with neither shows none. Each field carries its culture's `lang` and `dir`. `required` asks\nevery culture, or with `required-scope=\"default\"` the default one; the form submits the value's JSON.",
           "members": [
             {
               "kind": "field",
@@ -18768,12 +18768,31 @@
             {
               "kind": "field",
               "name": "layout",
-              "description": "tabs (the default): one culture at a time; stacked: every culture a field.",
+              "description": "tabs (the default): one culture at a time; stacked: every culture a field; flag: one field, its prefix a menu of the cultures.",
               "type": {
-                "text": "'tabs' | 'stacked'"
+                "text": "'tabs' | 'stacked' | 'flag'"
               },
               "default": "'tabs'",
               "attribute": "layout"
+            },
+            {
+              "kind": "field",
+              "name": "flags",
+              "description": "A flag before each culture's name, in its tab or row.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "flags"
+            },
+            {
+              "kind": "field",
+              "name": "regions",
+              "description": "The region whose flag a culture shows, by culture (`{ en: 'GB' }`): for a bare language, which has none, or to choose another.",
+              "type": {
+                "text": "Record<string, string>"
+              },
+              "default": "{}"
             },
             {
               "kind": "field",
@@ -18917,11 +18936,20 @@
             {
               "name": "layout",
               "fieldName": "layout",
-              "description": "tabs (the default): one culture at a time; stacked: every culture a field.",
+              "description": "tabs (the default): one culture at a time; stacked: every culture a field; flag: one field, its prefix a menu of the cultures.",
               "type": {
-                "text": "'tabs' | 'stacked'"
+                "text": "'tabs' | 'stacked' | 'flag'"
               },
               "default": "'tabs'"
+            },
+            {
+              "name": "flags",
+              "fieldName": "flags",
+              "description": "A flag before each culture's name, in its tab or row.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             },
             {
               "name": "multiline",
@@ -19017,6 +19045,10 @@
             {
               "name": "tab",
               "description": "A culture's tab, named in its own language."
+            },
+            {
+              "name": "cultureButton",
+              "description": "The flag layout's prefix: the active culture's flag (its code when it has none), a menu button."
             },
             {
               "name": "marker",

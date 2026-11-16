@@ -1,0 +1,20 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Flags</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>flags</code> puts a culture's flag before its name. The region is the culture's own (<code>pt-BR</code> → Brazil); a bare language has none, so <code>regions</code> names it (<code>{ en: 'GB' }</code>). A culture with neither shows no flag: the field never guesses a country for a language. The flag is decorative: the culture's name stays what a screen reader says.</p>
+    <div class="demo-stack">
+      <pdx-localized-input label="Product name" flags :cultures="cultures" :regions="regions" :value="name"></pdx-localized-input>
+      <pdx-localized-input label="Description" layout="stacked" flags :cultures="cultures" :regions="regions" :value="name"></pdx-localized-input>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it', 'pt-BR', 'eo'];
+const regions = { en: 'GB', it: 'IT' };
+const name = { en: 'Desk lamp', it: 'Lampada da scrivania' };
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); max-width: 440px; }
+</style>

@@ -42,6 +42,24 @@ export function cultureName(culture: string): string {
     }
 }
 
+/**
+ * The region whose flag a culture shows: `regions`' entry for it, else its region subtag (`pt-BR` → `BR`),
+ * upper case. A bare language (`en`) has no country, and a numeric region (`es-419`) no flag: both give
+ * `''` unless `regions` names one — the component never guesses a country for a language.
+ */
+export function regionOf(culture: string, regions: Readonly<Record<string, string>>): string {
+    const mapped = regions[culture];
+    if (mapped) return mapped.toUpperCase();
+    let region: string | undefined;
+    try {
+        region = new Intl.Locale(culture).region;
+    } catch {
+        // Not a language tag Intl knows (RangeError): it has no region to read.
+        return '';
+    }
+    return region && /^[A-Za-z]{2}$/.test(region) ? region.toUpperCase() : '';
+}
+
 /** Scripts written right to left, by language subtag: Arabic, Hebrew, Persian, Urdu, Yiddish… */
 const RTL = new Set(['ar', 'he', 'iw', 'fa', 'ur', 'yi', 'ps', 'sd', 'ug', 'dv', 'ckb']);
 

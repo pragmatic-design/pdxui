@@ -55,7 +55,8 @@
         // The per-scenario setup scripts (state markup cannot express). Run after the CEs upgrade
         // and after their initial render, before signalling ready.
         const __setups = {
-
+        "localized-input-flags": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
+        "localized-input-flag-layout": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
         };
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
@@ -103,6 +104,16 @@
     <section data-scenario="localized-input-stacked">
         <h3>Localized input — Stacked</h3>
         <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Description" layout="stacked" multiline cultures='["en","it"]' value='{"en":"A lamp for the desk."}'></pdx-localized-input></div>
+    </section>
+
+    <section data-scenario="localized-input-flags">
+        <h3>Localized input — Flags</h3>
+        <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" flags cultures='["en","it-IT","de-DE"]' regions='{"en":"GB"}' value='{"en":"Desk lamp","it-IT":"Lampada da scrivania"}'></pdx-localized-input></div>
+    </section>
+
+    <section data-scenario="localized-input-flag-layout">
+        <h3>Localized input — Flag layout</h3>
+        <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" layout="flag" cultures='["it-IT","de-DE","fr-FR"]' value='{"it-IT":"Lampada da scrivania"}'></pdx-localized-input></div>
     </section>
 
     <section data-scenario="localized-input-disabled">
