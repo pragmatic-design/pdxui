@@ -9,7 +9,7 @@
  * contracts (text, not PNGs); only purely visual regressions belong here.
  */
 import { test, expect, type Page, type BrowserContext, type PageAssertionsToHaveScreenshotOptions } from '@playwright/test';
-import { goToScenario, applyTheme } from '../ui-components/contracts/measure';
+import { goToScenario, applyTheme, iconsDrawn } from '../ui-components/contracts/measure';
 import { freezeAnimations } from '../ui-components/contracts/assertions';
 import { manifests, scenarioPage } from '../ui-components/contracts/generated/manifests';
 import { THEMES, schemeFor } from '../../manifests/_themes';
@@ -26,6 +26,9 @@ const SECTION = 'section[data-scenario]:not([hidden])';
  * `viewportScenarios` — after measuring that the area holds every fixed overlay on the page (#714).
  */
 async function shootArea(page: Page, viewport: boolean, name: string, options: PageAssertionsToHaveScreenshotOptions) {
+    // The ready flag says the components mounted, not that an icon loaded on demand is drawn: the
+    // first theme of a page is shot right after the load, and once in CI it held an empty logo (#1117).
+    await iconsDrawn(page);
     const section = page.locator(SECTION).first();
     // Measured where the screenshot will be taken: a section shot scrolls it into view first.
     if (!viewport) await section.scrollIntoViewIfNeeded();
