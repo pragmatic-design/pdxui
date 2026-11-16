@@ -59,6 +59,17 @@ export interface SchedulerResource {
     businessHours?: BusinessHours;
 }
 
+/**
+ * What an app's `editorContent` calls: `save(next)` asks `before-save` and writes the event, `remove()`
+ * asks `before-remove` and removes it, `cancel()` closes the editor and changes nothing. On an
+ * occurrence of a series, each goes as far as the reader chose in the scheduler's dialog.
+ */
+export interface SchedulerEditorActions {
+    save(next: SchedulerEvent): void;
+    remove(): void;
+    cancel(): void;
+}
+
 /** Per weekday, 0 = Sunday … 6 = Saturday: the working hours, or `null` for a day off. */
 export type BusinessHours = Partial<Record<0 | 1 | 2 | 3 | 4 | 5 | 6, { start: string; end: string } | null>>;
 

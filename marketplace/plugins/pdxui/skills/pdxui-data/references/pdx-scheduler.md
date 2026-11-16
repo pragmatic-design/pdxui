@@ -35,7 +35,7 @@ Events in time: day, week, month, year, agenda and timeline views, by resource.
 
 **Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row` · `rowgroup` · `rowheader` · `toolbar` · `treegrid`
 
-**Slot:** `event` — What an event draws; without it, its time and title.
+**Slot:** `event` — What an event draws; without it, its time and title.; `editorFields` — Fields the app adds to the built-in editor, under Notes: `set(patch)` merges its values into the event Save writes (a key set to `undefined` is left out). Validate in `before-save`.; `editorContent` — The editor's content, drawn by the app in place of the built-in fields and buttons; the scheduler keeps its dialog, the occurrence / series question, `before-save` / `before-remove` and writing `events`.
 
 **States:** `:state(disabled)` — `disabled` is set.; `:state(dragging)` — An event is being moved, resized or created with the pointer.; `:state(lifted)` — An event is picked up from the keyboard.; `:state(selecting)` — Empty slots or days are selected from the keyboard, to create an event over.
 

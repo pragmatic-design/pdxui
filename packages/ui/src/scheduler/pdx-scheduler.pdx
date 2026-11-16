@@ -45,7 +45,7 @@
     <span class="pdx-sr-only" :id="hintId">{{ uiString('scheduler', 'instructions') }}</span>
     <span class="pdx-sr-only" :id="createHintId">{{ uiString('scheduler', 'createInstructions') }}</span>
     @if (editing) {
-      <pdx-scheduler-editor :draft="editing" :resources="resources" :zone="zone" :locale="loc"
+      <pdx-scheduler-editor :draft="editing" :resources="resources" :zone="zone" :locale="loc" :editorFields="editorFields" :editorContent="editorContent"
         @save="onEditorSave($event.detail.event, $event.detail.scope)" @remove="onEditorDelete($event.detail.scope)" @discard="closeEditor()"></pdx-scheduler-editor>
     }
   </div>
@@ -106,7 +106,7 @@ import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, 
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts } from './time';
-import { buildColumns, buildSlots, buildHeaderRows, cellIndex, placeTimed, placeAllDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours } from './grid-model';
+import { buildColumns, buildSlots, buildHeaderRows, cellIndex, placeTimed, placeAllDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type SchedulerEditorActions, type BusinessHours } from './grid-model';
 import { buildMonthWeeks, buildYearMonths, buildAgendaDays } from './calendar-model';
 import { timelineRows, timelineColumns, placeTimeline, axisPosition } from './timeline-model';
 import { timelineWindow } from './timeline-window';
@@ -188,6 +188,10 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @prop editor: 'dialog' | 'none' = 'dialog';
 /** What an event draws; without it, its time and title. */
 @slot event?: (event: SchedulerEvent);
+/** Fields the app adds to the built-in editor, under Notes: `set(patch)` merges its values into the event Save writes (a key set to `undefined` is left out). Validate in `before-save`. */
+@slot editorFields?: (event: SchedulerEvent, set: (patch: Partial<SchedulerEvent>) => void);
+/** The editor's content, drawn by the app in place of the built-in fields and buttons; the scheduler keeps its dialog, the occurrence / series question, `before-save` / `before-remove` and writing `events`. */
+@slot editorContent?: (event: SchedulerEvent, actions: SchedulerEditorActions);
 /** An event is about to move, to another time, day or resource; `preventDefault()` refuses it. For an occurrence of a series, `scope` is 'occurrence' (it becomes an override in `events`); set it to 'series' to move the whole series. */
 @event(cancelable) 'before-move': { event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[]; scope?: 'occurrence' | 'series' };
 /** An event moved; `events` is already written. `event` is the override written, or the series moved, as `scope` says. */

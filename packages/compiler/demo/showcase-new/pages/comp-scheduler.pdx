@@ -61,7 +61,7 @@
         <div class="opt-row"><code>locale</code> / <code>label</code> / <code>disabled</code><span></span><span>Dates and times, the accessible name, no interaction</span></div>
       </div>
 
-      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippet</h3>
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippets</h3>
       <div class="options-table">
         <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>event-open</code><span>{ event }</span><span>An event was clicked, or Enter pressed on it</span></div>
@@ -77,6 +77,8 @@
         <div class="opt-row"><code>rejected</code><span>{ action, event, to, reason, conflicts }</span><span>A change was refused: <code>overlap</code> by <code>prevent-overlap</code>, <code>prevented</code> by the app</span></div>
         <div class="opt-row"><code>view-change</code> / <code>date-change</code> / <code>events-change</code><span>{ value }</span><span>A model was written</span></div>
         <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
+        <div class="opt-row"><code>&#64;snippet editorFields(e, set)</code><span></span><span>Fields the app adds to the editor, under Notes; <code>set(patch)</code> merges into the event Save writes (<code>undefined</code> leaves a key out). Validate in <code>before-save</code></span></div>
+        <div class="opt-row"><code>&#64;snippet editorContent(e, actions)</code><span></span><span>The app's editor in place of the built-in fields and buttons: <code>actions.save(next)</code>, <code>actions.remove()</code>, <code>actions.cancel()</code>. The scheduler keeps the dialog, the occurrence / series question, <code>before-save</code> / <code>before-remove</code> and writing <code>events</code></span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>

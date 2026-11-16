@@ -72,8 +72,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   first how far a change goes, this occurrence or the whole series, and `before-save` / `before-remove`
   carry the choice as `scope`: this occurrence saves an override or goes to `exdate`; the whole series
   changes the series (moved by what the occurrence moved, its overrides dropped when its rule changes)
-  or removes it with its overrides. Touch dragging, the editor's snippets, and print and export come in
-  the following parts.
+  or removes it with its overrides. An app adds fields to the editor with `@snippet editorFields(e, set)`,
+  drawn under Notes, where `set(patch)` merges its values into the event Save writes; or draws the
+  whole editor with `@snippet editorContent(e, actions)`, calling `actions.save(next)`,
+  `actions.remove()` and `actions.cancel()`, while the scheduler keeps the dialog, the occurrence or
+  series question, `before-save` / `before-remove` and writing `events`. Touch dragging, and print and
+  export come in the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.
