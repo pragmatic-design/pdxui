@@ -10,7 +10,7 @@ project's own licence is [LICENSE-MIT.txt](LICENSE-MIT.txt).
   Taken once, not depended on: no package of the repository installs it.
 - **Source**: https://github.com/lipis/flag-icons
 - **Licence**: MIT, © 2013 Panayiotis Lipiridis. The text travels with the drawings, in
-  `packages/ui/src/flag/LICENSE-flag-icons.txt`, and is reproduced here:
+  `packages/ui/src/flag/LICENSE-flag-icons.md`, and is reproduced here:
 
 ```
 The MIT License (MIT)

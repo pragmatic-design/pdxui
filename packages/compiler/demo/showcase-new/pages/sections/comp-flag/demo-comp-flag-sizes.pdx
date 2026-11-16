@@ -1,0 +1,14 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The size is the height, as for an icon; the width is four thirds of it.</p>
+    <div class="demo-row">
+      <pdx-flag region="IT" size="xs"></pdx-flag>
+      <pdx-flag region="IT" size="sm"></pdx-flag>
+      <pdx-flag region="IT" size="md"></pdx-flag>
+      <pdx-flag region="IT" size="lg"></pdx-flag>
+      <pdx-flag region="IT" size="xl"></pdx-flag>
+      <pdx-flag region="IT" size="48"></pdx-flag>
+    </div>
+  </section>
+</template>

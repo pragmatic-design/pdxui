@@ -3693,9 +3693,10 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     
     
     const componentItems = [
-      // ─── General (11) ───
+      // ─── General (12) ───
       { key: 'general', label: 'General', icon: 'box', expanded: true, children: [
         { key: '/components/icon', label: 'Icon', icon: 'image' },
+        { key: '/components/flag', label: 'Flag', icon: 'flag' },
         { key: '/components/button', label: 'Button', icon: 'rectangle-horizontal' },
         { key: '/components/button-group', label: 'ButtonGroup', icon: 'group' },
         { key: '/components/badge', label: 'Badge', icon: 'circle-dot' },
@@ -3953,7 +3954,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:312" });
+}, { name: "app.pdx:313" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -5810,6 +5811,39 @@ component('app-comp-filter-builder', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/filter-builder",tag:"app-comp-filter-builder",title:"Filter Builder",lazy:true,file:'./comp-filter-builder.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-flag.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-of06fu");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-of06fu"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-of06fu]) to ([data-pdx-root] \\u003E *) {:scope .opt-header, :scope .opt-row { grid-template-columns: 140px 120px 1fr; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Flag</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-flag&gt;</code> — a region\\'s flag, 4:3. Each flag is its own small module, loaded when it is\\n      shown: a page with three flags loads three. Named by the region in the page\\'s language, or decorative\\n      beside a name that is already said.</p>  <app-demo-comp-flag-regions class="demo-section"></app-demo-comp-flag-regions>  <app-demo-comp-flag-sizes class="demo-section"></app-demo-comp-flag-sizes>  <app-demo-comp-flag-decorative class="demo-section"></app-demo-comp-flag-decorative>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>region</code><span>string</span><span>Two-letter region subtag, either case (IT, br, EU). One without a flag draws nothing</span></div> <div class="opt-row"><code>size</code><span>string</span><span>Height: xs 12, sm 16, md 20 (default), lg 24, xl 32, or pixels; width is 4/3 of it</span></div> <div class="opt-row"><code>decorative</code><span>boolean</span><span>Its name is said beside it: empty alt, hidden from assistive technology</span></div> <div class="opt-row"><code>label</code><span>string</span><span>Its name instead of the region\\'s</span></div> <div class="opt-row"><code>locale</code><span>string</span><span>Language of the region\\'s name; empty: the page\\'s, then the browser\\'s</span></div></div> <p class="pdx-txt-small pdx-ink-muted">The drawings are flag-icons\\' (MIT, © 2013 Panayiotis Lipiridis).</p></section></div>'));
+component('app-comp-flag', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Flag Component" });
+    ctx.el.setAttribute('data-pdx-of06fu', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/flag'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/flag",tag:"app-comp-flag",title:"Flag Component",lazy:true,file:'./comp-flag.pdx'});
 "
 `;
 
@@ -19766,6 +19800,73 @@ component('app-demo-comp-filter-builder-same-json', {
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-flag/demo-comp-flag-decorative.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-z32u09");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-z32u09"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-z32u09]) to ([data-pdx-root] \\u003E *) {:scope .lang { display: inline-flex; align-items: center; gap: var(--pdx-space-sm); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Beside a name</h2> <p class="pdx-txt-small pdx-ink-muted">When the name is written next to it, the flag is <code>decorative</code>: a screen reader reads the name once.</p> <div class="demo-stack"><span class="lang"><pdx-flag region="IT" decorative></pdx-flag> Italiano</span> <span class="lang"><pdx-flag region="DE" decorative></pdx-flag> Deutsch</span> <span class="lang"><pdx-flag region="BR" decorative></pdx-flag> Português (Brasil)</span></div></section>'));
+component('app-demo-comp-flag-decorative', {
+  props: {},
+  setup(ctx) {
+    ctx.el.setAttribute('data-pdx-z32u09', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-flag/demo-comp-flag-regions.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Regions</h2> <p class="pdx-txt-small pdx-ink-muted">Each flag is named by its region, in the page\\'s language.</p> <div class="demo-row"><pdx-flag region="IT"></pdx-flag> <pdx-flag region="DE"></pdx-flag> <pdx-flag region="FR"></pdx-flag> <pdx-flag region="ES"></pdx-flag> <pdx-flag region="GB"></pdx-flag> <pdx-flag region="US"></pdx-flag> <pdx-flag region="BR"></pdx-flag> <pdx-flag region="JP"></pdx-flag> <pdx-flag region="EU"></pdx-flag></div></section>'));
+component('app-demo-comp-flag-regions', {
+  props: {},
+  setup(ctx) {
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-flag/demo-comp-flag-sizes.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Sizes</h2> <p class="pdx-txt-small pdx-ink-muted">The size is the height, as for an icon; the width is four thirds of it.</p> <div class="demo-row"><pdx-flag region="IT" size="xs"></pdx-flag> <pdx-flag region="IT" size="sm"></pdx-flag> <pdx-flag region="IT" size="md"></pdx-flag> <pdx-flag region="IT" size="lg"></pdx-flag> <pdx-flag region="IT" size="xl"></pdx-flag> <pdx-flag region="IT" size="48"></pdx-flag></div></section>'));
+component('app-demo-comp-flag-sizes', {
+  props: {},
+  setup(ctx) {
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-form/demo-comp-form-all-controls.pdx 1`] = `
 "// 0 warning(s)
 
@@ -31128,7 +31229,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 119 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 120 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

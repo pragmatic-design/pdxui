@@ -120,9 +120,10 @@ const designItems = [
 ];
 
 const componentItems = [
-  // ─── General (11) ───
+  // ─── General (12) ───
   { key: 'general', label: 'General', icon: 'box', expanded: true, children: [
     { key: '/components/icon', label: 'Icon', icon: 'image' },
+    { key: '/components/flag', label: 'Flag', icon: 'flag' },
     { key: '/components/button', label: 'Button', icon: 'rectangle-horizontal' },
     { key: '/components/button-group', label: 'ButtonGroup', icon: 'group' },
     { key: '/components/badge', label: 'Badge', icon: 'circle-dot' },

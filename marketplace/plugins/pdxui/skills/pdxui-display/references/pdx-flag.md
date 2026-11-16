@@ -22,5 +22,42 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-_No demo section shows `<pdx-flag>` yet: the entry above is all there is._
+**Regions** — Each flag is named by its region, in the page's language. _(from the live demo)_
+
+```html
+<div class="demo-row">
+  <pdx-flag region="IT"></pdx-flag>
+  <pdx-flag region="DE"></pdx-flag>
+  <pdx-flag region="FR"></pdx-flag>
+  <pdx-flag region="ES"></pdx-flag>
+  <pdx-flag region="GB"></pdx-flag>
+  <pdx-flag region="US"></pdx-flag>
+  <pdx-flag region="BR"></pdx-flag>
+  <pdx-flag region="JP"></pdx-flag>
+  <pdx-flag region="EU"></pdx-flag>
+</div>
+```
+
+**Sizes** — The size is the height, as for an icon; the width is four thirds of it. _(from the live demo)_
+
+```html
+<div class="demo-row">
+  <pdx-flag region="IT" size="xs"></pdx-flag>
+  <pdx-flag region="IT" size="sm"></pdx-flag>
+  <pdx-flag region="IT" size="md"></pdx-flag>
+  <pdx-flag region="IT" size="lg"></pdx-flag>
+  <pdx-flag region="IT" size="xl"></pdx-flag>
+  <pdx-flag region="IT" size="48"></pdx-flag>
+</div>
+```
+
+**Beside a name** — When the name is written next to it, the flag is `decorative`: a screen reader reads the name once. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  <span class="lang"><pdx-flag region="IT" decorative></pdx-flag> Italiano</span>
+  <span class="lang"><pdx-flag region="DE" decorative></pdx-flag> Deutsch</span>
+  <span class="lang"><pdx-flag region="BR" decorative></pdx-flag> Português (Brasil)</span>
+</div>
+```
 

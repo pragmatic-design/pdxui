@@ -1,0 +1,42 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Flag</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-flag&gt;</code> — a region's flag, 4:3. Each flag is its own small module, loaded when it is
+      shown: a page with three flags loads three. Named by the region in the page's language, or decorative
+      beside a name that is already said.
+    </p>
+
+    <!-- ═══ Regions ═══ -->
+    <app-demo-comp-flag-regions class="demo-section"></app-demo-comp-flag-regions>
+
+    <!-- ═══ Sizes ═══ -->
+    <app-demo-comp-flag-sizes class="demo-section"></app-demo-comp-flag-sizes>
+
+    <!-- ═══ Beside a name ═══ -->
+    <app-demo-comp-flag-decorative class="demo-section"></app-demo-comp-flag-decorative>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>region</code><span>string</span><span>Two-letter region subtag, either case (IT, br, EU). One without a flag draws nothing</span></div>
+        <div class="opt-row"><code>size</code><span>string</span><span>Height: xs 12, sm 16, md 20 (default), lg 24, xl 32, or pixels; width is 4/3 of it</span></div>
+        <div class="opt-row"><code>decorative</code><span>boolean</span><span>Its name is said beside it: empty alt, hidden from assistive technology</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>Its name instead of the region's</span></div>
+        <div class="opt-row"><code>locale</code><span>string</span><span>Language of the region's name; empty: the page's, then the browser's</span></div>
+      </div>
+      <p class="pdx-txt-small pdx-ink-muted">The drawings are flag-icons' (MIT, © 2013 Panayiotis Lipiridis).</p>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/flag';
+@title 'Flag Component';
+</script>
+
+<style scoped>
+  .opt-header, .opt-row { grid-template-columns: 140px 120px 1fr; }
+</style>
