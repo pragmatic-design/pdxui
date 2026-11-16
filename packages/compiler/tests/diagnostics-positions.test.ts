@@ -49,6 +49,7 @@ const ROWS: Record<string, Row> = {
     PDX_MODEL_ATTRIBUTE_UNKNOWN: { src: pdx('<p>{{ value }}</p>', "let a = $signal(1);\n@model value: string = '' { attribute: date };"), at: '@model value' },
     PDX_DUP_PROP: { src: pdx('<p>{{ a }}</p>', "@prop a: string = 'x';\n@prop a: string = 'y';"), at: "@prop a: string = 'y';" },
     PDX_MALFORMED_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event (saved): number;'), at: '@event (saved)' },
+    PDX_EVENT_NAME_RESERVED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event delete: { id: string };'), at: '@event delete' },
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },
     PDX_EVENT_NAME_CASE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event savedItem: number;'), at: '@event savedItem' },
     PDX_ATTACH_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<input attach:toltip />', 'let a = $signal(1);'), at: 'attach:toltip' },

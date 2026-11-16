@@ -306,6 +306,10 @@ name.
   `PDX_UNKNOWN_DECLARATION`, its hint the forms.
 - A quoted name is lowercase words of letters and digits, starting with a letter, joined by single
   hyphens; anything else raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
+- An event whose function would be a reserved word of JavaScript — `@event delete`, `@event 'import'`,
+  `@event new` — raises `PDX_EVENT_NAME_RESERVED` (error) and is not declared (#1130): no `const` can
+  be named so, and `delete({ … })` is the delete operator, not a call. The hint suggests a name, a past
+  participle as a rule (`deleted`, `imported`); `remove`, `before-import` and `deleted` are fine.
 - The function is the only way to dispatch from a `.pdx`. `$emit('name', x)` is removed (#138):
   `PDX_REMOVED_FORM`. `pdx migrate` rewrites it to `name(x)` and adds `@event name: unknown;` when the
   script does not declare it; a hyphenated name becomes its camelCase, with `@event 'x-y': unknown;`

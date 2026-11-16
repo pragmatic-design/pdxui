@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 115 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 116 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -464,6 +464,36 @@ A component's event stays on its host unless declared `@event(bubbles)`. `pdx mi
 HTML lowercases attribute names, so a parent's `@savedItem="…"` listens for `saveditem` and never hears it.
 
 **Fix.** Use a lowercase name: `@event saveditem: Item;`. The fix renames it in the script; when the template uses the name, the rename is left to you. `pdx check --fix` and the editor apply it.
+
+### PDX_EVENT_NAME_RESERVED
+
+*error* — An `@event` whose emitter would be a reserved word of JavaScript.
+
+The emitter is a function of the setup named after the event: `@event delete` would write `const delete = …`, a module that does not parse, and `delete({ … })` in the script is the delete operator, not a call. The event is not declared.
+
+**Fix.** Name the event for what happened, in a word that is not reserved: `remove` or `deleted`, `imported`, `created`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@event delete: { id: string };
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@event remove: { id: string };
+</script>
+```
 
 ### PDX_EXPOSE_UNDECLARED
 

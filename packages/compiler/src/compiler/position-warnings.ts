@@ -150,6 +150,12 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_EVENT_NAME_CASE':
         case 'PDX_EVENT_BUBBLES_UNUSED':
             return name ? find(source, script, new RegExp(`@event(?:\\([^)]*\\))?\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_EVENT_NAME_RESERVED': {
+            // The event the message names (`@event delete would have …`), at its declaration, quoted
+            // or not (#1130). Groups: [1]=the event's name
+            const event = /^@event (\S+) would/.exec(w.message)?.[1];
+            return event ? find(source, script, new RegExp(`@event(?:\\([^)]*\\))?\\s+['"]?${escape(event)}\\b`)) : undefined;
+        }
         case 'PDX_COMMAND_TARGET_MISSING': {
             // Match: the `commandfor="…"` the message names (`commandfor 'x' names …`).
             const id = /^commandfor '([^']+)'/.exec(w.message)?.[1];

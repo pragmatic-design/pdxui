@@ -42,6 +42,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_DUP_PROP` | error | The same `@prop` declared twice. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_WRITE` | warn | A component writes one of its own props (CD-A2). | `@prop`, [script.md](script.md) |
 | `PDX_MALFORMED_EVENT` | error | `@event` written in a shape the compiler does not recognise. | `@event`, [script.md](script.md) |
+| `PDX_EVENT_NAME_RESERVED` | error | An `@event` whose emitter would be a reserved word of JavaScript. | `@event`, [script.md](script.md) |
 | `PDX_DUP_EVENT` | error | The same `@event` declared twice. | `@event`, [script.md](script.md) |
 | `PDX_EVENT_NAME_CASE` | warn | An `@event` name with an uppercase letter. | `@event`, [script.md](script.md) |
 | `PDX_EVENT_BUBBLES_UNUSED` | info | An `@event(bubbles)` no template in the project listens to above the component (#138). | `@event`, [script.md](script.md) |

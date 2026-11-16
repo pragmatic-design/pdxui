@@ -33,7 +33,7 @@ import { DEFER_TRIGGERS, parseDeferTriggers, unknownHydrateTriggers } from './de
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, compileDevAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
-import { isEventName, eventEmitterName, eventOptions } from './event-names';
+import { isEventName, eventEmitterName, eventOptions, reservedEventName } from './event-names';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -499,6 +499,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const colonPos = trimmed.indexOf(':', quotedEvent[0].length);
             const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
             const emitter = eventEmitterName(name);
+            const reserved = reservedEventName(name, emitter);
+            if (reserved) { warnings.push(reserved); continue; }
             events.push({ name, emitter, payloadType, ...quotedOptions });
             continue;
         }
@@ -515,6 +517,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const nameEnd = trimmed.indexOf(name, '@event'.length + (eventPrefix[1]?.length ?? 0)) + name.length;
             const colonPos = trimmed.indexOf(':', nameEnd);
             const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
+            const reserved = reservedEventName(name, name);
+            if (reserved) { warnings.push(reserved); continue; }
             events.push({ name, payloadType, ...prefixOptions });
             continue;
         }
