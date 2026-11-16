@@ -24994,6 +24994,15 @@
             },
             {
               "kind": "field",
+              "name": "exports",
+              "description": "The formats the bar's «Export» menu offers, in order: the period's events as CSV or Excel, `events` as iCalendar. Empty hides it.",
+              "type": {
+                "text": "('csv' | 'xlsx' | 'ics')[]"
+              },
+              "default": "['csv', 'xlsx', 'ics']"
+            },
+            {
+              "kind": "field",
               "name": "events",
               "description": "The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. One with `rrule` is a series, drawn once per occurrence; one with `seriesId` and `recurrenceId` replaces an occurrence of its series. Written by the scheduler after a move, resize or create the app allowed.",
               "type": {
@@ -25020,6 +25029,52 @@
               },
               "default": "''",
               "attribute": "date"
+            },
+            {
+              "kind": "method",
+              "name": "exportCsv",
+              "parameters": [
+                {
+                  "name": "save",
+                  "optional": true
+                }
+              ],
+              "description": "The period's events as a CSV file, one row each, saved unless `save` is false."
+            },
+            {
+              "kind": "method",
+              "name": "exportXlsx",
+              "parameters": [
+                {
+                  "name": "save",
+                  "optional": true
+                }
+              ],
+              "description": "The period's events as an Excel workbook, one row each, saved unless `save` is false."
+            },
+            {
+              "kind": "method",
+              "name": "exportIcs",
+              "parameters": [
+                {
+                  "name": "save",
+                  "optional": true
+                }
+              ],
+              "description": "`events` as an iCalendar file — a series with its rule, an override with its RECURRENCE-ID — saved unless `save` is false."
+            },
+            {
+              "kind": "method",
+              "name": "importIcs",
+              "parameters": [
+                {
+                  "name": "text",
+                  "type": {
+                    "text": "string"
+                  }
+                }
+              ],
+              "description": "The iCalendar file `text` added to `events`, asking `before-import` first, which may change the\nevents or refuse them: an event of the same id is replaced, the others added, and `imported` is\nemitted. What it added and what it skipped, or null when it was refused."
             }
           ],
           "models": [
@@ -25147,6 +25202,30 @@
               },
               "description": "The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.",
               "detail": "{ view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string }"
+            },
+            {
+              "name": "exported",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A file went out, from the bar's menu or a method: its format and how many events it holds. (Not `export`, a reserved word, #1130.)",
+              "detail": "{ format: 'csv' | 'xlsx' | 'ics'; count: number }"
+            },
+            {
+              "name": "before-import",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "`importIcs` is about to add a file's events: `events` may be changed or replaced, `skipped` says what the file had that the scheduler cannot draw, and why; `preventDefault()` refuses them.",
+              "detail": "{ events: SchedulerEvent[]; skipped: IcsSkipped[] }"
+            },
+            {
+              "name": "imported",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A file's events were added to `events`, an event of the same id replaced. (Not `import`, a reserved word.)",
+              "detail": "{ events: SchedulerEvent[]; skipped: IcsSkipped[] }"
             },
             {
               "name": "events-change",
@@ -25409,6 +25488,14 @@
                 "resizable?: boolean",
                 "businessHours?: BusinessHours"
               ]
+            },
+            {
+              "name": "IcsSkipped",
+              "fields": [
+                "uid: string",
+                "title: string",
+                "reason: string"
+              ]
             }
           ],
           "slots": [
@@ -25456,6 +25543,10 @@
             {
               "name": "viewSwitcher",
               "description": "The view buttons, shown when `views` offers more than one."
+            },
+            {
+              "name": "exportButton",
+              "description": "The bar's «Export» button, which opens the formats `exports` offers."
             },
             {
               "name": "grid",

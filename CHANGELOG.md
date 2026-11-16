@@ -76,8 +76,14 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   drawn under Notes, where `set(patch)` merges its values into the event Save writes; or draws the
   whole editor with `@snippet editorContent(e, actions)`, calling `actions.save(next)`,
   `actions.remove()` and `actions.cancel()`, while the scheduler keeps the dialog, the occurrence or
-  series question, `before-save` / `before-remove` and writing `events`. Touch dragging, and print and
-  export come in the following parts.
+  series question, `before-save` / `before-remove` and writing `events`. The bar has an «Export» menu
+  (`exports` chooses its formats, empty hides it), and the methods `exportCsv`, `exportXlsx` and
+  `exportIcs` return the file and save it: CSV and Excel are the period's events, one row each;
+  iCalendar is `events` as data, a series with its RRULE and EXDATE, an override with its
+  RECURRENCE-ID, a wall time with its zone's VTIMEZONE. `importIcs(text)` reads a file back, a zone that
+  is not an IANA one from the file's own VTIMEZONE; it asks `before-import` (`{ events, skipped }`, the
+  events may be changed or refused), replaces an event of the same id, adds the others and emits
+  `imported`. `exported` says what went out. Touch dragging and print come in the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

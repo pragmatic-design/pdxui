@@ -282,7 +282,7 @@ export const scheduler: ComponentManifest = {
         ],
     },
 
-    // ── Dim. 4: keyboard ── the bar's nine buttons, then the grid's one tab stop; the arrows walk the cells.
+    // ── Dim. 4: keyboard ── the bar's eleven buttons (with «Export»), then the grid's one tab stop; the arrows walk the cells.
     keyboard: {
         scenario: 'scheduler-week',
         steps: [
@@ -296,6 +296,7 @@ export const scheduler: ComponentManifest = {
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(5)' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(6)' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(7)' },
+            { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="exportButton"]' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-row="1"][data-col="0"]' },
             { key: 'ArrowRight', expectFocus: '[data-test="scheduler"] [data-row="1"][data-col="1"]' },
             { key: 'ArrowDown', expectFocus: '[data-test="scheduler"] [data-row="2"][data-col="1"]' },
