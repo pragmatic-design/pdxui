@@ -1629,6 +1629,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `pdx-time-picker`'s AM/PM segment on a 12-hour clock is a valid spinbutton: its `aria-valuenow` was
+  the word «AM» or «PM», which assistive technology reads as no value and axe rejects
+  (`aria-valid-attr-value`). It is now 0 or 1, from `aria-valuemin` 0 to `aria-valuemax` 1, with the
+  word in `aria-valuetext`.
+
 - `watch()`, and so `$watch`, created inside a running effect no longer makes that effect depend on
   it. It read a getter source, and ran an `immediate` callback, tracked by whatever effect was
   running: a component that watches a ref, mounted by another component's effect, re-ran that effect

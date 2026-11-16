@@ -6,6 +6,7 @@
 //   - A1, inside a required pdx-form-field the group is named by the label, its marker with it;
 //   - A2, inside a pdx-form-field in error the group is described by the message.
 // Measured in Chromium: `:state()`, the accessible name and description are not happy-dom's to tell.
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Page } from './contracts/fixture';
 import { openPage, loadMarkup } from './contracts/measure';
 
@@ -27,6 +28,32 @@ const frame = (page: Page) => page.locator('#f pdx-time-picker [data-part="root"
 const isDisabled = (page: Page) => host(page).evaluate((h) => h.matches(':state(disabled)'));
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=time-picker-beta-contract'); });
+
+// The AM/PM segment of a 12-hour clock is a spinbutton too, and a spinbutton's aria-valuenow is a
+// number: it was the text «AM», which axe's aria-valid-attr-value rejects. AM is 0 and PM 1, and the
+// word is its aria-valuetext.
+test.describe('the 12-hour clock', () => {
+    const period = (page: Page) => page.getByRole('spinbutton', { name: 'AM/PM' });
+
+    test('AM/PM is a spinbutton from 0 to 1, its word in aria-valuetext, and stepping it says the other', async ({ page }) => {
+        await mount(page, '<pdx-time-picker locale="en-US" value="14:30"></pdx-time-picker>');
+        await expect(period(page)).toHaveAttribute('aria-valuenow', '1');
+        await expect(period(page)).toHaveAttribute('aria-valuetext', 'PM');
+        await expect(period(page)).toHaveAttribute('aria-valuemin', '0');
+        await expect(period(page)).toHaveAttribute('aria-valuemax', '1');
+        await period(page).focus();
+        await page.keyboard.press('ArrowDown');
+        await expect(period(page)).toHaveAttribute('aria-valuenow', '0');
+        await expect(period(page)).toHaveAttribute('aria-valuetext', 'AM');
+        expect(await host(page).evaluate((h) => (h as HTMLElement & { value: string }).value)).toBe('02:30');
+    });
+
+    test('axe finds nothing wrong with it', async ({ page }) => {
+        await mount(page, '<pdx-time-picker locale="en-US" value="09:00" aria-label="Start"></pdx-time-picker>');
+        const results = await new AxeBuilder({ page }).include('#f').disableRules(['color-contrast']).analyze();
+        expect(results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.html).join(' | ')}`)).toEqual([]);
+    });
+});
 
 test.describe('states', () => {
     test('control — a plain time picker is not :state(disabled)', async ({ page }) => {
