@@ -19,6 +19,9 @@
     <!-- ═══ Flag layout ═══ -->
     <app-demo-comp-localized-input-flag-layout class="demo-section"></app-demo-comp-localized-input-flag-layout>
 
+    <!-- ═══ All languages ═══ -->
+    <app-demo-comp-localized-input-expandable class="demo-section"></app-demo-comp-localized-input-expandable>
+
     <!-- ═══ Form ═══ -->
     <app-demo-comp-localized-input-form class="demo-section"></app-demo-comp-localized-input-form>
 
@@ -34,6 +37,7 @@
         <div class="opt-row"><code>layout</code><span>'tabs' | 'stacked' | 'flag'</span><span>One culture at a time, all, or one field whose flag prefix is a menu of the cultures</span></div>
         <div class="opt-row"><code>flags</code><span>boolean</span><span>A decorative flag before each culture's name</span></div>
         <div class="opt-row"><code>regions</code><span>{ [culture]: string }</span><span>The flag's region for a culture: for a bare language, which has none, or to choose another</span></div>
+        <div class="opt-row"><code>expandable</code><span>boolean</span><span>A button in the field's suffix opens every culture in a dialog (tabs and flag layouts)</span></div>
         <div class="opt-row"><code>multiline</code> / <code>rows</code><span>boolean / number</span><span>A textarea per culture</span></div>
         <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field's name; each culture's field is "label (language)"</span></div>
         <div class="opt-row"><code>disabled</code> / <code>readonly</code> / <code>error</code><span></span><span>As every field</span></div>
@@ -46,6 +50,7 @@
         <div class="opt-row"><code>:state(invalid | disabled | readonly)</code><span></span><span>As every field</span></div>
         <div class="opt-row"><code>[data-part="tab"] / [data-part="marker"] / [data-part="field"]</code><span></span><span>A culture's tab, its missing dot, its field</span></div>
         <div class="opt-row"><code>[data-part="cultureButton"]</code><span></span><span>The flag layout's prefix, a menu button</span></div>
+        <div class="opt-row"><code>[data-part="expandButton"]</code><span></span><span>The <code>expandable</code> suffix that opens the dialog</span></div>
       </div>
     </section>
   </div>

@@ -37,25 +37,39 @@ const designThemes = resolve(here, '../../../design/src/themes/layered');
  * derived: `./icon/pdx-icon` is not `icon/pdx-icon.ts` by pattern, `./all` is `index.ts`, and a
  * rule inferred from the common case would be wrong for both.
  */
-function uiSubpathAliases(): { find: string; replacement: string }[] {
+function uiSubpathAliases(): { find: string | RegExp; replacement: string }[] {
     const pkg = JSON.parse(readFileSync(resolve(here, '../../package.json'), 'utf-8')) as {
         exports: Record<string, { development?: string } | string>;
     };
     const aliases: { find: string; replacement: string }[] = [];
+    // A pattern export (`./icons/*` → `./src/icon/pragmatic/*.ts`): one regex alias, `*` captured and
+    // put back where the target has it. The compiler imports `@pdxui/ui/icons/<name>` for an icon a
+    // template names (#47), so a library .pdx that renders <pdx-icon name="…"> needs it here (#1091).
+    const patterns: { find: RegExp; replacement: string }[] = [];
     for (const [key, target] of Object.entries(pkg.exports)) {
         if (key === '.' || !key.startsWith('./')) continue;
         const dev = typeof target === 'string' ? target : target.development;
         // A component's source is .ts or, written in .pdx, .pdx (#1008); ./manifest is JSON, and
         // nothing imports it here.
         if (!dev?.endsWith('.ts') && !dev?.endsWith('.pdx')) continue;
+        if (key.includes('*')) {
+            const [before, after] = `@pdxui/ui${key.slice(1)}`.split('*');
+            const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+            patterns.push({
+                find: new RegExp(`^${escape(before)}(.+)${escape(after)}$`),
+                replacement: resolve(here, '../..', dev.replace(/^\.\//, '')).replace('*', '$1'),
+            });
+            continue;
+        }
         aliases.push({
             find: `@pdxui/ui${key.slice(1)}`,
             replacement: resolve(here, '../..', dev.replace(/^\.\//, '')),
         });
     }
     // Longest first: Vite matches a string alias by PREFIX, so `@pdxui/ui/icon` must not
-    // answer for `@pdxui/ui/icon/pdx-icon`.
-    return aliases.sort((a, b) => b.find.length - a.find.length);
+    // answer for `@pdxui/ui/icon/pdx-icon`. Without its pattern `@pdxui/ui/icons/check` fell to the
+    // `@pdxui/ui` prefix alias below: `<src>/index.ts/icons/check`, which does not exist.
+    return [...patterns, ...aliases.sort((a, b) => b.find.length - a.find.length)];
 }
 
 // The browser target the pages are certified for (#156): the design CSS in the form pdx() gives an

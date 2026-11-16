@@ -20,8 +20,11 @@ async function mount(page: Page, html: string): Promise<void> {
     await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 }
 
-const value = (page: Page) => page.locator('#f pdx-localized-input').evaluate((h) => (h as unknown as { value: unknown }).value);
-const validity = (page: Page) => page.locator('#f pdx-localized-input').evaluate((h) => (h as unknown as { validity: ValidityState }).validity.valueMissing);
+// The mounted field (inside a <form> in some tests), not the one an `expandable` field renders inside
+// its dialog (#1091).
+const FIELD = '#f pdx-localized-input:not(pdx-dialog pdx-localized-input)';
+const value = (page: Page) => page.locator(FIELD).evaluate((h) => (h as unknown as { value: unknown }).value);
+const validity = (page: Page) => page.locator(FIELD).evaluate((h) => (h as unknown as { validity: ValidityState }).validity.valueMissing);
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=localized-input-beta-contract'); });
 
@@ -135,5 +138,39 @@ test('axe finds nothing, in tabs and stacked', async ({ page }) => {
     await mount(page, `<pdx-localized-input label="Title" cultures='["en","it","ar"]' value='{"en":"Hi"}'></pdx-localized-input>`);
     expect(await axe()).toEqual([]);
     await mount(page, `<pdx-localized-input label="Title" layout="stacked" cultures='["en","it"]'></pdx-localized-input>`);
+    expect(await axe()).toEqual([]);
+});
+
+// #1091: `expandable` opens every culture in a dialog. A modal keeps the focus while it is open and gives
+// it back to the button that opened it; the dialog's fields are the same value.
+test('expandable: the dialog traps the focus, edits the value live, and gives the focus back on Escape', async ({ page }) => {
+    await mount(page, `<pdx-localized-input label="Title" expandable cultures='["en","it"]' value='{"en":"Hello"}'></pdx-localized-input>`);
+    const opener = page.getByRole('button', { name: 'All languages' });
+    await opener.click();
+    const dialog = page.getByRole('dialog', { name: 'Title' });
+    await expect(dialog).toBeVisible();
+    const focusInDialog = () => page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]'));
+    await expect.poll(focusInDialog).toBe(true);
+    // Tab cycles inside the dialog: past its last control it comes back to its first, never to the page.
+    for (let i = 0; i < 6; i++) {
+        await page.keyboard.press('Tab');
+        expect(await focusInDialog(), `Tab ${i + 1} left the dialog`).toBe(true);
+    }
+    await dialog.getByRole('textbox', { name: 'Title (italiano)' }).fill('Ciao');
+    await expect.poll(() => value(page)).toEqual({ en: 'Hello', it: 'Ciao' });
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(opener).toBeFocused();
+});
+
+test('expandable: axe finds nothing on the field and on its open dialog', async ({ page }) => {
+    const axe = async () => (await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .disableRules(['color-contrast'])
+        .analyze()).violations.map((v) => `${v.id} (${v.nodes.length})`);
+    await mount(page, `<pdx-localized-input label="Title" expandable flags cultures='["en-GB","it-IT"]' value='{"en-GB":"Hi"}'></pdx-localized-input>`);
+    expect(await axe()).toEqual([]);
+    await page.getByRole('button', { name: 'All languages' }).click();
+    await expect(page.getByRole('dialog', { name: 'Title' })).toBeVisible();
     expect(await axe()).toEqual([]);
 });

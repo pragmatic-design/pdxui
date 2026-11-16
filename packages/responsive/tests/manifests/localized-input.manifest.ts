@@ -55,6 +55,19 @@ export const localizedInput: ComponentManifest = {
             setup: WAIT_FLAGS,
         },
         {
+            // #1091: `expandable`, the «All languages» button in the field's suffix.
+            id: 'localized-input-expandable',
+            title: 'Localized input — Expandable',
+            html: `<div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" expandable cultures='["en","it","fr"]' value='{"en":"Desk lamp"}'></pdx-localized-input></div>`,
+        },
+        {
+            // #1091: the dialog the suffix button opens, every culture a labelled field with its flag.
+            id: 'localized-input-dialog',
+            title: 'Localized input — All languages dialog',
+            html: `<div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" expandable flags cultures='["en-GB","it-IT","de-DE"]' value='{"en-GB":"Desk lamp","it-IT":"Lampada da scrivania"}'></pdx-localized-input></div>`,
+            setup: `document.querySelector('section:not([hidden]) [data-test="loc"] [data-part="panel"]:not([hidden]) [data-part="expandButton"]').click(); ${WAIT_FLAGS.replace("section:not([hidden]) pdx-flag", "section:not([hidden]) pdx-dialog pdx-flag")} await new Promise((r) => { let n = 0; const c = () => { const d = document.querySelector('section:not([hidden]) pdx-dialog [data-part="root"]'); if ((d && getComputedStyle(d).opacity === '1') || n++ > 120) r(); else requestAnimationFrame(c); }; c(); });`,
+        },
+        {
             id: 'localized-input-disabled',
             title: 'Localized input — Disabled',
             html: `<div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" disabled cultures='["en","it"]' value='{"en":"Desk lamp"}'></pdx-localized-input></div>`,
@@ -141,6 +154,54 @@ export const localizedInput: ComponentManifest = {
                     },
                 ],
             },
+            'localized-input-expandable': {
+                composition: [
+                    {
+                        // The suffix is joined to the field: the same height, at its end, and the pair
+                        // fills the field's width.
+                        description: 'the all-languages button is joined to the field\'s end',
+                        parent: 'body',
+                        children: {
+                            button: 'section:not([hidden]) [data-test="loc"] [data-part="panel"]:not([hidden]) [data-part="expandButton"]',
+                            field: 'section:not([hidden]) [data-test="loc"] [data-part="panel"]:not([hidden]) [data-part="field"]',
+                            root: 'section:not([hidden]) [data-test="loc"] [data-part="root"]',
+                        },
+                        relations: [
+                            { description: 'button.top == field.top', left: 'button.top', op: '==', right: 'field.top', tolerance: 0.5 },
+                            { description: 'button.bottom == field.bottom', left: 'button.bottom', op: '==', right: 'field.bottom', tolerance: 0.5 },
+                            { description: 'no gap between the field and the button', left: 'button.left', op: '<=', right: 'field.right', tolerance: 0.5 },
+                            { description: 'the button ends where the field\'s row ends', left: 'button.right', op: '==', right: 'root.right', tolerance: 1 },
+                        ],
+                    },
+                ],
+                standalone: [
+                    {
+                        // A target a finger can take (WCAG 2.5.8 asks 24px).
+                        selector: 'section:not([hidden]) [data-test="loc"] [data-part="panel"]:not([hidden]) [data-part="expandButton"]',
+                        description: 'the all-languages button is at least 24px wide',
+                        width: { op: '>=', value: 24 },
+                    },
+                ],
+            },
+            'localized-input-dialog': {
+                composition: [
+                    {
+                        // Every culture is in the open dialog, a field each, inside its panel.
+                        description: 'the dialog shows every culture\'s field inside its panel',
+                        parent: 'body',
+                        children: {
+                            panel: 'section:not([hidden]) pdx-dialog [data-part="root"]',
+                            first: 'section:not([hidden]) pdx-dialog [data-part="field"][lang="en-GB"]',
+                            last: 'section:not([hidden]) pdx-dialog [data-part="field"][lang="de-DE"]',
+                        },
+                        relations: [
+                            { description: 'the first culture\'s field is in the dialog', left: 'first', op: 'contained-in', right: 'panel', tolerance: 1 },
+                            { description: 'the last culture\'s field is in the dialog', left: 'last', op: 'contained-in', right: 'panel', tolerance: 1 },
+                            { description: 'the cultures are stacked', left: 'first.bottom', op: '<=', right: 'last.top' },
+                        ],
+                    },
+                ],
+            },
             'localized-input-disabled': {
                 standalone: [
                     {
@@ -155,7 +216,7 @@ export const localizedInput: ComponentManifest = {
 
     // ── Dim. 2: axe-core ── a tablist with named tabs, each field named "label (language)".
     a11y: {
-        scenarios: ['localized-input-tabs', 'localized-input-stacked', 'localized-input-disabled', 'localized-input-flags', 'localized-input-flag-layout'],
+        scenarios: ['localized-input-tabs', 'localized-input-stacked', 'localized-input-disabled', 'localized-input-flags', 'localized-input-flag-layout', 'localized-input-expandable', 'localized-input-dialog'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -178,7 +239,9 @@ export const localizedInput: ComponentManifest = {
 
     // ── Dim. 5: visual regression (Docker) ──
     visual: {
-        scenarios: ['localized-input-tabs', 'localized-input-stacked', 'localized-input-flags', 'localized-input-flag-layout'],
+        scenarios: ['localized-input-tabs', 'localized-input-stacked', 'localized-input-flags', 'localized-input-flag-layout', 'localized-input-expandable', 'localized-input-dialog'],
+        // The dialog is fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['localized-input-dialog'],
     },
 };
 

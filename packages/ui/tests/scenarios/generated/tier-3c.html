@@ -57,6 +57,7 @@
         const __setups = {
         "localized-input-flags": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
         "localized-input-flag-layout": async function () { await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
+        "localized-input-dialog": async function () { document.querySelector('section:not([hidden]) [data-test="loc"] [data-part="panel"]:not([hidden]) [data-part="expandButton"]').click(); await new Promise((r) => { let n = 0; const c = () => { const flags = Array.from(document.querySelectorAll('section:not([hidden]) pdx-dialog pdx-flag')); const done = flags.length && flags.every((f) => { const i = f.querySelector('img'); return i && i.complete && i.naturalWidth > 0; }); if (done || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); await new Promise((r) => { let n = 0; const c = () => { const d = document.querySelector('section:not([hidden]) pdx-dialog [data-part="root"]'); if ((d && getComputedStyle(d).opacity === '1') || n++ > 120) r(); else requestAnimationFrame(c); }; c(); }); },
         };
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
@@ -114,6 +115,16 @@
     <section data-scenario="localized-input-flag-layout">
         <h3>Localized input — Flag layout</h3>
         <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" layout="flag" cultures='["it-IT","de-DE","fr-FR"]' value='{"it-IT":"Lampada da scrivania"}'></pdx-localized-input></div>
+    </section>
+
+    <section data-scenario="localized-input-expandable">
+        <h3>Localized input — Expandable</h3>
+        <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" expandable cultures='["en","it","fr"]' value='{"en":"Desk lamp"}'></pdx-localized-input></div>
+    </section>
+
+    <section data-scenario="localized-input-dialog">
+        <h3>Localized input — All languages dialog</h3>
+        <div style="max-width: 420px;"><pdx-localized-input data-test="loc" label="Product name" expandable flags cultures='["en-GB","it-IT","de-DE"]' value='{"en-GB":"Desk lamp","it-IT":"Lampada da scrivania"}'></pdx-localized-input></div>
     </section>
 
     <section data-scenario="localized-input-disabled">

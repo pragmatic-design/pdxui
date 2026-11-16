@@ -10,6 +10,7 @@ One text in several languages, a tab each.
 | `layout` | `layout` | 'tabs' \| 'stacked' \| 'flag' | `'tabs'` | tabs (the default): one culture at a time; stacked: every culture a field; flag: one field, its prefix a menu of the cultures. |
 | `flags` | `flags` | boolean | `false` | A flag before each culture's name, in its tab or row. |
 | `regions` | — | Record<string, string> | `{}` | The region whose flag a culture shows, by culture (`{ en: 'GB' }`): for a bare language, which has none, or to choose another. |
+| `expandable` | `expandable` | boolean | `false` | A button in the field's suffix, «All languages», opens a dialog with every culture as a labelled field (tabs and flag layouts). |
 | `multiline` | `multiline` | boolean | `false` | A textarea per culture instead of an input. |
 | `rows` | `rows` | number | `3` | The textarea's rows, when `multiline`. |
 | `label` | `label` | string | `''` | The field's name: the group's, and in each culture's field name. Empty: «Text». |
@@ -27,7 +28,7 @@ One text in several languages, a tab each.
 
 **States:** `:state(incomplete)` — Some culture has no text.; `:state(invalid)` — `error` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.
 
-**Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="tabs"]` — The tablist of the cultures.; `[data-part="tab"]` — A culture's tab, named in its own language.; `[data-part="cultureButton"]` — The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.; `[data-part="marker"]` — The dot of a culture with no text.; `[data-part="panel"]` — A culture's panel (a tabpanel), or its row when stacked.; `[data-part="field"]` — A culture's input or textarea.
+**Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="tabs"]` — The tablist of the cultures.; `[data-part="tab"]` — A culture's tab, named in its own language.; `[data-part="cultureButton"]` — The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.; `[data-part="marker"]` — The dot of a culture with no text.; `[data-part="expandButton"]` — `expandable`: the button in the field's suffix that opens every culture in a dialog.; `[data-part="panel"]` — A culture's panel (a tabpanel), or its row when stacked.; `[data-part="field"]` — A culture's input or textarea.
 
 
 #### Examples
@@ -68,6 +69,16 @@ are checked against the manifest above._
 <div class="demo-stack">
   <pdx-localized-input label="Product name" layout="flag" :cultures="cultures" :regions="regions" ::value="name"></pdx-localized-input>
   <pdx-localized-input label="Description" layout="flag" multiline :cultures="cultures" :regions="regions" :value="description"></pdx-localized-input>
+  <p class="pdx-txt-small pdx-ink-muted">value: <code>{{ JSON.stringify(name) }}</code></p>
+</div>
+```
+
+**All languages** — `expandable` puts a button in the field's suffix that opens every culture in a dialog: one labelled field each, with its flag when `flags` is set, its `lang` and `dir`, the missing ones marked. An edit there is the value at once; Escape or the close button closes it, and the focus goes back to the button. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  <pdx-localized-input label="Product name" expandable flags :cultures="cultures" :regions="regions" ::value="name"></pdx-localized-input>
+  <pdx-localized-input label="Description" layout="flag" expandable multiline :cultures="cultures" :regions="regions" :value="description"></pdx-localized-input>
   <p class="pdx-txt-small pdx-ink-muted">value: <code>{{ JSON.stringify(name) }}</code></p>
 </div>
 ```

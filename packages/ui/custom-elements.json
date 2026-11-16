@@ -18796,6 +18796,16 @@
             },
             {
               "kind": "field",
+              "name": "expandable",
+              "description": "A button in the field's suffix, «All languages», opens a dialog with every culture as a labelled field (tabs and flag layouts).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "expandable"
+            },
+            {
+              "kind": "field",
               "name": "multiline",
               "description": "A textarea per culture instead of an input.",
               "type": {
@@ -18952,6 +18962,15 @@
               "default": "false"
             },
             {
+              "name": "expandable",
+              "fieldName": "expandable",
+              "description": "A button in the field's suffix, «All languages», opens a dialog with every culture as a labelled field (tabs and flag layouts).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
               "name": "multiline",
               "fieldName": "multiline",
               "description": "A textarea per culture instead of an input.",
@@ -19053,6 +19072,10 @@
             {
               "name": "marker",
               "description": "The dot of a culture with no text."
+            },
+            {
+              "name": "expandButton",
+              "description": "`expandable`: the button in the field's suffix that opens every culture in a dialog."
             },
             {
               "name": "panel",
