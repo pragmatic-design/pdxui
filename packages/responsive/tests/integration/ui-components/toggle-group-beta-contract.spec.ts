@@ -42,6 +42,37 @@ const entries = (page: Page) => page.evaluate(() =>
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=toggle-group-beta-contract'); });
 
+// A template binds a toggle's value as a property (`:value="day.code"`), which writes no attribute. The
+// group read the attribute only: such toggles were never pressed, and a click on one did nothing
+// (pdx-scheduler's repetition editor, #1020, found it).
+test('toggles whose value is a property, as a template binds it, are pressed by the group\'s value and toggle it', async ({ page }) => {
+    await loadMarkup(page, '<pdx-toggle-group><pdx-toggle></pdx-toggle></pdx-toggle-group>');
+    await page.evaluate(() => {
+        document.getElementById('f')?.remove();
+        const f = document.createElement('div');
+        f.id = 'f';
+        const group = document.createElement('pdx-toggle-group');
+        group.setAttribute('type', 'multiple');
+        group.setAttribute('label', 'Days');
+        (group as HTMLElement & { value: string }).value = 'MO,FR';
+        for (const [code, name] of [['MO', 'Monday'], ['TU', 'Tuesday'], ['FR', 'Friday']]) {
+            const t = document.createElement('pdx-toggle') as HTMLElement & { value: string; ariaLabel: string };
+            t.value = code;
+            t.ariaLabel = name;
+            t.textContent = code;
+            group.appendChild(t);
+        }
+        f.appendChild(group);
+        document.body.appendChild(f);
+    });
+    await expect(page.getByRole('button', { name: 'Monday' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Tuesday' })).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.getByRole('button', { name: 'Friday' })).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: 'Friday' }).click();
+    await expect.poll(() => page.locator('#f pdx-toggle-group').evaluate((g) => (g as HTMLElement & { value: string }).value)).toBe('MO');
+    await expect(page.getByRole('button', { name: 'Friday' })).toHaveAttribute('aria-pressed', 'false');
+});
+
 test('disabled is a custom state on the host', async ({ page }) => {
     await mount(page, `
         <pdx-toggle-group data-k="on" label="Pick" disabled>${ITEMS}</pdx-toggle-group>

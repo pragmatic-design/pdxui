@@ -65,8 +65,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   open), writes `events` and emits `save`, and `create` for a new one; Delete, and the Delete key on
   an event, ask `before-remove`, then remove it (an occurrence goes to its series' `exdate`) and emit
   `remove`. The editor names a missing title and an end before the start. `editor="none"` turns it off
-  and keeps the app's `event-open`, `slot-open` and an immediate create. Touch dragging, the
-  repetition editor, the editor's snippets, and print and export come in the following parts.
+  and keeps the app's `event-open`, `slot-open` and an immediate create. The editor edits how an event
+  repeats through fields, never a typed rule: never, every day, week (with its weekdays), month or
+  year, every how many, and when it ends (never, after a number of times, on a date); a rule the
+  fields cannot say is shown as a custom one and kept as written. On an occurrence of a series it asks
+  first how far a change goes, this occurrence or the whole series, and `before-save` / `before-remove`
+  carry the choice as `scope`: this occurrence saves an override or goes to `exdate`; the whole series
+  changes the series (moved by what the occurrence moved, its overrides dropped when its rule changes)
+  or removes it with its overrides. Touch dragging, the editor's snippets, and print and export come in
+  the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.
@@ -1635,6 +1642,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   and `+=` are unchanged. (#187)
 
 ### Fixes
+
+- `pdx-toggle-group` reads a toggle's `value` property, not only its attribute. A template that binds
+  it, `<pdx-toggle :value="day.code">`, writes the property and no attribute: such toggles were never
+  pressed by the group's value, and a click on one changed nothing.
 
 - `pdx-time-picker`'s AM/PM segment on a 12-hour clock is a valid spinbutton: its `aria-valuenow` was
   the word «AM» or «PM», which assistive technology reads as no value and axe rejects

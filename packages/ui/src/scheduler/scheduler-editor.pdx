@@ -1,6 +1,12 @@
 <template>
   <pdx-dialog :open="true" :title="draft.isNew ? uiString('scheduler', 'newEvent') : uiString('scheduler', 'editEvent')" @open-change="onOpenChange($event)">
     <div class="pdx-scheduler-editor">
+      @if (draft.series) {
+        <pdx-radio-group ::value="scope" :label="uiString('scheduler', 'applyTo')" orientation="horizontal">
+          <pdx-radio value="occurrence" :label="uiString('scheduler', 'thisOccurrence')"></pdx-radio>
+          <pdx-radio value="series" :label="uiString('scheduler', 'wholeSeries')"></pdx-radio>
+        </pdx-radio-group>
+      }
       <pdx-form-field :label="uiString('scheduler', 'titleField')" :error="titleError" :show-error="titleError !== ''">
         <pdx-input ::value="title"></pdx-input>
       </pdx-form-field>
@@ -16,6 +22,30 @@
         @if (!allDay) { <pdx-time-picker ::value="endTime" :locale="locale" :ariaLabel="uiString('scheduler', 'endTime')"></pdx-time-picker> }
         @if (endError) { <p class="pdx-scheduler-editor-error" :id="endErrorId">{{ endError }}</p> }
       </fieldset>
+      @if (repeats) {
+        <pdx-form-field :label="uiString('scheduler', 'repeats')">
+          <pdx-select :options="freqOptions" ::value="freq"></pdx-select>
+        </pdx-form-field>
+        @if (freq !== 'none' && freq !== 'custom') {
+          <div class="pdx-scheduler-editor-when">
+            <span aria-hidden="true">{{ uiString('scheduler', 'every') }}</span>
+            <pdx-number-input ::value="interval" :min="1" :ariaLabel="uiString('scheduler', 'every')"></pdx-number-input>
+            <span>{{ unitOf(freq) }}</span>
+          </div>
+          @if (freq === 'WEEKLY') {
+            <pdx-toggle-group type="multiple" ::value="days" :label="uiString('scheduler', 'onDays')">
+              @for (weekdays as w; track w.code) { <pdx-toggle :value="w.code" :ariaLabel="w.long">{{ w.short }}</pdx-toggle> }
+            </pdx-toggle-group>
+          }
+          <div class="pdx-scheduler-editor-when">
+            <pdx-form-field :label="uiString('scheduler', 'repeatEnds')">
+              <pdx-select :options="endOptions" ::value="ends"></pdx-select>
+            </pdx-form-field>
+            @if (ends === 'count') { <pdx-number-input ::value="count" :min="1" :ariaLabel="uiString('scheduler', 'times')"></pdx-number-input> }
+            @if (ends === 'until') { <pdx-date-picker ::value="until" :locale="locale" :ariaLabel="uiString('scheduler', 'repeatUntil')" :clearable="false"></pdx-date-picker> }
+          </div>
+        }
+      }
       @if (resourceOptions.length) {
         <pdx-form-field :label="uiString('scheduler', 'resource')">
           <pdx-select :options="resourceOptions" ::value="resource" :multiple="multiple"></pdx-select>
@@ -27,7 +57,7 @@
     </div>
     <div slot="footer" class="pdx-scheduler-editor-actions">
       <div class="pdx-scheduler-editor-group">
-        @if (!draft.isNew) { <pdx-button variant="danger" @click="remove({})">{{ uiString('scheduler', 'delete') }}</pdx-button> }
+        @if (!draft.isNew) { <pdx-button variant="danger" @click="remove({ scope: chosenScope() })">{{ uiString('scheduler', 'delete') }}</pdx-button> }
       </div>
       <div class="pdx-scheduler-editor-group">
         <pdx-button variant="outline" @click="discard({})">{{ uiString('scheduler', 'cancel') }}</pdx-button>
@@ -39,29 +69,32 @@
 
 <script>
 // pdx-scheduler's built-in editor of an event (#1020, part 9): a dialog with its title, its start and
-// end (a date, and a time unless it lasts all day), its resource and its notes. It reads an event and
-// writes one back in the form the event was written in; what to do with it — ask before-save, write
-// `events`, say so — is the owner's, which hears `save`, `remove` and `discard`. Its parts are
-// pdx-scheduler's (#1110).
+// end (a date, and a time unless it lasts all day), how it repeats, its resource and its notes. It
+// reads an event and writes one back in the form the event was written in. On an occurrence of a
+// series it asks first how far a change goes, this occurrence or the whole series, and only the whole
+// series has a repetition to edit. How it repeats is edited through fields (repeat-form.ts), never a
+// typed rule. What to do with the result — ask before-save, write `events`, say so — is the owner's,
+// which hears `save`, `remove` and `discard`. Its parts are pdx-scheduler's (#1110).
 @internal;
 import { addDays, generatedId } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { eventInstant, parseClock, zonedInstant, zonedParts } from './time';
 import { formatLike } from './drag-model';
 import { isAllDay, type SchedulerEvent, type SchedulerResource } from './grid-model';
+import { repeatOf, ruleOf, type RepeatForm } from './repeat-form';
 
-/** The event edited, and whether it is a new one. */
-@prop draft: { event: SchedulerEvent; isNew: boolean } = { event: { id: '', title: '', start: '', end: '' }, isNew: true };
+/** The event edited, whether it is a new one, and for an occurrence of a series, that series. */
+@prop draft: { event: SchedulerEvent; isNew: boolean; series?: SchedulerEvent } = { event: { id: '', title: '', start: '', end: '' }, isNew: true };
 /** The resources an event may belong to. */
 @prop resources: SchedulerResource[] = [];
 /** The zone the times are shown and read in. */
 @prop zone: string = 'UTC';
-/** The resolved locale of the pickers. */
+/** The resolved locale of the pickers and the weekday names. */
 @prop locale: string = '';
-/** The event as the editor's fields made it, when Save is pressed and they are right. */
-@event save: { event: SchedulerEvent };
-/** Delete was pressed. */
-@event remove: {};
+/** The event as the editor's fields made it, when Save is pressed and they are right; for an occurrence, how far it goes. */
+@event save: { event: SchedulerEvent; scope?: 'occurrence' | 'series' };
+/** Delete was pressed; for an occurrence, how far it goes. */
+@event remove: { scope?: 'occurrence' | 'series' };
 /** Cancel, Escape or the close button: nothing changes. Not `cancel`, the native dialog's own event. */
 @event discard: {};
 
@@ -69,6 +102,8 @@ const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 const pad = (n: number) => String(n).padStart(2, '0');
 const clock = (minutes: number) => `${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}`;
 const endErrorId = generatedId('pdx-scheduler-editor-end');
+/** The weekdays from Monday, as RFC 5545 names them, with a Monday they fall on to name them by. */
+const CODES = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 
 let title = $signal('');
 let allDay = $signal(false);
@@ -79,6 +114,14 @@ let endTime = $signal('10:00');
 let resource = $signal<string | string[] | null>(null);
 let notes = $signal('');
 let tried = $signal(false);
+let scope = $signal<'occurrence' | 'series'>('occurrence');
+let freq = $signal<RepeatForm['freq']>('none');
+let interval = $signal<number | null>(1);
+let days = $signal('');
+let ends = $signal<RepeatForm['ends']>('never');
+let count = $signal<number | null>(1);
+let until = $signal('');
+let rawRule = $signal('');
 
 /** Every resource and its children, as the select's options. */
 const resourceOptions = $derived(flatten(resources));
@@ -86,12 +129,38 @@ const resourceOptions = $derived(flatten(resources));
 const multiple = $derived(Array.isArray(draft.event.resource));
 const titleError = $derived(tried && title.trim() === '' ? uiString('scheduler', 'titleRequired') : '');
 const endError = $derived(tried && !(range().end > range().start) ? uiString('scheduler', 'endBeforeStart') : '');
+/** The repetition is edited for a plain event, and for the whole series; not for one occurrence. */
+const repeats = $derived(!draft.series || scope === 'series');
+const freqOptions = $derived([
+  { value: 'none', label: uiString('scheduler', 'repeatNever') },
+  { value: 'DAILY', label: uiString('scheduler', 'everyDay') },
+  { value: 'WEEKLY', label: uiString('scheduler', 'everyWeek') },
+  { value: 'MONTHLY', label: uiString('scheduler', 'everyMonth') },
+  { value: 'YEARLY', label: uiString('scheduler', 'everyYear') },
+  ...(rawRule && repeatOf(rawRule).freq === 'custom' ? [{ value: 'custom', label: uiString('scheduler', 'customRule') }] : []),
+]);
+const endOptions = $derived([
+  { value: 'never', label: uiString('scheduler', 'repeatNever') },
+  { value: 'count', label: uiString('scheduler', 'endsAfter') },
+  { value: 'until', label: uiString('scheduler', 'endsOn') },
+]);
+/** The weekday toggles, Monday first, named in the locale. */
+const weekdays = $derived(CODES.map((code, i) => {
+  const day = new Date(Date.UTC(2024, 0, 1 + i));
+  const name = (weekday: 'short' | 'long') => new Intl.DateTimeFormat(locale || undefined, { weekday, timeZone: 'UTC' }).format(day);
+  return { code, short: name('short'), long: name('long') };
+}));
 
 function flatten(list: readonly SchedulerResource[]): { value: string; label: string }[] {
   return list.flatMap((r) => [{ value: r.id, label: r.label }, ...flatten(r.children ?? [])]);
 }
+function unitOf(f: RepeatForm['freq']): string {
+  return uiString('scheduler', f === 'DAILY' ? 'unitDays' : f === 'WEEKLY' ? 'unitWeeks' : f === 'MONTHLY' ? 'unitMonths' : 'unitYears');
+}
+/** How far a change goes: asked only for an occurrence of a series. */
+function chosenScope(): 'occurrence' | 'series' | undefined { return draft.series ? scope : undefined; }
 
-// The fields from the event, each time another one is edited.
+// The fields from the event, each time another one is edited; an occurrence repeats as its series.
 $watch(draft, (d) => {
   const e = d.event;
   const whole = isAllDay(e);
@@ -107,6 +176,15 @@ $watch(draft, (d) => {
   resource = e.resource ?? null;
   notes = typeof e.notes === 'string' ? e.notes : '';
   tried = false;
+  scope = 'occurrence';
+  const rule = repeatOf(d.series ? d.series.rrule : e.rrule);
+  freq = rule.freq;
+  interval = rule.interval;
+  days = rule.days;
+  ends = rule.ends;
+  count = rule.count;
+  until = rule.until;
+  rawRule = rule.raw;
 }, { immediate: true });
 
 /** The fields' range, as instants; an all-day range runs to the midnight after its last day. */
@@ -133,13 +211,16 @@ function made(): SchedulerEvent {
   const chosen = Array.isArray(resource) ? resource : resource ?? undefined;
   if (chosen === undefined || (Array.isArray(chosen) && chosen.length === 0)) delete next.resource; else next.resource = chosen;
   if (notes.trim()) next.notes = notes; else delete next.notes;
+  // The rule from the fields, for a plain event or the whole series; one occurrence has none of its own.
+  const rule = repeats ? ruleOf({ freq, interval: interval ?? 1, days, ends, count: count ?? 1, until, raw: rawRule }) : undefined;
+  if (rule) next.rrule = rule; else delete next.rrule;
   return next;
 }
 
 function trySave(): void {
   tried = true;
   if (title.trim() === '' || !(range().end > range().start)) return;
-  save({ event: made() });
+  save({ event: made(), scope: chosenScope() });
 }
 
 function onOpenChange(e: CustomEvent<{ value: boolean }>): void {

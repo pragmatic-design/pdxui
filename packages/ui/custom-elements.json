@@ -25089,8 +25089,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open.",
-              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean }"
+              "description": "The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open. On an occurrence of a series, `scope` says what the reader chose: 'occurrence' writes an override, 'series' changes the series (`event` is then the series).",
+              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean; scope?: 'occurrence' | 'series' }"
             },
             {
               "name": "save",
@@ -25098,23 +25098,23 @@
                 "text": "CustomEvent"
               },
               "description": "The editor saved an event; `events` is already written.",
-              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean }"
+              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean; scope?: 'occurrence' | 'series' }"
             },
             {
               "name": "before-remove",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. (Not `delete`, a reserved word, #1130.)",
-              "detail": "{ event: SchedulerEvent }"
+              "description": "An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. On an occurrence of a series, `scope`: 'occurrence' adds it to the series' `exdate`, 'series' removes the series (`event`) and its overrides. (Not `delete`, a reserved word, #1130.)",
+              "detail": "{ event: SchedulerEvent; scope?: 'occurrence' | 'series' }"
             },
             {
               "name": "remove",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "An event was removed; `events` is already written (an occurrence of a series is added to its `exdate`).",
-              "detail": "{ event: SchedulerEvent }"
+              "description": "An event was removed; `events` is already written.",
+              "detail": "{ event: SchedulerEvent; scope?: 'occurrence' | 'series' }"
             },
             {
               "name": "rejected",

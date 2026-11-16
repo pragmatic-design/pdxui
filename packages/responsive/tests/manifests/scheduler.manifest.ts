@@ -48,6 +48,8 @@ const SITES = `[{"id":"north","label":"North site","children":[{"id":"a","label"
 const SITE_EVENTS = `[{"id":"audit","title":"Audit","start":"2026-09-22T12:00","end":"2026-09-23T12:00","resource":"a"},{"id":"move","title":"Move","start":"2026-09-21","end":"2026-09-24","resource":"van"},{"id":"pickup","title":"Pickup","start":"2026-09-23T09:00","end":"2026-09-23T13:00","resource":"van"},{"id":"talk","title":"Talk","start":"2026-09-24T09:00","end":"2026-09-24T10:00","resource":"b"}]`;
 // A series: a stand-up every weekday at 9:00, from the week before the one on screen.
 const SERIES = `[{"id":"daily","title":"Daily","start":"2026-09-14T09:00","end":"2026-09-14T09:30","rrule":"FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR"}]`;
+// The same stand-up written as a weekly rule, which the editor's repetition fields can say.
+const WEEKLY_SERIES = `[{"id":"daily","title":"Daily","start":"2026-09-14T09:00","end":"2026-09-14T09:30","rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR"}]`;
 // Five hundred resources over a day of half-hour slots: 24 000 cells if every one were drawn.
 const MANY = JSON.stringify(Array.from({ length: 500 }, (_, i) => ({ id: `r${i}`, label: `Resource ${i + 1}` })));
 const MANY_EVENTS = JSON.stringify([{ id: 'first', title: 'First', start: '2026-09-22T09:00', end: '2026-09-22T11:00', resource: 'r0' }, { id: 'last', title: 'Last', start: '2026-09-22T09:00', end: '2026-09-22T10:00', resource: 'r499' }]);
@@ -74,6 +76,11 @@ export const scheduler: ComponentManifest = {
             id: 'scheduler-editor',
             title: 'Scheduler — The built-in editor',
             html: `<pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" ${WITH_EDITOR} events='${EVENTS}'></pdx-scheduler>`,
+        },
+        {
+            id: 'scheduler-editor-series',
+            title: 'Scheduler — The editor on a series',
+            html: `<pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" ${WITH_EDITOR} events='${WEEKLY_SERIES}'></pdx-scheduler>`,
         },
         {
             id: 'scheduler-recurring',
