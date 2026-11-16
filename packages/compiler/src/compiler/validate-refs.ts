@@ -39,6 +39,9 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
     for (const e of analysis.exports) s.add(e.name);
     // A template `@snippet` of the script is a function of the render (#489).
     for (const sn of analysis.snippets) s.add(sn.name);
+    // A typed `@slot` is the snippet the parent passes, a prop of the host: the template may test it or
+    // hand it to a child.
+    for (const sl of analysis.slots) if (sl.signature) s.add(sl.name);
     for (const n of analysis.importedNames ?? []) s.add(n);
     for (const n of analysis.coreImportNames) s.add(n);
     return s;
@@ -54,6 +57,7 @@ function publicNames(analysis: ScriptAnalysis): Set<string> {
     for (const p of analysis.props) s.add(p.name);
     for (const e of analysis.events) s.add(e.emitter ?? e.name);
     for (const sn of analysis.snippets) s.add(sn.name);
+    for (const sl of analysis.slots) if (sl.signature) s.add(sl.name);
     for (const e of analysis.exports) s.add(e.name);
     for (const n of analysis.importedNames ?? []) s.add(n);
     for (const n of analysis.coreImportNames) s.add(n);

@@ -7,6 +7,9 @@
           <pdx-radio value="series" :label="uiString('scheduler', 'wholeSeries')"></pdx-radio>
         </pdx-radio-group>
       }
+      @if (editorContent) {
+        @render editorContent?.(draft.event, actions)
+      } @else {
       <pdx-form-field :label="uiString('scheduler', 'titleField')" :error="titleError" :show-error="titleError !== ''">
         <pdx-input ::value="title"></pdx-input>
       </pdx-form-field>
@@ -54,7 +57,10 @@
       <pdx-form-field :label="uiString('scheduler', 'notesField')">
         <pdx-textarea ::value="notes" :rows="3"></pdx-textarea>
       </pdx-form-field>
+      @render editorFields?.(draft.event, set)
+      }
     </div>
+    @if (!editorContent) {
     <div slot="footer" class="pdx-scheduler-editor-actions">
       <div class="pdx-scheduler-editor-group">
         @if (!draft.isNew) { <pdx-button variant="danger" @click="remove({ scope: chosenScope() })">{{ uiString('scheduler', 'delete') }}</pdx-button> }
@@ -64,6 +70,7 @@
         <pdx-button variant="primary" @click="trySave()">{{ uiString('scheduler', 'save') }}</pdx-button>
       </div>
     </div>
+    }
   </pdx-dialog>
 </template>
 
@@ -74,13 +81,15 @@
 // series it asks first how far a change goes, this occurrence or the whole series, and only the whole
 // series has a repetition to edit. How it repeats is edited through fields (repeat-form.ts), never a
 // typed rule. What to do with the result — ask before-save, write `events`, say so — is the owner's,
-// which hears `save`, `remove` and `discard`. Its parts are pdx-scheduler's (#1110).
+// which hears `save`, `remove` and `discard`. Its parts are pdx-scheduler's (#1110). The app's
+// `editorFields` add to the fields, under Notes; its `editorContent` takes the place of all of them and
+// of the buttons, calling the actions instead (#1020, part 9c).
 @internal;
 import { addDays, generatedId } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { eventInstant, parseClock, zonedInstant, zonedParts } from './time';
 import { formatLike } from './drag-model';
-import { isAllDay, type SchedulerEvent, type SchedulerResource } from './grid-model';
+import { isAllDay, type SchedulerEditorActions, type SchedulerEvent, type SchedulerResource } from './grid-model';
 import { repeatOf, ruleOf, type RepeatForm } from './repeat-form';
 
 /** The event edited, whether it is a new one, and for an occurrence of a series, that series. */
@@ -97,6 +106,10 @@ import { repeatOf, ruleOf, type RepeatForm } from './repeat-form';
 @event remove: { scope?: 'occurrence' | 'series' };
 /** Cancel, Escape or the close button: nothing changes. Not `cancel`, the native dialog's own event. */
 @event discard: {};
+/** The app's fields, under Notes; what they `set` is merged into the event Save writes. */
+@slot editorFields?: (event: SchedulerEvent, set: (patch: Partial<SchedulerEvent>) => void);
+/** The app's editor, in place of the fields and the buttons. */
+@slot editorContent?: (event: SchedulerEvent, actions: SchedulerEditorActions);
 
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -122,6 +135,17 @@ let ends = $signal<RepeatForm['ends']>('never');
 let count = $signal<number | null>(1);
 let until = $signal('');
 let rawRule = $signal('');
+/** What the app's fields set, merged into the saved event; a key set to undefined is left out. */
+let extra = $signal<Partial<SchedulerEvent>>({});
+
+/** The app's fields write here. */
+function set(patch: Partial<SchedulerEvent>): void { extra = { ...extra, ...patch }; }
+/** What the app's editor calls; each goes as far as the scope chosen above it. */
+const actions: SchedulerEditorActions = {
+  save: (next) => save({ event: next, scope: chosenScope() }),
+  remove: () => remove({ scope: chosenScope() }),
+  cancel: () => discard({}),
+};
 
 /** Every resource and its children, as the select's options. */
 const resourceOptions = $derived(flatten(resources));
@@ -176,6 +200,7 @@ $watch(draft, (d) => {
   resource = e.resource ?? null;
   notes = typeof e.notes === 'string' ? e.notes : '';
   tried = false;
+  extra = {};
   scope = 'occurrence';
   const rule = repeatOf(d.series ? d.series.rrule : e.rrule);
   freq = rule.freq;
@@ -214,6 +239,10 @@ function made(): SchedulerEvent {
   // The rule from the fields, for a plain event or the whole series; one occurrence has none of its own.
   const rule = repeats ? ruleOf({ freq, interval: interval ?? 1, days, ends, count: count ?? 1, until, raw: rawRule }) : undefined;
   if (rule) next.rrule = rule; else delete next.rrule;
+  // The app's fields last: what they set is theirs to say.
+  for (const [key, value] of Object.entries(extra)) {
+    if (value === undefined) delete next[key]; else next[key] = value;
+  }
   return next;
 }
 

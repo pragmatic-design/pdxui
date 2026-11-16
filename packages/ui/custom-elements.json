@@ -25416,6 +25416,16 @@
               "name": "event",
               "description": "What an event draws; without it, its time and title.",
               "signature": "(event: SchedulerEvent)"
+            },
+            {
+              "name": "editorFields",
+              "description": "Fields the app adds to the built-in editor, under Notes: `set(patch)` merges its values into the event Save writes (a key set to `undefined` is left out). Validate in `before-save`.",
+              "signature": "(event: SchedulerEvent, set: (patch: Partial<SchedulerEvent>) => void)"
+            },
+            {
+              "name": "editorContent",
+              "description": "The editor's content, drawn by the app in place of the built-in fields and buttons; the scheduler keeps its dialog, the occurrence / series question, `before-save` / `before-remove` and writing `events`.",
+              "signature": "(event: SchedulerEvent, actions: SchedulerEditorActions)"
             }
           ],
           "cssParts": [
