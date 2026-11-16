@@ -1659,6 +1659,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `pdx-scheduler` reads a dragged pointer on the cell under it, not on the cell an event drawn over it
+  belongs to. An end dragged a slot down was redrawn under the pointer, and the next move read the
+  event's own start cell: the end flipped on every move, and where it was dropped depended on how
+  many moves there were. A move counts from the cell pressed, not from the event's start cell.
+
 - A typed `@slot` counts as declared for `PDX_UNDECLARED_REF`: a component may test the snippet its
   parent passes (`@if (row)`) or hand it on to a child (`:row="row"`) without an error that said the
   name was not declared.

@@ -63,12 +63,18 @@ export function cellOfPoint(m: PointModel, p: DropPoint): { row: number; col: nu
     return row < 0 || col < 0 ? null : { row, col: col + 1 };
 }
 
-/** The grid cell of `grid` under the viewport point (`x`, `y`): its row and column, from its data. */
+/**
+ * The grid cell of `grid` under the viewport point (`x`, `y`): its row and column, from its data. The
+ * cell itself under the point, not the cell an element drawn over it belongs to: a timed event is a
+ * child of its start cell and reaches down over the cells below, so the cell an event's button sits in
+ * is not the cell under the pointer. Read that way, an end dragged a slot down was redrawn under the
+ * pointer, the next move read the event's own start cell, and the end flipped on every move.
+ */
 export function cellAt(grid: HTMLElement, x: number, y: number): { row: number; col: number } | null {
     for (const el of document.elementsFromPoint(x, y)) {
-        if (!(el instanceof HTMLElement) || !grid.contains(el)) continue;
-        const cell = el.closest('[role="gridcell"][data-row][data-col]') as HTMLElement | null;
-        if (cell && grid.contains(cell)) return { row: Number(cell.dataset.row), col: Number(cell.dataset.col) };
+        if (el instanceof HTMLElement && el.matches('[role="gridcell"][data-row][data-col]') && grid.contains(el)) {
+            return { row: Number(el.dataset.row), col: Number(el.dataset.col) };
+        }
     }
     return null;
 }
