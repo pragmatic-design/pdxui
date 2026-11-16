@@ -42,6 +42,14 @@ describe('PDX_UNDECLARED_REF', () => {
         ]);
     });
 
+    // A snippet the parent passes is a prop of the component: it may hand it on to a child, or test it.
+    // The check knew `event` only because it is an ambient word (#1020, part 9c, found it).
+    it('a typed @slot is declared: the template may pass it on or read it', () => {
+        const src = pdx('<x-child :fields="fields" :row="row"></x-child>@if (row) { <p>row</p> }',
+            '@slot fields?: (item: string, set: (patch: Partial<{ a: number }>) => void);\n@slot row: (item: string);');
+        expect(refs(src)).toEqual([]);
+    });
+
     it('a misspelt handler names the function it meant, and the fix renames the read', () => {
         const src = pdx('<button @click="incremnt">+</button>', 'let count = $signal(0);\nfunction increment() { count++; }');
         const [w] = refs(src);

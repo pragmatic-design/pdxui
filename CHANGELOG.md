@@ -1643,6 +1643,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A typed `@slot` counts as declared for `PDX_UNDECLARED_REF`: a component may test the snippet its
+  parent passes (`@if (row)`) or hand it on to a child (`:row="row"`) without an error that said the
+  name was not declared.
+
 - `pdx-toggle-group` reads a toggle's `value` property, not only its attribute. A template that binds
   it, `<pdx-toggle :value="day.code">`, writes the property and no attribute: such toggles were never
   pressed by the group's value, and a click on one changed nothing.
