@@ -156,7 +156,7 @@ function wallAsUtc(ms: number, timeZone: string): number {
 }
 
 /** The zone's offset from UTC at instant `ms`, in ms. Seconds below a minute are dropped. */
-function offsetAt(ms: number, timeZone: string): number {
+export function offsetAt(ms: number, timeZone: string): number {
     const whole = ms - (ms % 1000 + 1000) % 1000;
     return wallAsUtc(whole, timeZone) - whole;
 }
