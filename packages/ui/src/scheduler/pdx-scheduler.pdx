@@ -110,6 +110,7 @@ import { slotWindow } from './time-window';
 import { periodLabel, dayHeader, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { conflicts, moveEvent, resizeEvent, type DropPoint, type Placement } from './drag-model';
+import { expandEvents, occurrenceId, shiftSeries } from './series';
 import { schedulerDrag, type Draft } from './scheduler-drag';
 import { cellAt, pointOfCell, type PointModel } from './drop-point';
 import { DRAFT_ID, canDo, eventWhen } from './event-state';
@@ -129,7 +130,7 @@ const INNER = '[data-part="eventButton"], [data-part="eventMenu"], [data-part="m
 const EVENT = '[data-part="event"][data-id]';
 type Range = { start: string; end: string; resource?: string | string[] };
 
-/** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. Written by the scheduler after a move, resize or create the app allowed. */
+/** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. One with `rrule` is a series, drawn once per occurrence; one with `seriesId` and `recurrenceId` replaces an occurrence of its series. Written by the scheduler after a move, resize or create the app allowed. */
 @model events: SchedulerEvent[] = [];
 /** The resources: each with its own columns in the time grid, where children are drawn as their leaves; each a row of the timeline, children under their parent. Empty: one column per day, one timeline row. */
 @prop resources: SchedulerResource[] = [];
@@ -180,14 +181,14 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @prop createId: () => string = () => crypto.randomUUID();
 /** What an event draws; without it, its time and title. */
 @slot event?: (event: SchedulerEvent);
-/** An event is about to move, to another time, day or resource; `preventDefault()` refuses it. */
-@event(cancelable) 'before-move': { event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] };
-/** An event moved; `events` is already written. */
-@event move: { event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] };
-/** An event is about to be resized by one edge; `preventDefault()` refuses it. */
-@event(cancelable) 'before-resize': { event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] };
-/** An event was resized; `events` is already written. */
-@event resize: { event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] };
+/** An event is about to move, to another time, day or resource; `preventDefault()` refuses it. For an occurrence of a series, `scope` is 'occurrence' (it becomes an override in `events`); set it to 'series' to move the whole series. */
+@event(cancelable) 'before-move': { event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[]; scope?: 'occurrence' | 'series' };
+/** An event moved; `events` is already written. `event` is the override written, or the series moved, as `scope` says. */
+@event move: { event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[]; scope?: 'occurrence' | 'series' };
+/** An event is about to be resized by one edge; `preventDefault()` refuses it. `scope` as for `before-move`. */
+@event(cancelable) 'before-resize': { event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[]; scope?: 'occurrence' | 'series' };
+/** An event was resized; `events` is already written. `event` and `scope` as for `move`. */
+@event resize: { event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[]; scope?: 'occurrence' | 'series' };
 /** A drag over empty slots is about to create an event there (ISO, UTC); `preventDefault()` refuses it. */
 @event(cancelable) 'before-create': { start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] };
 /** Something the app made draggable with `useDrag` was dropped on the grid: its data and where (ISO, UTC); `preventDefault()` refuses it, else an event is created there from `data.title` and `data.duration` (minutes). */
@@ -248,7 +249,9 @@ const periodView = $derived(view === 'timeline' ? timelineScale : view);
 const periodText = $derived(periodLabel(periodView, range.days, loc, refDate));
 const shownViews = $derived(views.filter((v) => VIEWS.includes(v)));
 /** The events the views draw: `events`, with the one being dragged in its new place, or the range being created. */
-const shown = $derived(withDraft(events, draft));
+/** The events in the period, each series as its occurrences there (`seriesId`, `recurrenceId`, an id of their own). */
+const expanded = $derived(expandEvents(events, { from: zonedInstant(range.start, 0, zone), to: zonedInstant(range.end, 0, zone) }, zone));
+const shown = $derived(withDraft(expanded, draft));
 const isTimeGrid = $derived(view === 'day' || view === 'week' || view === 'days');
 const columns = $derived(buildColumns(isTimeGrid ? range.days : [], resources, groupBy));
 const startMinutes = $derived(parseClock(startHour));
@@ -274,7 +277,7 @@ const moveRules = $derived({ disabled, readonly, resources });
 const createHint = $derived(disabled || readonly ? null : createHintId);
 const monthWeeks = $derived(view === 'month' ? buildMonthWeeks(range.days, perWeek, shown, zone, dayMaxEvents) : []);
 const monthHeads = $derived(monthWeeks.length ? monthWeeks[0].days.map((d) => ({ key: d, ...weekdayName(d, loc) })) : []);
-const yearMonths = $derived(view === 'year' ? buildYearMonths(range.start, weekStart, events, zone) : []);
+const yearMonths = $derived(view === 'year' ? buildYearMonths(range.start, weekStart, expanded, zone) : []);
 const yearCursor = $derived(yearDay >= range.start && yearDay < range.end ? yearDay : refDate);
 const agendaGroups = $derived(view === 'agenda' ? buildAgendaDays(range.days, shown, zone) : []);
 const tlColumns = $derived(view === 'timeline' ? timelineColumns(timelineScale, range.days, { timeZone: zone, startMinutes, endMinutes, slotMinutes }) : []);
@@ -399,7 +402,8 @@ function slotOf(row: number, col: number) {
   const to = Math.min(from + slotMinutes, endMinutes);
   return { start: new Date(zonedInstant(c.date, from, zone)).toISOString(), end: new Date(zonedInstant(c.date, to, zone)).toISOString(), resource: c.resource?.id ?? null, allDay: false };
 }
-function eventById(id: string): SchedulerEvent | undefined { return events.find((e) => e.id === id); }
+/** An event drawn in the period, an occurrence of a series too. */
+function eventById(id: string): SchedulerEvent | undefined { return expanded.find((e) => e.id === id); }
 
 function onKey(e: KeyboardEvent): void {
   if (disabled) return;
@@ -622,8 +626,8 @@ function endLift(commit: boolean): void {
   draft = null;
   if (!l) return;
   if (commit && d && l.gesture !== null) {
-    commitGesture(l.gesture === 'move' ? { kind: 'move', event: l.event } : { kind: 'resize', event: l.event, edge: l.gesture }, d);
-    focusEvent(l.event.id, l.cell);
+    const written = commitGesture(l.gesture === 'move' ? { kind: 'move', event: l.event } : { kind: 'resize', event: l.event, edge: l.gesture }, d);
+    focusEvent(written ?? l.event.id, l.cell);
     return;
   }
   if (!commit) announce(format(uiString('scheduler', 'cancelled'), { title: l.event.title }));
@@ -690,7 +694,7 @@ function refuse(action: 'move' | 'resize' | 'create', event: SchedulerEvent | nu
  * app's `before-create` or `external-drop`. Written to `events`, then `create`.
  */
 function createOver(r: { start: string; end: string; resource: string | null; wholeDay: boolean }, title: string, ask: (found: SchedulerEvent[]) => boolean): void {
-  const found = conflicts(events, null, r, zone);
+  const found = conflicts(expanded, null, r, zone);
   const to = rangeOf({ start: r.start, end: r.end, resource: r.resource ?? undefined });
   if (preventOverlap && found.length) return refuse('create', null, to, 'overlap', found);
   if (!ask(found)) return refuse('create', null, to, 'prevented', found);
@@ -723,26 +727,51 @@ const dropZone = useDropZone(() => (view === 'year' || view === 'agenda' ? null 
 
 /** What ended on a draft, from the pointer or the keyboard. */
 type GestureEnd = { kind: 'create' } | { kind: 'move'; event: SchedulerEvent } | { kind: 'resize'; event: SchedulerEvent; edge: 'start' | 'end' };
-/** The one way a gesture changes `events`: check the overlap, ask the app, write, say. */
-function commitGesture(g: GestureEnd, d: Draft): void {
+/**
+ * The one way a gesture changes `events`: check the overlap, ask the app, write, say. An occurrence of
+ * a series asks with `scope: 'occurrence'`, which the app may set to 'series': left so, the occurrence
+ * becomes an override of its own in `events`; set, the whole series moves by what the occurrence did.
+ * Returns the id the changed event is drawn under now, for the focus; null when nothing changed.
+ */
+function commitGesture(g: GestureEnd, d: Draft): string | null {
   if (g.kind === 'create') {
     const r = { start: d.start, end: d.end, resource: typeof d.resource === 'string' ? d.resource : null, wholeDay: d.allDay === true };
     createOver(r, uiString('scheduler', 'newEvent'), (found) => beforeCreate({ start: r.start, end: r.end, resource: r.resource, allDay: r.wholeDay, conflicts: found }));
-    return;
+    return null;
   }
   const e = g.event;
-  if (d.start === e.start && d.end === e.end && JSON.stringify(d.resource) === JSON.stringify(e.resource)) return;
+  if (d.start === e.start && d.end === e.end && JSON.stringify(d.resource) === JSON.stringify(e.resource)) return null;
   const from = rangeOf(e);
   const to = rangeOf(d);
-  const found = conflicts(events, e.id, d, zone);
-  if (preventOverlap && found.length) return refuse(g.kind, e, to, 'overlap', found);
-  const ok = g.kind === 'move' ? beforeMove({ event: e, from, to, conflicts: found }) : beforeResize({ event: e, edge: g.edge, from, to, conflicts: found });
-  if (!ok) return refuse(g.kind, e, to, 'prevented', found);
-  const next = placed(e, d);
-  events = events.map((x) => (x.id === e.id ? next : x));
-  if (g.kind === 'move') move({ event: next, from, to, conflicts: found });
-  else resize({ event: next, edge: g.edge, from, to, conflicts: found });
+  const found = conflicts(expanded, e.id, d, zone);
+  if (preventOverlap && found.length) { refuse(g.kind, e, to, 'overlap', found); return null; }
+  // An occurrence the scheduler drew from a series, not an event of `events`: the app says how far it goes.
+  const series = e.seriesId !== undefined && !events.some((x) => x.id === e.id) ? events.find((x) => x.id === e.seriesId) : undefined;
+  const asked: { scope?: 'occurrence' | 'series' } = series ? { scope: 'occurrence' } : {};
+  const ok = g.kind === 'move' ? beforeMove(Object.assign(asked, { event: e, from, to, conflicts: found }))
+    : beforeResize(Object.assign(asked, { event: e, edge: g.edge, from, to, conflicts: found }));
+  if (!ok) { refuse(g.kind, e, to, 'prevented', found); return null; }
+  const scope = series ? (asked.scope === 'series' ? 'series' : 'occurrence') : undefined;
+  let next: SchedulerEvent;
+  let drawnAs: string;
+  if (series && scope === 'series') {
+    next = shiftSeries(series, e, d, zone);
+    events = events.map((x) => (x.id === series.id ? next : x));
+    drawnAs = occurrenceId(series.id, d.start);
+  } else if (series) {
+    next = { ...placed(e, d), id: createId() };
+    events = [...events, next];
+    drawnAs = next.id;
+  } else {
+    next = placed(e, d);
+    events = events.map((x) => (x.id === e.id ? next : x));
+    drawnAs = next.id;
+  }
+  const done = { event: next, from, to, conflicts: found, ...(scope ? { scope } : {}) };
+  if (g.kind === 'move') move(done);
+  else resize({ ...done, edge: g.edge });
   announce(format(uiString('scheduler', g.kind === 'move' ? 'moved' : 'resized'), { title: next.title }));
+  return drawnAs;
 }
 
 // ─── Mount: the clock; the time grid opens at `scrollTo` ───────────────────────

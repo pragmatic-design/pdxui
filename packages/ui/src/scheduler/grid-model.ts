@@ -29,6 +29,17 @@ export interface SchedulerEvent {
     resizable?: boolean;
     /** A blocked slot, drawn behind: never moved, and not counted as an overlap. */
     background?: boolean;
+    /**
+     * A recurrence rule (RFC 5545, without `RRULE:` or with it): the event is a series, drawn once per
+     * occurrence in the period. FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH and WKST.
+     */
+    rrule?: string;
+    /** The occurrences of a series left out: their start, written like the series' `start`. */
+    exdate?: string[];
+    /** An override: the id of the series one of whose occurrences this event replaces. */
+    seriesId?: string;
+    /** An override: the original start of the occurrence it replaces, written like the series' `start`. */
+    recurrenceId?: string;
     [field: string]: unknown;
 }
 
