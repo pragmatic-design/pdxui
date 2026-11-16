@@ -24984,6 +24984,16 @@
             },
             {
               "kind": "field",
+              "name": "editor",
+              "description": "The built-in editor: `dialog` opens it on Enter or a double click on an event, on Enter on an empty slot, and on a create; `none` leaves those to the app (`event-open`, `slot-open`, `create`).",
+              "type": {
+                "text": "'dialog' | 'none'"
+              },
+              "default": "'dialog'",
+              "attribute": "editor"
+            },
+            {
+              "kind": "field",
               "name": "events",
               "description": "The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. One with `rrule` is a series, drawn once per occurrence; one with `seriesId` and `recurrenceId` replaces an occurrence of its series. Written by the scheduler after a move, resize or create the app allowed.",
               "type": {
@@ -25071,7 +25081,39 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "An event was created, by a drag over empty slots or a drop from outside, and added to `events`.",
+              "description": "An event was created, by a drag over empty slots, the keyboard, the editor or a drop from outside, and added to `events`.",
+              "detail": "{ event: SchedulerEvent }"
+            },
+            {
+              "name": "before-save",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open.",
+              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean }"
+            },
+            {
+              "name": "save",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The editor saved an event; `events` is already written.",
+              "detail": "{ event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean }"
+            },
+            {
+              "name": "before-remove",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. (Not `delete`, a reserved word, #1130.)",
+              "detail": "{ event: SchedulerEvent }"
+            },
+            {
+              "name": "remove",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event was removed; `events` is already written (an occurrence of a series is added to its `exdate`).",
               "detail": "{ event: SchedulerEvent }"
             },
             {
@@ -25306,6 +25348,15 @@
               "default": "false"
             },
             {
+              "name": "editor",
+              "fieldName": "editor",
+              "description": "The built-in editor: `dialog` opens it on Enter or a double click on an event, on Enter on an empty slot, and on a create; `none` leaves those to the app (`event-open`, `slot-open`, `create`).",
+              "type": {
+                "text": "'dialog' | 'none'"
+              },
+              "default": "'dialog'"
+            },
+            {
               "name": "view",
               "fieldName": "view",
               "description": "The view on screen.",
@@ -25342,7 +25393,8 @@
                 "rrule?: string",
                 "exdate?: string[]",
                 "seriesId?: string",
-                "recurrenceId?: string"
+                "recurrenceId?: string",
+                "notes?: string"
               ]
             },
             {

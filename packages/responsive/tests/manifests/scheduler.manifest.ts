@@ -34,11 +34,14 @@ import type { ComponentManifest } from './_types';
 const EVENTS = `[{"id":"standup","title":"Stand-up","start":"2026-09-21T09:00","end":"2026-09-21T09:30"},{"id":"review","title":"Review","start":"2026-09-22T10:00","end":"2026-09-22T12:00"},{"id":"call","title":"Call","start":"2026-09-22T11:00","end":"2026-09-22T12:00"},{"id":"offsite","title":"Offsite","start":"2026-09-23","end":"2026-09-25"}]`;
 const ROOMS = `[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]`;
 const ROOM_EVENTS = `[{"id":"a1","title":"Interview","start":"2026-09-22T09:00","end":"2026-09-22T10:00","resource":"a"},{"id":"b1","title":"Workshop","start":"2026-09-22T09:00","end":"2026-09-22T11:00","resource":"b"}]`;
-const FIXED = `date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false"`;
+// The grid's own mechanics, measured without the built-in editor: `editor="none"` keeps Enter on an
+// event an `event-open` and a create a write. The editor has a scenario of its own.
+const FIXED = `date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" editor="none"`;
+const WITH_EDITOR = `date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false"`;
 // September 2026: a trip over a weekend into the next week, a busy Thursday (four events, two shown and
 // «+2»), a call on Tuesday.
 const MONTH_EVENTS = `[{"id":"trip","title":"Trip","start":"2026-09-25","end":"2026-09-30"},{"id":"call","title":"Call","start":"2026-09-22T10:30","end":"2026-09-22T11:00"},{"id":"t1","title":"One","start":"2026-09-24T09:00","end":"2026-09-24T10:00"},{"id":"t2","title":"Two","start":"2026-09-24T11:00","end":"2026-09-24T12:00"},{"id":"t3","title":"Three","start":"2026-09-24T14:00","end":"2026-09-24T15:00"},{"id":"t4","title":"Four","start":"2026-09-24T16:00","end":"2026-09-24T17:00"}]`;
-const CALENDAR = `date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false"`;
+const CALENDAR = `date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false" editor="none"`;
 // The timeline: two rooms under a site, and a van. The audit runs Tuesday noon to Wednesday noon in Room
 // A; the van has two trips that overlap on Wednesday, so its row takes two lanes.
 const SITES = `[{"id":"north","label":"North site","children":[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]},{"id":"van","label":"Van"}]`;
@@ -65,7 +68,12 @@ export const scheduler: ComponentManifest = {
         {
             id: 'scheduler-resources',
             title: 'Scheduler — A day by room',
-            html: `<pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-09-22" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" resources='${ROOMS}' events='${ROOM_EVENTS}'></pdx-scheduler>`,
+            html: `<pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-09-22" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" editor="none" resources='${ROOMS}' events='${ROOM_EVENTS}'></pdx-scheduler>`,
+        },
+        {
+            id: 'scheduler-editor',
+            title: 'Scheduler — The built-in editor',
+            html: `<pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" ${WITH_EDITOR} events='${EVENTS}'></pdx-scheduler>`,
         },
         {
             id: 'scheduler-recurring',

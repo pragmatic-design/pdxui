@@ -1109,6 +1109,7 @@ exports[`observed attributes > are the ones each component has always observed 1
     "daymaxevents",
     "days",
     "disabled",
+    "editor",
     "end-hour",
     "endhour",
     "first-day",
