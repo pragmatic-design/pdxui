@@ -2717,6 +2717,10 @@
           "title": "Scheduler — The built-in editor"
         },
         {
+          "id": "scheduler-editor-series",
+          "title": "Scheduler — The editor on a series"
+        },
+        {
           "id": "scheduler-recurring",
           "title": "Scheduler — A recurring event"
         },

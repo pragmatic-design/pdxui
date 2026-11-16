@@ -67,7 +67,11 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // `picked` / `pickedResize` are said when one of them picks the event up, for a click on a slot.
     // `editEvent` names the built-in editor's dialog (`newEvent` a new one's); the `…Field`, `startDate`
     // and the like label its controls; `titleRequired` and `endBeforeStart` are its errors; `saved` and
-    // `deleted` are said when a save or a delete is done.
+    // `deleted` are said when a save or a delete is done. `applyTo` asks, on an occurrence of a series,
+    // how far a change goes (`thisOccurrence`, `wholeSeries`); `repeats` and the `every…` labels name how
+    // often an event repeats, `customRule` a rule the fields cannot say, `every` with a `unit…` every how
+    // many, `onDays` a weekly rule's weekdays, `repeatEnds` / `endsAfter` / `endsOn` / `times` /
+    // `repeatUntil` when it stops.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
@@ -88,6 +92,11 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         save: 'Save', delete: 'Delete', cancel: 'Cancel',
         titleRequired: 'Give the event a title.', endBeforeStart: 'The end must come after the start.',
         saved: '{title} saved', deleted: '{title} deleted',
+        applyTo: 'Apply to', thisOccurrence: 'This occurrence', wholeSeries: 'The whole series',
+        repeats: 'Repeats', repeatNever: 'Never', everyDay: 'Every day', everyWeek: 'Every week', everyMonth: 'Every month',
+        everyYear: 'Every year', customRule: 'Custom rule', every: 'Every',
+        unitDays: 'days', unitWeeks: 'weeks', unitMonths: 'months', unitYears: 'years', onDays: 'On',
+        repeatEnds: 'Ends', endsAfter: 'After', endsOn: 'On', times: 'Times', repeatUntil: 'End repeat',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.

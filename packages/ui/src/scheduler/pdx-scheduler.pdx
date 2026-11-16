@@ -46,7 +46,7 @@
     <span class="pdx-sr-only" :id="createHintId">{{ uiString('scheduler', 'createInstructions') }}</span>
     @if (editing) {
       <pdx-scheduler-editor :draft="editing" :resources="resources" :zone="zone" :locale="loc"
-        @save="onEditorSave($event.detail.event)" @remove="onEditorDelete()" @discard="closeEditor()"></pdx-scheduler-editor>
+        @save="onEditorSave($event.detail.event, $event.detail.scope)" @remove="onEditorDelete($event.detail.scope)" @discard="closeEditor()"></pdx-scheduler-editor>
     }
   </div>
 </template>
@@ -202,14 +202,14 @@ type Range = { start: string; end: string; resource?: string | string[] };
 @event(cancelable) 'external-drop': { data: unknown; start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] };
 /** An event was created, by a drag over empty slots, the keyboard, the editor or a drop from outside, and added to `events`. */
 @event create: { event: SchedulerEvent };
-/** The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open. */
-@event(cancelable) 'before-save': { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean };
+/** The editor's Save is about to write an event: `previous` is it as it was, null for a new one; `preventDefault()` refuses it and the editor stays open. On an occurrence of a series, `scope` says what the reader chose: 'occurrence' writes an override, 'series' changes the series (`event` is then the series). */
+@event(cancelable) 'before-save': { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean; scope?: 'occurrence' | 'series' };
 /** The editor saved an event; `events` is already written. */
-@event save: { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean };
-/** An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. (Not `delete`, a reserved word, #1130.) */
-@event(cancelable) 'before-remove': { event: SchedulerEvent };
-/** An event was removed; `events` is already written (an occurrence of a series is added to its `exdate`). */
-@event remove: { event: SchedulerEvent };
+@event save: { event: SchedulerEvent; previous: SchedulerEvent | null; isNew: boolean; scope?: 'occurrence' | 'series' };
+/** An event is about to be removed, from the editor's Delete or with the Delete key; `preventDefault()` refuses it. On an occurrence of a series, `scope`: 'occurrence' adds it to the series' `exdate`, 'series' removes the series (`event`) and its overrides. (Not `delete`, a reserved word, #1130.) */
+@event(cancelable) 'before-remove': { event: SchedulerEvent; scope?: 'occurrence' | 'series' };
+/** An event was removed; `events` is already written. */
+@event remove: { event: SchedulerEvent; scope?: 'occurrence' | 'series' };
 /** A move, resize or create was refused: by `prevent-overlap` (`overlap`) or by the app (`prevented`). */
 @event rejected: { action: 'move' | 'resize' | 'create'; event: SchedulerEvent | null; to: { start: string; end: string; resource?: string | string[] }; reason: 'overlap' | 'prevented'; conflicts: SchedulerEvent[] };
 /** An event was clicked, or Enter pressed on it. */
@@ -250,7 +250,7 @@ let lift = $signal<{ event: SchedulerEvent; gesture: KeyGesture | null; resource
 /** The empty cells selected from the keyboard: the one Shift+arrows began on, and the one they reached. */
 let selection = $signal<{ anchor: { row: number; col: number }; cell: { row: number; col: number } } | null>(null);
 /** The event the built-in editor is open on, and whether it is a new one. */
-let editing = $signal<{ event: SchedulerEvent; isNew: boolean } | null>(null);
+let editing = $signal<{ event: SchedulerEvent; isNew: boolean; series?: SchedulerEvent } | null>(null);
 /** What had the focus when the editor opened: it gets it back when the editor closes. */
 let editReturn: HTMLElement | null = null;
 
@@ -750,9 +750,11 @@ function canEdit(e: SchedulerEvent): boolean { return editor === 'dialog' && can
 /** An occurrence the scheduler drew from a series, not an event of `events`. */
 function isOccurrence(e: SchedulerEvent): boolean { return e.seriesId !== undefined && !events.some((x) => x.id === e.id); }
 
+/** The editor on event `e`; for an occurrence of a series, with that series, which it repeats as. */
 function openEditor(e: SchedulerEvent, isNew: boolean): void {
   editReturn = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  editing = { event: e, isNew };
+  const series = isOccurrence(e) ? events.find((x) => x.id === e.seriesId) : undefined;
+  editing = series ? { event: e, isNew, series } : { event: e, isNew };
 }
 /** The editor closed: the focus goes back where it was, or to the grid's cell. */
 function closeEditor(focusId?: string): void {
@@ -765,44 +767,72 @@ function closeEditor(focusId?: string): void {
 }
 
 /**
- * The editor's Save: `before-save` first, which may refuse it (the editor stays open); then `events`
- * is written — a new event added, an occurrence of a series made an override of its own, any other
- * replaced — and `save` (and `create` for a new one) is emitted.
+ * The series `series` as the editor's fields made its occurrence `occurrence` into `next`: moved by
+ * what the occurrence moved, with the occurrence's title, notes, all day and rule. A changed rule
+ * leaves the series' overrides behind (they belonged to occurrences it may no longer have).
  */
-function onEditorSave(next: SchedulerEvent): void {
-  const ed = editing;
-  if (!ed) return;
-  const previous = ed.isNew ? null : ed.event;
-  const to = rangeOf(next);
-  const found = conflicts(expanded, ed.isNew ? null : ed.event.id, next, zone);
-  if (preventOverlap && found.length) { refuse(ed.isNew ? 'create' : 'move', previous, to, 'overlap', found); return; }
-  if (!beforeSave({ event: next, previous, isNew: ed.isNew })) { announce(format(uiString('scheduler', 'refused'), { title: next.title })); return; }
-  let written = next;
-  if (ed.isNew) events = [...events, next];
-  else if (isOccurrence(ed.event)) { written = { ...next, id: createId() }; events = [...events, written]; }
-  else events = events.map((x) => (x.id === next.id ? next : x));
-  save({ event: written, previous, isNew: ed.isNew });
-  if (ed.isNew) create({ event: written });
-  announce(format(uiString('scheduler', 'saved'), { title: written.title }));
-  closeEditor(ed.isNew || written !== next ? written.id : undefined);
+function seriesFrom(series: SchedulerEvent, occurrence: SchedulerEvent, next: SchedulerEvent): SchedulerEvent {
+  const out: SchedulerEvent = { ...shiftSeries(series, occurrence, { start: next.start, end: next.end, resource: next.resource }, zone), title: next.title };
+  for (const k of ['notes', 'allDay', 'rrule'] as const) {
+    if (next[k] === undefined) delete out[k]; else out[k] = next[k] as never;
+  }
+  return out;
 }
 
 /**
- * Remove event `e`, asking `before-remove` first: out of `events`, or for an occurrence of a series,
- * its start added to the series' `exdate`. True when it is done.
+ * The editor's Save: `before-save` first, which may refuse it (the editor stays open); then `events`
+ * is written — a new event added; an occurrence of a series made an override of its own (`scope`
+ * 'occurrence') or its series changed (`scope` 'series'); any other replaced — and `save` (and
+ * `create` for a new one) is emitted.
  */
-function deleteEvent(e: SchedulerEvent): boolean {
-  if (!beforeRemove({ event: e })) { announce(format(uiString('scheduler', 'refused'), { title: e.title })); return false; }
-  if (isOccurrence(e)) {
+function onEditorSave(next: SchedulerEvent, scope?: 'occurrence' | 'series'): void {
+  const ed = editing;
+  if (!ed) return;
+  const series = ed.series && scope === 'series' ? ed.series : undefined;
+  const event = series ? seriesFrom(series, ed.event, next) : next;
+  const previous = ed.isNew ? null : series ?? ed.event;
+  const to = rangeOf(event);
+  const found = conflicts(expanded, ed.isNew ? null : ed.event.id, next, zone);
+  if (preventOverlap && found.length) { refuse(ed.isNew ? 'create' : 'move', previous, to, 'overlap', found); return; }
+  const asked = ed.series ? { scope: scope ?? 'occurrence' } : {};
+  if (!beforeSave({ event, previous, isNew: ed.isNew, ...asked })) { announce(format(uiString('scheduler', 'refused'), { title: next.title })); return; }
+  let written = event;
+  let focusId: string | undefined;
+  if (ed.isNew) { events = [...events, event]; focusId = event.id; }
+  else if (series) {
+    const ruleChanged = event.rrule !== series.rrule;
+    events = events.filter((x) => !(ruleChanged && x.seriesId === series.id)).map((x) => (x.id === series.id ? event : x));
+    focusId = occurrenceId(series.id, next.start);
+  } else if (ed.series) { written = { ...next, id: createId() }; events = [...events, written]; focusId = written.id; }
+  else events = events.map((x) => (x.id === next.id ? next : x));
+  save({ event: written, previous, isNew: ed.isNew, ...asked });
+  if (ed.isNew) create({ event: written });
+  announce(format(uiString('scheduler', 'saved'), { title: written.title }));
+  closeEditor(focusId);
+}
+
+/**
+ * Remove event `e`, asking `before-remove` first: out of `events`; for an occurrence of a series, its
+ * start added to the series' `exdate` (`scope` 'occurrence'), or the whole series and its overrides
+ * removed (`scope` 'series'). True when it is done.
+ */
+function deleteEvent(e: SchedulerEvent, scope?: 'occurrence' | 'series'): boolean {
+  const occurrence = isOccurrence(e);
+  const series = occurrence && scope === 'series' ? events.find((x) => x.id === e.seriesId) : undefined;
+  const target = series ?? e;
+  const asked = occurrence ? { scope: scope ?? 'occurrence' } : {};
+  if (!beforeRemove({ event: target, ...asked })) { announce(format(uiString('scheduler', 'refused'), { title: e.title })); return false; }
+  if (series) events = events.filter((x) => x.id !== series.id && x.seriesId !== series.id);
+  else if (occurrence) {
     events = events.map((x) => (x.id === e.seriesId ? { ...x, exdate: [...(x.exdate ?? []), e.recurrenceId ?? e.start] } : x));
   } else events = events.filter((x) => x.id !== e.id);
-  remove({ event: e });
-  announce(format(uiString('scheduler', 'deleted'), { title: e.title }));
+  remove({ event: target, ...asked });
+  announce(format(uiString('scheduler', 'deleted'), { title: target.title }));
   return true;
 }
-function onEditorDelete(): void {
+function onEditorDelete(scope?: 'occurrence' | 'series'): void {
   const ed = editing;
-  if (ed && deleteEvent(ed.event)) { editReturn = null; closeEditor(); }
+  if (ed && deleteEvent(ed.event, scope)) { editReturn = null; closeEditor(); }
 }
 
 /** A double click on an event edits it. */

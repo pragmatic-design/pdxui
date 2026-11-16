@@ -619,6 +619,7 @@ export const scenarioPage: Record<string, string> = {
     "scheduler-week": "tier-3c",
     "scheduler-resources": "tier-3c",
     "scheduler-editor": "tier-3c",
+    "scheduler-editor-series": "tier-3c",
     "scheduler-recurring": "tier-3c",
     "scheduler-disabled": "tier-3c",
     "scheduler-month": "tier-3c",
