@@ -2,7 +2,7 @@
  * Playwright measurement helpers for contract testing.
  * Extracts all visual properties needed by the contract rules.
  */
-import type { ConsoleMessage, Page, Request, Response } from '@playwright/test';
+import { expect, type ConsoleMessage, type Page, type Request, type Response } from '@playwright/test';
 import type { MeasuredElement } from './types';
 // The one definition of which CSS tokens become HTML attributes. Imported rather than copied: a
 // second hand-maintained list would drift the moment core adds a behaviour token, and the failure
@@ -119,6 +119,25 @@ export async function goToScenario(page: Page, scenario: string, theme: string, 
     // not a sleep.
     await waitForReady(page, `${scenario} on ${opts.page} (${theme})`,
         () => page.goto(url, { waitUntil: 'domcontentloaded' }), { timeout: opts.readyTimeout });
+}
+
+/**
+ * Wait until every `pdx-icon` of the visible scenario that has something to draw — a `name`, a `src`
+ * or an `svg` — has drawn its `<svg>`.
+ *
+ * The ready flag says the components mounted, not that their icons are drawn: a named icon is a
+ * module loaded on demand, and it arrives after the mount. A screenshot taken in between photographs
+ * an empty icon — once in CI, the navbar's logo in the first theme of its page, the only one shot
+ * right after the load (#1117). An icon that never draws (an unknown name) fails here, named.
+ */
+export async function iconsDrawn(page: Page, timeout = 10_000): Promise<void> {
+    const pending = () => page.evaluate(() => [...document.querySelectorAll('section[data-scenario]:not([hidden]) pdx-icon')]
+        .filter((i) => {
+            const icon = i as HTMLElement & { name?: string; src?: string; svg?: string };
+            return Boolean(icon.name || icon.src || icon.svg) && !icon.querySelector('svg');
+        })
+        .map((i) => (i as HTMLElement & { name?: string }).name || i.outerHTML.slice(0, 80)));
+    await expect.poll(pending, { timeout, message: 'the icons of the scenario are not drawn' }).toEqual([]);
 }
 
 /**
