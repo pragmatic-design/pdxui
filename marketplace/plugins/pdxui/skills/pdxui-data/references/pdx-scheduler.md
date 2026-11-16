@@ -2,6 +2,35 @@
 
 Events in time: day, week, month, year, agenda and timeline views, by resource.
 
+**Use it when** events live in time and someone plans them: a day or week of slots, by person, room or
+machine, a month, a year, an agenda, or a timeline of resources in rows — moved, resized, created, edited,
+repeated, exported.
+**Not when** only dates are picked → `pdx-date-picker` or `pdx-calendar`; a list of past happenings →
+`pdx-timeline`; a board of stages → `pdx-kanban`.
+
+**Pitfalls**
+- A start or end has three shapes, and the shape is the meaning: `2026-09-21T09:00` is a wall time in
+  `time-zone`, `2026-09-21T07:00:00Z` (or with an offset) an instant, `2026-09-21` a whole day, its `end`
+  the day AFTER the last. The scheduler writes a changed event back in the shape it was written in.
+- Bind `::events`: the scheduler writes `events` itself after every change the app allowed. Refuse a change
+  in its `before-*` (`before-move`, `before-resize`, `before-create`, `before-save`, `before-remove`,
+  `before-import`) with `preventDefault()`, never by putting the old array back afterwards.
+- Load by period: `period-change` gives the view's `start` and `end`; fetch those events and set `events`.
+- A series is one event with `rrule` (FREQ, INTERVAL, COUNT, UNTIL, BYDAY, BYMONTHDAY, BYMONTH, WKST) and
+  `exdate`; an override is its own event with `seriesId` and `recurrenceId`. A drawn occurrence's `id` is
+  the scheduler's (`<series>::<start>`), not one of `events`. `scope` on `before-move` / `before-resize`
+  is the app's to set ('occurrence', the default, or 'series'); the editor asks the reader.
+- `import` and `export` are reserved words: the events after them are `imported` and `exported`; the
+  delete is `remove`.
+- `editorFields(event, set)` adds to the built-in editor and validates nothing: check what `set` wrote in
+  `before-save`. `editorContent(event, actions)` replaces the fields and buttons, not the dialog.
+- The app's own fields ride on the event (`client`, `priority`): `events` keeps them, the files do not —
+  CSV and Excel carry title, times, resource and notes; iCalendar also the colour, the rule and the
+  exceptions.
+
+**Composes with** `useDrag` from `@pdxui/core` (an app element dropped on the grid, `external-drop`) ·
+a file input for `importIcs(text)` · `pdx-splitter` beside a list of unplanned work to drag in.
+
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `resources` | — | SchedulerResource[] | `[]` | The resources: each with its own columns in the time grid, where children are drawn as their leaves; each a row of the timeline, children under their parent. Empty: one column per day, one timeline row. |
@@ -81,7 +110,7 @@ are checked against the manifest above._
 <pdx-scheduler label="Rooms" view="day" :date="today" :resources="rooms" :events="bookings" :views="['day', 'week']" scroll-to="08:00"></pdx-scheduler>
 ```
 
-**Drag, resize, create** — With the mouse or a pen, drag an event to another time or room, pull its top or bottom edge to resize it, or drag over empty slots to create one. Drag the card below onto a room to book it. Each change asks first — `before-move`, `before-resize`, `before-create`, `external-drop` — and the app can refuse it with `preventDefault()`; then the scheduler writes `events`. Here `prevent-overlap` refuses a room that is already booked, and `rejected` says so. The workshop is `readonly`. _(from the live demo)_
+**Drag, resize, create** — With the mouse or a pen, drag an event to another time or room, pull its top or bottom edge to resize it, or drag over empty slots to create one. With a finger, a long press lifts the event or its edge first, so a finger that moves still scrolls; from the keyboard, Space picks an event up, and its ⋯ offers «Move» and «Resize» to a single pointer. Drag the card below onto a room to book it. Each change asks first — `before-move`, `before-resize`, `before-create`, `external-drop` — and the app can refuse it with `preventDefault()`; then the scheduler writes `events`. Here `prevent-overlap` refuses a room that is already booked, and `rejected` says so. The workshop is `readonly`. _(from the live demo)_
 
 ```html
 <div class="drag-demo">
@@ -89,6 +118,31 @@ are checked against the manifest above._
   <pdx-scheduler label="Rooms, bookable" view="day" :date="today" :resources="rooms" ::events="bookings" :views="['day', 'week']" scroll-to="08:00" prevent-overlap
     @move="onMove" @resize="onResize" @create="onCreate" @rejected="onRejected"></pdx-scheduler>
 </div>
+<p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
+```
+
+**Editing an event** — Enter or a double click on an event opens the built-in editor; Enter on an empty slot, or a drag over empty slots, opens it on a new one. It edits the title, the start and end, all day, how the event repeats — every day, week (on which weekdays), month or year, and until when — the resource and the notes. Save asks `before-save`, Delete `before-remove`. On an occurrence of «Stand-up», a weekly series, it asks first whether the change is for this occurrence or the whole series. The app adds its own fields with `@snippet editorFields(e, set)` — here a client, saved with the event; `@snippet editorContent(e, actions)` draws the editor's content instead, and `editor="none"` turns it off. _(from the live demo)_
+
+```html
+<pdx-scheduler label="Team, editable" view="week" :date="today" ::events="items" :views="['week', 'month', 'agenda']" scroll-to="08:00"
+  @save="onSave" @remove="onRemove">
+  @snippet editorFields(e, set) {
+    <pdx-form-field label="Client">
+      <pdx-input :value="e.client ?? ''" @value-change="set({ client: $event.detail.value })"></pdx-input>
+    </pdx-form-field>
+  }
+</pdx-scheduler>
+<p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
+```
+
+**Export, import, print** — The bar's «Export» menu saves the period's events as CSV or Excel — one row each, a series as its occurrences — or `events` as iCalendar, the data itself: a series with its rule, an override with the occurrence it replaces, a wall time with its time zone. «Print» prints the view whole, every hour and resource, with the scheduler alone on the page. `exports` chooses what the menu offers. The same are methods for the app's own buttons — `exportCsv()`, `exportXlsx()`, `exportIcs()`, `print()` — and `importIcs(text)` reads a calendar file back, asking `before-import` first. _(from the live demo)_
+
+```html
+<div class="demo-row">
+  <pdx-button variant="outline" @click="saveIcs()">Save as .ics</pdx-button>
+  <label class="pick">Import an .ics <input type="file" accept=".ics,text/calendar" @change="importFile($event)"></label>
+</div>
+<pdx-scheduler :ref="schedulerEl" label="Team calendar" view="week" :date="today" ::events="items" :views="['week', 'month', 'agenda']" scroll-to="08:00"></pdx-scheduler>
 <p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
 ```
 

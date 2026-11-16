@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Editing an event</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Enter or a double click on an event opens the built-in editor; Enter on an empty slot, or a drag over empty slots, opens it on a new one. It edits the title, the start and end, all day, how the event repeats — every day, week (on which weekdays), month or year, and until when — the resource and the notes. Save asks <code>before-save</code>, Delete <code>before-remove</code>. On an occurrence of «Stand-up», a weekly series, it asks first whether the change is for this occurrence or the whole series. The app adds its own fields with <code>&#64;snippet editorFields(e, set)</code> — here a client, saved with the event; <code>&#64;snippet editorContent(e, actions)</code> draws the editor's content instead, and <code>editor="none"</code> turns it off.</p>
+    <pdx-scheduler label="Team, editable" view="week" :date="today" ::events="items" :views="['week', 'month', 'agenda']" scroll-to="08:00"
+      @save="onSave" @remove="onRemove">
+      @snippet editorFields(e, set) {
+        <pdx-form-field label="Client">
+          <pdx-input :value="e.client ?? ''" @value-change="set({ client: $event.detail.value })"></pdx-input>
+        </pdx-form-field>
+      }
+    </pdx-scheduler>
+    <p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const today = at(1);
+let items = $signal([
+  { id: 'standup', title: 'Stand-up', start: at(0, '09:00'), end: at(0, '09:15'), rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' },
+  { id: 'review', title: 'Design review', start: at(1, '11:00'), end: at(1, '12:30'), client: 'Northwind', notes: 'Bring the print proofs.' },
+  { id: 'offsite', title: 'Offsite', start: at(3), end: at(5), allDay: true },
+]);
+let last = $signal('Nothing saved yet.');
+
+function onSave(e) {
+  const d = e.detail;
+  const scope = d.scope === 'series' ? ', the whole series' : d.scope === 'occurrence' ? ', this occurrence' : '';
+  last = d.event.title + (d.isNew ? ' created' : ' saved') + scope + (d.event.client ? ' — client ' + d.event.client : '') + '.';
+}
+function onRemove(e) {
+  last = e.detail.event.title + (e.detail.scope === 'occurrence' ? ', this occurrence,' : '') + ' deleted.';
+}
+</script>

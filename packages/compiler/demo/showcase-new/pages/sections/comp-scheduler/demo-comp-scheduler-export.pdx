@@ -1,0 +1,42 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Export, import, print</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The bar's «Export» menu saves the period's events as CSV or Excel — one row each, a series as its occurrences — or <code>events</code> as iCalendar, the data itself: a series with its rule, an override with the occurrence it replaces, a wall time with its time zone. «Print» prints the view whole, every hour and resource, with the scheduler alone on the page. <code>exports</code> chooses what the menu offers. The same are methods for the app's own buttons — <code>exportCsv()</code>, <code>exportXlsx()</code>, <code>exportIcs()</code>, <code>print()</code> — and <code>importIcs(text)</code> reads a calendar file back, asking <code>before-import</code> first.</p>
+    <div class="demo-row">
+      <pdx-button variant="outline" @click="saveIcs()">Save as .ics</pdx-button>
+      <label class="pick">Import an .ics <input type="file" accept=".ics,text/calendar" @change="importFile($event)"></label>
+    </div>
+    <pdx-scheduler :ref="schedulerEl" label="Team calendar" view="week" :date="today" ::events="items" :views="['week', 'month', 'agenda']" scroll-to="08:00"></pdx-scheduler>
+    <p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const today = at(1);
+let items = $signal([
+  { id: 'standup', title: 'Stand-up', start: at(0, '09:00'), end: at(0, '09:15'), rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR' },
+  { id: 'launch', title: 'Launch call', start: at(2, '15:00'), end: at(2, '16:00') },
+]);
+let schedulerEl = $signal(null);
+let last = $signal('Nothing exported or imported yet.');
+
+function saveIcs() {
+  const blob = schedulerEl?.exportIcs();
+  if (blob) last = 'Saved ' + items.length + ' events as iCalendar (' + blob.size + ' bytes).';
+}
+async function importFile(e) {
+  const file = e.target.files?.[0];
+  if (!file || !schedulerEl) return;
+  const result = schedulerEl.importIcs(await file.text());
+  last = result
+    ? 'Imported ' + result.events.length + ' events' + (result.skipped.length ? ', skipped ' + result.skipped.length + ': ' + result.skipped.map((s) => s.title + ' (' + s.reason + ')').join('; ') : '') + '.'
+    : 'The import was refused.';
+  e.target.value = '';
+}
+</script>
+
+<style scoped>
+  .pick { display: inline-flex; align-items: center; gap: var(--pdx-space-xs); font-size: var(--pdx-text-sm); }
+</style>
