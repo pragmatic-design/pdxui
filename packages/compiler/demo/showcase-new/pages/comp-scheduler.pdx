@@ -86,6 +86,7 @@
         <div class="opt-row"><code>Arrows</code><span></span><span>On a picked-up event: move it a slot, a day (a week up and down in the month) or a resource</span></div>
         <div class="opt-row"><code>Shift + arrows</code><span></span><span>On a picked-up event: move its end; with <kbd>Alt</kbd>, its start</span></div>
         <div class="opt-row"><code>Shift + arrows</code><span></span><span>On a cell: select the slots or days from it, in one resource; <kbd>Enter</kbd> creates an event over them, asking <code>before-create</code> first</span></div>
+        <div class="opt-row"><code>Tab</code><span></span><span>Among a cell's events: each event, then its <code>⋯</code>, whose <kbd>Move</kbd> and <kbd>Resize</kbd> pick it up for the arrows, or for a click on a slot</span></div>
         <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell; a picked-up event, or one dragged by the pointer, back where it was; a selection of cells, dropped</span></div>
         <div class="opt-row"><code>Enter · Space</code><span></span><span>On a timeline resource with children: open or close it</span></div>
         <div class="opt-row"><code>→ · ←</code><span></span><span>On a timeline resource: open a closed parent, close an open one, or from a child go to its parent</span></div>

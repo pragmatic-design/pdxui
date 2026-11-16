@@ -48,8 +48,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   a movable event's description says so. Shift and the arrows on an empty cell select slots or days,
   drawn as a drag over them draws them, and Enter creates an event there through the same
   `before-create`; Escape, or an arrow without Shift, drops the selection, and the grid's description
-  says so. Touch dragging, the single-pointer way, recurrence, the built-in editor, and print and
-  export come in the following parts.
+  says so. With a single pointer, an event's ⋯ offers Move and Resize: the event is picked up, and a
+  click on a slot puts it there, or ends it there, through the same `before-move` or `before-resize`;
+  the ⋯ shows on hover and focus, and always for a coarse pointer. The `event` part is now the box
+  that holds the event's button (`eventButton`, which carries its name and takes the focus), its edges
+  and its ⋯ (`eventMenu`). Touch dragging, recurrence, the built-in editor, and print and export come
+  in the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

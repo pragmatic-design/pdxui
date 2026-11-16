@@ -38,7 +38,11 @@ type Recorded = { type: string; detail: Record<string, unknown> };
 const events = (page: Page) => page.evaluate(() => (window as unknown as { __events: Recorded[] }).__events);
 const announced = (page: Page) => page.evaluate(() => document.querySelector('body > [role="status"][aria-atomic="true"]')?.textContent ?? '');
 const cell = (s: Locator, row: number, col: number) => s.locator(`[role="gridcell"][data-row="${row}"][data-col="${col}"]`);
-const focusedId = (page: Page) => page.evaluate(() => (document.activeElement as HTMLElement | null)?.dataset.id ?? null);
+/** The id of the event whose button has the focus; null when the focus is anywhere else, its ⋯ too. */
+const focusedId = (page: Page) => page.evaluate(() => {
+    const el = document.activeElement;
+    return el?.matches('[data-part="eventButton"]') ? (el.closest('[data-part="event"]') as HTMLElement | null)?.dataset.id ?? null : null;
+});
 const lifted = (s: Locator) => s.evaluate((el) => el.matches(':state(lifted)'));
 
 test.describe('the scheduler from the keyboard, a week', () => {

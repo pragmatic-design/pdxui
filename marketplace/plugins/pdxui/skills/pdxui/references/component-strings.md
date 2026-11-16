@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 501 keys in 82 components.
+> Generated from the sources. 506 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -395,17 +395,22 @@ placeholders, filled at render: keep them in the translation.
 | `scheduler` | `instructions` | `Press Space to pick the event up, the arrow keys to move it, Shift and the arrow keys to move its end, Alt, Shift and the arrow keys to move its start, Space or Enter to drop it, and Escape to cancel.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `label` | `Scheduler` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `lifted` | `{title} lifted. {when}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `menu` | `Change {title}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `month` | `Month` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `more` | `+{count} more` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `moreName` | `{count, plural, one {# more event} other {# more events}}, {date}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `moved` | `{title} moved` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `moveItem` | `Move` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `newEvent` | `New event` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `next` | `Next period` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `noEvents` | `No events in this period` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `overlapRefused` | `{title} not changed: it would overlap {count, plural, one {# event} other {# events}}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `picked` | `{title} picked up. Choose the slot to move it to, or press Escape.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `pickedResize` | `{title} picked up. Choose the slot it should end in, or press Escape.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `previous` | `Previous period` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `refused` | `{title} not changed` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `resized` | `{title} resized` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `resizeItem` | `Resize` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `resource` | `Resource` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `selectCancelled` | `Selection cancelled.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `scheduler` | `selected` | `{when} selected.` | `@pdxui/ui/src/shared/i18n.ts` |
