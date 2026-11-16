@@ -353,8 +353,11 @@ component('pdx-time-picker', {
             const empty = _empty();
             const emptyText = getComponentString('time-picker', 'empty')();
 
-            /** A segment's text and spinbutton value; empty shows "--" and says so, with no number. */
-            const show = (seg: HTMLElement | null, text: string, now: string): void => {
+            /**
+             * A segment's text and spinbutton value, a number, and `said` when the number is not what to
+             * say (AM/PM); empty shows "--" and says so, with no number.
+             */
+            const show = (seg: HTMLElement | null, text: string, now: string, said?: string): void => {
                 if (!seg) return;
                 if (empty) {
                     seg.textContent = '--';
@@ -363,7 +366,7 @@ component('pdx-time-picker', {
                 } else {
                     seg.textContent = text;
                     seg.setAttribute('aria-valuenow', now);
-                    seg.removeAttribute('aria-valuetext');
+                    if (said === undefined) seg.removeAttribute('aria-valuetext'); else seg.setAttribute('aria-valuetext', said);
                 }
             };
 
@@ -371,7 +374,8 @@ component('pdx-time-picker', {
                 show(_hourEl, String(h).padStart(2, '0'), String(h));
                 show(_minuteEl, String(m).padStart(2, '0'), String(m));
                 show(_secondEl, String(s).padStart(2, '0'), String(s));
-                show(_periodEl, period, period);
+                // A spinbutton's value is a number: AM is 0 and PM 1, the word its value text.
+                show(_periodEl, period, period === 'PM' ? '1' : '0', period);
             });
         });
 
@@ -397,8 +401,14 @@ component('pdx-time-picker', {
             val.setAttribute('data-part', 'segment');
             val.setAttribute('tabindex', ctx.disabled() ? '-1' : '0');
             val.setAttribute('aria-label', label);
-            val.setAttribute('aria-valuenow', display);
-            // The segment's range for the WAI-ARIA spinbutton pattern (period is AM/PM, not numeric).
+            // The segment's value and range for the WAI-ARIA spinbutton pattern, numbers all: AM/PM is 0
+            // or 1, its word in aria-valuetext.
+            if (segment === 'period') {
+                val.setAttribute('aria-valuenow', display === 'PM' ? '1' : '0');
+                val.setAttribute('aria-valuetext', display);
+                val.setAttribute('aria-valuemin', '0');
+                val.setAttribute('aria-valuemax', '1');
+            } else val.setAttribute('aria-valuenow', display);
             if (segment === 'hour') {
                 val.setAttribute('aria-valuemin', is12h() ? '1' : '0');
                 val.setAttribute('aria-valuemax', is12h() ? '12' : '23');
