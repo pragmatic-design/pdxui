@@ -8,11 +8,14 @@
 // resource), an all-day event a column and, resized, a day. The month: Left and Right a day, Up and
 // Down a week, across the rows. The timeline: Left and Right a column, Up and Down a resource's row; a
 // resize only along the time.
+//
+// Shift+arrows on an empty cell select a range to create an event over (keySelect): from the cell the
+// selection began on to the one the keys reached, the range a drag over them gives (createRange).
 
 import { addDays } from '@pdxui/core';
 import { eventInstant, zonedInstant, zonedParts } from './time';
 import { eventDates, isAllDay, type SchedulerEvent } from './grid-model';
-import { moveEvent, resizeEvent, type DropPoint, type Placement } from './drag-model';
+import { createRange, moveEvent, resizeEvent, type DropPoint, type Placement } from './drag-model';
 import { cellOfPoint, pointOfCell, type PointModel } from './drop-point';
 import type { Cell } from './grid-keys';
 
@@ -72,6 +75,33 @@ export function keyStep(m: PointModel, size: { rows: number; cols: number }, e: 
         ? moveEvent(e, { point: fromPoint }, toPoint, o.timeZone)
         : resizeEvent(e, edge, toPoint, o.step, o.timeZone);
     return { placement, cell: to };
+}
+
+export interface KeySelect {
+    /** The cell the selection began on. */
+    anchor: Cell;
+    /** The cell the keys reached so far. */
+    cell: Cell;
+    key: Arrow;
+    /** A slot's length in ms: a timed range ends a slot after the last one it takes in. */
+    step: number;
+    timeZone: string;
+}
+
+/**
+ * A selection over empty cells one Shift+arrow further, in the grid `m` of `size`: the cell it reaches
+ * and the range from the anchor's cell to it, both included. Null when the key cannot take it there: off
+ * the grid, or to a cell of another resource or of the other kind (a whole day against a slot), which
+ * one event could not cover.
+ */
+export function keySelect(m: PointModel, size: { rows: number; cols: number }, o: KeySelect): { cell: Cell; range: ReturnType<typeof createRange> } | null {
+    const { dr, dc } = DELTA[o.key];
+    const to = { row: o.cell.row + dr, col: o.cell.col + dc };
+    if (to.row < 0 || to.row >= size.rows || to.col < 0 || to.col >= size.cols) return null;
+    const anchor = pointOfCell(m, o.anchor.row, o.anchor.col);
+    const reached = pointOfCell(m, to.row, to.col);
+    if (!anchor || !reached || reached.resource !== anchor.resource || reached.allDay !== anchor.allDay) return null;
+    return { cell: to, range: createRange(anchor, reached, o.step, o.timeZone) };
 }
 
 /** The cell an arrow takes the edge to, along the view's axis; null off the grid or off the axis. */

@@ -45,9 +45,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   From the keyboard, Space picks a focused event up: the arrows move it a slot, a day or a resource,
   Shift and the arrows move its end, Alt, Shift and the arrows its start, Space or Enter drops it
   through the same `before-move` or `before-resize`, Escape puts it back, and each step is announced;
-  a movable event's description says so. Touch dragging, creating from the keyboard, the
-  single-pointer way, recurrence, the built-in editor, and print and export come in the following
-  parts.
+  a movable event's description says so. Shift and the arrows on an empty cell select slots or days,
+  drawn as a drag over them draws them, and Enter creates an event there through the same
+  `before-create`; Escape, or an arrow without Shift, drops the selection, and the grid's description
+  says so. Touch dragging, the single-pointer way, recurrence, the built-in editor, and print and
+  export come in the following parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.
