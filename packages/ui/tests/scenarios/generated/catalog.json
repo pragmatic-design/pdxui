@@ -2713,6 +2713,10 @@
           "title": "Scheduler — A day by room"
         },
         {
+          "id": "scheduler-recurring",
+          "title": "Scheduler — A recurring event"
+        },
+        {
           "id": "scheduler-disabled",
           "title": "Scheduler — Disabled"
         },

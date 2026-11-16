@@ -52,8 +52,14 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   click on a slot puts it there, or ends it there, through the same `before-move` or `before-resize`;
   the ⋯ shows on hover and focus, and always for a coarse pointer. The `event` part is now the box
   that holds the event's button (`eventButton`, which carries its name and takes the focus), its edges
-  and its ⋯ (`eventMenu`). Touch dragging, recurrence, the built-in editor, and print and export come
-  in the following parts.
+  and its ⋯ (`eventMenu`). An event with an `rrule` is a series, drawn once per occurrence in the
+  period: the scheduler's own expander of RFC 5545's FREQ, INTERVAL, COUNT, UNTIL, BYDAY (with
+  ordinals), BYMONTHDAY, BYMONTH and WKST, with `exdate`, in the series' wall time, so summer time does
+  not move a weekly 9:00; a rule with a part it does not do is drawn once. Moving or resizing an
+  occurrence asks with `scope: 'occurrence'`: left so, it writes an override, an event with `seriesId`
+  and `recurrenceId` (its series, and the start it replaces); set to `'series'` by the app, it moves
+  the whole series. Touch dragging, the built-in editor, and print and export come in the following
+  parts.
 
 - `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
   row as tall as its content, changes when they change, and the offsets of the items after it follow.

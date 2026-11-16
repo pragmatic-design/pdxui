@@ -43,6 +43,8 @@ const CALENDAR = `date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale
 // A; the van has two trips that overlap on Wednesday, so its row takes two lanes.
 const SITES = `[{"id":"north","label":"North site","children":[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]},{"id":"van","label":"Van"}]`;
 const SITE_EVENTS = `[{"id":"audit","title":"Audit","start":"2026-09-22T12:00","end":"2026-09-23T12:00","resource":"a"},{"id":"move","title":"Move","start":"2026-09-21","end":"2026-09-24","resource":"van"},{"id":"pickup","title":"Pickup","start":"2026-09-23T09:00","end":"2026-09-23T13:00","resource":"van"},{"id":"talk","title":"Talk","start":"2026-09-24T09:00","end":"2026-09-24T10:00","resource":"b"}]`;
+// A series: a stand-up every weekday at 9:00, from the week before the one on screen.
+const SERIES = `[{"id":"daily","title":"Daily","start":"2026-09-14T09:00","end":"2026-09-14T09:30","rrule":"FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR"}]`;
 // Five hundred resources over a day of half-hour slots: 24 000 cells if every one were drawn.
 const MANY = JSON.stringify(Array.from({ length: 500 }, (_, i) => ({ id: `r${i}`, label: `Resource ${i + 1}` })));
 const MANY_EVENTS = JSON.stringify([{ id: 'first', title: 'First', start: '2026-09-22T09:00', end: '2026-09-22T11:00', resource: 'r0' }, { id: 'last', title: 'Last', start: '2026-09-22T09:00', end: '2026-09-22T10:00', resource: 'r499' }]);
@@ -64,6 +66,11 @@ export const scheduler: ComponentManifest = {
             id: 'scheduler-resources',
             title: 'Scheduler — A day by room',
             html: `<pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-09-22" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" resources='${ROOMS}' events='${ROOM_EVENTS}'></pdx-scheduler>`,
+        },
+        {
+            id: 'scheduler-recurring',
+            title: 'Scheduler — A recurring event',
+            html: `<pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" ${FIXED} events='${SERIES}'></pdx-scheduler>`,
         },
         {
             id: 'scheduler-disabled',
