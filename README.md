@@ -277,14 +277,15 @@ on.
 A framework that writes your wiring has to be more reliable than the wiring it replaces. Every push
 runs the type check, the lint and the unit suites of the packages it affects on the machine it comes
 from; CI runs every suite, and the component certification, on every pull request. The last full run
-was **21,901 tests**:
+was **42,774 tests**:
 
-- **11,833 unit tests** across the compiler, the runtime, the router, the language server, the
-  components and the CLI, and **23 benchmarks**, among them one that keeps compile time linear in the
+- **18,007 unit tests** across the compiler, the runtime, the router, the language server, the
+  components and the CLI, and **63 benchmarks**, among them one that keeps compile time linear in the
   number of declarations.
-- **1,659 browser tests** on the design system, the theme builder, the documentation site and the
+- **2,036 browser tests** on the design system, the theme builder, the documentation site and the
   showcase application, on its production build and on the development server.
-- **Component certification: 6,678 tests**, plus **1,708 visual tests**. The components are
+- **Component certification: 13,017 tests**, **7,592** more that run the contract rules again under
+  the older browser target, `baseline-2024`, and **2,059 visual tests**. The components are
   described by [123 manifests](packages/responsive/tests/manifests/) of scenarios, and each scenario
   is measured in all 13 themes, in a browser: geometry and contrast, axe accessibility, immunity to
   hostile page CSS, the WAI-ARIA keyboard pattern, and screenshots compared against baselines made
