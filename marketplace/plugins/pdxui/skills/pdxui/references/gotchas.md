@@ -54,6 +54,20 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 - **A `.pdx` scoped style does NOT reach light DOM created at runtime** by a component (a data-grid cell built through
   `cell:`, say). Use a **global** stylesheet (imported in index.html) for those classes.
 - To centre an icon inside a button: `pdx-icon { display:block; line-height:0 }`.
+- **A library component is restyled through what it exposes, not its classes.** Its tokens
+  (`--pdx-button-bg`, set at any level, listed as **Tokens** on its page), its host attributes
+  (`pdx-button[variant="primary"]`), its custom states (`pdx-input:state(invalid)`) and its parts
+  (`[data-part="root"]`). The classes it writes on its own elements — `.pdx-input-wrap.error`,
+  `.pdx-primary` on pdx-button's inner button, `.pdx-input-sm` — changed in the beta and match
+  nothing: `pdx-input:state(invalid) [data-part="root"] { … }`. A native `<button class="pdx-primary">`
+  keeps its class.
+
+## Snippets of library menus and trees
+- A snippet's parameter is your own item: `@snippet item(it) { {{ it.lable }} }` is an error where it is
+  written, and a field your items carry reads with its type. A menu or a tree leaves out of the
+  snippet's type the entries it draws itself, a header or a separator, **when their `type` is a
+  literal**: write `{ key: 's', type: 'separator' as const }`; without `as const` its `type` is a
+  `string`, and the entry stays in the snippet's type.
 
 ## Routing / guard
 - No global `effect` that reads `currentPath()` and calls `navigate()` (it loops). Guard **per route** in the
