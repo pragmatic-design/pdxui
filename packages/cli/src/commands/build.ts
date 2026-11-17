@@ -32,12 +32,14 @@ export default defineCommand({
         const resolved = resolveConfig(config, cwd);
         const outDir = (args.outDir as string) ? resolve(cwd, args.outDir as string) : resolved.outDir;
 
+        // `--no-minify` reaches every build (#1161): the SPA and static ones minified whatever was asked.
+        const minify = args.minify as boolean;
         if (args.standalone) {
-            await buildStandalone(resolved, outDir, args.minify as boolean, sourcemap);
+            await buildStandalone(resolved, outDir, minify, sourcemap);
         } else if (args.ssg) {
-            await runSsg(cwd, resolved, outDir, sourcemap);
+            await runSsg(cwd, resolved, outDir, sourcemap, minify);
         } else {
-            await buildSpa(cwd, resolved, outDir, sourcemap);
+            await buildSpa(cwd, resolved, outDir, sourcemap, minify);
         }
     },
 });
@@ -61,7 +63,8 @@ async function buildSpa(
     cwd: string,
     resolved: ReturnType<typeof resolveConfig>,
     outDir: string,
-    sourcemap: SourcemapMode
+    sourcemap: SourcemapMode,
+    minify: boolean,
 ): Promise<void> {
     let vite: typeof import('vite');
     try {
@@ -76,7 +79,7 @@ async function buildSpa(
         plugins: await pdxPluginsFor(vite, cwd, resolved, false),
         build: {
             outDir,
-            minify: 'esbuild',
+            minify: minify ? 'esbuild' : false,
             target: resolved.target,
             sourcemap,
         },
@@ -91,10 +94,11 @@ async function runSsg(
     resolved: ReturnType<typeof resolveConfig>,
     outDir: string,
     sourcemap: SourcemapMode,
+    minify: boolean,
 ): Promise<void> {
     let report: SsgReport;
     try {
-        report = await buildSsg(cwd, resolved, outDir, sourcemap);
+        report = await buildSsg(cwd, resolved, outDir, sourcemap, undefined, minify);
     } catch (e) {
         if (!(e instanceof SsgError) && !(e instanceof PdxConfigError)) throw e;
         logger.error(`pdx build --ssg: ${e.message}`);

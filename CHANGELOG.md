@@ -23,6 +23,9 @@ semver.
 
 ### Fixes
 
+- `pdx build --no-minify` leaves the SPA and static builds readable (#1161). Only the standalone build
+  read the flag; the other two minified whatever was asked. The default is unchanged.
+
 - `pdx-bottom-nav` names a badged item with what it shows, in the order shown (#1154). The badge is
   drawn before the label, the text read "3Messages" and the name "Messages, 3 new", which fails
   WCAG 2.5.3 (label in name): axe's `label-content-name-mismatch`. The text has a space between the two
