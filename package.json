@@ -6,9 +6,9 @@
   "scripts": {
     "build": "pnpm -r run build",
     "test": "pnpm run test:unit && pnpm run test:browser",
-    "test:unit": "pnpm -r --workspace-concurrency=4 --filter=!@pdxui/design --filter=!@pdxui/builder --filter=!@pdxui/site --filter=!@pdxui/showcase run test",
+    "test:unit": "pnpm -r --workspace-concurrency=4 --no-bail --filter=!@pdxui/design --filter=!@pdxui/builder --filter=!@pdxui/site --filter=!@pdxui/showcase run test",
     "test:unit:uncovered": "pnpm -r --workspace-concurrency=4 --filter=!@pdxui/design --filter=!@pdxui/builder --filter=!@pdxui/site --filter=!@pdxui/showcase --filter=!@pdxui/core --filter=!@pdxui/compiler --filter=!@pdxui/router --filter=!@pdxui/lsp run test",
-    "test:browser": "pnpm -r --workspace-concurrency=1 --filter @pdxui/design --filter @pdxui/builder --filter @pdxui/site --filter @pdxui/showcase run test",
+    "test:browser": "pnpm -r --workspace-concurrency=1 --no-bail --filter @pdxui/design --filter @pdxui/builder --filter @pdxui/site --filter @pdxui/showcase run test",
     "test:affected": "node scripts/test-affected.mjs",
     "test:perf": "pnpm --filter @pdxui/compiler --filter @pdxui/core run test:perf",
     "bench:jfb": "node scripts/bench-jfb/run.mjs",
