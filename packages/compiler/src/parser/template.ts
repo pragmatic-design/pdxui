@@ -357,6 +357,20 @@ function lookAhead(ctx: ParseContext, str: string): boolean {
     return ctx.source.startsWith(str, ctx.pos);
 }
 
+/**
+ * Whether one of a block's clauses (`@else`, `@empty`, `@loading`…) comes next, past the whitespace
+ * before it; the cursor is left on the clause. When none does, the cursor goes back before the
+ * whitespace: it is content, the space between the block and the next node (#907), and skipping it
+ * ran «10:30 AM» and «Call» together (#1152).
+ */
+function clauseFollows(ctx: ParseContext, ...clauses: string[]): boolean {
+    const before = { pos: ctx.pos, line: ctx.line, column: ctx.column };
+    skipWhitespace(ctx);
+    if (clauses.some((c) => lookAhead(ctx, c))) return true;
+    Object.assign(ctx, before);
+    return false;
+}
+
 // ─── Node Parsing ──────────────────────────────────────────────────
 
 function parseNodes(ctx: ParseContext, stopAt?: string): TemplateNode[] {
@@ -672,9 +686,8 @@ function parseIf(ctx: ParseContext, loc: SourceLoc): IfNode {
     skipWhitespace(ctx);
     const body = parseBlock(ctx);
 
-    skipWhitespace(ctx);
     let elseBody: TemplateNode[] | undefined;
-    if (lookAhead(ctx, '@else')) {
+    if (clauseFollows(ctx, '@else')) {
         advance(ctx, 5); // skip @else
         skipWhitespace(ctx);
 
@@ -805,8 +818,7 @@ function parseFor(ctx: ParseContext, loc: SourceLoc): ForNode {
 
     // Optional @empty block — shown when the array is empty
     let emptyBody: TemplateNode[] | undefined;
-    skipWhitespace(ctx);
-    if (lookAhead(ctx, '@empty')) {
+    if (clauseFollows(ctx, '@empty')) {
         advance(ctx, 6); // skip @empty
         skipWhitespace(ctx);
         emptyBody = parseBlock(ctx);
@@ -899,9 +911,8 @@ function parseRequire(ctx: ParseContext, loc: SourceLoc): RequireNode {
     const permission = raw.replace(/^['"]|['"]$/g, '');
     const body = parseBlock(ctx);
 
-    skipWhitespace(ctx);
     let elseBody: TemplateNode[] | undefined;
-    if (lookAhead(ctx, '@else')) {
+    if (clauseFollows(ctx, '@else')) {
         advance(ctx, 5); // skip @else
         skipWhitespace(ctx);
         elseBody = parseBlock(ctx);
@@ -947,8 +958,7 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
     let retryVar: string | undefined;
 
     // Parse optional sub-blocks
-    while (ctx.pos < ctx.source.length) {
-        skipWhitespace(ctx);
+    while (clauseFollows(ctx, '@placeholder', '@loading', '@error')) {
         if (lookAhead(ctx, '@placeholder')) {
             advance(ctx, 12); // skip @placeholder
             skipWhitespace(ctx);
@@ -957,8 +967,8 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
             advance(ctx, 8); // skip @loading
             skipWhitespace(ctx);
             loading = parseBlock(ctx);
-        } else if (lookAhead(ctx, '@error')) {
-            advance(ctx, 6); // skip @error
+        } else {
+            advance(ctx, 6); // skip @error, the clause left
             skipWhitespace(ctx);
             // Optional names, as `@await`'s (#281): @error (err) / @error (err, again)
             if (ctx.source[ctx.pos] === '(') {
@@ -966,8 +976,6 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
                 skipWhitespace(ctx);
             }
             error = parseBlock(ctx);
-        } else {
-            break;
         }
     }
 
@@ -1037,14 +1045,13 @@ function parseAwait(ctx: ParseContext, loc: SourceLoc): AwaitNode {
     let retryVar: string | undefined;
 
     // Parse optional @loading / @error sub-blocks
-    while (ctx.pos < ctx.source.length) {
-        skipWhitespace(ctx);
+    while (clauseFollows(ctx, '@loading', '@error')) {
         if (lookAhead(ctx, '@loading')) {
             advance(ctx, 8); // skip @loading
             skipWhitespace(ctx);
             loading = parseBlock(ctx);
-        } else if (lookAhead(ctx, '@error')) {
-            advance(ctx, 6); // skip @error
+        } else {
+            advance(ctx, 6); // skip @error, the clause left
             skipWhitespace(ctx);
             // Optional error variable, and optional retry name: @error (err) / @error (err, again)
             if (ctx.source[ctx.pos] === '(') {
@@ -1052,8 +1059,6 @@ function parseAwait(ctx: ParseContext, loc: SourceLoc): AwaitNode {
                 skipWhitespace(ctx);
             }
             errorBody = parseBlock(ctx);
-        } else {
-            break;
         }
     }
 
