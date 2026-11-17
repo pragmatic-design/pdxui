@@ -56,6 +56,10 @@ else
     # the site's design check failed the push on demos of another commit (#1073).
     echo "[pre-push] Site demos: port-demos.mjs"
     node packages/site/scripts/port-demos.mjs || { echo "[pre-push] FAILED: port-demos. (override: git push --no-verify)"; exit 1; }
+    # The machine's state as the suites start: CPU in use, free memory, and the vitest, Playwright
+    # and node processes another session already runs. A timeout below is read from this line (#1182).
+    # It only reports: a failure to read the machine does not block the push.
+    node scripts/lib/machine-load.mjs || echo "[pre-push] machine-load could not read the machine (exit $?)"
     if [ "$PDX_TEST_ALL" = "1" ]; then
         echo "[pre-push] Suites: pnpm test, every package  (PDX_TEST_ALL=1)"
         pnpm test || { echo "[pre-push] FAILED: suites. Push blocked. (override: git push --no-verify)"; exit 1; }

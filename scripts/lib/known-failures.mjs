@@ -93,7 +93,7 @@ export const KNOWN = [
     {
         issue: 991,
         says: 'a fast vitest test timed out under the gate\'s load',
-        evidence: 'the [slow-test] line just above: its reading names what held the process',
+        evidence: 'the [slow-test] line just above, whose reading names what held the process, and the [machine-load] line at the start of the suites, which says what else the machine was running',
         // A timeout, not any slow failure: a slow test that asserts wrong is a test failing.
         matches: (f) => Boolean(f.slowTest) && TIMED_OUT.test(f.error),
     },
