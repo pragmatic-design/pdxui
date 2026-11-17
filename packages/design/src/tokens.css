@@ -403,6 +403,12 @@
     --pdx-input-min-height:  2.5rem;       /* 40px default */
     --pdx-input-border-width: var(--pdx-border-width);
 
+    /* Control — the height and corner shared by the controls beside a button (#514).
+       The input frame, pdx-toggle and the tag input read them first; unset, each falls back to its
+       own token, and a theme that sets one aligns them all. */
+    --pdx-control-min-height: initial;
+    --pdx-control-radius:     initial;
+
     /* Touch target: the page's (the pointer decides it), in the :root block below. */
 
     /* Form field — the space a pdx-form-field leaves below itself, in any container.
