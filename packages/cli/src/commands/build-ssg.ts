@@ -51,6 +51,8 @@ export async function buildSsg(
     sourcemap: boolean | 'hidden',
     /** The Vite config to build with, instead of the one Vite finds at `cwd`: an app's SSG variant. */
     configFile?: string,
+    /** Minify the client build, as `pdx build` does unless `--no-minify` (#1161). */
+    minify = true,
 ): Promise<SsgReport> {
     if (resolved.ssgSetup && !existsSync(resolved.ssgSetup)) {
         throw new SsgError(`ssg.setup names ${resolved.ssgSetup}, and there is no such file.`);
@@ -64,7 +66,7 @@ export async function buildSsg(
         root: cwd,
         configFile,
         plugins: [...plugins, preloads.plugin],
-        build: { outDir, minify: 'esbuild', target: resolved.target, sourcemap },
+        build: { outDir, minify: minify ? 'esbuild' : false, target: resolved.target, sourcemap },
     });
 
     const serverDir = mkdtempSync(join(tmpdir(), 'pdx-ssg-'));
