@@ -1,6 +1,6 @@
 ---
 name: pdxui-language
-description: "The .pdx language: the file format (template, script setup, style scoped), the runes ($signal, $derived, $effect), the declarations (@prop, @page, @event and more), the template syntax and how a project is wired. Use before writing or editing any .pdx file, or when starting a PDX app."
+description: "The .pdx language: the file format (template, script, style scoped), the runes ($signal, $derived, $effect), the declarations (@prop, @page, @event and more), the template syntax and how a project is wired. Use before writing or editing any .pdx file, or when starting a PDX app."
 ---
 
 Read this before writing a `.pdx` file. Without it an agent writes `.pdx` from memory — the SFC shape,
@@ -122,6 +122,7 @@ Written at the top of `<script>`, one per line, ending in `;`.
 @model value: string = '';         // a prop the component writes: value = x dispatches 'value-change'
 @event changed: number;            // an emitter: changed(n) dispatches 'changed' with detail n
 @event(bubbles) closed;            // an event its ancestors hear too
+@event(cancelable) 'before-save': Draft;  // a listener can refuse: beforeSave(d) returns false then
 @page '/jobs/:id';                 // this component is a route
 @tag 'app-something-else';         // override the tag derived from the filename
 ```
@@ -132,8 +133,13 @@ listens on it, `<app-counter @changed="e => total = e.detail">` — the payload 
 element further up hears nothing, unless the declaration says `@event(bubbles)`. Keep event names
 lowercase: the listener is an HTML attribute, lowercased when parsed, so `@event itemPicked` is
 dispatched as `itemPicked` and listened for as `itempicked` — never heard. The compiler warns
-`PDX_EVENT_NAME_CASE` on such a declaration. Not kebab-case either: the name is also the emitter's
-identifier.
+`PDX_EVENT_NAME_CASE` on such a declaration. A kebab-case name is quoted, `@event 'open-change': T;`,
+and its emitter is the camelCase, `openChange(…)`.
+
+**A step a listener may refuse is a `cancelable` event.** `@event(cancelable) 'before-save': Draft;`
+makes the emitter return `false` when a listener called `preventDefault()`: write
+`if (!beforeSave(draft)) return;` and act only after it. The options combine,
+`@event(bubbles, cancelable)`; in TypeScript, `event({ cancelable: true })`.
 
 **A value the component edits for its parent is a `@model`, not a `@prop`.** A prop is the parent's:
 writing it is `PDX_PROP_WRITE`. `@model value: string = '';` is a prop the component may assign —
@@ -148,7 +154,10 @@ an array as repeated entries), `form.reset()` restores it through the model, its
 `error` props are its validity, and a disabled fieldset sets its `disabled` prop. Leave the inner
 `<input>` unnamed, or the value goes twice. When the form should receive something other than the
 model as it is (a clamped number, a selection), say it on the model: `{ form: () => value ?? '' }`
-(in a TypeScript component, `ctx.formValue(() => …)` in the setup). When the type unites values the
+(in a TypeScript component, `ctx.formValue(() => …)` in the setup). A value that is missing by a rule
+of its own — an object, which the empty rule never calls missing — says when:
+`{ form, missing: () => value?.amount == null }` (`ctx.formMissing(() => …)`); `required` still decides
+whether missing is an error. When the type unites values the
 attribute reads differently — a select's `string | string[] | null` — say how the attribute is read:
 `{ attribute: string }` (or `number`, `boolean`, `json`; beside `form`, comma-separated). Without it
 such a union reads the attribute as JSON (`value="1"` is the number 1), `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`.
@@ -159,6 +168,11 @@ compiler checks it: no `id="d"` in the template is `PDX_COMMAND_TARGET_MISSING`,
 does not expose is `PDX_COMMAND_UNKNOWN`. Prefer a prop for state, `commandfor` for an action a button
 triggers, a `:ref` for what neither expresses (`focus()`). A `:ref` declared `$signal(null)` on a
 component is typed in the editor by what it exposes: `dlg.nope()` is an error.
+
+**An exposed `$signal` or `$derived` is its value on the element, not a function.** With
+`@expose count;`, a parent reads `counter.count` and writes `counter.count = 5` (a `$derived` is
+read-only). `counter.count()` is the alpha form: `pdx migrate` flags it on a `:ref`
+(`expose-reactive-call`).
 
 **`@part trigger, popup;`** names a component's public inner elements: write `data-part="popup"` on
 the elements it names. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,
@@ -296,8 +310,45 @@ On a page that is not generated, it renders as if the block were not there. `@hy
 script does the same for the whole component (a page included), without `when (…)`.
 
 The complete set the parser knows: `if · else · for · empty · switch · case · default · await ·
-loading · catch · try · error · defer · hydrate · placeholder · show · require · portal · slot · let · raw ·
-snippet · render`.
+loading · catch · try · error · defer · hydrate · placeholder · show · require · portal · raw ·
+snippet · render`, and `slot` and `let`, which it reads only to report the alpha scoped slots as
+`PDX_REMOVED_FORM`.
+
+### Templates a component accepts: snippets
+
+A component that draws a piece the parent decides — a row, an option, an empty state — takes a
+**typed snippet**. The child declares the signature and renders it; the parent writes it inside the tag:
+
+```html
+<!-- child: app-user-list.pdx -->
+<template>
+  <ul>@for (items as it, i; track it.id) { <li>@render row(it, i)</li> } @empty { @render empty?.() @else { <li>Nothing yet</li> } }</ul>
+</template>
+<script>
+@generic T extends { id: string };
+@prop items: T[];
+@slot row: (item: T, index: number);   // required: the parent must give it
+@slot empty?: ();                      // optional: @render empty?.() draws nothing without it
+</script>
+
+<!-- parent -->
+<app-user-list :items="users">
+  @snippet row(u, i) { <strong>{{ i + 1 }}.</strong> {{ u.name }} }
+</app-user-list>
+```
+
+`T` is inferred from `:items` (so `u.nmae` is an error where it is written); where nothing bound tells
+it, set it on the tag, `T="User"`. The library's lists, menus, pickers and the data grid take snippets
+the same way, each with the arguments its reference lists (`pdx-select`'s `item(option, index)`,
+`pdx-data-grid`'s `cell(row, column, value)`), typed by your items. A plain `<slot>` stays, for
+children without data. The alpha forms are `PDX_REMOVED_FORM`, and `pdx migrate` rewrites them: `let:`,
+the child's `<slot :x>`, the parent's `@slot(name, { … }) { }` block, and template props such as
+`:item-template`.
+
+**Whitespace at an element's edges is not rendered.** `<li> <b>x</b> </li>` is `<li><b>x</b></li>`, as
+is the space after an `@if` branch's `{`; between two nodes a run of whitespace is one space.
+`<pre>`, `<textarea>` and `@raw` keep theirs. A text that must start or end with a space writes
+`&nbsp;` or `{{ ' ' }}`.
 
 ⚠️ **A block body must start with `{`.** `@if (x)` followed by markup is a parse error — the message
 says so, with the line and column.
@@ -489,4 +540,6 @@ imported once in `index.html`; an `AGENTS.md`. Then `npm install` and `npm run d
   `@defer` `idle`/`timer(n)` keep their remaining time; no request starts, and a stale `@fetch` or
   `useQuery` refreshes on return; a dynamic `@title` is not written. Do not stop these in `onHide`.
   **A timer you start in `onMount` keeps running** — the framework cannot see it: put it in an
-  `$effect` and clear it in the effect's cleanup.
+  `$effect` and clear it in the effect's cleanup. The cache is bounded: `<component :is @keepAlive>`
+  keeps at most 10 views, the least recently shown out first, and `@keepAlive(n)` sets the maximum
+  (`PDX_KEEPALIVE_MAX` for anything but a whole number of at least 1); the outlet's is `keep-alive-max`.

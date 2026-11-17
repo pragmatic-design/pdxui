@@ -41,21 +41,25 @@ hue** — pass this to decouple them) · `--density compact|normal|comfort` (sca
 see §6) · `--radius sharp|rounded|pill` · `--out` (file; **stdout otherwise, and `--quiet` only
 suppresses the report, not the CSS**).
 
-**Strict mode is ON by default** → exit ≠ 0 when a pair fails the WCAG gate. That is what makes this an
-**agent/CI loop**: generate → gate → non-zero means *fix the input* (brand/language), not the CSS. To
-emit anyway, pass **`--no-strict`** (there is no `--strict` flag to type; it is the default).
+**Strict mode is ON by default** → exit ≠ 0 when a pair is an error, below 3:1; a pair between 3:1 and
+4.5:1 is reported as a warning and does not fail it. That is what makes this an
+**agent/CI loop**: generate → gate → non-zero means *fix the input* (brand/language), not the CSS.
+**`--no-strict`** keeps the exit code at 0 (there is no `--strict` flag to type; it is the default); the
+CSS is written either way, so read the warnings too.
 
 Then apply — the CSS block is scoped to `[pdx-theme="acme"]`:
 
 ```html
 <html pdx-theme="acme" pdx-scheme="light">
 <script type="module">
-  import '@pdxui/design';   // FIRST — base tokens/reset/components/shipped themes
-  import './theme-acme.css';    // then your generated theme (partial override)
+  import '@pdxui/design/base';   // FIRST — tokens, reset, layout and the layer order
+  import './theme-acme.css';     // then your generated theme (partial override)
+  // each component brings its own CSS when the compiler imports it; `import '@pdxui/design'` instead
+  // loads every component's CSS and the 13 shipped themes, for a page with no compiler
 </script>
 ```
 
-> ⚠️ **The generated file is a PARTIAL override — `@pdxui/design` must be imported first.** It sets
+> ⚠️ **The generated file is a PARTIAL override — `@pdxui/design/base` must be imported first.** It sets
 > the palettes, hues, semantic `bg/surface/text/muted/border/primary/danger/success/warning/info(+ -text)`
 > and behavior tokens, but **not** `--pdx-color-secondary*`, `--pdx-color-subtle`, most `*-hover`,
 > `--pdx-text-display`, `--pdx-transition` — those fall back to base `tokens.css`. Consequence:
@@ -179,11 +183,18 @@ a hardcoded `rgb(255,255,255)` expectation breaks in dark mode.
 - **Behavior tokens** drive structural variants app-wide: `--pdx-button-radius`, `--pdx-input-style`
   (`outlined|filled|underlined`), `--pdx-input-focus` (`bottom`), `--pdx-tab-indicator`
   (`underline|pill|filled`), `--pdx-card-style`, `--pdx-accordion-glyph` +
-  `--pdx-accordion-open-transform`, `--pdx-breadcrumb-separator`, `--pdx-toggle-width/height`.
+  `--pdx-accordion-transform-open` (the old `--pdx-accordion-open-transform` still applies),
+  `--pdx-breadcrumb-separator`, `--pdx-toggle-width/height`, and the measure the controls beside a
+  button share, `--pdx-control-min-height` and `--pdx-control-radius` (the input frame, `pdx-toggle`
+  and the tag input read them first, then their own token).
   Declare them as tokens and set nothing else: under the default target the design CSS reads the
   structural ones with style queries, so a `pdx-theme` subtree gets its own. Never write
   `pdx-input-style`/`pdx-card-style`/`pdx-tab-style` attributes on `<html>` by hand — under
   `baseline-2024` `setTheme` mirrors them.
+- **Component tokens** restyle one component: `--pdx-<component>-<property>[-<state>]`
+  (`--pdx-button-bg`, `--pdx-button-bg-hover`, `--pdx-input-border-color-invalid`), set at `:root`, on a
+  subtree or in one element's `style`. Each component's page in the area skills lists its **Tokens**
+  with their defaults. Prefer them to a selector against the component's internals.
 
 ## 7. Programmatic API (`@pdxui/design/engine`)
 
@@ -206,7 +217,12 @@ Also exported: `getLanguage`/`getLanguageIds` · `hexToOklch`/`oklchToHex`/`delt
 `scoreTheme`/`combineThemeScore` (§8).
 
 `cssOverrides` is appended **inside** the theme block (CSS nesting `&`) — use it for the intrinsically-CSS
-personality (gradients, blur, glyphs) the token system can't express.
+personality (gradients, blur, glyphs) the token system can't express. A rule there that styles a
+library component selects what the component exposes — its host attributes, `:state()` and
+`[data-part]` — never the classes it writes on its own elements, which are not public:
+`& pdx-button[variant="primary"] > [data-part="root"] { … }`,
+`& pdx-input:state(invalid) [data-part="root"] { … }`. The `.pdx-surface-card` above is a design
+system class, applied to native markup by the app, and stays.
 
 ## 8. What the validator actually tells you (observed)
 

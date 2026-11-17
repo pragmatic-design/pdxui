@@ -47,7 +47,8 @@ describe('the .pdx examples in the skills', () => {
         // + the comment thread composed from pdx-list, pdx-textarea and pdx-button (#1022).
         // + three blocks whose directives were written `&#64;if` / `&#64;for` until the catalogue decoded
         // them (#1055): pdx-data-grid's custom cells, its cell and header snippets, and a pdx-checkbox list.
-        expect(COMPILED.map(e => e.where)).toHaveLength(28);
+        // + the language skill's typed snippet: a child declaring @slot and rendering it with @render.
+        expect(COMPILED.map(e => e.where)).toHaveLength(29);
     });
 
     it('skips only what says it is partial — and nothing does today', () => {
