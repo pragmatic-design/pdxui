@@ -71,7 +71,9 @@ grid.data = rows;         // feed data
 ```
 
 From script, this is how to set state on an element you hold a ref to. In a template, prefer the
-declarative binding — `<pdx-dialog :open="showDialog">` — which keeps the state in one signal; a ref
+declarative binding — `<pdx-dialog ::open="showDialog">` — which keeps the state in one signal: the
+dialog writes `open` back when it closes itself (Escape, the backdrop, ✕), which a one-way `:open`
+would not hear; a ref
 is for what a prop cannot express, such as `focus()` or `scrollTo()`.
 
 ## 2. Call exposed methods
@@ -105,15 +107,25 @@ ships today:
 | Component | Methods |
 |-----------|---------|
 | `pdx-autocomplete` | `show()`, `close()`, `toggle()`, `clear()` |
+| `pdx-select` | `show()`, `close()`, `toggle()`, `clear()`, `focus()`, `blur()` |
+| `pdx-cascader` | `show()`, `close()`, `toggle()`, `clear()`, `getLabels()` |
+| `pdx-tree-select` | `show()`, `close()`, `toggle()`, `clear()`, `getLabel()` |
+| `pdx-date-picker` | `show()`, `close()`, `toggle()`, `clear()`, `getDate()`, `getRange()`, `getTime()` |
+| `pdx-color-picker` | `show()`, `close()`, `toggle()`, `clear()`, `getHex()`, `getRgb()`, `getHsl()` |
 | `pdx-file-upload`  | `addFiles()`, `removeFile()`, `uploadAll()`, `clear()` |
 | `pdx-tag-input`    | `addTag()`, `removeTag()`, `clear()`, `getTags()` |
-| `pdx-dialog` | `show()`, `close()`, `toggle()` — or the `open` prop |
-| `pdx-drawer` | `show()`, `close()`, `toggle()` — or the `open` prop |
-| `pdx-fab` | `show()`, `close()`, `toggle()` — its speed dial |
-| `pdx-dropdown-menu` | `show()`, `close()`, `toggle()` |
-| `pdx-split-button` | `show()`, `close()`, `toggle()` — its menu |
-| `pdx-context-menu` | `show(x?, y?)` (at a point, or over its area), `close()`, `toggle()` |
-| `pdx-menu` | `show()`, `close()`, `toggle()`, `closeSubmenu()` — or the `open` prop |
+| `pdx-dialog` | `show()`, `close()`, `toggle()`, `isOpen` — or the `open` model |
+| `pdx-drawer` | `show()`, `close()`, `toggle()`, `isOpen` — or the `open` model |
+| `pdx-bottom-sheet` | `show()`, `close()`, `toggle()`, `isOpen`, `snapTo(i)` — or the `open` model |
+| `pdx-popover` | `show()`, `close()`, `toggle()`, `isOpen` — or the `open` model |
+| `pdx-tooltip` | `show()`, `close()`, `toggle()`, `isOpen` |
+| `pdx-command` | `show()`, `close()`, `toggle()`, `isOpen` — or the `open` model |
+| `pdx-fab` | `show()`, `close()`, `toggle()`, `isOpen` — its speed dial |
+| `pdx-dropdown-menu` | `show()`, `close()`, `toggle()`, `isOpen` |
+| `pdx-split-button` | `show()`, `close()`, `toggle()`, `isOpen` — its menu |
+| `pdx-context-menu` | `show(x?, y?)` (at a point, or over its area), `close()`, `toggle()`, `isOpen` |
+| `pdx-menu` | `show()`, `close()`, `toggle()`, `isOpen`, `closeSubmenu()` — or the `open` model |
+| `pdx-form-template` | `getForm()`, `next()`, `prev()`, `goTo(n)` — the wizard layout's steps |
 | `pdx-menubar` | `openMenu(key)`, `closeMenu()` |
 | `pdx-nav-menu` | `toggleGroup(key)`, `expandAll()`, `collapseAll()` |
 | `pdx-navbar` | `toggleMobile()` |

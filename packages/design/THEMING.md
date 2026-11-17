@@ -540,6 +540,15 @@ Extracted from hardcoded values.
 | `--pdx-input-min-height` | `2.5rem` |
 | `--pdx-input-border-width` | `var(--pdx-border-width)` |
 
+### Control
+
+The height and corner shared by the controls beside a button (#514).
+
+| Token | Default |
+|---|---|
+| `--pdx-control-min-height` | `initial` |
+| `--pdx-control-radius` | `initial` |
+
 ### Form field
 
 The space a pdx-form-field leaves below itself, in any container.

@@ -147,12 +147,10 @@ const results = $derived(                // 2. a value DERIVED from query + prod
 effect(() => {                           // 3. ACTION: track what the user searches
   if (query.length > 2) analytics.track('search', { query });
 });
-
-function onInput(e) { query = e.target.value; }
 ```
 
 ```pdx
-<input :value="query" @input="onInput" placeholder="Search…" />
+<input ::value="query" placeholder="Search…" />   <!-- both ways: typing writes query -->
 <p class="pdx-ink-muted">{{ results.length }} results</p>
 @for (results as p; track p.id) {
   <li>{{ p.name }}</li>

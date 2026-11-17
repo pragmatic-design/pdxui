@@ -324,7 +324,7 @@ Two are on by default, because an application that has neither is worse off and 
 
 | | |
 |---|---|
-| **timeout** | 30 s. A request with no deadline never fails: `loading` stays true and no `error` is ever produced. A request that runs out of time fails with an `HttpTimeoutError` — not an `AbortError`, which is what your own cancel produces — so a page can say «the server did not answer». Set `timeout: 0` to disable it. |
+| **timeout** | 30 s. A request with no deadline never fails: `pending()` stays true and `error()` stays `null`. A request that runs out of time fails with an `HttpTimeoutError` — not an `AbortError`, which is what your own cancel produces — so a page can say «the server did not answer». Set `timeout: 0` to disable it. |
 | **retry** | Reads only — GET, HEAD, OPTIONS — on network errors, 5xx, 408 and 429, with backoff and jitter, honouring `Retry-After`. A write (POST, PUT, PATCH, DELETE) is never replayed unasked, nor a request that timed out or was cancelled. One request asks for its own: `api.put(url, dto, { retry: 2 })` retries a write the server makes idempotent, `{ retry: false }` turns it off for that request. Set `retry: false` on the client to disable it everywhere. |
 
 The rest are opt-in. You install them once, at startup, with `configureClient`:
@@ -697,6 +697,8 @@ virt.dispose();
 ```
 
 **The honest limits.** `estimateSize` is a guess and `measureElement` is how it stops being one.
+`estimateSize` may read signals: a size you know without measuring — a row as tall as a setting —
+is computed again when they change, and the offsets after it follow.
 Hand it each row you render, with `data-virtual-index` on it. It measures the row and keeps a
 `ResizeObserver` on it, so a row that changes size later — an image that loads, text that wraps on
 resize — is measured again and the rows after it move. A row above the viewport that changes size
@@ -727,7 +729,7 @@ const orders = createDataSource({ transport: myTransport }); // a server: the sa
 That symmetry is the point, and it is the reason to reach for it rather than for a plain array: a
 grid built against `createDataSource(rows)` does not change when the data outgrows the browser — the
 paging, sorting, filtering and grouping descriptors go to the transport instead of running locally.
-`data()`, `total()`, `loading()` and `error()` are signals, so the template follows a page or sort
+`data()`, `total()`, `isLoading()` and `error()` are signals, so the template follows a page or sort
 change without being told to. `<pdx-data-grid>`, `<pdx-entity-grid>`, `<pdx-list>` and `<pdx-select>`
 all take one.
 

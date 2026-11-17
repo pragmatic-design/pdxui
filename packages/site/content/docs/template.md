@@ -32,6 +32,14 @@ A value that is already markup is put in as markup: an element (`{{ icon }}`, wh
 `Node`), a fragment, or an array of them, one after the other. Both builds do it through
 `bindInterpolation`, which also follows the value when it changes.
 
+### Whitespace
+
+Whitespace at the start and the end of an element's content, and of a block's, is not rendered:
+`<li> <b>x</b> </li>` is `<li><b>x</b></li>`, and so is the space between an `@if` branch's `{` and
+its markup. Between two nodes a run of whitespace is one space, so `{{ time }} {{ title }}` keeps its
+space. `<pre>`, `<textarea>` and `@raw` keep their text as written. A text that must start or end with
+a space writes it as `&nbsp;` or `{{ ' ' }}`.
+
 ## Bind attributes: `:attr`
 
 To bind an attribute or property to an expression, prefix it with `:`.
@@ -506,7 +514,9 @@ When the component to show is decided at runtime (a tab router, swappable views)
 ```
 
 With `@keepAlive` the compiler generates an LRU cache: visited views stay "frozen" instead of being
-rebuilt every time you come back.
+rebuilt every time you come back. The cache keeps at most 10, the least recently shown out first;
+`@keepAlive(n)` sets the maximum, and anything but a whole number of at least 1 is
+`PDX_KEEPALIVE_MAX`.
 
 The component it becomes takes no children: write the tag self-closed, and pass what the view needs
 as props (`<component :is="view" :title="t" />`). Content between `<component :is>` and

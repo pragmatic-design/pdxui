@@ -299,6 +299,11 @@ restore and `required` stay on the model. A TypeScript component says it in its 
 one that has a form model, as a `pdx-checkbox` inside a `pdx-checkbox-group`, is part of it: the group
 resets, and the checkbox follows the group instead of resetting itself.
 
+A component whose value is missing by a rule of its own says when, with `missing`: an object, which
+the empty rule above never calls missing, is missing while the expression is true —
+`@model value: Money | null = null { form, missing: () => value?.amount == null };`. `required` still
+decides whether missing is an error, and `error` still wins. In TypeScript, `ctx.formMissing(() => …)`.
+
 ### `{ attribute }` — how the attribute is read
 
 A model's type also says how its attribute is read: `string` as a string, `number` as a number,
@@ -347,12 +352,30 @@ native one of an input inside. When ancestors do need to hear it, say so:
 @event(bubbles) selected: { id: string };   // bubbles, and crosses shadow roots
 ```
 
+An event a listener can **refuse** is `cancelable`: its function returns `false` when a listener
+called `preventDefault()`, so the component asks before it acts —
+
+```pdx
+@event(cancelable) 'before-archive': { id: string };
+@event archived: { id: string };
+
+function archive() {
+  if (!beforeArchive({ id: 'a1' })) return;   // a listener said no
+  archived({ id: 'a1' });
+}
+```
+
+The parent refuses with `@before-archive="e => e.preventDefault()"`. The two options combine,
+`@event(bubbles, cancelable)`. In TypeScript, `events: { 'before-archive': event({ cancelable: true }) }`.
+
 The library's components follow the same rule: `value-change` stays on the `<pdx-input>` that sent
 it. `pdx migrate` writes `(bubbles)` on the `@event`s of an alpha project, which keeps what they did;
 `PDX_EVENT_BUBBLES_UNUSED` then lists the ones nothing hears above the component.
 
-Convention: library-component events use the `pdx-` prefix (e.g. `pdx-select`, `pdx-clear`), except a
-model's change event, which is `<name>-change` (`value-change`, `open-change`). For your own app
+The library's event names: a model's change is `<name>-change` (`value-change`, `open-change`);
+the newest components name the rest plainly, `before-*` for the ones a listener can refuse
+(`pdx-scheduler`'s `before-move` and `event-open`, `pdx-kanban`'s `move`); the others keep a `pdx-`
+prefix (`pdx-select`, `pdx-clear`). Each component's page lists its events. For your own app
 components, pick meaningful names. A plain `@event` name is a JavaScript identifier, since it is also
 the function that emits it. A name with hyphens is written in quotes, and its function is the
 camelCase of it:
@@ -360,6 +383,21 @@ camelCase of it:
 ```pdx
 @event 'open-change': { value: boolean };   // a parent listens with @open-change; openChange({ value: true }) sends it
 ```
+
+### Live and committed: `value-change` and `change`
+
+A text field of the library announces its value live: `value-change` on every keystroke. Its
+**commit**, on blur or Enter, is the inner input's native `change`, which bubbles to the host; a
+field that commits a value no typing produced — `pdx-number-input`'s stepper, a clear button —
+dispatches that `change` itself. So a field that saves when the user is done listens to `change`
+and reads the host:
+
+```pdx
+<pdx-input ::value="name" @change="e => save(e.currentTarget.value)" />
+```
+
+`::value.lazy="name"` writes the signal on that `change` instead of on every keystroke.
+`pdx-color-picker` and `pdx-mention` commit the same way.
 
 ## Slots — content decided by the parent
 
@@ -486,9 +524,18 @@ grid's `DataGrid`, and `empty()` replaces the empty state.
 </pdx-pagination>
 ```
 
+A snippet's parameter is the **app's own item** (#651): the library's lists, menus, trees and the data
+grid are generic over what `:items` (or `:data`, `:options`) is given, so in
+`@snippet item(it) { {{ it.lable }} }` the misspelt field is an error where it is written, and a field
+your items carry reads with its type. A menu or a tree also types its snippet over an item's children,
+and leaves out the entries it draws itself: write a header's or a separator's `type` as a literal —
+`{ key: 's1', type: 'separator' as const }` — and it is not part of the snippet's type.
+
 A component written in TypeScript reads the parent's template with core's `declaredSnippet(ctx,
 name, args)`: the snippet when the parent gave one, called with the arguments `args` takes from the
-scope, and nothing otherwise (#492); every component of the library reads its snippets with it.
+scope, and nothing otherwise (#492); every component of the library reads its snippets with it. To
+make its own snippets generic in the same way, its descriptor declares the type parameter and the
+prop it is inferred from: `generics: { T: { extends: '{ id: string }', from: 'items' } }`.
 
 ### Scoped slots, removed
 
@@ -629,6 +676,25 @@ attribute to name. The expression has to be a boolean: `@state count = 0;` is `P
 descriptor and sets one with `ctx.state('expanded', true)`. The manifest lists a component's states as
 `cssStates`. Inside the component's own `<style scoped>` the host is not reachable yet, so `:state()`
 is written from a theme or the page.
+
+## Icons: a page ships the ones it draws
+
+`<pdx-icon name="search">` needs no setup: the built-in set registers itself. It is not loaded whole.
+Each icon is its own module, `@pdxui/ui/icons/<name>`, and the compiler imports the ones it can see —
+a literal `name`, a literal icon prop (`<pdx-fab icon="edit">`), a literal `icon` in the script's
+`actions([{ icon: 'eye' }])` or menu items. A name it cannot see, computed or written in a `.ts`
+module, loads the first time it is drawn, a round trip later; to have it on the first screen,
+import it:
+
+```ts
+import { defineIcons } from '@pdxui/ui/icon/pdx-icon';
+import trash from '@pdxui/ui/icons/trash';
+defineIcons({ trash });
+```
+
+`registerPragmaticIcons()` from `@pdxui/ui/icon/pragmatic-icons` puts the whole set on the page.
+A `name` the set does not have renders nothing, and in development says so in the console;
+`pdx-icon`'s page lists the names.
 
 ## Putting it all together
 
