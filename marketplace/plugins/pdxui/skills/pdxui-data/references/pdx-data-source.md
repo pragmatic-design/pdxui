@@ -97,7 +97,7 @@ const userDS = createDataSource({
   valueField="id" searchable clearable />
 ```
 
-**`<pdx-data-source>` — Declarative** — Non-rendering component. Pass `:data`, `url`, or `:transport`. Use `:ref` to get the DataSource, or `name` for Context Protocol.
+**`<pdx-data-source>` — Declarative** — Non-rendering component. Pass `:data`, `url`, or `:transport`. Use `:ref` to get the DataSource. It is also provided to the elements inside it, as `DataSourceContext` and, with `:token`, under a context token of your own.
 
 ```html
 <pdx-data-source :data="users" id-field="id" :ref="dsRef" />

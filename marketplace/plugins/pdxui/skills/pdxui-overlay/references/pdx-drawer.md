@@ -34,6 +34,8 @@ A panel that slides in from an edge.
 
 **Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.; `[data-part="resize"]` — The element reached as `[data-part="resize"]`.
 
+**Tokens:** `--pdx-drawer-width`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

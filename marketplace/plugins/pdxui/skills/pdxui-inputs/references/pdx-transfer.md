@@ -45,6 +45,10 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 
 **Parts:** `[data-part="root"]` — The frame, a `role="group"` holding the two panels and the move buttons.; `[data-part="panel"]` — A side, the source or the target: its header, its filter and its list.; `[data-part="search"]` — A side's filter, while `searchable`; it filters, it is not the value.; `[data-part="list"]` — A side's `role="listbox"`.; `[data-part="option"]` — An item of a list.; `[data-part="move"]` — A button that moves the chosen items, or all of them, to the other side.
 
+**Tokens:** `--pdx-transfer-check-bg-selected`; `--pdx-transfer-option-bg-selected`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 **Shapes:** `TransferItem { value: string; label: string; disabled?: boolean; _raw?: any }`
 
 

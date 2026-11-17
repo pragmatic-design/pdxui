@@ -20,6 +20,8 @@ Pick a single option from a set.
 
 **Parts:** `[data-part="root"]` — The native radio, the circle drawn; the size variants key by it.; `[data-part="label"]` — The `label` text, when set.; `[data-part="description"]` — The `description` text, when set.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

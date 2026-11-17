@@ -15,6 +15,8 @@ for draws nothing. The drawings are flag-icons' (MIT), taken by `scripts/gen-fla
 
 **Parts:** `[data-part="root"]` — The image of the flag, `--pdx-flag-size` tall and four thirds of it wide.
 
+**Tokens:** `--pdx-flag-size`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

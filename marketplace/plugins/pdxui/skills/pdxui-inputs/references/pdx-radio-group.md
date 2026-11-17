@@ -16,6 +16,8 @@ A managed set of radios.
 
 **States:** `:state(invalid)` — `error` is set; every radio is aria-invalid.; `:state(disabled)` — `disabled` is set; the group is aria-disabled and every radio disabled.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

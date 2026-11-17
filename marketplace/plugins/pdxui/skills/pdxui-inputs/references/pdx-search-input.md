@@ -31,6 +31,8 @@ Search box with clear and shortcuts.
 
 **Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input type="search">`, the searchbox a form submits.; `[data-part="prefix"]` — The space before the text: the search icon, or the spinner while `loading`.; `[data-part="spinner"]` — The loading spinner, a `role="status"`, while `loading`.; `[data-part="clear"]` — The clear button, while there is text.; `[data-part="shortcut"]` — The `shortcut` hint, while the field is empty.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

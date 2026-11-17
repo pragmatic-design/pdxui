@@ -41,6 +41,10 @@ A month calendar surface.
 
 **Parts:** `[data-part="root"]` — The frame, a `role="group"`: the navigation above the grid.; `[data-part="nav"]` — The navigation bar: the two arrows and the title.; `[data-part="prev"]` — The arrow to the previous month, year or twelve years.; `[data-part="title"]` — The month or year shown; in the day view, the button that opens the month view.; `[data-part="next"]` — The arrow to the next month, year or twelve years.; `[data-part="grid"]` — A month's grid of days (`role="grid"`), or the months or years to pick from.; `[data-part="cell"]` — A day, a month or a year to pick.
 
+**Tokens:** `--pdx-calendar-cell-bg-in-range`; `--pdx-calendar-cell-bg-selected`; `--pdx-calendar-cell-color-selected`; `--pdx-calendar-cell-color-today`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

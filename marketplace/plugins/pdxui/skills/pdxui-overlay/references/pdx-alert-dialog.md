@@ -45,7 +45,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openBasic">Delete Item</pdx-button>
-<pdx-alert-dialog :open="basicOpen" title="Delete this item?" message="This action cannot be undone. The item will be permanently removed."
+<pdx-alert-dialog ::open="basicOpen" title="Delete this item?" message="This action cannot be undone. The item will be permanently removed."
     @pdx-confirm="onBasicConfirm" @pdx-cancel="onBasicCancel"></pdx-alert-dialog>
 ```
 
@@ -53,7 +53,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="danger" @click="openDanger">Delete Repository</pdx-button>
-<pdx-alert-dialog :open="dangerOpen" variant="danger" title="Delete Repository?" message="All data, issues, and pull requests will be permanently deleted."
+<pdx-alert-dialog ::open="dangerOpen" variant="danger" title="Delete Repository?" message="All data, issues, and pull requests will be permanently deleted."
     confirmLabel="Delete Forever" @pdx-confirm="onDangerConfirm" @pdx-cancel="onDangerCancel"></pdx-alert-dialog>
 ```
 
@@ -61,7 +61,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="danger" @click="openTypeConfirm">Delete Account</pdx-button>
-<pdx-alert-dialog :open="typeOpen" variant="danger" title="Delete your account?" message="This will permanently delete all your data."
+<pdx-alert-dialog ::open="typeOpen" variant="danger" title="Delete your account?" message="This will permanently delete all your data."
     confirmLabel="Delete Account" confirmText="DELETE" @pdx-confirm="onTypeConfirm" @pdx-cancel="onTypeCancel"></pdx-alert-dialog>
 ```
 
@@ -69,7 +69,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="warning" @click="openTimer">Drop Database</pdx-button>
-<pdx-alert-dialog :open="timerOpen" variant="danger" title="Drop database?" message="All tables and data will be destroyed. This cannot be undone."
+<pdx-alert-dialog ::open="timerOpen" variant="danger" title="Drop database?" message="All tables and data will be destroyed. This cannot be undone."
     confirmLabel="Drop" confirmDelay="5" @pdx-confirm="onTimerConfirm" @pdx-cancel="onTimerCancel"></pdx-alert-dialog>
 ```
 

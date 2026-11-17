@@ -13,6 +13,8 @@ A lightweight loading indicator.
 
 **Parts:** `[data-part="root"]` — The status (`role="status"`), named by the label.; `[data-part="indicator"]` — The ring, the dots or the bar.; `[data-part="label"]` — The visible label, with `show-label`.
 
+**Tokens:** `--pdx-spinner-size`; `--pdx-spinner-speed`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

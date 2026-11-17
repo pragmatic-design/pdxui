@@ -33,6 +33,8 @@ Star rating with halves and tooltips.
 
 **Parts:** `[data-part="root"]` — The frame, `role="slider"`.; `[data-part="star"]` — One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

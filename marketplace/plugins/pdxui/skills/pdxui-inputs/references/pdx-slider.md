@@ -38,6 +38,8 @@ Pick a number by dragging.
 
 **Parts:** `[data-part="root"]` — The frame the pointer acts on.; `[data-part="track"]` — The rail.; `[data-part="fill"]` — The coloured portion: from the minimum to the value, or between the thumbs.; `[data-part="thumb"]` — A thumb, `role="slider"`: one, or two in range mode; aria-invalid with `error`.; `[data-part="mark"]` — One of `marks`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

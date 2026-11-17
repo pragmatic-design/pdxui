@@ -33,6 +33,8 @@ A modal window with focus trap.
 
 **Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.
 
+**Tokens:** `--pdx-dialog-footer-height` (default `auto`); `--pdx-dialog-header-height` (default `auto`); `--pdx-dialog-width-lg` (default `640px`); `--pdx-dialog-width-md` (default `480px`); `--pdx-dialog-width-sm` (default `360px`); `--pdx-dialog-width-xl` (default `800px`). Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 
@@ -163,8 +165,8 @@ async function onBeforeClose() {
 <div class="demo-row">
   <pdx-button variant="outline" size="sm" @click="openDeclarative">Open Dialog</pdx-button>
 </div>
-<pdx-dialog :open="declOpen" title="Declarative Dialog" size="md">
-  <p style="margin:0 0 var(--pdx-space-md)">This dialog is opened via <code>:open</code> binding.</p>
+<pdx-dialog ::open="declOpen" title="Declarative Dialog" size="md">
+  <p style="margin:0 0 var(--pdx-space-md)">This dialog is bound with <code>::open</code>: Escape and the backdrop close it and write <code>declOpen</code> back.</p>
   <p style="margin:0">Click below to open a programmatic confirm on top of this dialog.</p>
   <span slot="footer">
     <pdx-button variant="danger" size="sm" @click="onNestedConfirm">Delete (Programmatic)</pdx-button>

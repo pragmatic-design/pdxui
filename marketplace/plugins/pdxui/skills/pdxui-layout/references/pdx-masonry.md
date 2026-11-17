@@ -8,6 +8,8 @@ A staggered, Pinterest-style grid.
 | `columnWidth` | `columnwidth` | number | `250` | Minimum column width for auto mode (px) |
 | `gap` | `gap` | string | `'1rem'` | Gap between items (CSS value) |
 
+**Tokens:** `--pdx-masonry-gap`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

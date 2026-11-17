@@ -61,6 +61,8 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 
 **Parts:** `[data-part="root"]` — The group: the field and its stepper buttons.; `[data-part="field"]` — The frame around the text: border, background and the states' colours.; `[data-part="input"]` — The native `<input>` that shows the formatted number.; `[data-part="decrement"]` — The button that steps down.; `[data-part="increment"]` — The button that steps up.; `[data-part="sign"]` — The sign button, with `allow-negative`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

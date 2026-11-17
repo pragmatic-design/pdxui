@@ -44,6 +44,10 @@ move to the next segment.
 
 **Parts:** `[data-part="root"]` — The frame, a `role="group"` that holds the segments.; `[data-part="segment"]` — A segment, a `role="spinbutton"`: the hour, the minute, the second or AM/PM.; `[data-part="arrow"]` — An arrow above or below a segment, which steps it.; `[data-part="separator"]` — The `:` between two segments.
 
+**Tokens:** `--pdx-time-picker-segment-bg-focus`; `--pdx-time-picker-segment-color-focus`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

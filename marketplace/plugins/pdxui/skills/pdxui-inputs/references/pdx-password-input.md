@@ -31,6 +31,8 @@ Password field with reveal and strength.
 
 **Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>`, the textbox a form submits.; `[data-part="toggle"]` — The button that reveals or hides the password.; `[data-part="strength"]` — The strength meter under the frame, with `show-strength` and something typed.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

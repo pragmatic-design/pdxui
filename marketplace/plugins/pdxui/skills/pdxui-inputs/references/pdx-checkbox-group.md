@@ -33,6 +33,8 @@ checked value, and `form.reset()` puts its selection back, the children with it.
 
 **States:** `:state(invalid)` — `error` is set; every checkbox is aria-invalid.; `:state(disabled)` — `disabled` is set; the group is aria-disabled and every checkbox disabled.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

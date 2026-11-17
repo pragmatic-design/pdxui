@@ -49,6 +49,8 @@ and rounds them, and draws no trailing zeros.
 
 **Parts:** `[data-part="root"]` — The frame around the display and the editor.; `[data-part="display"]` — The value at rest, a `role="button"` that opens the editor; with `edit-on="icon"` it only shows the value.; `[data-part="edit"]` — With `edit-on="icon"`, the pencil button that opens the editor, and the only thing that does.; `[data-part="editor"]` — The editor's container, shown while editing.; `[data-part="save"]` — The save button, with `save-on="action"`, while editing.; `[data-part="cancel"]` — The cancel button, with `save-on="action"`, while editing.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

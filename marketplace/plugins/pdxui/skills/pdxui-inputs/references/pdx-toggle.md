@@ -28,6 +28,10 @@ A pressable on/off button.
 
 **Parts:** `[data-part="root"]` — The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute.
 
+**Tokens:** `--pdx-toggle-height` (default `1.5rem`); `--pdx-toggle-width` (default `2.75rem`). Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

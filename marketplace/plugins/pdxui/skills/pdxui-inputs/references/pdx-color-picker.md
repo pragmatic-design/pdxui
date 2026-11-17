@@ -38,6 +38,10 @@ Choose a color visually.
 
 **Parts:** `[data-part="root"]` — The swatch, the button that opens the popup; absent when `inline`.; `[data-part="popup"]` — The panel: a floating `role="dialog"`, or in place when `inline`.; `[data-part="area"]` — The colour area, a two-dimensional `role="slider"`: saturation and brightness.; `[data-part="hue"]` — The hue slider.; `[data-part="alpha"]` — The opacity slider, while `showAlpha`.; `[data-part="input"]` — The text field that reads and writes the colour.; `[data-part="clear"]` — The clear button, while `clearable`.; `[data-part="preset"]` — A preset colour's button.
 
+**Tokens:** `--pdx-color-picker-preset-ring-active`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

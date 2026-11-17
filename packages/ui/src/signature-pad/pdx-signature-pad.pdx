@@ -55,6 +55,11 @@
  * @cssstate disabled - `disabled` is set.
  * @cssstate readonly - `readonly` is set.
  * @cssstate invalid - `error` is set.
+ *
+ * @cssprop --pdx-signature-paper - The paper's colour, light in both schemes, as a signed document is (default `oklch(0.99 0.003 260)`).
+ * @cssprop --pdx-signature-ink - The colour the pen draws with (default `oklch(0.25 0.06 260)`).
+ * @cssprop --pdx-signature-height - The height of the signing surface (default `10rem`).
+ * @cssprop --pdx-font-signature - The font of the Type mode (default the bundled `pdx-signature` script face).
  */
 import { uiString, format } from '../shared/i18n';
 import { SignatureSurface } from './surface';

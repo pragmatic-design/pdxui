@@ -31,6 +31,8 @@ One-time-code entry boxes, masked for a PIN.
 
 **Parts:** `[data-part="root"]` — The cells' group, `role="group"`.; `[data-part="cell"]` — One cell: a native `<input>`, one per character.; `[data-part="separator"]` — The dash between groups of cells, with `separator`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

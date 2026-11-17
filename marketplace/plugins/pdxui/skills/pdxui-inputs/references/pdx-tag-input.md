@@ -41,6 +41,8 @@ Type to add removable tags.
 
 **Parts:** `[data-part="root"]` — The frame, `role="group"`: border, background and the states' colours.; `[data-part="input"]` — The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`.; `[data-part="tag"]` — One tag, a chip.; `[data-part="remove"]` — A tag's remove button, while neither `disabled` nor `readonly`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

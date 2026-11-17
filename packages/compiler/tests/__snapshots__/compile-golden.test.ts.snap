@@ -9663,7 +9663,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-alert
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic Confirm</h2> <pdx-button variant="outline">Delete Item</pdx-button> <pdx-alert-dialog title="Delete this item?" message="This action cannot be undone. The item will be permanently removed."></pdx-alert-dialog></section>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __el2=__el0.firstChild.nextSibling.nextSibling;const __el3=__el2.nextSibling.nextSibling;return [__el2,__el3];};
@@ -9680,7 +9680,7 @@ function openBasic() { __basicOpen.setRaw(true); }
     const __frag=__blk0();
     const [__el2,__el3]=__walk0(__frag);
     __el2.addEventListener('click', safeHandler(batchHandler(ctx.openBasic), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el3w_open = {}; effect(() => { const __b = ctx.basicOpen(); if (Object.is(__b, __el3w_open)) return; __el3w_open = __b; assignBoundProperty(__el3, "open", __b); });
+    bindTwoWay(__el3, 'open', ctx.basicOpen);
     __el3.addEventListener('pdx-confirm', safeHandler(batchHandler(ctx.onBasicConfirm), ctx.el?.tagName?.toLowerCase(), 'pdx-confirm'));
     __el3.addEventListener('pdx-cancel', safeHandler(batchHandler(ctx.onBasicCancel), ctx.el?.tagName?.toLowerCase(), 'pdx-cancel'));
     return __frag;
@@ -9693,7 +9693,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-alert
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Danger Variant</h2> <p class="pdx-txt-small pdx-ink-muted">Red confirm button for destructive actions.</p> <pdx-button variant="danger">Delete Repository</pdx-button> <pdx-alert-dialog variant="danger" title="Delete Repository?" message="All data, issues, and pull requests will be permanently deleted." confirmLabel="Delete Forever"></pdx-alert-dialog></section>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -9710,7 +9710,7 @@ function openDanger() { __dangerOpen.setRaw(true); }
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openDanger), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.dangerOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.dangerOpen);
     __el4.addEventListener('pdx-confirm', safeHandler(batchHandler(ctx.onDangerConfirm), ctx.el?.tagName?.toLowerCase(), 'pdx-confirm'));
     __el4.addEventListener('pdx-cancel', safeHandler(batchHandler(ctx.onDangerCancel), ctx.el?.tagName?.toLowerCase(), 'pdx-cancel'));
     return __frag;
@@ -9723,7 +9723,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-alert
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Timer-Gated Confirm</h2> <p class="pdx-txt-small pdx-ink-muted">Confirm button disabled for N seconds to prevent accidental clicks.</p> <pdx-button variant="warning">Drop Database</pdx-button> <pdx-alert-dialog variant="danger" title="Drop database?" message="All tables and data will be destroyed. This cannot be undone." confirmLabel="Drop" confirmDelay="5"></pdx-alert-dialog></section>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -9740,7 +9740,7 @@ function openTimer() { __timerOpen.setRaw(true); }
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openTimer), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.timerOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.timerOpen);
     __el4.addEventListener('pdx-confirm', safeHandler(batchHandler(ctx.onTimerConfirm), ctx.el?.tagName?.toLowerCase(), 'pdx-confirm'));
     __el4.addEventListener('pdx-cancel', safeHandler(batchHandler(ctx.onTimerCancel), ctx.el?.tagName?.toLowerCase(), 'pdx-cancel'));
     return __frag;
@@ -9753,7 +9753,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-alert
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Type to Confirm</h2> <p class="pdx-txt-small pdx-ink-muted">User must type the exact text to enable confirm. GitHub delete-repo pattern.</p> <pdx-button variant="danger">Delete Account</pdx-button> <pdx-alert-dialog variant="danger" title="Delete your account?" message="This will permanently delete all your data." confirmLabel="Delete Account" confirmText="DELETE"></pdx-alert-dialog></section>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -9770,7 +9770,7 @@ function openTypeConfirm() { __typeOpen.setRaw(true); }
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openTypeConfirm), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.typeOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.typeOpen);
     __el4.addEventListener('pdx-confirm', safeHandler(batchHandler(ctx.onTypeConfirm), ctx.el?.tagName?.toLowerCase(), 'pdx-confirm'));
     __el4.addEventListener('pdx-cancel', safeHandler(batchHandler(ctx.onTypeCancel), ctx.el?.tagName?.toLowerCase(), 'pdx-cancel'));
     return __frag;
@@ -16531,8 +16531,8 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-data-
 import { assignBoundProperty, bindRef, component, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { users } from './state.pdx';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">&lt;pdx-data-source&gt; — Declarative</h2> <p class="pdx-txt-small pdx-ink-muted">Non-rendering component. Pass <code>:data</code>, <code>url</code>, or <code>:transport</code>.\\n      Use <code>:ref</code> to get the DataSource, or <code>name</code> for Context Protocol.</p> <div class="demo-row"><pdx-data-source id-field="id"></pdx-data-source> <pdx-select labelField="name" valueField="id" searchable clearable placeholder="From &lt;pdx-data-source>..."></pdx-select></div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-data-source :data="users" id-field="id" :ref="dsRef" /&gt;\\n&lt;pdx-select :source="dsRef" labelField="name" valueField="id"\\n  searchable clearable /&gt;</code></pre></details></section>'));
-const __walk0=(r)=>{const __el0=r.firstChild;const __el8=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el9=__el8.firstChild;const __el10=__el9.nextSibling.nextSibling;return [__el9,__el10];};
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">&lt;pdx-data-source&gt; — Declarative</h2> <p class="pdx-txt-small pdx-ink-muted">Non-rendering component. Pass <code>:data</code>, <code>url</code>, or <code>:transport</code>.\\n      Use <code>:ref</code> to get the DataSource. It is also provided to the elements inside it, as\\n      <code>DataSourceContext</code> and, with <code>:token</code>, under a context token of your own.</p> <div class="demo-row"><pdx-data-source id-field="id"></pdx-data-source> <pdx-select labelField="name" valueField="id" searchable clearable placeholder="From &lt;pdx-data-source>..."></pdx-select></div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-data-source :data="users" id-field="id" :ref="dsRef" /&gt;\\n&lt;pdx-select :source="dsRef" labelField="name" valueField="id"\\n  searchable clearable /&gt;</code></pre></details></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el9=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el10=__el9.firstChild;const __el11=__el10.nextSibling.nextSibling;return [__el10,__el11];};
 component('app-demo-comp-data-source-declarative', {
   props: {},
   setup(ctx) {
@@ -16541,10 +16541,10 @@ component('app-demo-comp-data-source-declarative', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el9,__el10]=__walk0(__frag);
-    let __el9w_data = {}; effect(() => { const __b = users; if (Object.is(__b, __el9w_data)) return; __el9w_data = __b; assignBoundProperty(__el9, "data", __b); });
-    bindRef(__el9,ctx.dsRef);
-    let __el10w_source = {}; effect(() => { const __b = ctx.dsRef(); if (Object.is(__b, __el10w_source)) return; __el10w_source = __b; assignBoundProperty(__el10, "source", __b); });
+    const [__el10,__el11]=__walk0(__frag);
+    let __el10w_data = {}; effect(() => { const __b = users; if (Object.is(__b, __el10w_data)) return; __el10w_data = __b; assignBoundProperty(__el10, "data", __b); });
+    bindRef(__el10,ctx.dsRef);
+    let __el11w_source = {}; effect(() => { const __b = ctx.dsRef(); if (Object.is(__b, __el11w_source)) return; __el11w_source = __b; assignBoundProperty(__el11, "source", __b); });
     return __frag;
   })(),
 });
@@ -19936,7 +19936,7 @@ import { assignBoundProperty, batchHandler, bindTwoWay, clearBoundProperty, comp
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-feo4gz], [data-pdx-feo4gz-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-block, :where(:not([data-pdx-feo4gz])):scope:is(.demo-block) {\\n    margin-top: var(--pdx-space-lg);\\n    padding: var(--pdx-space-lg);\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-lg);\\n    background: var(--pdx-color-surface);\\n  }\\n  :scope .form-values pre, :where(:not([data-pdx-feo4gz])):scope:is(.form-values pre) {\\n    margin: var(--pdx-space-xs) 0 0;\\n    font-family: var(--pdx-font-mono);\\n    white-space: pre-wrap;\\n  }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">1. Basic Form (Bound Through the Model)</h2> <p class="pdx-txt-small pdx-ink-muted">Just add <code>name="field"</code> to controls inside <code>&lt;pdx-form&gt;</code>.\\n      The compiler generates value binding, onChange, and onBlur automatically.</p> <div class="demo-block"><pdx-form><pdx-form-field label="Full Name" required data-pdx-feo4gz-in><pdx-input name="name" placeholder="John Doe" data-pdx-feo4gz-in></pdx-input></pdx-form-field> <pdx-form-field label="Email" required data-pdx-feo4gz-in><pdx-input name="email" type="email" placeholder="john@example.com" data-pdx-feo4gz-in></pdx-input></pdx-form-field> <pdx-form-field label="Bio" data-pdx-feo4gz-in><pdx-textarea name="bio" placeholder="Tell us about yourself..." rows="3" data-pdx-feo4gz-in></pdx-textarea></pdx-form-field> <pdx-form-field label data-pdx-feo4gz-in><pdx-switch name="notifications" label="Email notifications" data-pdx-feo4gz-in></pdx-switch></pdx-form-field> <pdx-form-actions submitLabel="Save Profile" resetLabel="Reset" data-pdx-feo4gz-in></pdx-form-actions></pdx-form> <div class="form-status"><span></span> <span></span> <span class="form-status-badge"></span></div></div> <details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>@form basicForm: {\\n  name: string { required },\\n  email: string { required, email },\\n  bio?: string,\\n  notifications: boolean\\n}\\n\\n// Validates, moves \`state\` through submitting → success, and rebases the form.\\nconst saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.saveProfile(values); });\\n\\n&lt;pdx-form :form="basicForm" @pdx-submit="saveBasic"&gt;\\n  &lt;pdx-form-field :field="basicForm.name" label="Full Name" required&gt;\\n    &lt;pdx-input name="name" ::value="basicForm.name"&gt;&lt;/pdx-input&gt;\\n  &lt;/pdx-form-field&gt;\\n  &lt;!-- compiler generates :value, @pdx-change, @pdx-blur --&gt;\\n&lt;/pdx-form&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">1. Basic Form (Bound Through the Model)</h2> <p class="pdx-txt-small pdx-ink-muted">Bind each control to its field with <code>::value="form.field"</code>: the binding writes the\\n      field through the control\\'s <code>value-change</code>, marks the control invalid or required, and\\n      touches the field when the control is left.</p> <div class="demo-block"><pdx-form><pdx-form-field label="Full Name" required data-pdx-feo4gz-in><pdx-input name="name" placeholder="John Doe" data-pdx-feo4gz-in></pdx-input></pdx-form-field> <pdx-form-field label="Email" required data-pdx-feo4gz-in><pdx-input name="email" type="email" placeholder="john@example.com" data-pdx-feo4gz-in></pdx-input></pdx-form-field> <pdx-form-field label="Bio" data-pdx-feo4gz-in><pdx-textarea name="bio" placeholder="Tell us about yourself..." rows="3" data-pdx-feo4gz-in></pdx-textarea></pdx-form-field> <pdx-form-field label data-pdx-feo4gz-in><pdx-switch name="notifications" label="Email notifications" data-pdx-feo4gz-in></pdx-switch></pdx-form-field> <pdx-form-actions submitLabel="Save Profile" resetLabel="Reset" data-pdx-feo4gz-in></pdx-form-actions></pdx-form> <div class="form-status"><span></span> <span></span> <span class="form-status-badge"></span></div></div> <details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>@form basicForm: {\\n  name: string { required },\\n  email: string { required, email },\\n  bio?: string,\\n  notifications: boolean\\n}\\n\\n// Validates, moves \`state\` through submitting → success, and rebases the form.\\nconst saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.saveProfile(values); });\\n\\n&lt;pdx-form :form="basicForm" @pdx-submit="saveBasic"&gt;\\n  &lt;pdx-form-field :field="basicForm.name" label="Full Name" required&gt;\\n    &lt;pdx-input name="name" ::value="basicForm.name"&gt;&lt;/pdx-input&gt;\\n  &lt;/pdx-form-field&gt;\\n  &lt;!-- ::value binds the field both ways, through value-change --&gt;\\n&lt;/pdx-form&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild;const __el7=__el6.firstChild;const __el8=__el7.firstChild;const __el9=__el7.nextSibling.nextSibling;const __el10=__el9.firstChild;const __el11=__el9.nextSibling.nextSibling;const __el12=__el11.firstChild;const __el13=__el11.nextSibling.nextSibling;const __el14=__el13.firstChild;const __el16=__el6.nextSibling.nextSibling;const __el17=__el16.firstChild;const __el18=__el17.nextSibling.nextSibling;const __el19=__el18.nextSibling.nextSibling;return [__el6,__el7,__el8,__el9,__el10,__el11,__el12,__el13,__el14,__el17,__el18,__el19];};
 component('app-demo-comp-form-basic', {
   props: {},
@@ -26460,12 +26460,12 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-overl
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { dialog } from '@pdxui/ui/dialog';
 import { toast } from '@pdxui/ui/toast';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Declarative + Programmatic Mix</h2> <p class="pdx-txt-small pdx-ink-muted">A declarative <code>&lt;pdx-dialog&gt;</code> with a programmatic <code>dialog.confirm()</code> on top.</p> <div class="demo-row"><pdx-button variant="outline" size="sm">Open Dialog</pdx-button></div> <pdx-dialog title="Declarative Dialog" size="md"><p style="margin:0 0 var(--pdx-space-md)">This dialog is opened via <code>:open</code> binding.</p> <p style="margin:0">Click below to open a programmatic confirm on top of this dialog.</p> <span slot="footer"><pdx-button variant="danger" size="sm">Delete (Programmatic)</pdx-button> <pdx-button variant="ghost" size="sm">Close</pdx-button></span></pdx-dialog></section>'));
-const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild;const __el7=__el5.nextSibling.nextSibling;const __el11=__el7.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el12=__el11.firstChild;const __el13=__el12.nextSibling.nextSibling;return [__el6,__el7,__el12,__el13];};
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Declarative + Programmatic Mix</h2> <p class="pdx-txt-small pdx-ink-muted">A declarative <code>&lt;pdx-dialog&gt;</code> with a programmatic <code>dialog.confirm()</code> on top.</p> <div class="demo-row"><pdx-button variant="outline" size="sm">Open Dialog</pdx-button></div> <pdx-dialog title="Declarative Dialog" size="md"><p style="margin:0 0 var(--pdx-space-md)">This dialog is bound with <code>::open</code>: Escape and the backdrop close it and write <code>declOpen</code> back.</p> <p style="margin:0">Click below to open a programmatic confirm on top of this dialog.</p> <span slot="footer"><pdx-button variant="danger" size="sm">Delete (Programmatic)</pdx-button> <pdx-button variant="ghost" size="sm">Close</pdx-button></span></pdx-dialog></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild;const __el7=__el5.nextSibling.nextSibling;const __el12=__el7.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el13=__el12.firstChild;const __el14=__el13.nextSibling.nextSibling;return [__el6,__el7,__el13,__el14];};
 component('app-demo-comp-overlay-stack-mixed', {
   props: {},
   setup(ctx) {
@@ -26489,11 +26489,11 @@ function openDeclarative() { __declOpen.setRaw(true); }
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el6,__el7,__el12,__el13]=__walk0(__frag);
+    const [__el6,__el7,__el13,__el14]=__walk0(__frag);
     __el6.addEventListener('click', safeHandler(batchHandler(ctx.openDeclarative), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el7w_open = {}; effect(() => { const __b = ctx.declOpen(); if (Object.is(__b, __el7w_open)) return; __el7w_open = __b; assignBoundProperty(__el7, "open", __b); });
-    __el12.addEventListener('click', safeHandler(batchHandler(ctx.onNestedConfirm), ctx.el?.tagName?.toLowerCase(), 'click'));
-    __el13.addEventListener('click', safeHandler(batchHandler(ctx.closeDeclarative), ctx.el?.tagName?.toLowerCase(), 'click'));
+    bindTwoWay(__el7, 'open', ctx.declOpen);
+    __el13.addEventListener('click', safeHandler(batchHandler(ctx.onNestedConfirm), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __el14.addEventListener('click', safeHandler(batchHandler(ctx.closeDeclarative), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
   })(),
 });

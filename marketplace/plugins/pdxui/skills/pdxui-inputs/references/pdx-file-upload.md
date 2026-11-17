@@ -35,6 +35,10 @@ Drag-and-drop or browse to upload.
 
 **Parts:** `[data-part="root"]` — The frame: the drop zone, the refusals and the list.; `[data-part="dropzone"]` — The `role="button"` area a file is dropped on, or clicked to browse.; `[data-part="list"]` — The `role="list"` of the files it holds; busy while one uploads.; `[data-part="file"]` — A file of the list.; `[data-part="remove"]` — A file's remove button.; `[data-part="progress"]` — A file's `role="progressbar"`, while it uploads.
 
+**Tokens:** `--pdx-file-upload-bg-dragover`; `--pdx-file-upload-border-color-dragover`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

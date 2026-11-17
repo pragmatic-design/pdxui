@@ -174,7 +174,10 @@ for (const mod of PACKAGES.flatMap(p => JSON.parse(readFileSync(p.manifest, 'utf
     // The public styling surface beside the tokens (#132, #134): what a theme or a test selects.
     const states = (d.cssStates || []).map(s => ({ name: s.name, desc: s.description || '' }));
     const parts = (d.cssParts || []).map(p => ({ name: p.name, desc: p.description || '' }));
-    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, states, parts, shapes: d.shapes || [], roles: d.roles || [], context: d['x-pdx-context'], area: areaOf(tag, d.category) });
+    // Its tokens (#154): restyle one component through them, at :root, on a subtree or on one
+    // element, instead of with a selector against its internals.
+    const tokens = (d.cssProperties || []).map(t => ({ name: t.name, def: t.default || '', desc: t.description || '' }));
+    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, states, parts, tokens, formAssociated: d.formAssociated === true, shapes: d.shapes || [], roles: d.roles || [], context: d['x-pdx-context'], area: areaOf(tag, d.category) });
   }
 }
 comps.sort((a, b) => a.tag.localeCompare(b.tag));
@@ -263,6 +266,10 @@ function renderComp(c) {
   // written against one breaks when the component changes them.
   if (c.states && c.states.length) lines.push('**States:** ' + c.states.map(s => '`:state(' + s.name + ')`' + (s.desc ? ' — ' + esc(s.desc) : '')).join('; '), '');
   if (c.parts && c.parts.length) lines.push('**Parts:** ' + c.parts.map(p => '`[data-part="' + p.name + '"]`' + (p.desc ? ' — ' + esc(p.desc) : '')).join('; '), '');
+  if (c.tokens && c.tokens.length) lines.push('**Tokens:** ' + c.tokens.map(t => '`' + t.name + '`' + (t.def ? ' (default `' + esc(t.def) + '`)' : '') + (t.desc ? ' — ' + esc(t.desc) : '')).join('; ') + '. Set one at `:root`, on a subtree, or on the element itself.', '');
+  // Inside a native <form> it takes part as a native control does (#135): what an app's server
+  // receives, and that form.reset() reaches it, is not something a props table says.
+  if (c.formAssociated) lines.push('**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.', '');
   // The shape of an `array`/`object` prop. Without it, "items · array · The data items to render" is
   // unusable: the consumer guesses the fields, the component renders, and the field they missed is
   // silent: a breadcrumb given `[{ label }]` never tells its author about `href`.
@@ -377,7 +384,10 @@ function demoSections(file) {
   const out = [];
   for (const sec of text.split(/<section\b/).slice(1)) {
     const title = plainText(/<h2[^>]*>([\s\S]*?)<\/h2>/.exec(sec)?.[1] ?? '');
-    const desc = plainText(/<p class="pdx-txt-small[^"]*"[^>]*>([\s\S]*?)<\/p>/.exec(sec)?.[1] ?? '');
+    const rawDesc = plainText(/<p class="pdx-txt-small[^"]*"[^>]*>([\s\S]*?)<\/p>/.exec(sec)?.[1] ?? '');
+    // A description that interpolates (`{{ iconCount }} icons included`) is live text the site
+    // evaluates and the catalogue cannot: copied, it would print the expression. The title stays.
+    const desc = /\{\{/.test(rawDesc) ? '' : rawDesc;
     // Two shapes carry a transcription for the reader: `details.source` and `details.source-block`.
     let blocks = [...sec.matchAll(/<details class="source(?:-block)?"[^>]*>[\s\S]*?<code>([\s\S]*?)<\/code>/g)]
       .flatMap(m => splitRuns(unescapeHtml(m[1]).split('\n')));

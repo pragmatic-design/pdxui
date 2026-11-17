@@ -17,6 +17,8 @@ User image or initials, any size.
 
 **Parts:** `[data-part="root"]` — The avatar's box, `role="img"` when it has a name.; `[data-part="image"]` — The picture, when `src` is set and has loaded.; `[data-part="fallback"]` — The initials, shown without a picture or when it fails.
 
+**Tokens:** `--pdx-avatar-bg`; `--pdx-avatar-fg`; `--pdx-avatar-radius`; `--pdx-avatar-size`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

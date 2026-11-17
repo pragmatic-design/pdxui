@@ -33,6 +33,8 @@ A floating action button.
 
 **Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="menu"]` — The element reached as `[data-part="menu"]`.; `[data-part="item"]` — The element reached as `[data-part="item"]`.; `[data-part="label"]` — The element reached as `[data-part="label"]`.; `[data-part="mask"]` — The element reached as `[data-part="mask"]`.
 
+**Tokens:** `--pdx-fab-position`. Set one at `:root`, on a subtree, or on the element itself.
+
 **Shapes:** `FabAction { key: string; label: string; icon: string }`
 
 
