@@ -23,6 +23,12 @@ semver.
 
 ### Fixes
 
+- `fromResize`, `fromIntersection` and `fromMutation` follow a getter for their target (#1158). They
+  called it once, when created: in a component's setup a `:ref` is still empty then, so
+  `fromResize(() => card)` observed nothing, ever. The getter is now read in an effect, as
+  `fromEvent` reads its own: the bridge observes the element once the getter yields it, moves to a new
+  one, lets go on null, and stops on `dispose()`. `fromEvents` takes a getter too.
+
 - The integration page's snippet for components from a CDN registered nothing (#1163). The library's
   modules import `@pdxui/core` and their own stylesheets by bare name, which a browser loads neither
   of; the snippet imported `@pdxui/design` as a module, a CSS file. The page now links the stylesheet

@@ -84,13 +84,16 @@ export function fromEvent<T = Event>(
 // ─── fromEvents() — multi-event ─────────────────────────────────
 
 /**
- * Listen to multiple events on the same target, merged into one signal.
+ * Listen to multiple events on the same target, merged into one signal. The target is the element or,
+ * as for `fromEvent`, a getter for it that is followed: a `:ref` still empty in setup is listened to
+ * once it fills (#1158).
  *
  * Usage:
  *   const interaction = fromEvents(el, ['mousedown', 'touchstart', 'pointerdown']);
+ *   const focus = fromEvents(() => field, ['focus', 'blur'], { transform: e => e.type });
  */
 export function fromEvents<T = Event>(
-    target: EventTarget,
+    target: EventTarget | (() => EventTarget | null),
     eventNames: string[],
     options?: FromEventOptions<T>,
 ): DisposableSignal<T> {
@@ -101,16 +104,36 @@ export function fromEvents<T = Event>(
         _value.set(transform(event) as never);
     };
 
-    for (const name of eventNames) {
-        target.addEventListener(name, handler, options?.eventOptions);
+    let currentTarget: EventTarget | null = null;
+
+    function attach(el: EventTarget): void {
+        for (const name of eventNames) el.addEventListener(name, handler, options?.eventOptions);
+        currentTarget = el;
+    }
+
+    function detach(): void {
+        if (!currentTarget) return;
+        for (const name of eventNames) currentTarget.removeEventListener(name, handler, options?.eventOptions);
+        currentTarget = null;
+    }
+
+    let disposeEffect: Dispose | null = null;
+    if (typeof target === 'function') {
+        disposeEffect = effect(() => {
+            const el = target();
+            detach();
+            if (el) attach(el);
+            onCleanup(detach);
+        });
+    } else if (target) {
+        attach(target);
     }
 
     const readable = (() => _value()) as DisposableSignal<T>;
     readable.peek = () => _value.peek();
     readable.dispose = () => {
-        for (const name of eventNames) {
-            target.removeEventListener(name, handler, options?.eventOptions);
-        }
+        detach();
+        if (disposeEffect) disposeEffect();
     };
 
     return readable;
