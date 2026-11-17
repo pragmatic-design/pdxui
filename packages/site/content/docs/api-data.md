@@ -202,7 +202,7 @@ Pass an array and it uses {@link arrayTransport} — everything client-side; pas
 the same API sends the descriptors to a server instead. That symmetry is the point: a grid built
 against an array does not change when the data outgrows the browser.
 
-`data()`, `total()`, `loading()` and `error()` are signals, so a template re-renders on a page or
+`data()`, `total()`, `isLoading()` and `error()` are signals, so a template re-renders on a page or
 sort change without being told to.
 
 ## `createEditForm`
@@ -252,9 +252,9 @@ function createHttpClient(config: HttpClientConfig = {}): HttpClient
 Build an HTTP client: a base URL, headers, a middleware chain and the request methods.
 
 Two defaults are ON, because their absence is not a feature: a **30s timeout** (a request with no
-deadline never settles — `loading` stays true forever and no error is produced) and **retry** for
-idempotent methods. Both are overridable: `timeout: 0` disables the deadline, `retry: false` the
-replay.
+deadline never settles — the source stays `pending()` forever and no error is produced) and
+**retry** for idempotent methods. Both are overridable: `timeout: 0` disables the deadline,
+`retry: false` the replay.
 
 The chain order is deliberate and is the part worth knowing: retry sits OUTSIDE the caller's
 middleware, so a retried attempt re-runs the whole chain (a refreshed token is picked up), and
@@ -686,9 +686,9 @@ Prefer `createHttpClient({ timeout })`, which is the same deadline expressed whe
 looks for it — this exists for the case where different middleware layers need different
 deadlines. It does NOT override a request that already carries one.
 
-A request with no deadline never settles: `loading` stays true and no error is ever produced, so
-the component shows its skeleton for as long as the tab is open. That is why the default client
-sets 30s.
+A request with no deadline never settles: the source stays `pending()` and no error is ever
+produced, so the component shows its skeleton for as long as the tab is open. That is why the
+default client sets 30s.
 
 ## `toColumnDefs`
 

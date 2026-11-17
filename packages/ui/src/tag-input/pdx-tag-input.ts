@@ -37,7 +37,10 @@ import '@pdxui/design/components/chip';
 component('pdx-tag-input', {
     // The tags (#481). Adding one, removing one and clear() write them, and the write dispatches
     // `value-change`. The text being typed is not the value: it is announced with `draft-change`.
-    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    models: {
+        /** The tags. A form submits one entry per tag under the name, and resets it (#135). */
+        value: model<string[]>(() => [], { type: Array, form: true }),
+    },
     events: {
         /** The text typed into the field, before it becomes a tag. */
         'draft-change': event<{ value: string }>(),

@@ -81,7 +81,10 @@ component('pdx-masked-input', {
     // or Enter, is the inner input's native `change`, which bubbles to the host. What the alpha events
     // also carried, the formatted text and whether it is in range, the element answers itself:
     // `getFormatted()` and `isValid()`.
-    models: { value: model<string>('', { form: true }) },
+    models: {
+        /** The value. A form submits it, and an empty entry when it is empty, as a text input does (#135). */
+        value: model<string>('', { form: true }),
+    },
     events: {
         /** The textbox received focus. */
         'pdx-focus': event<void>(),

@@ -1821,7 +1821,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135).",
               "type": {
                 "text": "unknown"
               },
@@ -2115,7 +2115,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The current value.",
+              "description": "The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135).",
               "type": {
                 "text": "unknown"
               },
@@ -5844,7 +5844,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The path, one option's value per level. A form submits one entry per level under the name (#135).",
               "type": {
                 "text": "string[]"
               },
@@ -7968,7 +7968,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
               "type": {
                 "text": "string"
               },
@@ -8169,7 +8169,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The current value.",
+              "description": "The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
               "type": {
                 "text": "string"
               },
@@ -10289,7 +10289,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The date, or `[start, end]` with `mode=\"daterange\"` or `\"datetimerange\"`. A form submits it; a range as two entries, one per date (#135).",
               "type": {
                 "text": "string | string[]"
               },
@@ -10685,7 +10685,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The current value.",
+              "description": "The date, or `[start, end]` with `mode=\"daterange\"` or `\"datetimerange\"`. A form submits it; a range as two entries, one per date (#135).",
               "type": {
                 "text": "string | string[]"
               },
@@ -19213,7 +19213,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The value. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
               "type": {
                 "text": "string"
               },
@@ -19391,7 +19391,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The current value.",
+              "description": "The value. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
               "type": {
                 "text": "string"
               },
@@ -28202,7 +28202,7 @@
             {
               "kind": "field",
               "name": "range",
-              "description": "Range mode: value is \"min,max\"",
+              "description": "Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `\"low,high\"`.",
               "type": {
                 "text": "boolean"
               },
@@ -28252,7 +28252,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135).",
               "type": {
                 "text": "number | number[]"
               },
@@ -28456,7 +28456,7 @@
             {
               "name": "range",
               "fieldName": "range",
-              "description": "Range mode: value is \"min,max\"",
+              "description": "Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `\"low,high\"`.",
               "type": {
                 "text": "boolean"
               },
@@ -28501,7 +28501,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The current value.",
+              "description": "The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135).",
               "type": {
                 "text": "number | number[]"
               },
@@ -30509,7 +30509,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The tags. A form submits one entry per tag under the name, and resets it (#135).",
               "type": {
                 "text": "string[]"
               },
@@ -33084,7 +33084,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The values of the items in the target list. A form submits one entry per value under the name (#135).",
               "type": {
                 "text": "string[]"
               },
@@ -33470,7 +33470,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The current value.",
+              "description": "The selected node's value, or the values when `multiple`. A form submits one entry per value under the name (#135).",
               "type": {
                 "text": "string | string[] | null"
               },

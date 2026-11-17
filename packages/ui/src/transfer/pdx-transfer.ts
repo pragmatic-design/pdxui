@@ -65,7 +65,10 @@ component('pdx-transfer', {
     // dispatches `value-change`; setting `value` is the way to set it (#287). In DataSource mode the
     // partition comes from the source, and a move writes the target values it leaves; the diff to
     // persist is getChanges(). A form submits the target values, one entry each, and resets them (#135).
-    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    models: {
+        /** The values of the items in the target list. A form submits one entry per value under the name (#135). */
+        value: model<string[]>(() => [], { type: Array, form: true }),
+    },
     // The visual state, on the host as a custom state (#132, #287): the frame carries no class for it.
     // sm, md (the default) or lg (#748): the design CSS's `@variant` rules size the rows, the headers
     // and the move buttons from the host's `size`; the search fields are native `.pdx-input`s that

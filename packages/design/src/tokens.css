@@ -399,6 +399,9 @@
     --pdx-input-focus:       ring;         /* ring | bottom */
     --pdx-input-border-color: initial;     /* unset: --pdx-color-border; the resting border, which a state replaces (#519) */
     --pdx-input-border-color-focus: initial; /* unset: --pdx-color-primary; the focused border, which a state replaces (#521) */
+    --pdx-input-border-color-invalid: initial; /* unset: --pdx-color-danger; the border and its focus glow under :state(invalid) (#286) */
+    --pdx-input-border-color-success: initial; /* unset: --pdx-color-success; the same under :state(success) */
+    --pdx-input-border-color-warning: initial; /* unset: --pdx-color-warning; the same under :state(warning) */
     --pdx-input-focus-ring:  initial;      /* unset: --pdx-focus-ring (none when underlined); a state replaces it */
     --pdx-input-min-height:  2.5rem;       /* 40px default */
     --pdx-input-border-width: var(--pdx-border-width);

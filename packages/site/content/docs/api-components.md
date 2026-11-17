@@ -915,7 +915,7 @@ import { prop } from '@pdxui/core';
 const prop: typeof propBuilder & { required: typeof requiredProp; optional: typeof optionalProp }
 ```
 
-Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or `prop.optional<T>({ type? })`.
+Declare a prop: `prop<T>(default, { type?, iconName? })`, `prop.required<T>({ type?, iconName? })` or `prop.optional<T>({ type?, iconName? })`. `iconName: true` marks a prop whose value names an icon: the compiler imports the icon a literal value names, as it does for `pdx-icon`'s `name`.
 
 ## `provide`
 

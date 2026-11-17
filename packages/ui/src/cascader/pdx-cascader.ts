@@ -66,7 +66,10 @@ component('pdx-cascader', {
     // The selected path, the values from the root down (#481). A choice, the clear button and clear()
     // write it, and the write dispatches `value-change`; so does setting `value`, the way to set it.
     // A form submits the path, one entry per level, and resets it (#135).
-    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    models: {
+        /** The path, one option's value per level. A form submits one entry per level under the name (#135). */
+        value: model<string[]>(() => [], { type: Array, form: true }),
+    },
     events: {
         /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
         'open-change': event<{ value: boolean }>(),

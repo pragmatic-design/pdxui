@@ -251,7 +251,7 @@ export function isDataSource<T = unknown>(value: unknown): value is DataSource<T
  * the same API sends the descriptors to a server instead. That symmetry is the point: a grid built
  * against an array does not change when the data outgrows the browser.
  *
- * `data()`, `total()`, `loading()` and `error()` are signals, so a template re-renders on a page or
+ * `data()`, `total()`, `isLoading()` and `error()` are signals, so a template re-renders on a page or
  * sort change without being told to.
  */
 export function createDataSource<T extends Record<string, unknown>>(

@@ -14,7 +14,7 @@ Choose a color visually.
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `clearable` | `clearable` | boolean | `false` | Shows a clear button to reset the value. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the swatch's size. |
-| `value` | `value` | string | `'#000000'` | The current value. |
+| `value` | `value` | string | `'#000000'` | The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135). |
 
 **API (via `:ref`)**
 

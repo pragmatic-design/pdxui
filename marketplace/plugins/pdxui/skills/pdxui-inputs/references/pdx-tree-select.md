@@ -31,7 +31,7 @@ toggles only the node clicked).
 | `loadChildren` | — | ((...args: unknown[]) => unknown) \| null | `null` | Lazy load: (node) => Promise<TreeSelectNode[]> |
 | `name` | `name` | string | `''` | Form field name |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | — | string \| string[] \| null | `null` | The current value. |
+| `value` | — | string \| string[] \| null | `null` | The selected node's value, or the values when `multiple`. A form submits one entry per value under the name (#135). |
 
 **API (via `:ref`)**
 

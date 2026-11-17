@@ -21,7 +21,7 @@ import { sanitizeUrl } from '../security/sanitize-url';
 import { retryMiddleware } from './middleware';
 
 /**
- * A request with no deadline never fails: `loading` stays true and no error is ever
+ * A request with no deadline never fails: the source stays `pending()` and no error is ever
  * produced, so the component shows its skeleton for as long as the tab is open.
  * Set `timeout: 0` to opt out.
  */
@@ -188,9 +188,9 @@ function buildChain(middleware: HttpMiddleware[], base: HttpHandler): HttpHandle
  * Build an HTTP client: a base URL, headers, a middleware chain and the request methods.
  *
  * Two defaults are ON, because their absence is not a feature: a **30s timeout** (a request with no
- * deadline never settles — `loading` stays true forever and no error is produced) and **retry** for
- * idempotent methods. Both are overridable: `timeout: 0` disables the deadline, `retry: false` the
- * replay.
+ * deadline never settles — the source stays `pending()` forever and no error is produced) and
+ * **retry** for idempotent methods. Both are overridable: `timeout: 0` disables the deadline,
+ * `retry: false` the replay.
  *
  * The chain order is deliberate and is the part worth knowing: retry sits OUTSIDE the caller's
  * middleware, so a retried attempt re-runs the whole chain (a refreshed token is picked up), and

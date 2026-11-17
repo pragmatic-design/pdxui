@@ -65,7 +65,10 @@ component('pdx-tree-select', {
     // setting `value`, the way to set it.
     // A form submits it, one entry per value when multiple, an empty entry with none as a native
     // select; and resets it (#135).
-    models: { value: model<string | string[] | null>(null, { type: Object, form: true }) },
+    models: {
+        /** The selected node's value, or the values when `multiple`. A form submits one entry per value under the name (#135). */
+        value: model<string | string[] | null>(null, { type: Object, form: true }),
+    },
     events: {
         /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
         'open-change': event<{ value: boolean }>(),

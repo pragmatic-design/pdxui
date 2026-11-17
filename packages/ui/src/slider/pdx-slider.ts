@@ -28,7 +28,10 @@ import { reflectNameToHost } from '../shared/own-prop';
 component('pdx-slider', {
     // A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
     // still marks the end of a drag. In range mode it holds `[min, max]`.
-    models: { value: model<number | number[]>(0, { type: Number, form: true }) },
+    models: {
+        /** The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135). */
+        value: model<number | number[]>(0, { type: Number, form: true }),
+    },
     // On the host as custom states (#132); the root carries no state class.
     states: ['disabled', 'invalid', 'dragging'],
     parts: ['root', 'track', 'fill', 'thumb', 'mark'],
@@ -60,7 +63,7 @@ component('pdx-slider', {
         labelAlways: prop(false),
         name: prop(''),
         error: prop(false),
-        /** Range mode: value is "min,max" */
+        /** Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `"low,high"`. */
         range: prop(false),
         /** Minimum gap between thumbs in range mode */
         minGap: prop(0),

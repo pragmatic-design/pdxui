@@ -117,7 +117,10 @@ component('pdx-color-picker', {
     // dispatches `value-change`, live. The commit is a native `change` bubbling to the host: the hex
     // field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
     // a preset is picked or the colour is cleared.
-    models: { value: model<string>('#000000', { form: true }) },
+    models: {
+        /** The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135). */
+        value: model<string>('#000000', { form: true }),
+    },
     events: {
         /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
         'open-change': event<{ value: boolean }>(),
