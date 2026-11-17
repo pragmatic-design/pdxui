@@ -245,6 +245,65 @@ describe('focusGroup', () => {
     });
 });
 
+// ─── focusTrap: escapeDeactivates (#1160) ─────────────────────
+
+describe('focusTrap escapeDeactivates', () => {
+    function trapFixture(): { container: HTMLElement; outside: HTMLElement; last: HTMLElement } {
+        const outside = document.createElement('button');
+        const container = document.createElement('div');
+        container.innerHTML = '<button id="esc-first">First</button><button id="esc-last">Last</button>';
+        document.body.append(outside, container);
+        return { container, outside, last: container.querySelector<HTMLElement>('#esc-last')! };
+    }
+
+    it('releases the trap on Escape: Tab is no longer held, the page is exposed again', () => {
+        const { container, outside, last } = trapFixture();
+        const dispose = focusTrap(container, { escapeDeactivates: true });
+        expect(outside.getAttribute('aria-hidden')).toBe('true');
+
+        dispatchKey(last, 'Escape');
+        last.focus();
+        const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+        last.dispatchEvent(tab);
+        expect(tab.defaultPrevented, 'the trap still holds Tab after Escape').toBe(false);
+        expect(document.activeElement).toBe(last);
+        expect(outside.hasAttribute('aria-hidden'), 'the page stays hidden after Escape').toBe(false);
+
+        dispose();
+        container.remove();
+        outside.remove();
+    });
+
+    it('keeps the trap on Escape with escapeDeactivates: false', () => {
+        const { container, outside, last } = trapFixture();
+        const dispose = focusTrap(container, { escapeDeactivates: false });
+
+        dispatchKey(last, 'Escape');
+        last.focus();
+        dispatchKey(last, 'Tab');
+        expect(document.activeElement?.id).toBe('esc-first');
+        expect(outside.getAttribute('aria-hidden')).toBe('true');
+
+        dispose();
+        container.remove();
+        outside.remove();
+    });
+
+    it('restores focus once: a dispose after the Escape release does nothing', () => {
+        const { container, outside, last } = trapFixture();
+        outside.focus();
+        const dispose = focusTrap(container, { escapeDeactivates: true });
+        const focusSpy = vi.spyOn(outside, 'focus');
+
+        dispatchKey(last, 'Escape');
+        dispose();
+        expect(focusSpy).toHaveBeenCalledTimes(1);
+
+        container.remove();
+        outside.remove();
+    });
+});
+
 // ─── focusRestore ──────────────────────────────────────────────
 
 describe('focusRestore', () => {

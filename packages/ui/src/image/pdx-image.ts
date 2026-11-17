@@ -282,7 +282,7 @@ component('pdx-image', {
             document.body.appendChild(overlay);
             // Focus goes in and stays: the same trap pdx-dialog uses. It returns focus itself only
             // when the opener is what had it; closeLightbox does that, from a pointer click too.
-            trapDispose = focusTrap(overlay, { restoreFocus: false });
+            trapDispose = focusTrap(overlay, { restoreFocus: false, escapeDeactivates: false });
             closeBtn.focus();
             _lightboxClose = closeLightbox;
         }

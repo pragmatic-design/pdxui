@@ -106,7 +106,7 @@ function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLEle
         });
         document.body.appendChild(back);
         // The dialog holds focus while its fields are built; then the first of them takes it.
-        const releaseTrap = focusTrap(box, { initialFocus: box, restoreFocus: false });
+        const releaseTrap = focusTrap(box, { initialFocus: box, restoreFocus: false, escapeDeactivates: false });
         buildRoot().then((r) => {
             root = r;
             body.appendChild(r.el);

@@ -23,6 +23,15 @@ semver.
 
 ### Fixes
 
+- `focusTrap(container, { escapeDeactivates })` releases the trap on Escape, as its name and the
+  accessibility page said (#1160): Tab is no longer held, the page is exposed to screen readers again,
+  focus is restored, and the key still reaches the page. It let the key through and kept the trap, so
+  an author using `focusTrap` without an overlay left users trapped. Calling the returned function
+  after that does nothing: focus is restored once. The default stays `true`. The library's dialogs,
+  drawers, sheets, command palette, lightbox, json editor and overlay outlet pass `false` — each
+  releases its trap when it closes, and may stay open on Escape — as does `attach:trapFocus`, which
+  holds until its scope goes; their behaviour is unchanged.
+
 - `focusRestore()` gives focus to the nearest place still in the document when the saved element was
   removed before `restore()` (#1159), as it promised: the nearest remaining ancestor if it takes focus
   (tabbable, or a `tabindex="-1"` focus target), else the first focusable inside it, else on up. It

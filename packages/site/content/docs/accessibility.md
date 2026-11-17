@@ -52,6 +52,12 @@ container; Escape releases it; and **everything else on the page is hidden from 
 `aria-hidden`, so a screen-reader user is not read the page *behind* the dialog. With several traps
 active only the most recent is exposed — a dialog that opens a dialog behaves correctly.
 
+Escape releases the trap as `release()` does, and the key still reaches the page; calling `release()`
+afterwards does nothing, so focus is restored once. A component that releases the trap itself when it
+closes — and may stay open on Escape, as a dialog that refuses to close does — passes
+`escapeDeactivates: false`: the library's dialogs, drawers and sheets do, and `attach:trapFocus` holds
+until its scope goes.
+
 `<pdx-dialog>`, `<pdx-alert-dialog>`, `<pdx-bottom-sheet>` and `<pdx-command>` are each one call to
 this.
 
