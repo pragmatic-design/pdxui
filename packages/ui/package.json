@@ -18,6 +18,8 @@
   "description": "PDX UI Web Components — button, input, dialog, drawer, toast, tabs, popover, tooltip, slider, overlay",
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "unpkg": "dist/browser/pdx-ui.js",
+  "jsdelivr": "dist/browser/pdx-ui.js",
   "types": "dist/index.d.ts",
   "customElements": "custom-elements.json",
   "exports": {
@@ -678,7 +680,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly && node scripts/gen-pdx-dts.mjs",
+    "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && vite build --config vite.config.browser.ts && tsc --emitDeclarationOnly && node scripts/gen-pdx-dts.mjs",
     "manifest": "node scripts/gen-manifest.mjs",
     "icons": "node scripts/gen-icons.mjs",
     "flags": "node scripts/gen-flags.mjs",

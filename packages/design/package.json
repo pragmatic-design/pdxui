@@ -10,6 +10,8 @@
   "type": "module",
   "main": "src/pragmatic-design.css",
   "style": "src/pragmatic-design.css",
+  "unpkg": "dist/pragmatic-design.css",
+  "jsdelivr": "dist/pragmatic-design.css",
   "exports": {
     ".": {
       "//": "development FIRST: this repository resolves to source without a prior build. dist/ is what a consumer installing from npm gets, and it is only as fresh as the last `pnpm --filter @pdxui/design build`. Before this entry existed the in-repo save was accidental \u2014 the PDX Vite plugin aliases via the legacy `main` field, which no modern resolver reads, so deleting `main` would have moved the site onto a stylesheet built weeks earlier with nothing to notice.",

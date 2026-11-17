@@ -71,20 +71,32 @@ production optimizations.
 
 ## Prebuilt components from a CDN
 
-The `<pdx-*>` component library ships as ES modules. Pull it in as a module and the custom elements
-register themselves — then use them as plain HTML:
+`@pdxui/ui` ships a browser build beside its library build: core bundled in, nothing left for a
+bundler to resolve. Link the design system's stylesheet, import the library as a module, and the
+custom elements register themselves — then use them as plain HTML:
 
 ```html
+<link rel="stylesheet" href="https://unpkg.com/@pdxui/design">
 <script type="module">
-  import 'https://unpkg.com/@pdxui/ui';
-  import 'https://unpkg.com/@pdxui/design';   // the CSS (tokens + themes)
+  // Registers every <pdx-*>, and gives core's API from the same module: one core on the page.
+  import { signal, effect } from 'https://unpkg.com/@pdxui/ui';
+
+  const clicks = signal(0);
+  document.querySelector('pdx-button').addEventListener('click', () => clicks.set(n => n + 1));
+  effect(() => { document.querySelector('pdx-badge').value = clicks(); });
 </script>
 
 <pdx-button variant="primary">Click me</pdx-button>
-<pdx-badge value="5"></pdx-badge>
+<pdx-badge value="0"></pdx-badge>
 ```
 
-No build needed for the components either — they're standard custom elements.
+`https://unpkg.com/@pdxui/ui` is `dist/browser/pdx-ui.js`, every component at once. A page that uses a
+few loads them one by one from the same folder, at the path the library build uses —
+`…/@pdxui/ui/dist/browser/button/pdx-button.js` — and core's API from `…/dist/browser/core.js`; they
+share one copy of core. `https://unpkg.com/@pdxui/design` is the flattened stylesheet, every
+component's styles and the 13 themes. Pin the version in the URL (`@pdxui/ui@1.0.0-beta.1`) for a
+page that must not change under you. The browser build carries no development diagnostics, as core's
+script does not.
 
 ## In any framework (Angular, React, Vue)
 

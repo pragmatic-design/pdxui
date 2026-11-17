@@ -7,6 +7,27 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 
 may introduce breaking changes between versions; stable releases (`1.0.0` and later) follow strict
 semver.
 
+## Unreleased
+
+### Features
+
+- `@pdxui/ui` ships a browser build, for a page that loads the library from a CDN with no build step
+  (#1163). `https://unpkg.com/@pdxui/ui` (the package's `unpkg` and `jsdelivr` fields) is
+  `dist/browser/pdx-ui.js`: every component registered, and core's API re-exported, with core bundled
+  in. A page that uses a few components loads them one by one from `dist/browser/`, at the paths the
+  library build uses (`dist/browser/button/pdx-button.js`), and core's API from
+  `dist/browser/core.js`; every module shares one copy of core. The components' styles come from
+  `@pdxui/design`'s single sheet, which `https://unpkg.com/@pdxui/design` now serves
+  (`dist/pragmatic-design.css`). The browser build carries no development diagnostics, as core's
+  script does not.
+
+### Fixes
+
+- The integration page's snippet for components from a CDN registered nothing (#1163). The library's
+  modules import `@pdxui/core` and their own stylesheets by bare name, which a browser loads neither
+  of; the snippet imported `@pdxui/design` as a module, a CSS file. The page now links the stylesheet
+  and imports the browser build.
+
 ## 1.0.0-beta.0 — 2026-11-17
 
 The beta: its release notes are [docs/releases/beta.md](docs/releases/beta.md) — how to upgrade with
