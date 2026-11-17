@@ -33,12 +33,18 @@ export function selection(changed) {
     return { all: false, reason: null, folders: [...new Set(changed.map((f) => f.split('/')[1]))].sort() };
 }
 
-/** The pnpm arguments for a selection: the folders and their dependents, core and cli, no browser suite. */
+/**
+ * The pnpm arguments for a selection: the folders and their dependents, core and cli, no browser suite.
+ *
+ * `--no-bail` (#1181): stopping at the first red left the suites already started running after pnpm
+ * exited, a vitest pool loading the machine for the next push. pnpm now waits for every package, and
+ * a failed push reports every red at once.
+ */
 export function pnpmArgs(sel) {
     const exclude = BROWSER.map((p) => `--filter=!${p}`);
-    if (sel.all) return ['-r', '--workspace-concurrency=4', ...exclude, 'run', 'test'];
+    if (sel.all) return ['-r', '--workspace-concurrency=4', '--no-bail', ...exclude, 'run', 'test'];
     const include = [...sel.folders.map((d) => `--filter=...{./packages/${d}}`), ...ALWAYS.map((p) => `--filter=${p}`)];
-    return ['-r', '--workspace-concurrency=4', ...include, ...exclude, 'run', 'test'];
+    return ['-r', '--workspace-concurrency=4', '--no-bail', ...include, ...exclude, 'run', 'test'];
 }
 
 function git(args) {
