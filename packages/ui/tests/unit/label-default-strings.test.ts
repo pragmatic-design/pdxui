@@ -57,7 +57,8 @@ const CASES: Record<string, Case> = {
     'progress bar': { string: ['progress', 'label'], html: '<pdx-progress value="30"></pdx-progress>', prop: 'aria-label', target: '[role="progressbar"]', read: 'name' },
     'rating slider': { string: ['rating', 'label'], html: '<pdx-rating></pdx-rating>', prop: 'label', target: '[role="slider"]', read: 'name' },
     'fab button': { string: ['fab', 'label'], html: '<pdx-fab></pdx-fab>', prop: 'label', target: 'button.pdx-fab', read: 'name' },
-    'file-upload dropzone name': { string: ['file-upload', 'drop'], html: '<pdx-file-upload></pdx-file-upload>', prop: 'label', target: 'div[role="button"]', read: 'name' },
+    // The drop zone has no aria-label: it is named by its text, the row below (WCAG 2.5.3). The computed
+    // name is measured in Chromium, file-upload-beta-contract.spec.ts.
     'file-upload dropzone text': { string: ['file-upload', 'drop'], html: '<pdx-file-upload></pdx-file-upload>', prop: 'label', target: '.pdx-file-dropzone-label', read: 'text' },
     'date-picker trigger': { string: ['date-picker', 'choose'], html: '<pdx-date-picker></pdx-date-picker>', prop: 'aria-label', target: '.pdx-date-picker-trigger', read: 'name' },
     'time-picker group': { string: ['time-picker', 'label'], html: '<pdx-time-picker></pdx-time-picker>', prop: 'aria-label', target: '.pdx-time-picker[role="group"]', read: 'name' },
