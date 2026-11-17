@@ -23,6 +23,14 @@ semver.
 
 ### Fixes
 
+- An app's own unlayered `@media print` block overrides the print layer's hidden chrome and removed
+  shadows, as the printing page promised (#1162). Those rules were `!important`, and an important
+  declaration in a layer beats a normal unlayered one, so the page's own example did not work. They
+  are plain declarations now. Three stay `!important`, because what they win against is usually
+  inline: the lifted clips of scrolling regions, the stopped transitions and animations, and
+  `[data-pdx-no-print]`. The page names them, and its sidebar example now brings back the shell's
+  aside too.
+
 - `pdx build --no-minify` leaves the SPA and static builds readable (#1161). Only the standalone build
   read the flag; the other two minified whatever was asked. The default is unchanged.
 
