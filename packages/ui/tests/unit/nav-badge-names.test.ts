@@ -24,13 +24,17 @@ async function create(tag: string, props: Record<string, unknown>): Promise<HTML
 afterEach(() => { document.body.innerHTML = ''; });
 
 describe('pdx-bottom-nav badge', () => {
-    it('names a badged item with its label and the count in context', async () => {
+    // #1154: the badge is drawn in the icon, before the label. The name holds what is shown, in the
+    // order shown (WCAG 2.5.3, label in name): "3 Messages", and the text has a space between the two.
+    it('names a badged item with the text it shows, in the order shown', async () => {
         const el = await create('pdx-bottom-nav', { items: [
             { key: 'home', label: 'Home', icon: 'home' },
             { key: 'msg', label: 'Messages', icon: 'mail', badge: '3' },
         ] });
         const msg = el.querySelector('[data-nav-key="msg"]')!;
-        expect(msg.getAttribute('aria-label')).toBe('Messages, 3 new');
+        const text = (msg.textContent ?? '').replace(/\s+/g, ' ').trim();
+        expect(text).toBe('3 Messages');
+        expect(msg.getAttribute('aria-label')).toContain(text);
         expect(el.querySelector('[data-nav-key="home"]')!.hasAttribute('aria-label')).toBe(false);
     });
 });

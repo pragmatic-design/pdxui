@@ -443,6 +443,10 @@
         {
           "id": "bottom-nav-basic",
           "title": "Bottom Nav — Basic"
+        },
+        {
+          "id": "bottom-nav-badge",
+          "title": "Bottom Nav — Badge"
         }
       ]
     },

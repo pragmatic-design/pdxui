@@ -45,6 +45,13 @@ export const bottomNav: ComponentManifest = {
             title: 'Bottom Nav — Basic',
             html: `<pdx-bottom-nav data-test="bottom-nav" active-key="home" items='[{"key":"home","label":"Home","icon":"home"},{"key":"search","label":"Search","icon":"search"},{"key":"profile","label":"Profile","icon":"user"}]'></pdx-bottom-nav>`,
         },
+        {
+            // #1154: a badged item. The badge is drawn in the icon, before the label, so its name must
+            // hold "3 Messages" in that order (axe's label-content-name-mismatch, WCAG 2.5.3).
+            id: 'bottom-nav-badge',
+            title: 'Bottom Nav — Badge',
+            html: `<pdx-bottom-nav data-test="bottom-nav-badge" active-key="home" items='[{"key":"home","label":"Home","icon":"home"},{"key":"msg","label":"Messages","icon":"mail","badge":"3"}]'></pdx-bottom-nav>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, derived from bottom-nav.css) ──
@@ -126,7 +133,7 @@ export const bottomNav: ComponentManifest = {
     // A <nav> with aria-label="Bottom navigation"; every item takes its accessible name from its label text.
     // No disableRules: no known false positive.
     a11y: {
-        scenarios: ['bottom-nav-basic'],
+        scenarios: ['bottom-nav-basic', 'bottom-nav-badge'],
     },
 
     // ── Dim. 3: style isolation ──

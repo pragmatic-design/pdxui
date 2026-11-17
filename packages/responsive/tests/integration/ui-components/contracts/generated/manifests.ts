@@ -262,6 +262,7 @@ export const scenarioPage: Record<string, string> = {
     "block-ui-tall": "tier-3",
     "block-ui-fullscreen": "tier-3",
     "bottom-nav-basic": "tier-6",
+    "bottom-nav-badge": "tier-6",
     "bottom-sheet-open": "tier-2a",
     "breadcrumb-basic": "tier-6",
     "breadcrumb-element": "tier-6",

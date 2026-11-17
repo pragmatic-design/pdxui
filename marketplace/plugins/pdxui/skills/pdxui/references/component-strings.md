@@ -43,7 +43,7 @@ placeholders, filled at render: keep them in the translation.
 | `avatar-group` | `more` | `{count} more` | `@pdxui/ui/src/shared/i18n.ts` |
 | `badge` | `indicator` | `{variant} indicator` | `@pdxui/ui/src/shared/i18n.ts` |
 | `banner` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
-| `bottom-nav` | `badge` | `{label}, {badge} new` | `@pdxui/ui/src/shared/i18n.ts` |
+| `bottom-nav` | `badge` | `{badge} {label}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `bottom-nav` | `label` | `Bottom navigation` | `@pdxui/ui/src/shared/i18n.ts` |
 | `bottom-sheet` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
 | `bottom-sheet` | `handle` | `Sheet height` | `@pdxui/ui/src/shared/i18n.ts` |

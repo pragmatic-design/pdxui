@@ -23,6 +23,12 @@ semver.
 
 ### Fixes
 
+- `pdx-bottom-nav` names a badged item with what it shows, in the order shown (#1154). The badge is
+  drawn before the label, the text read "3Messages" and the name "Messages, 3 new", which fails
+  WCAG 2.5.3 (label in name): axe's `label-content-name-mismatch`. The text has a space between the two
+  and the `bottom-nav.badge` string is `{badge} {label}`, "3 Messages". An app that translates the
+  string keeps the visible words in the order they are shown.
+
 - `focusTrap(container, { escapeDeactivates })` releases the trap on Escape, as its name and the
   accessibility page said (#1160): Tab is no longer held, the page is exposed to screen readers again,
   focus is restored, and the key still reaches the page. It let the key through and kept the trap, so
