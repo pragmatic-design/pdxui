@@ -20,8 +20,11 @@ import { pnpmArgs, selection } from '../../../scripts/test-affected.mjs';
 
 const REPO = join(__dirname, '..', '..', '..');
 
-// Writes its PID, leaves its folder (so the workspace can be removed), and outlives the failing one.
-const LONGER = "require('fs').writeFileSync('pid', String(process.pid)); process.chdir(require('os').tmpdir()); setTimeout(() => {}, 8000);\n";
+// Writes its PID, outlives the failing one, and writes `done` when it finishes: whether `done` is
+// there when pnpm exits says whether pnpm waited for it, with no clock read.
+const LONGER = "const fs = require('fs'), path = require('path'); const here = process.cwd();"
+    + " fs.writeFileSync('pid', String(process.pid)); process.chdir(require('os').tmpdir());"
+    + " setTimeout(() => fs.writeFileSync(path.join(here, 'done'), ''), 8000);\n";
 const FAILS = "setTimeout(() => process.exit(1), 3000);\n";
 
 function workspace(): string {
@@ -55,28 +58,33 @@ afterEach(() => {
     for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
 });
 
-/** Run pnpm in a fresh fixture; the exit status, and the PID of the package still running at the failure. */
-function run(args: string[]): { status: number | null; longer: number } {
+/** Run pnpm in a fresh fixture; the exit status, whether the longer package had finished, and its PID. */
+function run(args: string[]): { status: number | null; finished: boolean; longer: number } {
     const root = workspace();
     roots.push(root);
     const result = spawnSync('pnpm', args, { cwd: root, stdio: 'ignore', shell: process.platform === 'win32' });
+    const finished = existsSync(join(root, 'a', 'done'));
     const file = join(root, 'a', 'pid');
     expect(existsSync(file), 'the longer package never started').toBe(true);
     const longer = Number(readFileSync(file, 'utf8'));
     started.push(longer);
-    return { status: result.status, longer };
+    return { status: result.status, finished, longer };
 }
 
 describe('a failed recursive run leaves no process behind', () => {
-    it('control: without --no-bail, pnpm exits while the other package still runs', () => {
-        const { status, longer } = run(['-r', '--workspace-concurrency=2', 'run', 'test']);
+    // pnpm bails on every platform. What it leaves differs: on Linux it ends the packages it started
+    // (they are in its process group), on Windows they run on as orphans — the defect, measured there.
+    it('control: without --no-bail, pnpm exits before the other package is done', () => {
+        const { status, finished, longer } = run(['-r', '--workspace-concurrency=2', 'run', 'test']);
         expect(status).not.toBe(0);
-        expect(alive(longer), 'the fixture does not reproduce the orphan').toBe(true);
+        expect(finished, 'pnpm waited for the other package: the fixture does not bail').toBe(false);
+        if (process.platform === 'win32') expect(alive(longer), 'the fixture does not reproduce the orphan').toBe(true);
     }, 60_000);
 
     it('with --no-bail, pnpm waits for every package, and still fails', () => {
-        const { status, longer } = run(['-r', '--workspace-concurrency=2', '--no-bail', 'run', 'test']);
+        const { status, finished, longer } = run(['-r', '--workspace-concurrency=2', '--no-bail', 'run', 'test']);
         expect(status).not.toBe(0);
+        expect(finished, 'pnpm did not wait for the other package').toBe(true);
         expect(alive(longer), 'a package outlived the failed run').toBe(false);
     }, 60_000);
 });
