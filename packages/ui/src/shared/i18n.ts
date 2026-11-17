@@ -161,8 +161,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // A dot badge's name: `{variant}` is the variant it shows, e.g. "danger indicator".
     badge: { indicator: '{variant} indicator' },
     banner: { close: 'Close' },
-    // A badged item's name: the count read in context, "Messages, 3 new", not glued to the label.
-    'bottom-nav': { label: 'Bottom navigation', badge: '{label}, {badge} new' },
+    // A badged item's name holds what it shows, in the order shown: the badge sits before the label,
+    // "3 Messages" (WCAG 2.5.3, label in name, #1154). A translation keeps the visible words in order.
+    'bottom-nav': { label: 'Bottom navigation', badge: '{badge} {label}' },
     // `handle` names the drag handle, a slider over the detents; `height` is its value text.
     'bottom-sheet': { close: 'Close', label: 'Bottom sheet', handle: 'Sheet height', height: '{percent}% of the screen' },
     // `expand` names the collapse ellipsis, a button that shows the hidden part of the path.

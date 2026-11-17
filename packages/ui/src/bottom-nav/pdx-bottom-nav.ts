@@ -94,15 +94,19 @@ component('pdx-bottom-nav', {
                     }
                     badge.textContent = item.badge;
                     iconWrap.appendChild(badge);
-                    // A named label, or the name reads the count glued to the label, "3Messages".
-                    // Captured, not read in the closure: the count this name describes is the one
-                    // rendered above it, and the narrowing from `if (item.badge)` does not survive
-                    // a callback that runs again on a locale change.
+                    // The name holds what is shown, in the order shown (WCAG 2.5.3, label in name, #1154):
+                    // the badge is drawn in the icon, before the label, so "3 Messages". Captured, not
+                    // read in the closure: the count this name describes is the one rendered above it,
+                    // and the narrowing from `if (item.badge)` does not survive a callback that runs
+                    // again on a locale change.
                     const badgeText = item.badge;
                     uiAttr(btn, 'aria-label', () => format(uiString('bottom-nav', 'badge'), { label: item.label, badge: badgeText }));
                 }
 
                 btn.appendChild(iconWrap);
+                // A space between the badge and the label, so the text reads "3 Messages", not
+                // "3Messages". The button is a flex container: the space is not laid out.
+                if (item.badge) btn.appendChild(document.createTextNode(' '));
 
                 // Label
                 const label = document.createElement('span');
