@@ -13,11 +13,12 @@ Three rules, and every action is one of them:
 
 | the action | the answer | where |
 |---|---|---|
-| **reversible, and out of sight** — archive, bulk close | a **toast carrying the undo**, for as long as the undo lasts | `answerReversible()` |
-| **visible where it happened** — create, inline edit, a saved form | the record appears and **nothing else**: the screen IS the confirmation | `answerVisible()` |
-| **refused** — the server said no, a permission is missing | a **toast in view that stays until it is dismissed** — never on a timer — and the next action takes it away | `answerRefused()` |
+| **reversible, and out of sight** — archive, bulk close | a **toast carrying the undo**, for as long as the undo lasts | `answer.reversible()` |
+| **visible where it happened** — create, inline edit, a saved form | the record appears and **nothing else**: the screen IS the confirmation | `answer.visible()` |
+| **refused** — the server said no, a permission is missing | a **toast in view that stays until it is dismissed** — never on a timer — and the next action takes it away | `answer.refused()` |
 
-Measured in `tests/after-the-action.spec.ts`, one row per rule.
+The three are one module, `src/data/answer.ts` (`createAnswer(toast)`), shared by every screen that
+writes. Measured in `tests/after-the-action.spec.ts`, one row per rule.
 
 Rule 3 is a toast and not a paragraph next to the control: a paragraph ends up under the pager, out
 of sight, while the reader is at the bulk bar. What the rule is FOR — a refusal does not vanish on a
@@ -36,7 +37,8 @@ what was asked. The rows that were refused stay selected, so the next attempt is
 **And each answer reaches a screen reader exactly once.** That is the half no visual rule covers,
 and the half that is easy to get wrong in both directions:
 
-- a toast already carries `role="status"` and `aria-live="polite"` (`pdx-toast.ts:129`), so calling
+- a toast already carries `role="status"` and `aria-live="polite"` (`pdx-toast.ts:164`; an error
+  toast, `role="alert"` and `assertive`), so calling
   `announce()` beside it says the same thing **twice** — worse than silence;
 - a row appearing is not an event a screen reader notices, so rule 2 announces and draws nothing;
 - a refusal is a toast, so the toast's own live region carries it, as for rule 1,
@@ -44,8 +46,9 @@ and the half that is easy to get wrong in both directions:
 
 The toast host lives on the SCREENS that can raise one, not in the shell — measured, not chosen for
 tidiness. In `app.pdx` it joins the entry chunk, and the entry is what a visitor waits for before
-anything is painted: **81 KB blocking against a budget of 78**, to answer an action that has not
-happened yet. On the screens, blocking is 77.8 KB. The QUEUE is global (`getToastQueue`), so the
+anything is painted. When it was decided that cost **81 KB blocking against a budget of 78**, to
+answer an action that has not happened yet, and on the screens blocking was 77.8 KB; the budget
+today is 103 KB (`tests/bundle-budget.spec.ts`), and the reason holds. The QUEUE is global (`getToastQueue`), so the
 screens share one and only one host is ever mounted.
 
 ## Running it

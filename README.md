@@ -16,7 +16,7 @@ PDX UI is a framework for the front end of line-of-business software: lists, rec
 dashboards. You write `.pdx` single-file components and declare what is specific to the screen:
 its route, its data, its state, its events. The compiler writes what is not: component
 registration, the route table, lazy loading, reactive bindings, scoped CSS, types. The output is
-standard Web Components, and it ships with **119 components** built for that kind of software and a
+standard Web Components, and it ships with **120 components** built for that kind of software and a
 design system with **13 themes**.
 
 It is the front-end half of the same idea as [Pragmatic.Design](https://github.com/pragmatic-design/Pragmatic.Design):
@@ -98,15 +98,15 @@ those is wiring, and wiring is the compiler's job.
 
 ## What the compiler writes for you
 
-That page is [`employees.pdx`](packages/showcase/src/pages/employees.pdx), 110 lines. Compiled, it
-becomes 138 lines of plain JavaScript, and every part of them comes from a declaration:
+That page is [`employees.pdx`](packages/showcase/src/pages/employees.pdx), 112 lines. Compiled, it
+becomes 121 lines of plain JavaScript, and every part of them comes from a declaration:
 
 | From | The compiler writes |
 |---|---|
 | The file name | A custom element, `<app-employees>`, registered with `component()` |
 | `@page '/employees'` | A route table entry: path, tag, label key, scroll policy, and a lazy `import()` so the page is its own chunk |
-| `@title` | An effect that keeps `document.title` in step with the language |
-| `$signal`, `$derived`, `$watch` | `signal()`, `computed()` and `watch()`, named for the devtools: a signal after the file and the variable (`employees:total`), a watch after the file and the line (`employees.pdx:63`) |
+| `@title` | A `useTitle()` that keeps `document.title` in step with the language |
+| `$signal`, `$derived`, `$watch` | `signal()`, `computed()` and `watch()`, named for the devtools: a signal after the file and the variable (`employees:total`), a watch after the file and the line (`employees.pdx:64`) |
 | The template | Reactive bindings; `{{ total }}` reads the signal without you writing a call |
 | `@click`, `@pdx-row-click`, … | Event handlers wrapped so an exception is reported with the component and the event that raised it |
 | `<style scoped>` | CSS scoped to the component; in a production build, extracted to a stylesheet of its own |
@@ -122,15 +122,19 @@ component('app-employees', {
     const source = createDataSource({ transport: employeeTransport, pageSize: 10 });
     const total = computed(() => source.total(), { name: 'employees:total' });
     // …
-    ctx.track(() => { document.title = $t('employees.title'); });
+    useTitle(() => $t('employees.title'));
     return { source, /* … */ total, gridEl: __gridEl, openRecord };
   },
-  render: (ctx) => html`…`,
+  render: (ctx) => (() => {
+    const __frag = __blk0();   // the static markup, built once and copied
+    // … each binding reaches its node and stays in step with the signal it reads
+  })(),
 });
 
 // Auto-route: @page '/employees'
 __pdx_pushRoute({ path: "/employees", tag: "app-employees", scroll: "preserve",
-                  labelKey: "employees.title", lazy: true, file: './employees.pdx' });
+                  labelKey: "employees.title", titleKey: "employees.title",
+                  lazy: true, file: './employees.pdx' });
 ```
 
 In development nothing is built: `pdx dev` compiles each `.pdx` when it is requested, through the
@@ -197,7 +201,7 @@ PDX_DUP_DECLARATION    error  12:1
   Hint: Rename one of them, or remove the one you do not mean.
 ```
 
-There are **61** of these, each in the [diagnostics catalogue](https://pdxui.com/docs/diagnostics).
+There are **116** of these, each in the [diagnostics catalogue](https://pdxui.com/docs/diagnostics).
 `pdx check --json` reports them with their positions and the fixes as text edits, `pdx check --fix`
 applies them, and `pdx check --types` adds the TypeScript check of scripts and templates.
 
@@ -235,7 +239,7 @@ You still read what the agent wrote. There is less of it, and none of it is plum
 | **Routing** | `@page` routes, nested routes, guards, lazy loading, scroll restoration, keep-alive pages |
 | **Data** | Data sources with paging, sorting, filtering and search; resources with cache and retry; mutations; an HTTP client |
 | **Forms** | Schema-driven forms, validation, field arrays, auto-forms from a schema |
-| **Components** | 114 custom elements: a data grid with views, filters, grouping and CSV/Excel export; inputs, pickers, overlays, navigation, layout, feedback, charts |
+| **Components** | 120 custom elements: a data grid with views, filters, grouping and CSV/Excel export; inputs, pickers, overlays, navigation, layout, feedback, charts |
 | **Design system** | Tokens, 13 themes, light and dark, density, a theme engine whose colours are checked against WCAG contrast, and a [theme builder](https://themebuilder.pdxui.com) |
 | **i18n** | Translations with ICU plurals, and dates and numbers in the user's locale |
 | **Tooling** | `pdx dev · build · check · new · theme · mcp`; a language server and a [VS Code extension](packages/vscode-pdx); devtools; test utilities |
@@ -262,8 +266,8 @@ You still read what the agent wrote. There is less of it, and none of it is plum
   function. In PDX you write declarations and the compiler writes the registration and the reactive
   wiring, and you get a router, a data layer and a component library with it.
 
-**It is probably not for you (yet)** if you need a stable 1.0 today, server-side rendering or static
-generation (on the roadmap, not available), or a framework whose library ecosystem you already depend
+**It is probably not for you (yet)** if you need a stable 1.0 today, rendering per request or streaming
+from a server (on the roadmap, not available; static generation is), or a framework whose library ecosystem you already depend
 on.
 
 ---
@@ -271,8 +275,8 @@ on.
 ## How we know it works
 
 A framework that writes your wiring has to be more reliable than the wiring it replaces. Every push
-runs the type check, the lint and every suite on the machine it comes from; CI runs the suites again
-on every pull request, and the component certification on every pull request too. The last full run
+runs the type check, the lint and the unit suites of the packages it affects on the machine it comes
+from; CI runs every suite, and the component certification, on every pull request. The last full run
 was **21,901 tests**:
 
 - **11,833 unit tests** across the compiler, the runtime, the router, the language server, the
@@ -281,13 +285,13 @@ was **21,901 tests**:
 - **1,659 browser tests** on the design system, the theme builder, the documentation site and the
   showcase application, on its production build and on the development server.
 - **Component certification: 6,678 tests**, plus **1,708 visual tests**. The components are
-  described by [106 manifests](packages/responsive/tests/manifests/) of scenarios, and each scenario
+  described by [123 manifests](packages/responsive/tests/manifests/) of scenarios, and each scenario
   is measured in all 13 themes, in a browser: geometry and contrast, axe accessibility, immunity to
   hostile page CSS, the WAI-ARIA keyboard pattern, and screenshots compared against baselines made
   in a pinned Docker image.
 
 **Ratchets that only go one way.** The showcase's bundle has a budget the build is measured against:
-33.8 KB gzipped for the entry module and 82.6 KB before the first paint, with a cap on headroom so a
+43.6 KB gzipped for the entry module and 103 KB before the first paint, with a cap on headroom so a
 budget cannot drift far above the real number. Lint warnings and coverage thresholds are held the
 same way.
 
@@ -298,7 +302,8 @@ specs beside it; inlined bindings and the parity of the two modes in the compile
 
 **Maturity.** This is `1.0.0-beta.0`. The language, the runtime and the component APIs may still
 change before 1.0; every change an application can notice is in the [CHANGELOG](CHANGELOG.md).
-Server-side rendering and static generation are on the roadmap.
+Static generation with hydration ships (`pdx build --ssg`); rendering per request and streaming are
+on the roadmap.
 
 ---
 
@@ -345,7 +350,7 @@ Then pick your way in:
 | [`@pdxui/core`](packages/core) | Signals, templates, components, forms, data, i18n, with no dependencies |
 | [`@pdxui/compiler`](packages/compiler) | The Vite plugin: `.pdx` → Web Components |
 | [`@pdxui/router`](packages/router) | `@page` routing, guards, lazy routes |
-| [`@pdxui/ui`](packages/ui) | 119 components for line-of-business applications |
+| [`@pdxui/ui`](packages/ui) | 120 components for line-of-business applications |
 | [`@pdxui/design`](packages/design) | The CSS design system: tokens, 13 themes, a WCAG-checked theme engine |
 | [`@pdxui/cli`](packages/cli) | `pdx dev · build · check · new · theme · mcp` |
 | [`@pdxui/lsp`](packages/lsp) | The `.pdx` language server; the [VS Code extension](packages/vscode-pdx) uses it |

@@ -4,11 +4,15 @@
 
 `r$` measures, models, and validates CSS layouts mathematically — across all viewport widths.
 
+`r$` is the standalone package [`@responsivejs/design`](https://www.npmjs.com/package/@responsivejs/design).
+This package, `@pdxui/responsive`, is private: it is PDX UI's certification harness built on it,
+with the components' manifests and the runners of the five dimensions.
+
 ## Quick Start
 
 ```typescript
 import { test, expect } from '@playwright/test';
-import { r$ } from '@pdxui/responsive';
+import { r$ } from '@responsivejs/design';
 
 test('layout is correct at all viewports', async ({ page }) => {
     const r = r$(page);
@@ -118,7 +122,7 @@ const report = r.report();
 Pure functions, no browser dependency:
 
 ```typescript
-import { rect, curve, stats } from '@pdxui/responsive';
+import { rect, curve, stats } from '@responsivejs/design';
 
 // Rect geometry
 rect.contains(parent, child)
@@ -156,9 +160,11 @@ stats.gaps([0, 16, 32, 48])    // [16, 16, 16]
 ## Development
 
 ```bash
-npm test          # Unit tests (math)
-npm run test:e2e  # Integration tests (Playwright)
-npm run test:all  # Both
+pnpm certify                               # from the root: dimensions 1-4, every component in 13 themes
+pnpm certify:visual                        # from the root: dimension 5, screenshots in Docker
+pnpm --filter @pdxui/responsive test:gen   # the scenario pages and the registry, from the manifests
+pnpm --filter @pdxui/responsive test:e2e   # the layout integration tests
+pnpm --filter @pdxui/responsive design-score
 ```
 
 ## License

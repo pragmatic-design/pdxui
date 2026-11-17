@@ -21,8 +21,9 @@ The first block is a page; the second is the app shell that renders it. `navigat
 `@pdxui/router` navigates from code.
 
 Routes are destroyed when you leave them. A route declared `@page '/results' { keepAlive };` is
-frozen instead and resumed on return. In development the router matches paths at runtime. A production build replaces it with
-a matcher generated from the project's `@page` declarations.
+frozen instead and resumed on return. One router runs in development and in a build: the compiler
+emits the route table from the project's `@page` declarations, and the router builds its matcher from
+it once, at startup.
 
 ## Entry points
 

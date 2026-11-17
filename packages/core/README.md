@@ -31,6 +31,9 @@ count.set(v => v + 1);                  // 4
 | `@pdxui/core/i18n` | Locales, `$t`, plural and ICU messages |
 | `@pdxui/core/testing` | `mount`, `tick`, `fireEvent`, `waitFor`, `cleanup` |
 | `@pdxui/core/devtools` | The development overlay and signal inspector |
+| `@pdxui/core/hydrate` | `installHydration`, for an app whose pages are generated: the client adopts the server's markup |
+| `@pdxui/core/server` | `renderToString`, for static generation in Node |
+| `@pdxui/core/server-dom` | `installServerDom`, the server DOM, installed before anything else of core is imported |
 
 ## Documentation
 
