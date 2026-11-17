@@ -29,6 +29,8 @@ A compact set of exclusive options.
 
 **Parts:** `[data-part="root"]` — The frame, the `radiogroup`.; `[data-part="item"]` — One segment, a `radio` button; the chosen one is `aria-checked`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

@@ -23,6 +23,8 @@ Columns of cards, moved by pointer, keyboard or menu.
 
 **Parts:** `[data-part="root"]` — The board, `role="group"` named by `label`.; `[data-part="column"]` — A column; `[data-column]` is its key, `[data-over]` marks one over its limit.; `[data-part="header"]` — A column's title and count.; `[data-part="count"]` — The number of cards, with the limit when the column has one.; `[data-part="list"]` — A column's list of cards, named by its title.; `[data-part="card"]` — A card, the list item the keyboard moves; `[data-key]` is its key.; `[data-part="moveButton"]` — A card's Move menu button.; `[data-part="empty"]` — What an empty column says.
 
+**Tokens:** `--pdx-kanban-column-width`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

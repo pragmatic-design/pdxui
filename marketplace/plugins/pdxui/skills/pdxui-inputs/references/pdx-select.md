@@ -87,6 +87,10 @@ paged table → `pdx-relation-picker`.
 
 **Parts:** `[data-part="root"]` — The trigger: the frame, its border, background and the states' colours.; `[data-part="search"]` — The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.; `[data-part="tag"]` — A chosen option in the trigger, while `multiple`.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`.; `[data-part="spinner"]` — The loading spinner, a `role="status"`, while loading.; `[data-part="popup"]` — The floating panel that holds the list.; `[data-part="list"]` — The `role="listbox"`.; `[data-part="option"]` — An option of the list.
 
+**Tokens:** `--pdx-input-border-color` — The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).; `--pdx-input-border-color-focus` — The frame's border while focused (the outlined input style).; `--pdx-input-border-color-invalid` — The frame's border in the invalid state.; `--pdx-input-border-color-success` — The frame's border in the success state.; `--pdx-input-border-color-warning` — The frame's border in the warning state.; `--pdx-input-border-width` — The frame's bottom border, in the filled input style.; `--pdx-input-focus-ring` — The ring around the frame while focused.; `--pdx-input-min-height` — The frame's height, at the md size.; `--pdx-select-caret-size`; `--pdx-select-caret-stroke`. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

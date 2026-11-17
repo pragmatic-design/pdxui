@@ -2,8 +2,9 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">1. Basic Form (Bound Through the Model)</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Just add <code>name="field"</code> to controls inside <code>&lt;pdx-form&gt;</code>.
-      The compiler generates value binding, onChange, and onBlur automatically.
+      Bind each control to its field with <code>::value="form.field"</code>: the binding writes the
+      field through the control's <code>value-change</code>, marks the control invalid or required, and
+      touches the field when the control is left.
     </p>
 
     <div class="demo-block">
@@ -48,7 +49,7 @@ const saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.savePr
   &lt;pdx-form-field :field="basicForm.name" label="Full Name" required&gt;
     &lt;pdx-input name="name" ::value="basicForm.name"&gt;&lt;/pdx-input&gt;
   &lt;/pdx-form-field&gt;
-  &lt;!-- compiler generates :value, @pdx-change, @pdx-blur --&gt;
+  &lt;!-- ::value binds the field both ways, through value-change --&gt;
 &lt;/pdx-form&gt;</code></pre></details>}
   </section>
 </template>

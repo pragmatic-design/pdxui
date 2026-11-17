@@ -106,6 +106,8 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 
 **Parts:** `[data-part="toolbar"]` — The formatting toolbar, with `toolbar-mode="top"`.; `[data-part="field"]` — The frame around the text: its height and scrolling.; `[data-part="input"]` — The editing area, a contenteditable `role="textbox"`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

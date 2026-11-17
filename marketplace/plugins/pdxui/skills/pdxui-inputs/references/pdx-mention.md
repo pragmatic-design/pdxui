@@ -42,6 +42,8 @@ Type @ to mention people.
 
 **Parts:** `[data-part="root"]` — The frame around the textarea and its highlight layer.; `[data-part="input"]` — The native `<textarea>` the text is typed into.; `[data-part="list"]` — The floating suggestion list, `role="listbox"`.; `[data-part="option"]` — One suggestion, `role="option"`; the active one is `aria-selected="true"`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 **Shapes:** `MentionItem { value: string; label: string; description?: string }`
 
 

@@ -42,6 +42,8 @@ row. It shares the
 
 **Parts:** `[data-part="root"]` — The `role="tree"`: one click and one keydown listener serve every row.; `[data-part="item"]` — A row, `role="treeitem"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3).; `[data-part="group"]` — The `role="group"` of an open branch's children.; `[data-part="twisty"]` — A branch's open/closed marker.; `[data-part="check"]` — A row's checkbox, with `checkable`.; `[data-part="label"]` — A row's label.
 
+**Tokens:** `--pdx-tree-level`. Set one at `:root`, on a subtree, or on the element itself.
+
 **Shapes:** `TreeNode { isBranch?: boolean }`
 
 

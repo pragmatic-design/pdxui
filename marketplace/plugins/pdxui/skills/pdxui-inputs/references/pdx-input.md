@@ -45,6 +45,10 @@ Text field with sizes, states and addons.
 
 **Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>`, the textbox a form submits.; `[data-part="prefix"]` — The `prefix` text, when set.; `[data-part="suffix"]` — The `suffix` text, when set.; `[data-part="clear"]` — The clear button, while `clearable` and neither `disabled` nor `readonly`.; `[data-part="spinner"]` — The loading spinner, a `role="status"`, while `loading`.; `[data-part="count"]` — The character count, with `show-count`.
 
+**Tokens:** `--pdx-input-border-color`; `--pdx-input-border-color-focus`; `--pdx-input-border-color-invalid`; `--pdx-input-border-color-success`; `--pdx-input-border-color-warning`; `--pdx-input-border-width` (default `var(--pdx-border-width)`); `--pdx-input-focus-ring`; `--pdx-input-min-height` (default `2.5rem`). Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

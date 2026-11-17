@@ -23,6 +23,8 @@ A surface for grouped content.
 
 **Parts:** `[data-part="root"]` — The card's box (`.pdx-surface-card`); the header, body and footer inside it are your markup.; `[data-part="link"]` — The `<a>` laid across the card when it has an `href`.
 
+**Tokens:** `--pdx-card-border-color` (default `var(--pdx-color-border)`); `--pdx-card-radius` (default `var(--pdx-radius-lg)`); `--pdx-card-shadow` (default `var(--pdx-shadow-sm)`). Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

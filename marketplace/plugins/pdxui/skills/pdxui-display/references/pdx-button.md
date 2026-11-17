@@ -37,6 +37,8 @@ no `@click` to write.
 
 **Parts:** `[data-part="root"]` — The native `<button>`.; `[data-part="label"]` — The text of `label`, after any slotted content.
 
+**Tokens:** `--pdx-button-bg`; `--pdx-button-bg-hover`; `--pdx-button-color`; `--pdx-button-min-height` (default `2.5rem`); `--pdx-button-radius`; `--pdx-button-shadow-hover`; `--pdx-button-transform-hover`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 
@@ -190,8 +192,8 @@ are checked against the manifest above._
 <div class="demo-row">
   <pdx-button variant="outline" size="sm" @click="openDeclarative">Open Dialog</pdx-button>
 </div>
-<pdx-dialog :open="declOpen" title="Declarative Dialog" size="md">
-  <p style="margin:0 0 var(--pdx-space-md)">This dialog is opened via <code>:open</code> binding.</p>
+<pdx-dialog ::open="declOpen" title="Declarative Dialog" size="md">
+  <p style="margin:0 0 var(--pdx-space-md)">This dialog is bound with <code>::open</code>: Escape and the backdrop close it and write <code>declOpen</code> back.</p>
   <p style="margin:0">Click below to open a programmatic confirm on top of this dialog.</p>
   <span slot="footer">
     <pdx-button variant="danger" size="sm" @click="onNestedConfirm">Delete (Programmatic)</pdx-button>

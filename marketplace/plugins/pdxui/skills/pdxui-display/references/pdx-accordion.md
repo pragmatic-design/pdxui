@@ -47,6 +47,8 @@ ids are unique per accordion, so two on a page never collide; ids you write are 
 
 **Parts:** `[data-part="item"]` — An item, `[data-accordion-item]`; open, it carries `data-open`.; `[data-part="trigger"]` — An item's header, `[data-accordion-trigger]`, `aria-expanded` while open.; `[data-part="panel"]` — An item's content, `[data-accordion-content]`, a `role="region"`.
 
+**Tokens:** `--pdx-accordion-glyph` (default `'+'`); `--pdx-accordion-glyph-size` (default `var(--pdx-text-lg)`); `--pdx-accordion-transform-open`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

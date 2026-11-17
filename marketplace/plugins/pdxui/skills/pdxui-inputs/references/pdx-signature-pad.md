@@ -34,6 +34,10 @@ Draw or type a signature; the form gets a PNG.
 
 **Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="toolbar"]` — The two ways to sign.; `[data-part="modeButton"]` — The Draw and the Type button, `aria-pressed` on the one in use.; `[data-part="nameInput"]` — The text field of the Type mode.; `[data-part="surface"]` — The paper the signature is drawn on.; `[data-part="pad"]` — The canvas, `role="img"` named by the label and whether it is signed.; `[data-part="guide"]` — The signing line.; `[data-part="prompt"]` — The placeholder shown while nothing is signed.; `[data-part="undoButton"]` — The button that takes the last stroke off.; `[data-part="clearButton"]` — The button that clears the signature.
 
+**Tokens:** `--pdx-signature-paper` — The paper's colour, light in both schemes, as a signed document is (default `oklch(0.99 0.003 260)`).; `--pdx-signature-ink` — The colour the pen draws with (default `oklch(0.25 0.06 260)`).; `--pdx-signature-height` — The height of the signing surface (default `10rem`).; `--pdx-font-signature` — The font of the Type mode (default the bundled `pdx-signature` script face).. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

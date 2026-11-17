@@ -15,6 +15,8 @@ A plain or labeled separating line.
 
 **Parts:** `[data-part="line"]` — A line: the `<hr>`, the vertical rule, or each line beside the label.; `[data-part="label"]` — The label between the two lines.
 
+**Tokens:** `--pdx-divider-style`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

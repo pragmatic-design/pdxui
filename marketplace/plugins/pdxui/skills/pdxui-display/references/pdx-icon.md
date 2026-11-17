@@ -49,6 +49,8 @@ Any other set: `registerIconSet(name, resolver)` from `@pdxui/core`, then `set="
 
 **Parts:** `[data-part="root"]` — The box the SVG fills, `--pdx-icon-size` square.
 
+**Tokens:** `--pdx-icon-size`. Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 
@@ -56,7 +58,7 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Built-in Pragmatic Icons** — {{ iconCount }} icons included. Zero dependencies. A page ships the icons it names: the compiler imports each one a template or a script names, and any other name loads on demand. `registerPragmaticIcons()` puts the whole set on the page, as this gallery does.
+**Built-in Pragmatic Icons**
 
 ```html
 <!-- No setup: the compiler imports check and settings -->

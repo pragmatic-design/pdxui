@@ -48,6 +48,8 @@ let pinError = $signal(''); // set when the server refuses the PIN: pinError = '
 
 **Parts:** `[data-part="root"]` — The field's wrapper.; `[data-part="label"]` — The `<label>`, with `label`.; `[data-part="description"]` — The description under the label, with `description`.; `[data-part="control"]` — The box that holds the slotted control.; `[data-part="error"]` — The error message, while it is shown.; `[data-part="warning"]` — The warning message, while it is shown.; `[data-part="success"]` — The success message, while it is shown.; `[data-part="hint"]` — The hint, while no message takes its place.
 
+**Tokens:** `--pdx-form-field-gap` (default `var(--pdx-space-md)`). Set one at `:root`, on a subtree, or on the element itself.
+
 
 #### Examples
 

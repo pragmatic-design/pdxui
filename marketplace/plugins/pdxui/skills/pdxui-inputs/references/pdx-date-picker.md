@@ -16,6 +16,9 @@ with `editable`, lets it be typed.
 - The value has a shape per mode: the ISO date; the date and its time, `2026-03-14T09:30`, in `datetime`;
   `[start, end]` for a range or a week. `getDate()`, `getRange()` and `getTime()` read the parts.
 - `calendar` changes the display only; the value and its math stay Gregorian ISO.
+- The calendar inside has parts of its own, among them a `root`. Select the picker's parts as its
+  children: `pdx-date-picker > [data-part="root"]` is the trigger; a bare `pdx-date-picker
+  [data-part="root"]` also finds the calendar's frame.
 
 **Composes with** `pdx-form` + `pdx-form-field` (bound through its model, `::value="f.x"`) · `pdx-auto-form` / `pdx-form-template` (a
 schema `date` field is drawn as an editable picker) · `@form` touched state (it emits `pdx-blur` when focus
@@ -78,6 +81,10 @@ leaves both the field and its panel).
 **States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.
 
 **Parts:** `[data-part="root"]` — The trigger, the combobox unless `editable`: the frame, its border and background.; `[data-part="input"]` — The text field inside the trigger, while `editable`: the combobox then.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and not `disabled`.; `[data-part="popup"]` — The floating panel, a `role="dialog"`, that holds the calendar, the time and the presets.; `[data-part="preset"]` — A preset button in the panel's sidebar.; `[data-part="calendar"]` — The `pdx-calendar` the picker draws, in the panel or `inline`.
+
+**Tokens:** `--pdx-input-border-color` — The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).; `--pdx-input-border-color-focus` — The frame's border while focused (the outlined input style).; `--pdx-input-border-width` — The frame's bottom border, in the filled input style.; `--pdx-input-focus-ring` — The ring around the frame while focused.; `--pdx-input-min-height` — The frame's height, at the md size.. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
 
 **Shapes:** `DatePreset { label: string; value: string | [string, string] }`
 

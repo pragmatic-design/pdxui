@@ -137,6 +137,8 @@ describe('the component pages', () => {
                 if (examples.includes('@@')) wrong.push(`${f}: @@`);
                 for (const l of examples.split('\n').filter(x => x.startsWith('**'))) {
                     if (/<[a-z][\w-]*[\s>]/.test(l.replace(/`[^`]*`/g, ''))) wrong.push(`${f}: ${l.slice(0, 60)}`);
+                    // A demo's live text, `{{ iconCount }} icons included`, is the expression here.
+                    if (l.includes('{{')) wrong.push(`${f}: interpolation in "${l.slice(0, 60)}"`);
                 }
             }
         }
@@ -158,6 +160,17 @@ describe('the component pages', () => {
             }
         }
         expect(hidden).toEqual([]);
+    });
+
+    it("a page carries the component's tokens and, when it has one, its part in a native form", () => {
+        // The manifest has both (cssProperties, formAssociated); a page that leaves them out leaves an
+        // agent restyling a component by its internals, and guessing what a <form> receives.
+        const page = (area: string, tag: string) => readFileSync(join(SKILLS, `pdxui-${area}`, 'references', `${tag}.md`), 'utf-8').replace(/\r\n/g, '\n');
+        const button = page('display', 'pdx-button');
+        expect(button).toMatch(/\*\*Tokens:\*\* .*`--pdx-button-bg`/);
+        expect(button).toContain('`--pdx-button-min-height` (default `2.5rem`)');
+        expect(page('inputs', 'pdx-rich-text')).toMatch(/\*\*Form:\*\* form-associated/);
+        expect(button).not.toMatch(/\*\*Form:\*\*/);
     });
 
     it('the reader can fail', () => {

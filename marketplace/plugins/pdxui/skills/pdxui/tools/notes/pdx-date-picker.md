@@ -12,6 +12,9 @@ with `editable`, lets it be typed.
 - The value has a shape per mode: the ISO date; the date and its time, `2026-03-14T09:30`, in `datetime`;
   `[start, end]` for a range or a week. `getDate()`, `getRange()` and `getTime()` read the parts.
 - `calendar` changes the display only; the value and its math stay Gregorian ISO.
+- The calendar inside has parts of its own, among them a `root`. Select the picker's parts as its
+  children: `pdx-date-picker > [data-part="root"]` is the trigger; a bare `pdx-date-picker
+  [data-part="root"]` also finds the calendar's frame.
 
 **Composes with** `pdx-form` + `pdx-form-field` (bound through its model, `::value="f.x"`) · `pdx-auto-form` / `pdx-form-template` (a
 schema `date` field is drawn as an editable picker) · `@form` touched state (it emits `pdx-blur` when focus

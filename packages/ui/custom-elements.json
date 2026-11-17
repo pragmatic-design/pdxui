@@ -28023,6 +28023,24 @@
               "description": "The button that clears the signature."
             }
           ],
+          "cssProperties": [
+            {
+              "name": "--pdx-signature-paper",
+              "description": "The paper's colour, light in both schemes, as a signed document is (default `oklch(0.99 0.003 260)`)."
+            },
+            {
+              "name": "--pdx-signature-ink",
+              "description": "The colour the pen draws with (default `oklch(0.25 0.06 260)`)."
+            },
+            {
+              "name": "--pdx-signature-height",
+              "description": "The height of the signing surface (default `10rem`)."
+            },
+            {
+              "name": "--pdx-font-signature",
+              "description": "The font of the Type mode (default the bundled `pdx-signature` script face)."
+            }
+          ],
           "cssStates": [
             {
               "name": "empty",

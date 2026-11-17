@@ -39,6 +39,8 @@ Multi-line text input that can auto-grow.
 
 **Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<textarea>`, the textbox a form submits.; `[data-part="footer"]` — The row under the frame that holds the counts, with `show-count` or `word-count`.; `[data-part="count"]` — The character count, with `show-count`.; `[data-part="word-count"]` — The word count, with `word-count`.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

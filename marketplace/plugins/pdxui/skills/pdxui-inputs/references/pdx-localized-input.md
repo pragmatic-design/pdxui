@@ -30,6 +30,8 @@ One text in several languages, a tab each.
 
 **Parts:** `[data-part="root"]` — The field, `role="group"` named by the label.; `[data-part="tabs"]` — The tablist of the cultures.; `[data-part="tab"]` — A culture's tab, named in its own language.; `[data-part="cultureButton"]` — The flag layout's prefix: the active culture's flag (its code when it has none), a menu button.; `[data-part="marker"]` — The dot of a culture with no text.; `[data-part="expandButton"]` — `expandable`: the button in the field's suffix that opens every culture in a dialog.; `[data-part="panel"]` — A culture's panel (a tabpanel), or its row when stacked.; `[data-part="field"]` — A culture's input or textarea.
 
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

@@ -343,7 +343,7 @@ const orderForm = createForm({
 </div>
 ```
 
-**1. Basic Form (Bound Through the Model)** — Just add `name="field"` to controls inside `<pdx-form>`. The compiler generates value binding, onChange, and onBlur automatically.
+**1. Basic Form (Bound Through the Model)** — Bind each control to its field with `::value="form.field"`: the binding writes the field through the control's `value-change`, marks the control invalid or required, and touches the field when the control is left.
 
 ```js
 @form basicForm: {
@@ -362,7 +362,7 @@ const saveBasic = basicForm.handleSubmit(async (values) => { await api.saveProfi
   <pdx-form-field :field="basicForm.name" label="Full Name" required>
     <pdx-input name="name" ::value="basicForm.name"></pdx-input>
   </pdx-form-field>
-  <!-- compiler generates :value, @pdx-change, @pdx-blur -->
+  <!-- ::value binds the field both ways, through value-change -->
 </pdx-form>
 ```
 

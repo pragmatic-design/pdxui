@@ -68,6 +68,10 @@ on blur.
 
 **Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>`, the combobox.; `[data-part="clear"]` — The clear button, while `clearable` and something is typed.; `[data-part="spinner"]` — The loading spinner, while loading.; `[data-part="popup"]` — The floating panel that holds the list.; `[data-part="list"]` — The `role="listbox"`.; `[data-part="option"]` — A suggestion of the list.
 
+**Tokens:** `--pdx-input-border-color` — The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).; `--pdx-input-border-color-focus` — The frame's border while focused (the outlined input style).; `--pdx-input-border-color-invalid` — The frame's border in the invalid state.; `--pdx-input-border-color-success` — The frame's border in the success state.; `--pdx-input-border-color-warning` — The frame's border in the warning state.; `--pdx-input-border-width` — The frame's bottom border, in the filled input style.; `--pdx-input-focus-ring` — The ring around the frame while focused.; `--pdx-input-min-height` — The frame's height, at the md size.. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 
 #### Examples
 

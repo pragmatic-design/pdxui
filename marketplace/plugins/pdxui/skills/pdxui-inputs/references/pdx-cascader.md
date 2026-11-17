@@ -37,6 +37,10 @@ Drill through nested options.
 
 **Parts:** `[data-part="root"]` — The trigger, the combobox: the frame, its border and background.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and not `disabled`.; `[data-part="popup"]` — The floating panel that holds the columns, or the search results.; `[data-part="search"]` — The search field atop the panel, while `searchable`.; `[data-part="list"]` — A column, or the list of search results: a `role="listbox"`.; `[data-part="option"]` — An option of a column, or a search result.; `[data-part="spinner"]` — The spinner of a branch being fetched by `loadChildren`.
 
+**Tokens:** `--pdx-input-border-color` — The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).; `--pdx-input-border-color-focus` — The frame's border while focused (the outlined input style).; `--pdx-input-border-width` — The frame's bottom border, in the filled input style.; `--pdx-input-focus-ring` — The ring around the frame while focused.; `--pdx-input-min-height` — The frame's height, at the md size.. Set one at `:root`, on a subtree, or on the element itself.
+
+**Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
+
 **Shapes:** `CascaderNode { value: string; label: string; children?: CascaderNode[]; isLeaf?: boolean; disabled?: boolean }`
 
 
