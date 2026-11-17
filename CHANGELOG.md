@@ -7,7 +7,7 @@ This project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 
 may introduce breaking changes between versions; stable releases (`1.0.0` and later) follow strict
 semver.
 
-## 1.0.0-beta.0
+## 1.0.0-beta.0 — 2026-11-17
 
 The beta: its release notes are [docs/releases/beta.md](docs/releases/beta.md) — how to upgrade with
 `pdx migrate`, what it cannot detect, the removed exports, the runtime behaviour that changed and the
