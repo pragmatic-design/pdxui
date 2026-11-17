@@ -12,9 +12,11 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 - Ids come out as strings: `pdx-select` and `pdx-check` carry `String(node[idField])`, so `7` arrives as `"7"`.
 - `pdx-check` lists the leaves and the fully-checked branches; a mixed parent is not in it.
 - No prop holds the selection or the checks: you learn them from the events.
-- It is not virtualized, and every expand, select or check rebuilds the visible rows, by design.
+- It is not virtualized, and every expand or collapse rebuilds the visible rows; a select or a check
+  only marks again the rows on screen.
 
-**Composes with** — its `node` slot (`{ node, level, expanded }`) for a custom row. It shares the
+**Composes with** — its `node` snippet, `@snippet node(node, level, expanded) { … }`, for a custom
+row. It shares the
 `loadChildren(node) => Promise<Node[]>` shape with `pdx-tree-select` and `pdx-cascader`.
 
 | Prop | Attr | Type | Default | Notes |

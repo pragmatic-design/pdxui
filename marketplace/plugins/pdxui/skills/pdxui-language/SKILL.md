@@ -259,9 +259,9 @@ A component with no content may be written self-closing, `<pdx-autocomplete … 
 core's `html` tag) expands it to `<pdx-autocomplete …></pdx-autocomplete>`. The browser alone would not — it
 would open the element and swallow what follows. Void elements (`<input />`, `<br />`) stay as written.
 
-**A component's events stay on it.** No `@pdxui/ui` event bubbles — `pdx-change` included — and
+**A component's events stay on it.** No `@pdxui/ui` event bubbles — `value-change` included — and
 neither does an `@event` without `(bubbles)`: an `@open-change` on a `pdx-dialog` hears the dialog, not
-the select or date picker inside it, and a `@pdx-change` on a `<form>` or a section hears none of the
+the select or date picker inside it, and a `@value-change` on a `<form>` or a section hears none of the
 fields inside. Listen on the component itself. Native events (`input`, `change`, `click`) still bubble
 as the browser makes them.
 
@@ -296,7 +296,8 @@ On a page that is not generated, it renders as if the block were not there. `@hy
 script does the same for the whole component (a page included), without `when (…)`.
 
 The complete set the parser knows: `if · else · for · empty · switch · case · default · await ·
-loading · catch · try · error · defer · hydrate · placeholder · show · require · portal · slot · let · raw`.
+loading · catch · try · error · defer · hydrate · placeholder · show · require · portal · slot · let · raw ·
+snippet · render`.
 
 ⚠️ **A block body must start with `{`.** `@if (x)` followed by markup is a parse error — the message
 says so, with the line and column.
@@ -392,7 +393,7 @@ export default { plugins: [pdx()] };
 ```html
 <!-- index.html -->
 <!doctype html>
-<html pdx-theme="default" pdx-scheme="light">
+<html pdx-scheme="light">
   <head><meta charset="utf-8"><title>…</title></head>
   <body>
     <app-app-shell></app-app-shell>
@@ -464,8 +465,9 @@ bottom navigation — the shortcut still works there. Turn it off with `pdx({ de
 the panel says «Debug hook not found», core is not running as a dev build (the page is a production
 build, or `process.env.NODE_ENV` is `production`).
 
-`npx @pdxui/cli new project <name>` scaffolds a project to start from: `@pdxui/framework`, and
-`@pdxui/cli` and `@pdxui/compiler` as dev dependencies, at the CLI's own version; the design system
+`npx @pdxui/cli new project <name>` scaffolds a project to start from: `@pdxui/framework` and
+`@pdxui/design`, and `@pdxui/cli`, `@pdxui/compiler` and `vite` as dev dependencies, at the CLI's own
+version (vite at the range the CLI supports); the design system
 imported once in `index.html`; an `AGENTS.md`. Then `npm install` and `npm run dev`.
 
 ## Things that will cost you an hour otherwise

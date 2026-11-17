@@ -61,7 +61,8 @@ The component: **`pdx-data-grid`**, with either `:data` (an array, auto-wrapped 
 - Multiple selection: `selection="multiple"` → the `pdx-selection-change {selected:ids,count}` event. Give the
   source `selection: {mode:'multiple'}` and `ds.selectedCount()` / `ds.selectedItems()` follow the ticks too, with
   cross-page select-all and optional persistence; without it the source stays empty by design. The bulk-action bar:
-  build it yourself (sticky at the bottom), driven imperatively from the handler (see the reactivity gotchas). The API:
+  `pdx-bulk-actions` (pdxui-data), with `:count` set from the selection and its `pdx-action` / `pdx-clear` events
+  handled by the page. The API:
   `el.clearSelection()` and `el.getSelectedIds()` — FLAT on the element (there is no `__dataGrid`; measured).
 - The canonical examples: `Pragmatic.Design.Builder/golden/app/src/routes/patients.pdx` (plus `patients-paged/header/builder.pdx`).
 - **A reusable structure (DRY, the shape the generator emits)**: THIN screens that wire up a
@@ -79,7 +80,7 @@ The component: **`pdx-data-grid`**, with either `:data` (an array, auto-wrapped 
 KPIs go in a **`pdx-card`** (a large value, a muted label, a coloured trend and an icon pill) or in a **`pdx-statistic`**.
 Charts: **`pdx-chart`** (`type` of line, bar or doughnut, plus `:data`, `x-field`, `y-field` and `series-names`). For a dual-axis combo:
 `series-config` (a JSON string carrying `field`, `type` and `yAxisIndex`) plus `y-axis-right-name` and `y-right-format`.
-The activity table: a `pdx-data-grid` using `format` for the status badges. The canonical example: `Pragmatic.Design.Builder/golden/app/src/routes/home.pdx`.
+The activity table: a `pdx-data-grid` with `cell: status()` (or `badge()`) for the status column. The canonical example: `Pragmatic.Design.Builder/golden/app/src/routes/home.pdx`.
 
 ## Auth / login
 An uncontrolled form (no `:value`), with submit-on-Enter through `@keydown`. A per-route guard (`requireAuth()`), and the chrome conditioned on the
@@ -100,7 +101,7 @@ route rather than on the authentication. The credential fields: `autocomplete="u
   (the golden app does; a signal set from a custom event does update the template — measured). The form is **rebuilt on every
   opening** (`createFormFromSchema` → `form.reset(row)` → a `pdx-form-template` around that form): form-template's value
   binding happens at build time and is not reactive (see the gotchas). To save: `form.getValues()` → `ds.update` plus `ds.sync`.
-- The other edit modes (planned): a modal (`pdx-dialog`, or the grid's `edit-mode="dialog"`), and a dedicated page.
+- The other edit modes: the grid's own `editable edit-mode="dialog"` (or `"row"`), a `pdx-dialog`, or a dedicated page.
 
 ## A long form filled in more than one sitting: `<pdx-form :form>`
 
@@ -163,7 +164,7 @@ Two mechanisms, no shared implementation, and **they do not compose**. Pick one 
 | what a row can contain | plain controls only — text, email, number, textarea, checkbox, switch. A `select` gets **no options**; anything else becomes a text input | anything you can render |
 | writing one field of one row | the form field at that path: `form['rooms.0.type'].onChange(v)` | `rows.update(i, { ...rows.getValues()[i], type: v })` — `update` keeps the `__id`, `replace` does not |
 
-**Choose the component** when the rows are plain fields and you want the table, the dialog mode and the buttons for free. **Choose the primitive** when a row needs a picker, a select with options or a component of its own — then draw it yourself, or keep `pdx-field-list` and put the row in its `row` slot, which receives `{ item, index, fields, remove }`.
+**Choose the component** when the rows are plain fields and you want the table, the dialog mode and the buttons for free. **Choose the primitive** when a row needs a picker, a select with options or a component of its own — then draw it yourself, or keep `pdx-field-list` and put the row in its `row` snippet, `@snippet row(item, index, remove) { … }`.
 
 ⚠️ **Never both on one name.** They are two storages, and `form.getValues()` merges the field arrays back **last**: one call to `form.array('rooms')` on a name a `<pdx-field-list name="rooms">` is managing replaces everything the list has written, with the array's own contents — which it seeded from `initialValues`, not from what you typed. Measured: a field edited through the list reads back as its initial value the moment `form.array()` is called on that name, with nothing in the console.
 

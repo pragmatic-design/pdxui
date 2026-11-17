@@ -1,7 +1,8 @@
 **`type="number"` and `type="currency"` keep the decimals the display can show.** The editor keeps
 `precision` decimals: by default the currency's own (2 for EUR, 0 for JPY) or, for a plain number,
 up to 3 — 29.5 edited to «30.2» saves 30.2. Set `precision` to fix it (`precision="0"` saves whole
-numbers). The number editor shows the value with that many decimals while you edit («29.500»).
+numbers). The number editor opens on the value's own decimals (29.5, not «29.500»): `precision` caps
+and rounds them, and draws no trailing zeros.
 
 ```html
 <pdx-inline-edit type="number" ::value="weight"></pdx-inline-edit>

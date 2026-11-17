@@ -13,8 +13,8 @@ comparison, and which to choose, is in the recipe "Rows that repeat".
 
 `itemFields` builds **plain controls only** — text, email, number, textarea, checkbox, switch. A
 `select` gets no options, and anything else becomes a text input: a row that needs a picker, a select
-with options or a component of its own goes in the `row` slot, which receives
-`{ item, index, fields, remove }`.
+with options or a component of its own goes in the `row` snippet, `@snippet row(item, index, remove)
+{ … }`: `item` holds that row's values, and `remove()` removes the row.
 
 **Use it when** a form field is a list of plain sub-records — order lines, contacts, addresses — and you want
 the rows, add and remove, min and max drawn for you; or a row field must be `required`: a rule written inside
@@ -30,7 +30,7 @@ added. **Not when** you want keyed rows that survive a removal → `createFieldA
 - Inside a `<pdx-field-group>` its rows are prefixed with the group's path.
 
 **Composes with** `pdx-form` (the form it writes into) · `pdx-field-group` (a nested path) · `pdx-wizard` (rows
-inside a step) · `pdx-select` and other components in the `row` slot.
+inside a step) · `pdx-select` and other components in the `row` snippet.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|

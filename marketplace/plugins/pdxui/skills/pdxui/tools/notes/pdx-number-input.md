@@ -9,7 +9,8 @@
   the browser's after typing, the component's own after a stepper, an arrow key or the wheel. `@change`
   and `::value.lazy` hear it.
 - `min` and `max` bound numbers only; empty stays empty. A stepper press or ArrowUp/ArrowDown on an
-  empty field starts from `min` if there is one, else from 0.
+  empty field steps from 0, and the result is clamped into `min`/`max` (with `min="5"` the first step
+  lands on 5; with `min="-10"`, ArrowUp gives 1).
 - The form value is `null` when empty, so a `required` rule reports it missing; `0` is a number and
   passes.
 

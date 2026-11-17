@@ -4,7 +4,7 @@ window, and in that shell the window never scrolls: `pdx-app-layout` is `overflo
 scroll that does not happen and never sticks — with no error and nothing in the console.
 
 ```html
-<pdx-affix target=".pdx-app-main" :offset="16">…</pdx-affix>
+<pdx-affix target=".pdx-app-main" :offset-top="16">…</pdx-affix>
 ```
 
 Measured in `skill-claims.spec.ts` (case `who-scrolls`).

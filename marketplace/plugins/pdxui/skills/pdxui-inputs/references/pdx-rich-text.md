@@ -56,7 +56,9 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 **Pitfalls**
 - An HTML string as `value` with the default `output="json"` is not HTML to it: the editor starts EMPTY, and
   only a dev build warns. Set `output="html"`.
-- `source` and `field` are declared and read by nothing: setting them does nothing.
+- With `source`, `field` and `record-id` all set, the editor edits that record's field: it loads it,
+  follows changes to it, and writes each edit back with `source.update` (`record-id="1"` finds
+  `{ id: 1 }`). With any of the three missing, `value` is the document.
 - Only the setters wait for the editor. Before `pdx-ready`, `getJSON()` is `null`, `getHTML()` and `getText()`
   are `''`, and `execCommand()` does nothing.
 

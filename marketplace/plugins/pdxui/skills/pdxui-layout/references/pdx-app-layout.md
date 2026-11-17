@@ -18,7 +18,8 @@ there are exactly **four** names:
 ⚠️ **There is no `content` region, and no `sidebar`.** The main area is whatever carries no
 `data-region` at all; the left sidebar is `navbar`. A child with a `data-region` the layout does not
 know gets neither treatment — it is skipped by the four and skipped by the `main` wrap, so it drops
-out of the grid **silently**: no class, no `grid-area`, no warning.
+out of the grid: no class, no `grid-area`. In development a console warning names it and lists
+the regions; a production build says nothing.
 
 `:class` on a region is safe: the layout adds its class with `classList.add`, so both survive. Each
 region is also the part of its name (`[data-part="navbar"]`), and the `<main>` is `[data-part="main"]`.

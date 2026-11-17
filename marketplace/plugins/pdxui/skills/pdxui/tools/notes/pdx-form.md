@@ -14,7 +14,8 @@ is one `<pdx-form name>` each under `createFormCoordinator()` (recipes: *A long 
   is the full path too: select `[name="customer.email"]`.
 - With `warnUnsaved`, a save from `@pdx-submit` does not tell the form it succeeded: call `form.reset(saved)`
   before navigating away, or the page asks about work it just saved (recipes: *Do not leave with unsaved work*).
-- `:source` + `record-id` does not find a record whose id is a number: pass the id the rows carry.
+- `:source` + `record-id`: the id is tried as written and then as the number it spells, so
+  `record-id="1"` finds `{ id: 1 }`.
 
 **Composes with** `pdx-form-field` (error, touched, warning) · `pdx-field-group` (nested `a.b` paths) ·
 `pdx-field-list` (repeating rows) · `pdx-form-actions` (the submit bar) · `pdx-wizard` (steps grouped by form).

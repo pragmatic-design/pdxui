@@ -26,7 +26,7 @@ in a skill.
 | "thousands of rows", "two years of records", "they search for it" | a **grid** — `pdx-data-grid` |
 | a handful, scanned by eye, heterogeneous content | **cards** |
 | a queue somebody works through in order | a **list** — `pdx-list` |
-| appointments by resource and time of day | a **day agenda** — no component yet; the recipe «Day agenda per resource» in `pdxui/references/recipes.md` |
+| appointments by resource and time of day | a **day agenda**: `pdx-scheduler` with `view="day"` and `resources` (pdxui-data); the recipe «Day agenda per resource» in `pdxui/references/recipes.md` only for a read-only agenda that must look different |
 
 The number is the tell. If the commission says a collection is large, or that the user *finds* things
 in it rather than *browses* them, cards are the wrong shape however good they look: no columns, no
