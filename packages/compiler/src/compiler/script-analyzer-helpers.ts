@@ -131,7 +131,10 @@ export function parseFetchDecl(trimmed: string): {
             }
         }
         if (typeEnd === -1) {
-            type = rest.replace(/;?\s*$/, '').trim();
+            // The trailing `;` and the space around it off. Not `/;?\s*$/`: on a long run of spaces
+            // inside the type, the engine retried the run from each of its positions (CodeQL #182).
+            const end = rest.trimEnd();
+            type = (end.endsWith(';') ? end.slice(0, -1) : end).trim();
             rest = '';
         } else {
             type = rest.slice(0, typeEnd).trim();
