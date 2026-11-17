@@ -16,7 +16,8 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
-import { UNIT_TEST_CONCURRENCY } from '../../../build/unit-test-workers';
+import { availableParallelism } from 'node:os';
+import { UNIT_TEST_CONCURRENCY, unitTestWorkers, cpuFreeShare } from '../../../build/unit-test-workers';
 
 const ROOT = join(__dirname, '..', '..', '..');
 const PACKAGES = join(ROOT, 'packages');
@@ -69,5 +70,37 @@ describe('the divisor is the number of packages pnpm runs together', () => {
         const m = /--workspace-concurrency[= ](\d+)/.exec(scripts['test:unit'] ?? '');
         expect(m, '`test:unit` leaves its concurrency to pnpm\'s default').not.toBeNull();
         expect(Number(m![1])).toBe(UNIT_TEST_CONCURRENCY);
+    });
+});
+
+// The machine is not the gate's alone (#991): the owner runs several sessions on it at once, and the
+// gate's 2 workers per core at the peak, on top of their load, timed out tests that take
+// milliseconds alone. The pre-push samples the CPU free as it starts and hands the share to the
+// suites in PDX_CPU_FREE; the cap scales by it. No timeout is raised.
+describe('the cap scales with the CPU free when the gate starts', () => {
+    const idle = Math.max(1, Math.floor(availableParallelism() * 2 / UNIT_TEST_CONCURRENCY));
+
+    it('all of it free: today\'s cap, 2 workers per core at the peak', () => {
+        expect(unitTestWorkers(1)).toBe(idle);
+    });
+
+    it('half free: fewer, in proportion', () => {
+        expect(unitTestWorkers(0.5)).toBe(Math.max(1, Math.floor(idle / 2)));
+        if (idle > 1) expect(unitTestWorkers(0.5)).toBeLessThan(idle);
+    });
+
+    it('none free: still one worker per package', () => {
+        expect(unitTestWorkers(0)).toBe(1);
+    });
+
+    it('the share comes from PDX_CPU_FREE; without it, the machine is taken as free (CI, a run by hand)', () => {
+        expect(cpuFreeShare({})).toBe(1);
+        expect(cpuFreeShare({ PDX_CPU_FREE: '0.37' })).toBe(0.37);
+    });
+
+    it('a share that is not one is refused, not read as free', () => {
+        for (const bad of ['', 'abc', '-0.1', '1.5', 'NaN']) {
+            expect(() => cpuFreeShare({ PDX_CPU_FREE: bad }), `PDX_CPU_FREE=${JSON.stringify(bad)}`).toThrow(/PDX_CPU_FREE/);
+        }
     });
 });
