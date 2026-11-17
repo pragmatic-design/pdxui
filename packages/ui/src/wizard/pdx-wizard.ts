@@ -296,13 +296,15 @@ component('pdx-wizard', {
                     btn.style.cursor = 'default';
                 }
 
-                // Update number content
+                // The marker: the number, ✓ or the step's icon. An attribute the design draws, not text:
+                // as text it joins the label in the button's visible text, which then is not in the
+                // accessible name (WCAG 2.5.3); the position is in aria-posinset.
                 const num = btn.querySelector('.pdx-step-number');
                 if (num) {
                     const step = _steps[i];
-                    if (isDone) num.textContent = step.icon || '✓';
-                    else if (step.icon && isActive) num.textContent = step.icon;
-                    else num.textContent = String(i + 1);
+                    if (isDone) num.setAttribute('data-number', step.icon || '✓');
+                    else if (step.icon && isActive) num.setAttribute('data-number', step.icon);
+                    else num.setAttribute('data-number', String(i + 1));
                 }
             });
 

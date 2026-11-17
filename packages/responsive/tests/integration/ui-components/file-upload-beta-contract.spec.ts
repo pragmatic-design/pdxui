@@ -91,6 +91,17 @@ test.describe('parts', () => {
 });
 
 test.describe('A-rules', () => {
+    // The drop zone is a button named by what it shows (WCAG 2.5.3): its label — the file-upload.drop
+    // string when `label` is not set — and the hint shown with it, from `max-size` and `accept`.
+    test('the drop zone is named by what it shows: the default string, a label, the hint', async ({ page }) => {
+        await mount(page, '<pdx-file-upload></pdx-file-upload>');
+        await expect(dropzone(page)).toHaveAccessibleName('Drop files here or click to browse');
+        await mount(page, '<pdx-file-upload label="Attach the invoice" accept=".pdf" max-size="5242880"></pdx-file-upload>');
+        const shown = (await dropzone(page).innerText()).replace(/\s+/g, ' ').trim();
+        expect(shown).toMatch(/^Attach the invoice .*PDF/);
+        await expect(dropzone(page)).toHaveAccessibleName(shown);
+    });
+
     test('A1 — in a required pdx-form-field the drop zone is named by the label', async ({ page }) => {
         await mount(page, '<pdx-form-field label="Documents" required><pdx-file-upload></pdx-file-upload></pdx-form-field>');
         await expect(dropzone(page)).toHaveAccessibleName(/^Documents/);

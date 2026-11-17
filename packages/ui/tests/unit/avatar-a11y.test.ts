@@ -63,7 +63,12 @@ describe('pdx-avatar-group', () => {
         for (const [i, a] of avatars.entries()) {
             expect(a.getAttribute('role')).toBe('button');
             expect(a.getAttribute('tabindex')).toBe('0');
-            expect(a.getAttribute('aria-label')).toBe(PEOPLE[i].name);
+            // Named by its content: the avatar's image of the person. No aria-label over initials it
+            // shows (WCAG 2.5.3). The computed name is measured in Chromium (display-b-beta-contract).
+            expect(a.hasAttribute('aria-label')).toBe(false);
+            const image = a.querySelector('[data-part="root"]')!;
+            expect(image.getAttribute('role')).toBe('img');
+            expect(image.getAttribute('aria-label')).toBe(PEOPLE[i].name);
         }
     });
 

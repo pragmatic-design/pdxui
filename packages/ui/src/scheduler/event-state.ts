@@ -42,7 +42,11 @@ export function eventWhen(e: SchedulerEvent, timeZone: string, locale: string, r
 /** A month's event: its time (or «All day») and its days in this week, then its resources. */
 export function monthEventName(e: SchedulerEvent, minutes: number | null, days: readonly string[], first: number, span: number,
     locale: string, resources: readonly SchedulerResource[]): string {
-    const when = (minutes === null ? uiString('scheduler', 'allDay') : clockLabel(minutes, locale)) + ', ' + dayRange(days[first], days[first + span - 1], locale);
+    const dates = dayRange(days[first], days[first + span - 1], locale);
     const names = resourceLabels(e, resources);
-    return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (names ? ', ' + names : '');
+    // A timed event shows its time before its title: its name says them in that order (WCAG 2.5.3).
+    const name = minutes === null
+        ? format(uiString('scheduler', 'eventName'), { title: e.title, when: uiString('scheduler', 'allDay') + ', ' + dates })
+        : format(uiString('scheduler', 'eventNameTimeFirst'), { time: clockLabel(minutes, locale), title: e.title, when: dates });
+    return name + (names ? ', ' + names : '');
 }

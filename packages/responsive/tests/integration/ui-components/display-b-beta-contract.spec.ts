@@ -64,6 +64,18 @@ test('pdx-avatar-group: no class on the host (the author\'s kept), still a row; 
     expect(await logged(page)).toEqual({ own: 1, parent: 0 });
 });
 
+// A clickable avatar is a button named by its person. With a name, the avatar inside is already an image
+// of that name: the button takes it from its content, and puts no aria-label over initials it shows,
+// which would not hold them (WCAG 2.5.3, axe 4.14's label-content-name-mismatch). Without a name, the
+// avatar is hidden and the button is named «Member N».
+test('pdx-avatar-group: a clickable avatar is a button named by its person, with or without a name', async ({ page }) => {
+    await mount(page, '<pdx-avatar-group clickable></pdx-avatar-group>');
+    await page.locator('#f pdx-avatar-group').evaluate((h) => { (h as unknown as { items: unknown[] }).items = [{ name: 'Ada Lovelace' }, {}]; });
+    await expect(page.getByRole('button', { name: 'Ada Lovelace', exact: true })).toHaveCount(1);
+    await expect(page.locator('#f [data-part="avatar"]').first()).not.toHaveAttribute('aria-label', /.*/);
+    await expect(page.getByRole('button', { name: 'Member 2', exact: true })).toHaveCount(1);
+});
+
 test('pdx-image: no class on the host; loaded, it shows the image and leaves the loading state; parts named', async ({ page }) => {
     await mount(page, `<pdx-image class="author-x" src="${DOT}" alt="A dot" width="80px" height="80px" caption="A dot"></pdx-image>`);
     const host = page.locator('#f pdx-image');

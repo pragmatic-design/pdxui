@@ -144,8 +144,10 @@ export const avatarGroup: ComponentManifest = {
     keyboard: {
         scenario: 'avatar-group-clickable',
         steps: [
+            // The focused button is named by its content, the avatar's image of the person (WCAG 2.5.3):
+            // the name is that image's.
             { key: 'Tab', expectFocus: '[data-test="agc"] .pdx-avatar-group-item:nth-child(1)',
-              expectAttr: { selector: '[data-test="agc"] .pdx-avatar-group-item:nth-child(1)', name: 'aria-label', value: 'Ada Lovelace' } },
+              expectAttr: { selector: '[data-test="agc"] .pdx-avatar-group-item:nth-child(1) [data-part="root"][role="img"]', name: 'aria-label', value: 'Ada Lovelace' } },
             { key: 'Tab', expectFocus: '[data-test="agc"] .pdx-avatar-group-item:nth-child(2)' },
             { key: 'Tab', expectFocus: '[data-test="agc"] .pdx-avatar-group-item:nth-child(3)' },
             { key: 'Tab', expectFocus: '[data-test="agc"] .pdx-avatar-group-overflow',

@@ -364,11 +364,12 @@ component('pdx-file-upload', {
         };
     },
     host: { ':name': (ctx) => ctx.name() || null },
+    // The drop zone is a button named by what it shows, its label and its hint: an aria-label of the
+    // label alone did not hold the hint shown with it (WCAG 2.5.3). Its icon is aria-hidden.
     render: (ctx) => html`
         <div class="pdx-file-upload" data-part="root">
             <div class="pdx-file-dropzone" data-part="dropzone"
                 role="button" tabindex="0"
-                :aria-label="${() => (ctx.label() as string) || uiString('file-upload', 'drop')}"
                 :aria-disabled=${() => ctx.disabled() ? 'true' : null}
                 @click=${ctx.onDropzoneClick}
                 @keydown=${ctx.onDropzoneKeydown}

@@ -8,11 +8,15 @@ import { uiString, format } from '../shared/i18n';
 import '@pdxui/design/components/avatar-group';
 import '../avatar/pdx-avatar'; // rendered by this component, and registered by nobody else
 
-/** Make `el` a named, focusable button: a click, Enter or Space all run `activate`. */
-function makeButton(el: HTMLElement, name: string, activate: () => void): void {
+/**
+ * Make `el` a focusable button: a click, Enter or Space all run `activate`. `name` names it when its
+ * content does not: an avatar with a name is an image of that name inside, which the button takes as
+ * its own. An aria-label over that would not hold the initials it shows (WCAG 2.5.3).
+ */
+function makeButton(el: HTMLElement, name: string | null, activate: () => void): void {
     el.setAttribute('role', 'button');
     el.setAttribute('tabindex', '0');
-    el.setAttribute('aria-label', name);
+    if (name) el.setAttribute('aria-label', name);
     el.addEventListener('click', activate);
     el.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -102,7 +106,9 @@ component('pdx-avatar-group', {
                     // A button, named by its person: a bare pdx-avatar has no role and no tab
                     // stop, and would be reachable by mouse only.
                     const fire = (): void => { ctx.emit('pdx-click', { item, index: idx }); };
-                    makeButton(avatar, item.name || format(uiString('avatar-group', 'member'), { n: idx + 1 }), fire);
+                    // Named by the avatar's own image when it has a name; «Member N» when it has none
+                    // (the avatar is then hidden, and the button would have no name).
+                    makeButton(avatar, item.name ? null : format(uiString('avatar-group', 'member'), { n: idx + 1 }), fire);
                 }
 
                 _containerEl!.appendChild(avatar);

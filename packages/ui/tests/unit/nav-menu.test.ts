@@ -96,6 +96,14 @@ describe('pdx-nav-menu', () => {
         expect(badge?.textContent).toBe('5');
     });
 
+    it('shows the label and the badge as two words, which its name says in that order (WCAG 2.5.3)', async () => {
+        // Run together, «Item 15» was a word not in the name «Item 1, 5 new».
+        const el = await mountNav(FULL_ITEMS);
+        const item = el.querySelector<HTMLElement>('[data-nav-key="item1"]')!;
+        expect(item.textContent!.replace(/\s+/g, ' ').trim()).toBe('Item 1 5');
+        expect(item.getAttribute('aria-label')).toContain('Item 1, 5');
+    });
+
     it('applies badge variant', async () => {
         const el = await mountNav(FULL_ITEMS);
         const badge = el.querySelector('.pdx-nav-badge');
