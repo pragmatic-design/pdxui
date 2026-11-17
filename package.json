@@ -49,7 +49,7 @@
       "colord@<2.9.4": "^2.9.4",
       "postcss-selector-parser@>=7.0.0 <7.1.6": "^7.1.6",
       "svgo@>=4.0.0 <4.1.0": "^4.1.0",
-      "happy-dom": ">=20.8.9",
+      "happy-dom": ">=21.0.4",
       "vitest": ">=4.1.0",
       "@vitest/coverage-v8": ">=4.1.0"
     }
