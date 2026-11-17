@@ -83,7 +83,7 @@ function optionalProp<T>(options?: PropOptions): PropSpec<T | undefined> {
     return { type: options?.type ?? Object, [PROP_SPEC]: true };
 }
 
-/** Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or `prop.optional<T>({ type? })`. */
+/** Declare a prop: `prop<T>(default, { type?, iconName? })`, `prop.required<T>({ type?, iconName? })` or `prop.optional<T>({ type?, iconName? })`. `iconName: true` marks a prop whose value names an icon: the compiler imports the icon a literal value names, as it does for `pdx-icon`'s `name`. */
 export const prop: typeof propBuilder & { required: typeof requiredProp; optional: typeof optionalProp } =
     Object.assign(propBuilder, { required: requiredProp, optional: optionalProp });
 

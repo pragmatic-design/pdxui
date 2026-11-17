@@ -43,7 +43,7 @@ on blur.
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | `value` | unknown | `''` | The current value. |
+| `value` | `value` | unknown | `''` | The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135). |
 
 **API (via `:ref`)**
 

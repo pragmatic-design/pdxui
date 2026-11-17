@@ -1,14 +1,15 @@
 // pdx-data-source — Non-rendering data provider component.
-// Creates a DataSource from declarative props and exposes it to children via slot scope.
-// Usage:
-//   <pdx-data-source url="/api/users" :page-size="25" let:source>
-//     <pdx-select :source="source" label-field="name" />
+// Creates a DataSource from declarative props and provides it under DataSourceContext (#495): a
+// pdx-list, pdx-pagination, pdx-infinite-scroll, pdx-select or pdx-autocomplete inside reads the
+// nearest one with no binding. Usage:
+//   <pdx-data-source url="/api/users" :page-size="25">
+//     <pdx-select label-field="name"></pdx-select>
+//     <pdx-pagination></pdx-pagination>
 //   </pdx-data-source>
 //
 // Or with static data:
-//   <pdx-data-source :data="items" id-field="id" let:source>
-//     <pdx-table :source="source" />
-//   </pdx-data-source>
+//   <pdx-data-source :data="items" id-field="id"> … </pdx-data-source>
+// Any other child injects it: inject(DataSourceContext, el, null).
 
 import { component, html, signal, computed, provide, prop } from '@pdxui/core';
 import { createDataSource, restTransport, arrayTransport } from '@pdxui/core';

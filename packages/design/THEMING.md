@@ -536,6 +536,9 @@ Extracted from hardcoded values.
 | `--pdx-input-focus` | `ring` |
 | `--pdx-input-border-color` | `initial` |
 | `--pdx-input-border-color-focus` | `initial` |
+| `--pdx-input-border-color-invalid` | `initial` |
+| `--pdx-input-border-color-success` | `initial` |
+| `--pdx-input-border-color-warning` | `initial` |
 | `--pdx-input-focus-ring` | `initial` |
 | `--pdx-input-min-height` | `2.5rem` |
 | `--pdx-input-border-width` | `var(--pdx-border-width)` |

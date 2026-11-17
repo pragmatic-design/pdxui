@@ -195,9 +195,9 @@ function sleep(ms: number): Promise<void> {
  * looks for it — this exists for the case where different middleware layers need different
  * deadlines. It does NOT override a request that already carries one.
  *
- * A request with no deadline never settles: `loading` stays true and no error is ever produced, so
- * the component shows its skeleton for as long as the tab is open. That is why the default client
- * sets 30s.
+ * A request with no deadline never settles: the source stays `pending()` and no error is ever
+ * produced, so the component shows its skeleton for as long as the tab is open. That is why the
+ * default client sets 30s.
  */
 export function timeoutMiddleware(ms: number): HttpMiddleware {
     return async (request, next) => {

@@ -57,7 +57,7 @@ leaves both the field and its panel).
 | `ariaLabel` | `arialabel` | string | `''` | Aria label. |
 | `editable` | `editable` | boolean | `false` | The date can be typed: the trigger's text is an input (still the combobox), read in the locale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the popup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep the plain trigger. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | `value` | string \| string[] | `''` | The current value. |
+| `value` | `value` | string \| string[] | `''` | The date, or `[start, end]` with `mode="daterange"` or `"datetimerange"`. A form submits it; a range as two entries, one per date (#135). |
 
 **API (via `:ref`)**
 

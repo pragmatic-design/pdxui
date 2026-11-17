@@ -15,12 +15,12 @@ Pick a number by dragging.
 | `labelAlways` | `labelalways` | boolean | `false` | Always show label (not just on drag) |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
-| `range` | `range` | boolean | `false` | Range mode: value is "min,max" |
+| `range` | `range` | boolean | `false` | Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `"low,high"`. |
 | `minGap` | `mingap` | number | `0` | Minimum gap between thumbs in range mode |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the track's and thumb's size. |
 | `color` | `color` | 'primary' \| 'success' \| 'warning' | `'primary'` | primary (the default), success or warning: the fill's and thumb's colour. |
 | `orientation` | `orientation` | 'horizontal' \| 'vertical' | `'horizontal'` | horizontal (the default) or vertical. |
-| `value` | `value` | number \| number[] | `0` | The current value. |
+| `value` | `value` | number \| number[] | `0` | The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135). |
 
 **API (via `:ref`)**
 

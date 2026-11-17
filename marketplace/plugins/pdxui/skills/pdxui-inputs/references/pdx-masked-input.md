@@ -12,7 +12,7 @@ Input that enforces a fixed format.
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `placeholderChar` | `placeholderchar` | string | `'_'` | Character shown for unfilled positions |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | `value` | string | `''` | The current value. |
+| `value` | `value` | string | `''` | The value. A form submits it, and an empty entry when it is empty, as a text input does (#135). |
 
 **API (via `:ref`)**
 

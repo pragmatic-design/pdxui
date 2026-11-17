@@ -13,12 +13,13 @@ pnpm add @pdxui/router
 ```
 
 ```pdx
-<nav><pdx-link to="/users/42">Ada</pdx-link></nav>
+<nav><pdx-link to="/users/:id" :params="{ id: 42 }">Ada</pdx-link></nav>
 <pdx-router-outlet></pdx-router-outlet>
 ```
 
-The first block is a page; the second is the app shell that renders it. `navigate('/users/42')` from
-`@pdxui/router` navigates from code.
+The first block is a page; the second is the app shell that renders it. `navigate('/users/:id', { id: 42 })`
+from `@pdxui/router` navigates from code; a route's pattern and its params are checked against the
+declared `@page`s, and a built URL goes to `navigate.url('/users/42')`.
 
 Routes are destroyed when you leave them. A route declared `@page '/results' { keepAlive };` is
 frozen instead and resumed on return. One router runs in development and in a build: the compiler

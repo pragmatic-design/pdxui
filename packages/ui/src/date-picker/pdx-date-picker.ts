@@ -95,7 +95,10 @@ component('pdx-date-picker', {
     // in `time` mode; `[start, end]` in `daterange`, `datetimerange` (each with its time) and `week`
     // mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
     // dispatches `value-change`. A form submits it, a range as two entries, and resets it (#135).
-    models: { value: model<string | string[]>('', { form: true }) },
+    models: {
+        /** The date, or `[start, end]` with `mode="daterange"` or `"datetimerange"`. A form submits it; a range as two entries, one per date (#135). */
+        value: model<string | string[]>('', { form: true }),
+    },
     events: {
         /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
         'open-change': event<{ value: boolean }>(),

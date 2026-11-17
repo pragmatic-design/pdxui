@@ -80,7 +80,10 @@ component('pdx-autocomplete', {
     // none), the field cleared, or free text confirmed by leaving the field or pressing Enter with no
     // option chosen. Once per edit, like a native `change`. The text typed is not the value: it is
     // announced with `query-change`.
-    models: { value: model<unknown>('', { type: String, form: true }) },
+    models: {
+        /** The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135). */
+        value: model<unknown>('', { type: String, form: true }),
+    },
     events: {
         /** The text typed, on each keystroke: the query the suggestions are filtered by. */
         'query-change': event<{ value: string }>(),
