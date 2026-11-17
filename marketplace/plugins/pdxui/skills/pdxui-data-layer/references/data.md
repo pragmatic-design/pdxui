@@ -186,7 +186,8 @@ const canAdd = $derived(draft.name.length > 0);
 
 The first parameter is what `execute(arg)` passes; `{ signal }`, when you write it, is the call's
 own, aborted by `addUser.cancel()`. `when` is `addUser.enabled()`, and `with` takes `mutation()`'s
-options — `invalidate`, `optimistic`, `onSuccess`, `onError`, `concurrency`. Any other option is
+options — `invalidate`, `optimistic`, `onSuccess`, `onError`, `concurrency` — and `agent` and
+`consequential`, which expose the action to an agent ([the CLI](../../pdxui-setup/references/cli.md)). Any other option is
 `PDX_ACTION_UNKNOWN_OPTION`. In the editor `addUser` is typed by its parameter and by what the body
 returns, so `addUser.execute(1)` is an error where it is written.
 
@@ -302,7 +303,7 @@ to, and there `dispose()` is the only thing that stops it.
 Both behaviours above are pinned in `packages/core/tests/use-query-interval.test.ts`.
 
 **A push from the server** is the right answer for most of what polling gets used for — see
-[Live data](#live-data-a-push-from-the-server) above. Polling is what you use when the source
+[Live data](#live-data-a-push-from-the-server) below. Polling is what you use when the source
 cannot push: a third-party API, a job queue you only own the read side of.
 
 ## Direct HttpClient
@@ -431,11 +432,6 @@ Two things that will bite, and neither is a bug to be fixed:
 - **a queued call has already returned.** It rejected with `OfflineError` at the time, so whatever
   the caller did with that rejection has happened: the eventual success arrives with nobody
   awaiting it. Treat `OfflineError` as *accepted, not yet sent*, rather than as a failure.
-
-One limit that is a bug and is tracked rather than hidden: a mutation issued **while a replay is
-already in flight** goes straight out and can land before the older queued ones. It does not affect
-the reload path, which waits, nor the reconnect path when the app is idle — only an app that writes
-during the drain.
 
 All of the above is measured against a real network drop rather than a redefined `navigator.onLine`:
 `packages/responsive/tests/integration/ui-components/offline-queue.spec.ts` takes the network away
@@ -672,7 +668,7 @@ here than discovered:
   finding a row matters, the search has to be the grid's (a filter over the source), not the
   browser's.
 - **Printing gets the window, not the table.** A print of a virtualised grid shows the rows that
-  were on screen. Export the data instead — see *Export* below.
+  were on screen. Export the data instead — see *Export* above.
 - **The row count a screen reader announces** is the number of rendered rows unless the grid says
   otherwise: check what your own set needs before promising accessibility over a windowed list.
 
@@ -746,9 +742,9 @@ Below `@fetch` there is a `resource`, and two shapes of it are worth knowing by 
   request's signal and passes it on: `resource(({ signal }) => fetch(url, { signal }))`.
 - **`resourceWhen(res, handlers)`** — renders a resource's states as a fragment, so a template
   branches on them without a chain of `@if`s. The handlers are `loading`, `success(data)`,
-  `error(err, retry)` — the retry is handed to you, so the error branch can offer it —
-  plus `stale(data)` and `reloading(data)`, which are the two that let a refetch keep the old data
-  on screen instead of flashing a spinner over it.
+  `error(err, retry)` — the retry is handed to you, so the error branch can offer it. `success`
+  stays on screen while a refetch runs and after a refetch that fails, so the old data is not
+  covered by a spinner.
 
 Two more you will meet rarely and should know exist:
 

@@ -54,8 +54,10 @@ turns the whole thing into a tracked effect, so the tab re-titles itself when th
 When the page changes, PDX updates `document.title` and the matching meta. You don't hand-manage the
 `<head>` DOM.
 
-> For *full* SEO (content indexable without JS) you need static/server rendering (SSG), on the
-> framework roadmap. `@title`/`@meta` cover per-route title and meta in the SPA.
+> For content that is indexable without JS, build with `pdx build --ssg`
+> ([static generation](../../pdxui-setup/references/cli.md#static-generation-ssg)): every static route is written as HTML
+> with its `@title` and `@meta`, and the app hydrates it. In the SPA, `@title`/`@meta` cover
+> per-route title and meta.
 
 ## Scroll — useScroll
 

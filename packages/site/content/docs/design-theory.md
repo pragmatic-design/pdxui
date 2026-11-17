@@ -7,7 +7,7 @@ order: 15.1
 # Design theory
 
 A PDX theme is **generated**, not painted. You give the engine one brand colour and an
-archetype; it produces a complete token set — 102 for the `neutral` archetype, 110 for
+archetype; it produces a complete token set — 102 for the `neutral` archetype, 111 for
 `material`, which declares more vocabulary — and every one of them is the output of a rule you
 can read. This page is those rules — not so you can recite them, but because the moment you want
 a theme the presets don't give you, they are what tells you which knob to turn.
@@ -152,8 +152,9 @@ black.
 golden `1.618`. But note the deliberate asymmetry: **the type scale is not part of a theme's
 identity here.** `tokens.css` owns one fluid `clamp()` scale that every theme shares, and the
 engine emits `--pdx-text-*` **only** if you explicitly pass `typeScale`. What themes actually
-personalise is the **weights** (`--pdx-weight-medium`, `--pdx-weight-semibold`) — 6 of the 13
-shipped themes override one (`material`, `fluent`, `metro`, `cyberpunk`, `playful`, `editorial`). That is what typographic personality looks like in this system.
+personalise is the **weights** (`--pdx-weight-medium`, `--pdx-weight-semibold`) — 5 of the 13
+shipped themes override one (`material`, `fluent`, `metro`, `cyberpunk`, `playful`), and `editorial`
+and `metro` set the heading weight (`--pdx-weight-heading`). That is what typographic personality looks like in this system.
 
 > **Two different densities, don't conflate them.** The engine's `density` (`compact 0.85`,
 > `normal 1`, `comfort 1.15`) multiplies the spacing values *at generation time* and bakes them
@@ -193,8 +194,9 @@ Stated plainly, because a guarantee you have to guess at is worth nothing:
 
 - **It is not taste.** The engine produces a coherent, accessible palette. Whether it is the
   right palette for your product is your judgement.
-- **The gate checks seven pairs**, in both schemes: text-on-background, muted-on-surface, and
-  the label on each of the five coloured fills. It does not check every element in your app —
+- **The gate checks these pairs**, in both schemes: text on the background; muted text on the
+  surface, the background and the inset; each semantic `-ink` on the background, the surface, the
+  inset and its own `-soft` tint; and the label on each of the seven filled colours. It does not check every element in your app —
   run [axe](https://github.com/dequelabs/axe-core) or the builder's oracle for that.
 - **WCAG 2.x, not APCA.** The ratio formula is the one WCAG 2.1 defines. APCA (WCAG 3 draft) is
   a better model of perceived contrast and is not what this measures.

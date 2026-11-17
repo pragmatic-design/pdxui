@@ -70,8 +70,8 @@ chart canvas. Reaching for it first is a smell; reaching for it third is fine.
 
 - **`tick()`** — waits for the reactive flush *and* the render. After every action that changes state,
   before asserting.
-- **`fireEvent(el, name, detail?)`** — dispatches a real event, bubbling and composed. With a `detail`
-  it dispatches a `CustomEvent`, which is how you drive a component's own `@event` contract:
+- **`fireEvent(el, name, detail?)`** — dispatches a real event that bubbles. With a `detail`
+  it dispatches a `CustomEvent`, also composed, which is how you drive a component's own `@event` contract:
   `fireEvent(row, 'selected', { id: '7' })`.
 - **`waitFor(condition, timeout?)`** — waits for a **condition to return true**, not for an assertion
   to stop throwing: `await waitFor(() => queryByRole(el, 'dialog') !== null)`. Default timeout 3 s.

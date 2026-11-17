@@ -351,7 +351,8 @@ The library's components follow the same rule: `value-change` stays on the `<pdx
 it. `pdx migrate` writes `(bubbles)` on the `@event`s of an alpha project, which keeps what they did;
 `PDX_EVENT_BUBBLES_UNUSED` then lists the ones nothing hears above the component.
 
-Convention: library-component events use the `pdx-` prefix (e.g. `pdx-change`). For your own app
+Convention: library-component events use the `pdx-` prefix (e.g. `pdx-select`, `pdx-clear`), except a
+model's change event, which is `<name>-change` (`value-change`, `open-change`). For your own app
 components, pick meaningful names. A plain `@event` name is a JavaScript identifier, since it is also
 the function that emits it. A name with hyphens is written in quotes, and its function is the
 camelCase of it:

@@ -83,8 +83,8 @@ function add(line) {
 </script>
 ```
 
-`persist: 'local'` keeps them in `localStorage`, any other value in `sessionStorage` (`'session'` is
-the one to write; another value is not checked). They are restored when the store is first created
+`persist: 'local'` keeps them in `localStorage`, `persist: 'session'` in `sessionStorage`; any other
+value is `PDX_UNKNOWN_DECLARATION`, an error, and the store is not persisted. They are restored when the store is first created
 and written about 100 ms after they change, a changed signal at a time, under `__pdx_store_cart`. A
 `$store` object and a `$derived` are not persisted: state meant to survive a refresh goes in a
 `$signal`. The rules are in the [reference](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/data.md#store).

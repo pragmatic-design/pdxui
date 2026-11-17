@@ -54,12 +54,13 @@ const columns = responsive({ sm: 1, md: 2, lg: 3, xl: 4 }, 1);
 ## `useAdaptive()` — container-aware
 
 `device` tracks the **viewport**. When a component should adapt to *its own* width instead (a card
-that's narrow in a sidebar but wide in the main column), `useAdaptive()` gives you the same
-`isMobile`/`isDesktop` signals measured against the component's container.
+that's narrow in a sidebar but wide in the main column), `useAdaptive({ container: () => el })` gives
+you `isMobile`/`isDesktop` signals measured against that element. Called without `container` it
+measures the viewport; `breakpoint` defaults to 768.
 
 ## Touch gestures
 
-Four primitives, each taking an element and returning the way to detach:
+Three primitives, each taking an element and returning the way to detach:
 
 ```ts
 import { onSwipe, onLongpress, onPinch } from '@pdxui/core';
@@ -105,7 +106,7 @@ edge to edge. `injectSafeAreaCSS` publishes the insets as custom properties so a
 them anywhere; it is idempotent, so calling it from several places is safe.
 
 And the gesture that goes with them, for a sheet: `swipeDownDismiss(el, onDismiss, threshold?)` moves
-the element with the finger and dismisses past the threshold — what `<pdx-bottom-sheet>` uses.
+the element with the finger and dismisses past the threshold, 100 px unless you pass one.
 
 ## Gotchas
 

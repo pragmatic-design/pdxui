@@ -108,7 +108,7 @@ ships today:
 | `pdx-file-upload`  | `addFiles()`, `removeFile()`, `uploadAll()`, `clear()` |
 | `pdx-tag-input`    | `addTag()`, `removeTag()`, `clear()`, `getTags()` |
 | `pdx-dialog` | `show()`, `close()`, `toggle()` — or the `open` prop |
-| `pdx-drawer` | controlled via the `open` prop (set `dlg.open = true`) |
+| `pdx-drawer` | `show()`, `close()`, `toggle()` — or the `open` prop |
 | `pdx-fab` | `show()`, `close()`, `toggle()` — its speed dial |
 | `pdx-dropdown-menu` | `show()`, `close()`, `toggle()` |
 | `pdx-split-button` | `show()`, `close()`, `toggle()` — its menu |

@@ -188,8 +188,8 @@ reports through `setDevtoolsRouteSource(() => ({ path, params, query, matched })
 
 ## Naming things for readability
 
-Signals declared with `$signal` carry a debug name derived from the variable, so they show up as
-`count`, `user`, … in the inspector — not `anon`. A `$effect` or `$watch` is named after where you
+Signals declared with `$signal` carry a debug name, the file then the variable, so they show up as
+`counter:count`, `cart:user`, … in the inspector — not `anon`. A `$effect` or `$watch` is named after where you
 wrote it, `cart.pdx:12`, so `effects()`, the trace and a signal's subscribers say which one ran. That
 naming is automatic in dev, and a production build carries none of it. An effect you create by hand
 takes the same name as an option: `effect(fn, { name: 'sync-cart' })`.

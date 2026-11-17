@@ -129,7 +129,8 @@ For overlays that must not appear at the same time there are two queues, and bot
 into their components:
 
 - **`createDialogQueue()` / `getDialogQueue()`** — one dialog at a time, the rest wait their turn.
-  `getDialogQueue()` returns the shared one, which is what `<pdx-dialog>` uses;
+  `getDialogQueue()` returns the shared one, which the dialog service (`dialog.confirm()`,
+  `dialog.alert()`, `dialog.open()`) pushes to and `<pdx-overlay-outlet>` renders;
 - **`createToastQueue(options?)`** — toasts, with a cap and a dismissal policy, behind
   `<pdx-toast>`.
 

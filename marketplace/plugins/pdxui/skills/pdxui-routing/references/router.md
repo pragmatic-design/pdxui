@@ -71,8 +71,9 @@ A dynamic segment is written `:name`, with an optional constraint:
 ```
 
 The constraints are `number` (digits), `uuid`, `slug` (lowercase words joined by single hyphens, as in
-`/posts/hello-world`) and `string` (any segment, the same as none). A URL whose segment fails the
-constraint does not match the route.
+`/posts/hello-world`) and `string` (any segment, the same as none). Anything else in the parentheses
+is a pattern of your own, `:code([A-Z]{3})`, matched against the whole segment. A URL whose segment
+fails the constraint does not match the route.
 
 Inside the page, declare the params you read with `@params`, each with its type. Each one is a name the
 template and the script read, like a `$derived`, and it follows the URL: going from `/users/1` to
@@ -271,7 +272,9 @@ The second form is what lets a shell be an ordinary component with a `<slot>`.
 
 The shell is **diffed, not rebuilt**: navigating from `/admin/users` to `/admin/roles` keeps the
 layout element mounted, with whatever state it holds — a collapsed rail stays collapsed. A route
-that declares no layout tears the stack down and renders in the outlet itself.
+that declares no layout renders in the app's default, `pdx({ defaultLayout: 'shell' })`, when there
+is one, and otherwise tears the stack down and renders in the outlet itself; `@layout 'none'` opts a
+page (a login screen, say) out of the default.
 
 One layout per page, not a chain. A frame *inside* a frame is a **nested route**: put a
 `<pdx-router-outlet>` in the parent page and the routes below its path render inside it. That is

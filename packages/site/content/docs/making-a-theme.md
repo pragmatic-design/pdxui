@@ -56,11 +56,12 @@ npx pdx theme acme --brand "#6442d6" --language material --out src/themes/acme.c
 | `--density` | `compact` / `normal` / `comfort`. Default `normal`. |
 | `--radius` | `sharp` / `rounded` / `pill`. Overrides the archetype's. |
 | `--out` | Write the CSS to a file. Prints to stdout otherwise. |
-| `--no-strict` | Emit the CSS even if a pair fails WCAG AA. |
+| `--no-strict` | Exit 0 even when a pair is an error. The CSS is written either way. |
 | `--quiet` | Suppress the validation report. |
 
-**`--strict` is on by default, and that is the point.** The command exits non-zero if any pair
-fails AA, so it is a check, not just a generator:
+**`--strict` is on by default, and that is the point.** The command exits non-zero when a pair is
+an error, below 3:1, so it is a check, not just a generator. A pair between 3:1 and 4.5:1 fails AA
+for body text and is reported as a warning, which does not fail the command:
 
 ```bash
 # CI: fail the build if the brand cannot produce an accessible theme
@@ -121,12 +122,15 @@ for (const issue of theme.validate()) {
 }
 ```
 
-`remedy.suggested` is produced by the engine's own label rule, so applying it is guaranteed to
-clear the threshold. Note `remedy.scheme`: the same pair can pass in light and fail in dark, and
+`remedy.suggested` is the engine's own label rule: the better of its near-white and near-black on
+that background. It usually clears the threshold; on a fill where neither does (a mid-lightness
+green, say), the background has to move instead. Note `remedy.scheme`: the same pair can pass in light and fail in dark, and
 the fix must only rewrite the failing branch of the `light-dark()` pair.
 
-The gate covers seven pairs in both schemes — text-on-background, muted-on-surface, and the
-label on each coloured fill. See [Design theory §7](/docs/design-theory) for what it does not
+The gate covers, in both schemes: text on the background; muted text on the surface, the
+background and the inset; each semantic `-ink` on the background, the surface, the inset and its own
+`-soft` tint; and the label on each of the seven filled colours (primary, secondary, accent, danger,
+success, warning, info). See [Design theory §7](/docs/design-theory) for what it does not
 cover.
 
 ## 5. Overrides, and what they cost
