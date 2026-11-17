@@ -83,7 +83,7 @@ const idle = useIdle({
 </script>
 
 <template>
-  <pdx-dialog :open="showStayLoggedIn">
+  <pdx-dialog ::open="showStayLoggedIn">
     Still there? Logging out in {{ Math.ceil(idle.msRemaining() / 1000) }}s.
     <pdx-button @click="idle.reset(); showStayLoggedIn = false">Stay</pdx-button>
   </pdx-dialog>

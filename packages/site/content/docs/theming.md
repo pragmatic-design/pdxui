@@ -143,10 +143,12 @@ decisions that change *shape*:
 |---|---|
 | `--pdx-button-radius` | Button corners, independently of the global radius ramp |
 | `--pdx-button-min-height` / `--pdx-input-min-height` | Control heights (44px in Cupertino, per Apple HIG) |
+| `--pdx-control-min-height` | The height shared by the controls that sit beside a button — the input frame, `pdx-toggle`, the tag input — each falling back to its own token above |
+| `--pdx-control-radius` | The corner of a button-like control that is not the button itself (`pdx-toggle` and its group), falling back to `--pdx-button-radius` |
 | `--pdx-input-style` | `outlined` / `filled` / `underlined` |
 | `--pdx-tab-indicator` / `-size` | `underline` or `pill`, and its thickness |
 | `--pdx-card-style` | `bordered` / `elevated` / `flat` |
-| `--pdx-accordion-glyph` / `-open-transform` | The glyph, and how it moves when open |
+| `--pdx-accordion-glyph` / `-transform-open` | The glyph, and how it moves when open (the old `--pdx-accordion-open-transform` still applies) |
 | `--pdx-breadcrumb-separator` | The separator character |
 | `--pdx-table-header-*` | Transform, tracking, weight, size, color, rules |
 | `--pdx-opacity-disabled` | How far a disabled control fades |
@@ -154,6 +156,44 @@ decisions that change *shape*:
 
 Material has pill buttons on rounded cards; Metro has zero radius and no shadows; Cupertino has
 large-radius buttons and 44pt targets. These tokens are how a theme says so.
+
+### Component tokens
+
+Each component has tokens of its own, named `--pdx-<component>-<property>[-<state>]`:
+`--pdx-button-bg`, `--pdx-button-bg-hover`, `--pdx-button-color`. Its CSS reads its own token first
+and falls back to a global one, so you restyle one component without touching the rest, at any level:
+
+```css
+:root { --pdx-button-bg: var(--pdx-color-accent); }          /* every button */
+.billing { --pdx-button-bg: var(--pdx-color-success); }      /* the buttons in one section */
+```
+
+```html
+<pdx-button style="--pdx-button-bg: var(--pdx-color-danger)">Delete</pdx-button>   <!-- one button -->
+```
+
+A component's page lists its tokens and their defaults. Three were renamed to this convention:
+`--pdx-button-hover-shadow` is `--pdx-button-shadow-hover`, `--pdx-button-hover-transform` is
+`--pdx-button-transform-hover`, and `--pdx-accordion-open-transform` is
+`--pdx-accordion-transform-open`; the old names still apply.
+
+### Restyling a library component
+
+What a component exposes for styling is its tokens, its **host attributes**, its **custom states**
+and its **parts**, not the classes it puts on its own elements, which are not public and changed in
+the beta. Select the host by what you set on it, its condition with `:state()`, and its pieces with
+`[data-part]`:
+
+```css
+pdx-button[variant="primary"] > [data-part="root"] { letter-spacing: 0.02em; }
+pdx-button:state(loading) > [data-part="root"] { cursor: progress; }
+pdx-input:state(invalid) [data-part="root"] { background: var(--pdx-color-danger-soft); }
+```
+
+A component's page lists its states and parts. Native markup styled with the design system's classes
+(`<button class="pdx-primary">`) keeps them: only the components stopped writing them on their own
+elements. In a `.pdx`, a scoped selector that reaches into a component is reported
+(`scoped-reaches-child`).
 
 ## The built-in themes
 

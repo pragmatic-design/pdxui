@@ -239,8 +239,14 @@ write instead. `pdx migrate` reads the same list: it rewrites every form that ha
 rewrite, writes the files, and lists each place a person has to rewrite — a form with no mechanical
 rewrite, and every *fix*, a behaviour that changed because the old one was a defect (an arrow function
 assigned to a `$signal` is now stored, not called with the previous value). It reads `.pdx` files,
-scripts and `vite.config.*`, where the plugin's options are, and leaves `node_modules` and `dist`
-alone. A second run changes nothing.
+scripts, `vite.config.*`, where the plugin's options are, and the HTML page that mounts the app, and
+leaves `node_modules` and `dist` alone. A second run changes nothing.
+
+Some entries are `changed`: valid source whose meaning changed, rewritten so the alpha code keeps
+what it did. They fire on code written for the beta too — `event-bubbles` adds `(bubbles)` to every
+`@event` — so run `pdx migrate` once, on the alpha code, and after that read its `changed` reports
+instead of applying them. The [release notes](https://github.com/pragmatic-design/pdxui/blob/main/docs/releases/beta.md)
+list what it does not detect.
 
 One rewrite creates a file. The alpha's string context keys (`@provide user = …`, `@inject user;`)
 become tokens: `pdx migrate` writes one per key into `src/contexts.ts` (`contexts.ts` at the root
