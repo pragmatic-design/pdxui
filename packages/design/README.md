@@ -150,7 +150,7 @@ Three orthogonal axes on `<html>`:
 
 ```html
 <html pdx-scheme="auto"    <!-- light | dark | auto -->
-      pdx-theme="neutral"  <!-- neutral | pragmatic | corporate | playful -->
+      pdx-theme="neutral"  <!-- one of the 13 themes below -->
       pdx-density="normal"  <!-- compact | normal | comfort -->
 >
 ```
@@ -161,12 +161,23 @@ Three orthogonal axes on `<html>`:
 
 ### Available Themes
 
-| Theme | Primary | Character |
-|-------|---------|-----------|
-| `default` | Indigo (250) | Neutral, warm grays |
-| `pragmatic` | Gold (85) | Brand, premium dark |
-| `corporate` | Blue (220) | Serious, sharp corners |
-| `playful` | Purple (290) | Vibrant, rounded |
+Thirteen ship. `neutral` is also the theme with no `pdx-theme` at all.
+
+| Theme | Primary hue |
+|-------|-------------|
+| `neutral` | Charcoal (260, near-zero chroma) |
+| `pragmatic` | Blue (235) |
+| `pragmatic-gold` | Gold (85) |
+| `corporate` | Blue (220) |
+| `playful` | Purple (290) |
+| `material` | Violet (280) |
+| `fluent` | Blue (215) |
+| `cupertino` | Blue (230) |
+| `metro` | Cyan-blue (207) |
+| `neumorphic` | Slate blue (260) |
+| `glass` | Blue (240) |
+| `cyberpunk` | Magenta (330) |
+| `editorial` | Ink blue (250); gold in dark |
 
 ## Adaptive (Automatic)
 
@@ -258,9 +269,9 @@ One limit: an island of the outer theme inside a nested one (`a > b > a`) gets `
 | Token | Default | Corporate | Playful |
 |-------|---------|-----------|---------|
 | `sm` | 0.25rem | 0.125rem | 0.5rem |
-| `md` | 0.5rem | 0.25rem | 0.75rem |
-| `lg` | 0.75rem | 0.375rem | 1.25rem |
-| `xl` | 1rem | 0.5rem | 1.75rem |
+| `md` | 0.5rem | 0.1875rem | 0.75rem |
+| `lg` | 0.75rem | 0.25rem | 1.25rem |
+| `xl` | 1rem | 0.375rem | 1.75rem |
 | `full` | 9999px | 9999px | 9999px |
 
 ### Shadows (`--pdx-shadow-*`)
@@ -298,15 +309,21 @@ An agent needs only these words to compose any layout:
 ## Architecture
 
 ```
-@layer pdx.reset     — Modern CSS reset
-@layer pdx.tokens    — All --pdx-* custom properties
-@layer pdx.layout    — Layout primitives (pdx-stack, pdx-row, etc.)
-@layer pdx.surfaces  — Surface + interactive + input styles
-@layer pdx.typography — Text roles + ink colors
-@layer pdx.adaptive  — Container queries, touch, motion, print
-@layer pdx.themes    — Theme overrides (colors, radius, weights)
+@layer pdx.reset       — Modern CSS reset
+@layer pdx.tokens      — All --pdx-* custom properties
+@layer pdx.layout      — Layout primitives (pdx-stack, pdx-row, etc.)
+@layer pdx.surfaces    — Surface + interactive + input styles
+@layer pdx.typography  — Text roles + ink colors
+@layer pdx.media       — Images, avatar, video and embeds, figure
+@layer pdx.components  — CSS-only classes (table, nav, code, feedback); each component's own
+                         stylesheet travels with the component
+@layer pdx.adaptive    — Container queries, touch, motion
+@layer pdx.themes      — Theme overrides (colors, radius, weights)
+@layer pdx.preferences — The reader's density, after the themes so it wins over theirs
+@layer pdx.composition — Group constraints, applied after the themes
+@layer pdx.print       — Print, last so no theme overrides it
 
-Your CSS (unlayered) always wins — zero !important needed.
+Your CSS (unlayered) wins over every normal rule of these layers.
 ```
 
 ## Browser Support
@@ -320,8 +337,9 @@ Key features used: `@layer`, `light-dark()`, `oklch()`, Container Queries, CSS N
 | Package | Purpose |
 |---------|---------|
 | `@pdxui/design` | CSS framework (this) |
-| `@pdxui/components` | UI component library (future) |
-| `@pdxui/ui` | TypeScript SPA framework (future) |
+| `@pdxui/ui` | The Web Component library |
+| `@pdxui/core` | The runtime |
+| `@pdxui/compiler` | The `.pdx` compiler |
 
 ## Development
 

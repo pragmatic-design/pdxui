@@ -36,7 +36,7 @@ export function createAnswer(toast: ToastApi): Answer {
             // rendered as the default `filled`, and the type was `info` by default. Same toast.
             toast.add({ type: 'info', message, duration: 8000, action: { label: undoLabel, onClick: undo } });
             // NO announce() here, and it is measured rather than assumed: a toast already carries
-            // role="status" + aria-live="polite" (pdx-toast.ts:129), so adding one would say it TWICE.
+            // role="status" + aria-live="polite" (pdx-toast.ts:164), so adding one would say it TWICE.
         },
         visible(message) {
             // A row appearing is not an event a screen reader notices.

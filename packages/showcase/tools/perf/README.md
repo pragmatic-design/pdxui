@@ -36,7 +36,7 @@ node packages/showcase/tools/perf/build-scenario.mjs pilot-pdx packages/showcase
 
 `pilot-ts` is built the same way, into `dist/perf/pilot-ts`, for `compare.mjs` below.
 `<scenario>` is a name of the suite's table: `hello`, `memory`, `lifecycle`, `crud`, `dashboard`,
-`benchmark`, `pilot-ts`, `pilot-pdx`. `--config` builds the same root with another of its Vite configs
+`benchmark`, `pilot-ts`, `pilot-pdx`, `component-mount`. `--config` builds the same root with another of its Vite configs
 (`pilot-ts` with `--config vite.pilot.config.ts` is `pilot-pdx`). Build under `scenarios/dist/`, which
 git ignores. **Profile an unminified build**: a minified one names its functions with one letter. Time
 a minified one when the number itself matters.

@@ -30,7 +30,7 @@ these pages when the beta issues landed (#159).
 | [routing.md](routing.md) | `@page` and the declarations a page carries: loaders, navigation, typed routes |
 | [data.md](data.md) | The async vocabulary and its execution contract, `@fetch`, `@action` and its concurrency, `@form` and async validation, `@store`, `$store` |
 | [lifecycle.md](lifecycle.md) | What effects, requests, timers, attachments, refs and snippets do when a block is removed, hidden, frozen, resumed or destroyed |
-| [server.md](server.md) | Rendering outside the browser: Node-safe imports, static generation, and the separate roadmap to hydration, per-request rendering and streaming |
+| [server.md](server.md) | Rendering outside the browser: Node-safe imports, static generation and hydration, and the separate roadmap to per-request rendering and streaming |
 | [performance.md](performance.md) | Guarantees with their measurements: the compiler, the compiled output, loading and deferred code, the first render, virtual lists, bounded memory, requests, heavy work, bundle budgets |
 | [agents.md](agents.md) | How an agent reads and operates an app: the accessibility the framework guarantees, the description API, capabilities offered to agents |
 | [library.md](library.md) | What the language asks of each `@pdxui/ui` component: contract, forms, states, parts, tokens, accessibility for people and agents, and when one is done |
@@ -77,9 +77,9 @@ S             ::= ( " " | "\t" | "\n" | "\r" )+
 
 ## Scope
 
-The language covers its client runtime and static generation (#160). It does **not** cover streaming
-rendering, offline conflict resolution for writes, or hydration of server-rendered markup: those are
-a separate roadmap, and nothing in these pages promises them.
+The language covers its client runtime, static generation and hydration (#160). It does **not**
+cover rendering per request, streaming rendering, or offline conflict resolution for writes: those
+are a separate roadmap, and nothing in these pages promises them.
 
 Where a page says what the runtime must *do* — the execution contract in data.md, lifecycle.md,
 performance.md — it says it as **rules with acceptance cases**, not as new syntax. New syntax is kept

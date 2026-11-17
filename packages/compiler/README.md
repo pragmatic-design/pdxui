@@ -16,7 +16,7 @@ Vite plugin that compiles `.pdx` Single File Components into standard Web Compon
 2. **`src/parser/sfc.ts`** — Splits `.pdx` into `<template>`, `<script>`, `<style>` blocks.
 3. **`src/parser/template.ts`** — Parses template into AST: `@if`, `@for`, `@switch`, `{{ interpolation }}`.
 4. **`src/compiler/script-analyzer.ts`** — Analyzes `<script>`: extracts `@prop`, `@event`, `$signal`, auto-expose list.
-5. **`src/compiler/signal-rewrite.ts`** — Transforms `count++` → `__count.set(v => v + 1)` in function bodies.
+5. **`src/compiler/signal-rewrite-ast.ts`** — One walk of the script's AST that rewrites writes and reads: `count++` → `__count.set(__v => __v + 1)`. `src/compiler/signal-rewrite.ts` emits the `signal()`/`computed()` declarations and the auto-return.
 6. **`src/compiler/codegen.ts`** — Assembles final JS module from all the above: one script grammar (#158), a component or a `@store` module.
 7. **`src/compiler/dts-generator.ts`** — Generates `.pdx.d.ts` for IntelliSense.
 
@@ -24,9 +24,9 @@ Vite plugin that compiles `.pdx` Single File Components into standard Web Compon
 
 Every script is read the same way (#158): declarations and runes.
 ```
-@prop label: string = 'Hello';   → props: { label: { type: String, default: 'Hello' } }
+@prop label: string = 'Hello';   → props: { label: prop('Hello', { type: String }) }
 let count = $signal(0);          → const __count = signal(0, { name: 'file:count' })
-count++;                         → __count.set(v => v + 1)
+count++;                         → __count.set(__v => __v + 1)
 // No return needed              → auto-generated from top-level declarations
 ```
 
@@ -35,14 +35,17 @@ count++;                         → __count.set(v => v + 1)
 
 ### Key Transformations
 
+There is one render path, in development and in a build (#107): each block's static markup is built
+once and copied, and only what changes is bound, on nodes a walk computed at compile time reaches.
+
 | Source (.pdx) | Compiled (JS) |
 |---------------|---------------|
-| `{{ expr }}` | `${() => expr}` or `${ctx.expr}` |
-| `@if (cond) { ... }` | `when(() => cond, () => html\`...\`)` |
-| `@for (items as item; track item.id)` | `each(() => items, 'id', (item) => ...)` |
-| `@switch/@case/@default` | `match(() => expr, { case: ... })` |
-| `@require ('perm')` | `requirePermission('perm', ...)` |
-| `@click="handler"` | `@click=\${ctx.handler}` |
-| `::value="signal"` | `::value=\${ctx.signal}` |
-| `:prop="expr"` | `:prop=\${() => ctx.expr}` |
-| `<style scoped>` | CSS with `[data-pdx-HASH]` attribute scoping |
+| `{{ expr }}` | `bindInterpolation(textNode, () => ctx.expr())` |
+| `@if (cond) { ... }` | `when(() => cond, () => { /* the block's copy */ }, null)` |
+| `@for (items as item; track item.id)` | `eachRow(() => ctx.items(), 'id', (item) => …)` |
+| `@switch/@case/@default` | `match(() => expr, { "1": () => …, _: () => … })` |
+| `@require ('perm')` | `requirePermission('perm', () => …, null)` |
+| `@click="handler"` | `el.addEventListener('click', safeHandler(batchHandler(ctx.handler), tag, 'click'))` |
+| `::value="signal"` | `bindTwoWay(el, 'value', ctx.signal)` |
+| `:prop="expr"` | an effect that assigns `expr` to the property when it changes (`assignBoundProperty`) |
+| `<style scoped>` | `@scope ([data-pdx-HASH]) to ([data-pdx-root] > *) { … }` under the default target; a `[data-pdx-HASH]` prefix under `baseline-2024` |
