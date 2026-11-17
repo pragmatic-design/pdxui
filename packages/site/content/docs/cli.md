@@ -269,8 +269,11 @@ file: `pdx new component user-card`, `pdx new page settings`, `pdx new project s
 somewhere other than the current folder. A project comes with an `AGENTS.md`, which tells an AI agent
 opened in it how to work — see [Using PDX with an AI agent](/docs/agents).
 
-A new project depends on `@pdxui/framework` and `@pdxui/design`, with `@pdxui/cli`, `@pdxui/compiler`
-and `vite` as dev dependencies, all at the version of the CLI that created it. Its `index.html` imports
+A new project depends on the packages its files import by name — `@pdxui/core`, `@pdxui/design`,
+`@pdxui/router` and `@pdxui/ui`, since the compiled `.pdx` imports core, a library tag's module from
+ui and the router for `@page` — with `@pdxui/cli`, `@pdxui/compiler` and `vite` as dev dependencies,
+all at the version of the CLI that created it. Declared one by one, they install with pnpm too, which
+does not resolve a package reached only through another (`@pdxui/framework`). Its `index.html` imports
 the design system's base and one theme — `@pdxui/design/base` and `@pdxui/design/themes/neutral`, the
 theme that applies with no `pdx-theme` on `<html>` — and places `<app-root>`, the tag its `App.pdx`
 declares with `@tag 'app-root'`; each component brings its

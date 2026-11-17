@@ -516,8 +516,9 @@ bottom navigation — the shortcut still works there. Turn it off with `pdx({ de
 the panel says «Debug hook not found», core is not running as a dev build (the page is a production
 build, or `process.env.NODE_ENV` is `production`).
 
-`npx @pdxui/cli new project <name>` scaffolds a project to start from: `@pdxui/framework` and
-`@pdxui/design`, and `@pdxui/cli`, `@pdxui/compiler` and `vite` as dev dependencies, at the CLI's own
+`npx @pdxui/cli new project <name>` scaffolds a project to start from: `@pdxui/core`, `@pdxui/design`,
+`@pdxui/router` and `@pdxui/ui` — what the compiled `.pdx` and `index.html` import by name, each
+declared, so pnpm resolves them — and `@pdxui/cli`, `@pdxui/compiler` and `vite` as dev dependencies, at the CLI's own
 version (vite at the range the CLI supports); the design system
 imported once in `index.html`; an `AGENTS.md`. Then `npm install` and `npm run dev`.
 
