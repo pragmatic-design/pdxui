@@ -1,6 +1,7 @@
 // Focus management utilities — first-focus, restore, trap.
 
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+/** What a Tab key reaches. Shared with focus-restore.ts; not part of the package's public surface. */
+export const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 /**
  * Focus the first focusable element inside a container.

@@ -2198,8 +2198,10 @@ function focusRestore(): FocusRestoreReturn
 ```
 
 Create a save/restore focus pair with automatic fallback.
-If the saved element is removed from the DOM before restore(),
-focus is moved to the nearest focusable ancestor.
+If the saved element is removed from the DOM before restore(), focus moves to the nearest ancestor
+still in the document: the ancestor itself if it takes focus, else the first focusable inside it,
+else on up (#1159). The case it exists for: a dialog opened from a row's menu button, whose own
+action deletes the row — focus goes to the list, not to <body>.
 
 ### `focusTrap`
 

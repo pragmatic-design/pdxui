@@ -287,6 +287,49 @@ describe('focusRestore', () => {
         fr.restore(); // should not throw
         fr.dispose();
     });
+
+    // #1159: the saved element's row is removed before restore() — a dialog opened from a row's menu
+    // button, whose own action deletes the row. Focus goes to the nearest ancestor still in the
+    // document, not to <body>.
+    it('falls back to the nearest ancestor still in the document, when that ancestor is focusable', () => {
+        const list = document.createElement('div');
+        list.tabIndex = -1;
+        const row = document.createElement('div');
+        const menu = document.createElement('button');
+        row.appendChild(menu);
+        list.appendChild(row);
+        document.body.appendChild(list);
+        menu.focus();
+
+        const fr = focusRestore();
+        fr.save();
+        row.remove();
+        fr.restore();
+        expect(document.activeElement).toBe(list);
+
+        fr.dispose();
+        list.remove();
+    });
+
+    it('falls back to the first focusable inside the nearest remaining ancestor', () => {
+        const section = document.createElement('section');
+        const row = document.createElement('div');
+        const menu = document.createElement('button');
+        row.appendChild(menu);
+        const next = document.createElement('button');
+        section.append(row, next);
+        document.body.appendChild(section);
+        menu.focus();
+
+        const fr = focusRestore();
+        fr.save();
+        row.remove();
+        fr.restore();
+        expect(document.activeElement).toBe(next);
+
+        fr.dispose();
+        section.remove();
+    });
 });
 
 // ─── manageFocusOrder ──────────────────────────────────────────

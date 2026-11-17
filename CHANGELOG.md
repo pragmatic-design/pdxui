@@ -23,6 +23,12 @@ semver.
 
 ### Fixes
 
+- `focusRestore()` gives focus to the nearest place still in the document when the saved element was
+  removed before `restore()` (#1159), as it promised: the nearest remaining ancestor if it takes focus
+  (tabbable, or a `tabindex="-1"` focus target), else the first focusable inside it, else on up. It
+  cleared the saved element and focused nothing, so focus fell to `<body>` — after a dialog whose own
+  action deleted the row it was opened from, for one.
+
 - `fromResize`, `fromIntersection` and `fromMutation` follow a getter for their target (#1158). They
   called it once, when created: in a component's setup a `:ref` is still empty then, so
   `fromResize(() => card)` observed nothing, ever. The getter is now read in an effect, as
