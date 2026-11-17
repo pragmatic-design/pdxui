@@ -706,9 +706,14 @@ describe('the data page teaches polling, the rollback, and the offline queue', (
             .toMatch(/waits for the backlog|queues behind/i);
     });
 
-    it('names the limit that is still a bug, rather than leaving it to be met', () => {
-        expect(flat, 'a mutation issued during a drain can overtake the queue — unstated')
-            .toMatch(/while a replay is already in flight|during the drain/i);
+    // A mutation issued while the queue drains waits behind it: offline-queue.spec.ts measures it in
+    // Chromium ("a mutation made DURING the replay waits for it"). This test once held the page to
+    // call that a tracked bug, and the page said both; it holds the page to the measured behaviour.
+    it('says a mutation made while the queue drains waits for it', () => {
+        expect(flat, 'the page does not say a mutation made during the drain waits for it')
+            .toMatch(/a mutation made while the queue is draining waits for it/i);
+        expect(flat, 'the page still calls the drain a tracked bug')
+            .not.toMatch(/while a replay is already in flight/i);
     });
 
     it('says the offline claims are measured against a real network drop', () => {

@@ -451,8 +451,9 @@ It adds `pdx-in-view` / `pdx-out-view` classes so the animation itself stays in 
 ## Accessibility
 
 `useRovingTabindex` is the keyboard pattern every group of controls needs: exactly one child is
-tabbable, the arrows move between them, Tab leaves the group. The built-in tabs, toolbar, menubar,
-radio group and button group all use it — reach for it when you build a group of your own:
+tabbable, the arrows move between them, Tab leaves the group. The built-in tree and sortable list use
+it (the tabs, toolbar, menubar and radio group get the same pattern from `focusGroup`) — reach for it
+when you build a group of your own:
 
 ```ts
 import { useRovingTabindex } from '@pdxui/core';

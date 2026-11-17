@@ -90,7 +90,7 @@ templates with no adapter:
 
 ```html
 <!-- Angular / Vue templates -->
-<pdx-button variant="primary" (pdx-click)="save()">Save</pdx-button>
+<pdx-button variant="primary" (click)="save()">Save</pdx-button>
 ```
 
 ```jsx

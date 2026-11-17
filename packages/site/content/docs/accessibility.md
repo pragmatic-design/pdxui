@@ -105,7 +105,7 @@ strip and a button group rather than plain buttons — `focusGroup` on the regio
 children for the arrow keys.
 
 Below them sit the three that do one thing each: `getFocusableElements(container)` is the list, in
-tab order; `focusFirst(container)` and `focusLast(container)` move focus and return what they focused,
+document order (a positive `tabindex` is not sorted); `focusFirst(container)` and `focusLast(container)` move focus and return what they focused,
 or `null` when there was nothing focusable.
 
 ## Telling the screen reader
@@ -127,9 +127,9 @@ which is correct for an error the user must act on and rude for anything else.
 your own when a subsystem needs one it controls, and `destroyAnnouncer()` tears the shared one down —
 which a test needs, and an application does not.
 
-The framework already announces one thing for you: `<pdx-router-outlet>` announces the new page's
-title on every navigation, because a route change moves no focus and a screen reader would otherwise
-be told nothing at all.
+The framework already announces one thing for you: on every navigation `<pdx-router-outlet>` moves
+focus to the new page and announces its title (`document.title`, or the route's path), so a
+keyboard or screen-reader user is not left on the page they came from.
 
 ## What the components already do
 

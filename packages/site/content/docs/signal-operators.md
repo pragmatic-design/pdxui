@@ -35,7 +35,9 @@ The past participle is the standalone one: `debounced` is a value, `debounce(300
 `distinctOp` is the odd name in the set — it is `distinct` as a pipe operator, with a name of its own
 because the standalone holds `distinct`.
 
-Everything here returns a signal that owns a subscription, so everything has a **`dispose()`**. Inside
+The operators and the bridges that subscribe to something return a signal that owns the
+subscription, so they have a **`dispose()`**; `fromPromise`, `toPromise` and `linkedSignal` own none,
+and have none. Inside
 a `.pdx` component you rarely call it: what setup creates is disposed with the component. Call it when
 you build one outside a component's lifetime.
 
@@ -136,7 +138,8 @@ condition, so the difference is the whole point:
 | `concatSignal(src, fetcher)` | **queue** it, and run them in order |
 | `retrySignal(fetcher, opts?)` | not about mid-flight: retries a failing request, and hands you a `retry()` to do it by hand |
 
-Each receives an `AbortSignal` and returns `data`, `status`, `loading`, `error` and `dispose` — so
+Each receives an `AbortSignal` and returns a signal of the value (call it: `results()`) carrying
+`status`, `loading`, `error` and `dispose` — so
 `switchSignal` really does abort, not merely discard.
 
 ```ts

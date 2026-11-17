@@ -125,7 +125,8 @@ whatever reads best:
 You don't manage subscription/teardown — the compiler wires `addEventListener` and removes it when
 the element is gone. Behind the scenes a bare name (`save`) is passed as a function; everything else
 becomes a handler. Crucially, signal **writes** are rewritten for you: `count++` becomes
-`count.set(v => v + 1)`, `name = x` becomes `name.set(x)`. Reads stay reactive too. So you write the
+`count.set(v => v + 1)`, `name = x` becomes `name.setRaw(x)` (the value is stored as it is, even a
+function). Reads stay reactive too. So you write the
 JS you'd expect, and reactivity just works.
 
 > **Reference vs. call.** `@click="save"` passes the function (the event object arrives as its first

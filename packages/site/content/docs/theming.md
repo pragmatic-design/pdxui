@@ -63,10 +63,12 @@ toggleDarkMode();              // the other one
 
 1. sets `pdx-theme` on `<html>`;
 2. **persists it**, so the choice survives a reload;
-3. **re-derives the structural attributes** above from the new theme's tokens.
+3. under `baseline-2024`, or without the `pdx()` plugin, **re-derives the structural attributes**
+   above from the new theme's tokens. Under the default target the style queries need nothing more.
 
-The third is the one that bites. Those attributes are read by CSS selectors, and a theme switch that
-sets only `pdx-theme` leaves the *previous* theme's behaviour in place: a card keeps a border it
+The third is the one that bites there. Under that target those attributes are read by CSS
+selectors, and a theme switch that sets only `pdx-theme` leaves the *previous* theme's behaviour in
+place: a card keeps a border it
 should have lost, an input keeps the wrong fill. That is not hypothetical — it is what made 36 of
 1591 screenshots differ when a test re-themed a page by hand.
 
@@ -90,17 +92,18 @@ overwritten. With neither, the system preference decides.
 
 ### Reading a token back
 
-`cssVar(name, initial, target?)` is a signal over a CSS custom property's computed value — for the
-cases where JavaScript has to know what the theme resolved to, a canvas or a chart being the usual
-ones:
+`createTokenBridge(prefix?, target?)` reads the `--pdx-*` custom properties as signals that follow a
+theme change — for the cases where JavaScript has to know what the theme resolved to, a canvas or a
+chart being the usual ones:
 
 ```ts
-const accent = cssVar('--pdx-color-accent', '#000');
-chart.setStroke(accent());
+const tokens = createTokenBridge();
+chart.setStroke(tokens.get('colorAccent')());   // --pdx-color-accent, as resolved
 ```
 
-`createTokenBridge(prefix?, target?)` is the bulk form over a whole prefix, and `applyTheme(tokens,
-target?)` writes a set of custom properties onto an element — a subtree themed differently from the
+The other way round, `cssVar(name, initial, target?)` is a signal you write: its value is set on the
+custom property (on `<html>` unless you give a target), so `cssVar('--pdx-color-accent', '#000')`
+overrides the accent rather than reading it. `applyTheme(tokens, target?)` writes a set of custom properties onto an element — a subtree themed differently from the
 page, which the [nested-theme guard](/docs/making-a-theme) is about.
 
 ## The tokens
@@ -265,8 +268,8 @@ Three ways, one engine — all produce the same CSS:
 
 - **[Theme Builder](https://themebuilder.pdxui.com/)** — pick a brand and an archetype, watch
   every component restyle, export CSS or DTCG.
-- **`pdx theme acme --brand "#6442d6" --language material`** — one command, WCAG-gated, exits
-  non-zero on failure.
+- **`pdx theme acme --brand "#6442d6" --language material`** — one command, WCAG-gated: it exits
+  non-zero when a pair is below 3:1, and reports a pair under 4.5:1 as a warning.
 - **`createTheme()` from `@pdxui/design/engine`** — when a theme is data in your app.
 
 Shipping one is a CSS file plus an attribute:
