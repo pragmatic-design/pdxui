@@ -2370,14 +2370,14 @@ import { fromPromise } from '@pdxui/core';
 function fromPromise(promise: Promise<T>, initialValue?: T): PromiseSignal<T>
 ```
 
-Convert a Promise into a reactive signal with loading/error states.
+Convert a Promise into a reactive signal that speaks the async vocabulary.
 
 Usage:
   const user = fromPromise(fetchUser(42));
   effect(() => {
-    if (user.loading()) showSpinner();
+    if (user.state() === 'pending') showSpinner();
     else if (user.error()) showError(user.error());
-    else renderUser(user());
+    else renderUser(user.data());
   });
 
 ### `fromResize`
@@ -5393,8 +5393,8 @@ Usage:
     (query) => fetch(`/api/search?q=${query}`).then(r => r.json())
   );
   effect(() => {
-    if (results.loading()) showSpinner();
-    else renderResults(results());
+    if (results.state() === 'pending') showSpinner();
+    else renderResults(results.data());
   });
 
 ### `take`

@@ -1,20 +1,35 @@
 // Async signal operators — the patterns that make RxJS indispensable, as signals.
 // switchSignal (cancel previous), exhaustSignal (ignore while busy), retrySignal.
 
-import { signal, computed, effect } from './signal';
+import { signal, computed, effect, batch } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
+import type { AsyncState } from './resource';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
+/** @deprecated The alpha status words; read {@link AsyncSignal.state} (#1169). Removed in the next release. */
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
+/**
+ * A signal of an async value that speaks the beta's async vocabulary (#141, #1169), as a resource,
+ * `useQuery`, a mutation and a loader do: call it, or `data()`, for the last successful value.
+ */
 export interface AsyncSignal<T> extends ReadonlySignal<T | undefined> {
-    /** Current async status. */
+    /** The last successful value, `undefined` until there is one. */
+    data: ReadonlySignal<T | undefined>;
+    /** The last error, `null` when there is none; only a success clears it. */
+    error: ReadonlySignal<Error | null>;
+    /**
+     * `'pending'` while a first request runs with no data, `'success'` or `'error'` once one has
+     * settled; a later request leaves it where it was, with {@link pending} true.
+     */
+    state: ReadonlySignal<AsyncState>;
+    /** A request is in flight, first load or refresh. */
+    pending: ReadonlySignal<boolean>;
+    /** @deprecated `state()`, in the alpha words: `'loading'` for a request with no data yet. Removed in the next release. */
     status: ReadonlySignal<AsyncStatus>;
-    /** Loading flag (convenience). */
+    /** @deprecated `state() === 'pending'`, a request with no data yet. Removed in the next release. */
     loading: ReadonlySignal<boolean>;
-    /** Error if last fetch failed. */
-    error: ReadonlySignal<unknown>;
     /** Dispose the signal and cancel any in-flight request. */
     dispose: Dispose;
 }
@@ -32,29 +47,74 @@ export interface RetryOptions {
 
 // ─── Helpers ───────────────────────────────────────────────────────
 
-function createAsyncSignal<T>(initialValue: T | undefined): {
-    _value: ReturnType<typeof signal<T | undefined>>;
-    _status: ReturnType<typeof signal<AsyncStatus>>;
-    _error: ReturnType<typeof signal<unknown>>;
-} {
+/**
+ * The state behind an async signal, and its three transitions, as resource() makes them: a request
+ * starting is pending, and `'pending'` only with no data yet; a success sets the data and clears the
+ * error; a failure sets the error and keeps the data.
+ */
+export interface AsyncCell<T> {
+    readonly _value: ReturnType<typeof signal<T | undefined>>;
+    readonly _state: ReturnType<typeof signal<AsyncState>>;
+    readonly _pending: ReturnType<typeof signal<boolean>>;
+    readonly _error: ReturnType<typeof signal<Error | null>>;
+    start(): void;
+    succeed(value: T): void;
+    fail(err: unknown): void;
+}
+
+/** A failure as an `Error`: a rejection with anything else is wrapped, its value kept as the cause. */
+function asError(err: unknown): Error {
+    return err instanceof Error ? err : new Error(String(err), { cause: err });
+}
+
+/** The state of an async signal, `initialValue` its data until a request settles. */
+export function createAsyncCell<T>(initialValue: T | undefined): AsyncCell<T> {
+    const _value = signal<T | undefined>(initialValue);
+    const _state = signal<AsyncState>('idle');
+    const _pending = signal(false);
+    const _error = signal<Error | null>(null);
     return {
-        _value: signal<T | undefined>(initialValue),
-        _status: signal<AsyncStatus>('idle'),
-        _error: signal<unknown>(null),
+        _value, _state, _pending, _error,
+        start: () => batch(() => {
+            _pending.set(true);
+            if (_value.peek() === undefined) _state.set('pending');
+        }),
+        succeed: (value) => batch(() => {
+            _value.set(value as never);
+            _error.set(null);
+            _pending.set(false);
+            _state.set('success');
+        }),
+        fail: (err) => batch(() => {
+            _error.set(asError(err));
+            _pending.set(false);
+            _state.set('error');
+        }),
     };
 }
 
-function wrapAsync<T>(
-    _value: ReturnType<typeof signal<T | undefined>>,
-    _status: ReturnType<typeof signal<AsyncStatus>>,
-    _error: ReturnType<typeof signal<unknown>>,
-    disposeFn: Dispose,
-): AsyncSignal<T> {
-    const readable = (() => _value()) as AsyncSignal<T>;
+/**
+ * The async vocabulary over a cell: the readable signal, its members, and the deprecated alpha
+ * names computed from them.
+ */
+export function readAsyncCell<T, S extends ReadonlySignal<T | undefined>>(cell: AsyncCell<T>): S & {
+    data: ReadonlySignal<T | undefined>; error: ReadonlySignal<Error | null>; state: ReadonlySignal<AsyncState>;
+    pending: ReadonlySignal<boolean>; status: ReadonlySignal<AsyncStatus>; loading: ReadonlySignal<boolean>;
+} {
+    const { _value, _state, _pending, _error } = cell;
+    const readable = (() => _value()) as S & AsyncSignal<T>;
     readable.peek = () => _value.peek();
-    readable.status = computed(() => _status());
-    readable.loading = computed(() => _status() === 'loading');
+    readable.data = computed(() => _value());
     readable.error = computed(() => _error());
+    readable.state = computed(() => _state());
+    readable.pending = computed(() => _pending());
+    readable.status = computed(() => { const s = _state(); return s === 'pending' ? 'loading' : s; });
+    readable.loading = computed(() => _state() === 'pending');
+    return readable;
+}
+
+function wrapAsync<T>(cell: AsyncCell<T>, disposeFn: Dispose): AsyncSignal<T> {
+    const readable = readAsyncCell<T, AsyncSignal<T>>(cell);
     readable.dispose = disposeFn;
     return readable;
 }
@@ -80,15 +140,15 @@ function computeDelay(attempt: number, opts: RetryOptions): number {
  *     (query) => fetch(`/api/search?q=${query}`).then(r => r.json())
  *   );
  *   effect(() => {
- *     if (results.loading()) showSpinner();
- *     else renderResults(results());
+ *     if (results.state() === 'pending') showSpinner();
+ *     else renderResults(results.data());
  *   });
  */
 export function switchSignal<S, T>(
     source: () => S,
     fetcher: (value: S, signal: AbortSignal) => Promise<T>,
 ): AsyncSignal<T> {
-    const { _value, _status, _error } = createAsyncSignal<T>(undefined);
+    const cell = createAsyncCell<T>(undefined);
     let abortCtrl: AbortController | null = null;
     let version = 0;
 
@@ -101,26 +161,19 @@ export function switchSignal<S, T>(
         const myVersion = ++version;
         const myAbort = abortCtrl;
 
-        _status.set('loading' as never);
-        _error.set(null as never);
+        cell.start();
 
         fetcher(sourceVal, myAbort.signal)
             .then((result) => {
                 // Only apply if still the latest version
-                if (myVersion === version) {
-                    _value.set(result as never);
-                    _status.set('success' as never);
-                }
+                if (myVersion === version) cell.succeed(result);
             })
             .catch((err) => {
-                if (myVersion === version && !myAbort.signal.aborted) {
-                    _error.set(err as never);
-                    _status.set('error' as never);
-                }
+                if (myVersion === version && !myAbort.signal.aborted) cell.fail(err);
             });
     });
 
-    return wrapAsync<T>(_value, _status, _error, () => {
+    return wrapAsync<T>(cell, () => {
         dispose();
         if (abortCtrl) abortCtrl.abort();
     });
@@ -142,7 +195,7 @@ export function exhaustSignal<S, T>(
     source: () => S,
     fetcher: (value: S, signal: AbortSignal) => Promise<T>,
 ): AsyncSignal<T> {
-    const { _value, _status, _error } = createAsyncSignal<T>(undefined);
+    const cell = createAsyncCell<T>(undefined);
     let busy = false;
     let abortCtrl: AbortController | null = null;
     let disposed = false;
@@ -156,25 +209,22 @@ export function exhaustSignal<S, T>(
 
         const myAbort = new AbortController();
         abortCtrl = myAbort;
-        _status.set('loading' as never);
-        _error.set(null as never);
+        cell.start();
 
         fetcher(sourceVal, myAbort.signal)
             .then((result) => {
                 // Drop the result if disposed/aborted in the meantime (align with switchSignal).
                 if (disposed || myAbort.signal.aborted) return;
-                _value.set(result as never);
-                _status.set('success' as never);
+                cell.succeed(result);
             })
             .catch((err) => {
                 if (disposed || myAbort.signal.aborted) return;
-                _error.set(err as never);
-                _status.set('error' as never);
+                cell.fail(err);
             })
             .finally(() => { busy = false; });
     });
 
-    return wrapAsync<T>(_value, _status, _error, () => {
+    return wrapAsync<T>(cell, () => {
         disposed = true;
         dispose();
         if (abortCtrl) abortCtrl.abort();
@@ -197,25 +247,22 @@ export function retrySignal<T>(
     options?: RetryOptions,
 ): AsyncSignal<T> & { retry: () => void } {
     const opts: RetryOptions = { maxRetries: 3, backoff: 'exponential', delayMs: 1000, ...options };
-    const { _value, _status, _error } = createAsyncSignal<T>(undefined);
+    const cell = createAsyncCell<T>(undefined);
     let abortCtrl: AbortController | null = null;
     let disposed = false;
 
     async function attempt(): Promise<void> {
         if (disposed) return;
         abortCtrl = new AbortController();
-        _status.set('loading' as never);
-        _error.set(null as never);
+        // The retries are part of one request: pending stays true while they wait or run.
+        cell.start();
 
         for (let i = 0; i <= (opts.maxRetries ?? 3); i++) {
             if (disposed || abortCtrl.signal.aborted) return;
 
             try {
                 const result = await fetcher(abortCtrl.signal);
-                if (!disposed) {
-                    _value.set(result as never);
-                    _status.set('success' as never);
-                }
+                if (!disposed) cell.succeed(result);
                 return;
             } catch (err) {
                 if (disposed || abortCtrl.signal.aborted) return;
@@ -227,8 +274,7 @@ export function retrySignal<T>(
                     continue;
                 }
 
-                _error.set(err as never);
-                _status.set('error' as never);
+                cell.fail(err);
                 return;
             }
         }
@@ -237,7 +283,7 @@ export function retrySignal<T>(
     // Start immediately
     attempt();
 
-    const base = wrapAsync<T>(_value, _status, _error, () => {
+    const base = wrapAsync<T>(cell, () => {
         disposed = true;
         if (abortCtrl) abortCtrl.abort();
     });
@@ -264,7 +310,7 @@ export function concatSignal<S, T>(
     source: () => S,
     fetcher: (value: S, signal: AbortSignal) => Promise<T>,
 ): AsyncSignal<T> {
-    const { _value, _status, _error } = createAsyncSignal<T>(undefined);
+    const cell = createAsyncCell<T>(undefined);
     let queue: S[] = [];
     let processing = false;
     let abortCtrl: AbortController | null = null;
@@ -277,21 +323,15 @@ export function concatSignal<S, T>(
         while (queue.length > 0 && !disposed) {
             const val = queue.shift()!;
             abortCtrl = new AbortController();
-            _status.set('loading' as never);
+            cell.start();
 
             const myAbort = abortCtrl;
             try {
                 const result = await fetcher(val, myAbort.signal);
                 // Drop the result if disposed/aborted in the meantime (align with switchSignal).
-                if (!disposed && !myAbort.signal.aborted) {
-                    _value.set(result as never);
-                    _status.set('success' as never);
-                }
+                if (!disposed && !myAbort.signal.aborted) cell.succeed(result);
             } catch (err) {
-                if (!disposed && !myAbort.signal.aborted) {
-                    _error.set(err as never);
-                    _status.set('error' as never);
-                }
+                if (!disposed && !myAbort.signal.aborted) cell.fail(err);
             }
         }
 
@@ -304,7 +344,7 @@ export function concatSignal<S, T>(
         processQueue();
     });
 
-    return wrapAsync<T>(_value, _status, _error, () => {
+    return wrapAsync<T>(cell, () => {
         disposed = true;
         dispose();
         if (abortCtrl) abortCtrl.abort();

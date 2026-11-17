@@ -1,54 +1,54 @@
 // Promise ↔ Signal bridge — seamless async/signal interop.
 
-import { signal, computed, effect } from './signal';
+import { signal, effect } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
-import type { AsyncStatus } from './async-operators';
+import { createAsyncCell, readAsyncCell, type AsyncStatus } from './async-operators';
+import type { AsyncState } from './resource';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
+/** A promise as a signal, in the beta's async vocabulary (#141, #1169). */
 export interface PromiseSignal<T> extends ReadonlySignal<T | undefined> {
+    /** The resolved value, `undefined` until it resolves (or the initial value given). */
+    data: ReadonlySignal<T | undefined>;
+    /** The rejection, `null` until there is one. */
+    error: ReadonlySignal<Error | null>;
+    /** `'pending'` until the promise settles, then `'success'` or `'error'`. */
+    state: ReadonlySignal<AsyncState>;
+    /** The promise has not settled. */
+    pending: ReadonlySignal<boolean>;
+    /** @deprecated `state()`, in the alpha words: `'loading'` while it is pending. Removed in the next release. */
     status: ReadonlySignal<AsyncStatus>;
+    /** @deprecated `state() === 'pending'`. Removed in the next release. */
     loading: ReadonlySignal<boolean>;
-    error: ReadonlySignal<unknown>;
 }
 
 // ─── fromPromise() ──────────────────────────────────────────────
 
 /**
- * Convert a Promise into a reactive signal with loading/error states.
+ * Convert a Promise into a reactive signal that speaks the async vocabulary.
  *
  * Usage:
  *   const user = fromPromise(fetchUser(42));
  *   effect(() => {
- *     if (user.loading()) showSpinner();
+ *     if (user.state() === 'pending') showSpinner();
  *     else if (user.error()) showError(user.error());
- *     else renderUser(user());
+ *     else renderUser(user.data());
  *   });
  */
 export function fromPromise<T>(
     promise: Promise<T>,
     initialValue?: T,
 ): PromiseSignal<T> {
-    const _value = signal<T | undefined>(initialValue);
-    const _status = signal<AsyncStatus>('loading');
-    const _error = signal<unknown>(null);
+    const cell = createAsyncCell<T>(initialValue);
+    // A promise is a request that has already started; an initial value is shown, not data, so
+    // the state is 'pending' whatever it is.
+    cell._pending.set(true);
+    cell._state.set('pending');
 
-    promise
-        .then((result) => {
-            _value.set(result as never);
-            _status.set('success' as never);
-        })
-        .catch((err) => {
-            _error.set(err as never);
-            _status.set('error' as never);
-        });
+    promise.then((result) => cell.succeed(result), (err) => cell.fail(err));
 
-    const readable = (() => _value()) as PromiseSignal<T>;
-    readable.peek = () => _value.peek();
-    readable.status = computed(() => _status());
-    readable.loading = computed(() => _status() === 'loading');
-    readable.error = computed(() => _error());
-    return readable;
+    return readAsyncCell<T, PromiseSignal<T>>(cell);
 }
 
 // ─── fromCallback() ─────────────────────────────────────────────

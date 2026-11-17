@@ -599,6 +599,14 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Changed
 
+- The signal operators speak the async vocabulary (#1169): `fromPromise`, `switchSignal`,
+  `exhaustSignal`, `concatSignal` and `retrySignal` return a signal with `data()`, `error()`
+  (`Error | null`), `state()` (`'idle' | 'pending' | 'success' | 'error'`) and `pending()`, as a
+  resource does. A request with no data yet is `'pending'`; a later one keeps the settled state with
+  `pending()` true; `error()` is cleared only by a success, no longer when a request starts. The alpha
+  `loading()` and `status()` still answer in this release, deprecated: in a `.pdx` they are
+  `PDX_REMOVED_FORM`, and `pdx migrate` flags them (`async-alpha-names`). `loading()` is now true
+  only while there is no data, as `state() === 'pending'`; it was true for every request.
 - **Breaking:** whitespace at the start and the end of an element's content, and of a block's, is
   no longer a text node (#907, the rule of Svelte 5). `<li> <b>x</b> </li>` renders
   `<li><b>x</b></li>`; between two nodes a run of whitespace is still one space. `<pre>`,

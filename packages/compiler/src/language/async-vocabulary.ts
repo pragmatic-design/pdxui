@@ -5,7 +5,8 @@
 // a removed value (`'loading'`, `'reloading'`, `'stale'`, `'local'`) have no one-word replacement —
 // `loading()` is `state() === 'pending' && !data()` — so they are flagged. Only the names the file
 // declares as an async source are looked at (`@fetch x`, `x = resource(…)`, `useQuery`,
-// `httpResource`, `mutation`): a DataSource keeps its own `isLoading()`.
+// `httpResource`, `mutation`, and the signal operators `fromPromise`, `switchSignal`,
+// `exhaustSignal`, `concatSignal`, `retrySignal`, #1169): a DataSource keeps its own `isLoading()`.
 //
 // A route loader's state changes words too, `'loading'` → `'pending'` and `'done'` → `'success'`:
 // a comparison of `currentLoaderState()` or `loaderState(…)` with an old word still compiles and is
@@ -23,8 +24,9 @@ function asyncSources(text: string): string[] {
     const names = new Set<string>();
     // Match: `@fetch users` — the declared name. Groups: [1]=the name
     for (const m of text.matchAll(/@fetch\s+([A-Za-z_$][\w$]*)/g)) names.add(m[1]);
-    // Match: `const users = resource(` / `useQuery<T>(` / `httpResource(` / `mutation(`. Groups: [1]=the name
-    for (const m of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=\n]+)?=\s*(?:resource|useQuery|httpResource|mutation)\s*[<(]/g)) names.add(m[1]);
+    // Match: `const users = resource(` / `useQuery<T>(` / `httpResource(` / `mutation(`, or a signal
+    // operator, `switchSignal(` and the rest. Groups: [1]=the name
+    for (const m of text.matchAll(/\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=\n]+)?=\s*(?:resource|useQuery|httpResource|mutation|fromPromise|switchSignal|exhaustSignal|concatSignal|retrySignal)\s*[<(]/g)) names.add(m[1]);
     return [...names];
 }
 
