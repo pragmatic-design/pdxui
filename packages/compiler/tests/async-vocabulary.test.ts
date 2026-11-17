@@ -54,6 +54,28 @@ describe('the alpha names with no one-word replacement are flagged', () => {
         const pdx = "<template>@if (users.loading()) { <i>…</i> }</template>\n<script>\n@fetch users: 'GET /api/u' as string[];\n</script>\n";
         expect(asyncAlphaNames.detect(pdx).map((f) => f.found)).toEqual(['users.loading()']);
     });
+
+    it('on a signal operator too: fromPromise, switchSignal, exhaustSignal, concatSignal, retrySignal (#1169)', () => {
+        const ts = "const a = fromPromise(load());\nconst b = switchSignal(() => q(), fetchIt);\nconst c = exhaustSignal(() => t(), send);\n"
+            + "const d = concatSignal(() => t(), save);\nconst e = retrySignal(fetchIt, { maxRetries: 2 });\n"
+            + "a.loading(); b.status(); c.loading(); d.status(); e.loading();\nb.pending(); a.state();\n";
+        expect(asyncAlphaNamesScript.detect(ts).map((f) => f.found)).toEqual([
+            'a.loading()', 'b.status()', 'c.loading()', 'd.status()', 'e.loading()',
+        ]);
+    });
+
+    it('in a template, against a switchSignal: loading() is flagged, pending() is not', () => {
+        const pdx = "<template>@if (results.loading()) { <i>…</i> } @if (results.pending()) { <b>…</b> }</template>\n"
+            + "<script>\nconst results = switchSignal(() => query, search);\n</script>\n";
+        expect(asyncAlphaNames.detect(pdx).map((f) => f.found)).toEqual(['results.loading()']);
+    });
+
+    it('a .pdx that reads loading() on a switchSignal compiles with PDX_REMOVED_FORM', () => {
+        const pdx = "<template>@if (results.loading()) { <i>…</i> }</template>\n"
+            + "<script>\nimport { switchSignal } from '@pdxui/core';\nlet query = $signal('');\nconst results = switchSignal(() => query, (q) => Promise.resolve(q));\n</script>\n";
+        const r = compile(pdx, 'search.pdx', [], undefined, {});
+        expect(r.warnings.filter((w) => w.code === 'PDX_REMOVED_FORM').length).toBe(1);
+    });
 });
 
 describe('a route loader\'s state words', () => {

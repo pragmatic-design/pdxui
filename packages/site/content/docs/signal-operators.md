@@ -120,7 +120,7 @@ const seen = fromIntersection(() => card);      // { isIntersecting, ratio, … 
 | --- | --- |
 | `fromEvent(target, name, opts?)` · `fromEvents(target, names[], opts?)` | a DOM event as a signal of its last value |
 | `fromResize(el)` · `fromIntersection(el)` · `fromMutation(node)` | the three observers, without the observer bookkeeping |
-| `fromPromise(p, initial?)` | a promise as a signal, with `loading` and `error` |
+| `fromPromise(p, initial?)` | a promise as a signal, with `data`, `error`, `state` and `pending` |
 | `fromCallback(setup, initial?)` | anything that hands you values through a callback — a WebSocket, an SDK subscription. `setup` returns its own teardown |
 | `toPromise(src, predicate?)` | the other direction: wait for a signal to satisfy a condition |
 | `toAsync(src)` | a signal as an `for await` iterable |
@@ -138,9 +138,13 @@ condition, so the difference is the whole point:
 | `concatSignal(src, fetcher)` | **queue** it, and run them in order |
 | `retrySignal(fetcher, opts?)` | not about mid-flight: retries a failing request, and hands you a `retry()` to do it by hand |
 
-Each receives an `AbortSignal` and returns a signal of the value (call it: `results()`) carrying
-`status`, `loading`, `error` and `dispose` — so
-`switchSignal` really does abort, not merely discard.
+Each receives an `AbortSignal` — so `switchSignal` really does abort, not merely discard — and
+returns a signal of the value that speaks the same async vocabulary as a resource
+([Data](/docs/data)): `data()` (or call the signal itself, `results()`), `error()`, `state()` and
+`pending()`, plus `dispose()`. A request with no data yet is `state() === 'pending'`; a later one
+keeps the settled state with `pending()` true; `error()` is cleared only by a success. The alpha
+`loading()` and `status()` still answer in this release and are deprecated: in a `.pdx` they are
+`PDX_REMOVED_FORM`, and `pdx migrate` flags them in a script.
 
 ```ts
 const results = switchSignal(() => term(), (q, signal) => fetch(`/api/s?q=${q}`, { signal }).then(r => r.json()));
