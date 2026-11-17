@@ -9,7 +9,11 @@ export interface FocusTrapOptions {
     initialFocus?: HTMLElement | 'first' | 'last';
     /** Restore focus to previously focused element on deactivate. Default: true. */
     restoreFocus?: boolean;
-    /** Allow Escape to deactivate the trap. Default: true. */
+    /**
+     * Escape releases the trap, as calling the returned function does, and the key goes on to the page.
+     * Default: true. A component that releases the trap itself when it closes — and may stay open on
+     * Escape — passes false (#1160).
+     */
     escapeDeactivates?: boolean;
 }
 
@@ -44,7 +48,8 @@ export function focusTrap(container: HTMLElement, options?: FocusTrapOptions): D
 
     function onKeyDown(e: KeyboardEvent): void {
         if (e.key === 'Escape' && escapeDeactivates) {
-            // Don't prevent default — let overlay stack handle Escape
+            // Released, and not prevented: the key still reaches the overlay stack or the page.
+            release();
             return;
         }
 
@@ -79,7 +84,11 @@ export function focusTrap(container: HTMLElement, options?: FocusTrapOptions): D
 
     container.addEventListener('keydown', onKeyDown);
 
-    return () => {
+    // Once: Escape may release the trap before its owner disposes it, and focus is restored only once.
+    let released = false;
+    function release(): void {
+        if (released) return;
+        released = true;
         container.removeEventListener('keydown', onKeyDown);
         const index = activeTraps.indexOf(entry);
         if (index !== -1) {
@@ -89,7 +98,9 @@ export function focusTrap(container: HTMLElement, options?: FocusTrapOptions): D
         if (restoreFocus && previouslyFocused && typeof previouslyFocused.focus === 'function') {
             previouslyFocused.focus();
         }
-    };
+    }
+
+    return release;
 }
 
 // ─── aria-hidden siblings management ───────────────────────────

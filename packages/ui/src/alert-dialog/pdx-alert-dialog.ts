@@ -140,7 +140,7 @@ component('pdx-alert-dialog', {
                     // Focus trap + auto-focus cancel
                     requestAnimationFrame(() => {
                         const panel = ctx.el.querySelector('.pdx-dialog-panel') as HTMLElement;
-                        if (panel) trapDispose = focusTrap(panel, { restoreFocus: true });
+                        if (panel) trapDispose = focusTrap(panel, { restoreFocus: true, escapeDeactivates: false });
                         const cancelBtn = ctx.el.querySelector('.pdx-alert-cancel') as HTMLElement;
                         if (cancelBtn) setTimeout(() => cancelBtn.focus(), 0);
                     });

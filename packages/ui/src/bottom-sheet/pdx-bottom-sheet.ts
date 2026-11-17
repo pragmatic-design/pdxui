@@ -353,7 +353,7 @@ component('pdx-bottom-sheet', {
 
                         // Focus trap
                         if (sheetEl) {
-                            trapDispose = focusTrap(sheetEl, { restoreFocus: true });
+                            trapDispose = focusTrap(sheetEl, { restoreFocus: true, escapeDeactivates: false });
                         }
 
                         // Hide footer if empty

@@ -302,7 +302,7 @@ component('pdx-drawer', {
                     // Focus trap. The drawer restores focus itself (returnFocus), to the opener recorded
                     // above: the trap's own record would be <body>.
                     if (drawerEl) {
-                        trapDispose = focusTrap(drawerEl, { restoreFocus: false });
+                        trapDispose = focusTrap(drawerEl, { restoreFocus: false, escapeDeactivates: false });
                         // A mousedown on the backdrop would move focus to the page before the click closed
                         // the drawer; pdx-dialog holds focus the same way.
                         if (backdropEl) holdModalFocus(backdropEl, drawerEl);

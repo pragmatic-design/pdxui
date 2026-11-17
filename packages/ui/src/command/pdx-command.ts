@@ -193,7 +193,7 @@ component('pdx-command', {
                 requestAnimationFrame(() => {
                     const dialog = el.querySelector('.pdx-command') as HTMLElement;
                     if (dialog) {
-                        _trapDispose = focusTrap(dialog, { restoreFocus: true });
+                        _trapDispose = focusTrap(dialog, { restoreFocus: true, escapeDeactivates: false });
                         const input = dialog.querySelector('input');
                         if (input) input.focus();
                     }

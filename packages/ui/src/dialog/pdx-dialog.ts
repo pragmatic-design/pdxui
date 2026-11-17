@@ -170,7 +170,7 @@ component('pdx-dialog', {
                         // A frame after the backdrop is placed, so the design CSS animates it in.
                         ctx.state('open', true);
                         if (panelEl) {
-                            trapDispose = focusTrap(panelEl, { restoreFocus: true });
+                            trapDispose = focusTrap(panelEl, { restoreFocus: true, escapeDeactivates: false });
                             // Focus after trap initializes (next microtask)
                             setTimeout(() => focusInitial(), 0);
                         }

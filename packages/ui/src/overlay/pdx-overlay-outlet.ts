@@ -115,7 +115,7 @@ component('pdx-overlay-outlet', {
                     const panel = el.querySelector('.pdx-dialog-panel') as HTMLElement;
                     if (panel) {
                         panel.addEventListener('focusin', (e) => lastFocused.set(item.id, e.target as HTMLElement));
-                        trapDisposers.set(item.id, focusTrap(panel, { restoreFocus: false }));
+                        trapDisposers.set(item.id, focusTrap(panel, { restoreFocus: false, escapeDeactivates: false }));
                     }
                     // Auto-focus: cancel for confirm, OK for alert, close for dialog. Only if it is still
                     // the dialog on top when the timer runs: closed by then, focus would land in a dialog

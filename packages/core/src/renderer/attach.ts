@@ -58,7 +58,8 @@ export const autofocus: Attachment = (el) => {
 export const trapFocus: Attachment = (el) => {
     let release: (() => void) | null = null;
     let cancelled = false;
-    queueMicrotask(() => { if (!cancelled) release = focusTrap(el as HTMLElement); });
+    // Held until the scope goes, not released by Escape: the template decides when it ends (#1160).
+    queueMicrotask(() => { if (!cancelled) release = focusTrap(el as HTMLElement, { escapeDeactivates: false }); });
     return () => { cancelled = true; release?.(); };
 };
 
