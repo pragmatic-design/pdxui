@@ -76,6 +76,7 @@ These are generated. Change the source and run the command; the gate fails when 
 | `packages/ui/src/icon/pragmatic/*.ts`, `…/icon/pragmatic-loaders.ts` | `packages/ui/src/icon/pragmatic-icon-data.ts` | `pnpm --dir packages/ui run icons` |
 | `packages/ui/src/flag/flags/*.ts`, `…/flag/flag-loaders.ts` | flag-icons' `flags/4x3` (MIT, see `licenses/THIRD-PARTY.md`) | `pnpm --dir packages/ui run flags -- --from <flag-icons>/flags/4x3` (the steps are in the script's header) |
 | `packages/ui/tests/scenarios/generated/`, `…/contracts/generated/` | the certification manifests | `pnpm certify:gen` |
+| `packages/compiler/src/no-import-tags.generated.ts`, the `pdx-` tags that need no import | the design CSS's element selectors and `component()` / `define()` calls in every package's `src/` | `pnpm --dir packages/compiler run no-import-tags` |
 | the skill catalogue under `marketplace/plugins/pdxui/skills/` | `custom-elements.json`, the site's summaries, the sources' events | `node marketplace/plugins/pdxui/skills/pdxui/tools/gen-catalog.mjs` and `gen-topics.mjs` |
 | `packages/site/content/docs/api.md`, the `api-*.md` module pages, and the skill's `api.md` | core's and router's public surface | `node packages/site/scripts/gen-api.mjs` |
 | `packages/design/src/themes/*.css`, the 13 shipped themes | `packages/design/theme-sources/*.css`, overrides inside `@pdx-theme <name> { … }` | `node packages/design/scripts/gen-themes.mjs` |

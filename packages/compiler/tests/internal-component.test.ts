@@ -204,8 +204,7 @@ describe('a library component that imports its internal view', () => {
         // Without it, the same template is one the warning is for — the control.
         injectComponentImports('import "./inner.pdx";\n', outer, readFileSync(outer, 'utf-8'), r);
         expect(warn.mock.calls.map((c) => String(c[0])).some((m) => m.includes('PDX_UNRESOLVED_COMPONENT') && m.includes('pdx-inner'))).toBe(true);
-        // `pdx-inner` is a pdx- tag, so the control pays the resolver's walk of the sibling packages
-        // (knownWithoutImport, #771): 1.3–1.7 s alone, over 5 s under the gate's load (#991). The
-        // timeout is the one resolver-no-import-scan.test.ts gives the same walk.
-    }, 60_000);
+        // The control's `pdx-inner` is asked of knownWithoutImport, which used to walk the sibling
+        // packages for it and timed this test out in the gate (#991): it reads a generated list now.
+    });
 });

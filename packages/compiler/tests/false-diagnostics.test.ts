@@ -8,16 +8,14 @@
 // 2. "<pdx-router-outlet> … will not be registered" in an app that INSTALLED the packages. A scan
 //    for tags that need no import that walks up to a `packages/` folder, which exists in the
 //    monorepo and nowhere else, finds nothing in node_modules/@pdxui — and the outlet the router
-//    defines is reported missing while it renders.
+//    defines is reported missing while it renders. Since #991 the resolver walks nothing: it reads
+//    the list generated from the packages, which ships inside the compiler, wherever it is installed.
 //
 // Each has its control: a signal that really is unused still warns, and a tag defined nowhere is
 // still unknown. Without the controls, "never warn" would pass.
-import { describe, it, expect, afterAll } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
-import { tmpdir } from 'node:os';
+import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { scanNoImportTags } from '../src/no-import-tags';
+import { ComponentResolver } from '../src/component-resolver';
 
 const unused = (src: string) => compile(src, 'probe.pdx').warnings
     .filter((w) => w.code === 'PDX_UNUSED_REACTIVE').map((w) => w.message);
@@ -53,21 +51,14 @@ let forgotten = $signal(0);
 });
 
 describe('tags another @pdxui package defines, in an INSTALLED app', () => {
-    // node_modules/@pdxui/{compiler,router} as npm lays them out: published packages ship src/.
-    const root = mkdtempSync(join(tmpdir(), 'pdx-147-'));
-    const scope = join(root, 'node_modules', '@pdxui');
-    mkdirSync(join(scope, 'compiler', 'dist'), { recursive: true });
-    mkdirSync(join(scope, 'router', 'src'), { recursive: true });
-    writeFileSync(join(scope, 'router', 'src', 'outlet.ts'),
-        "class PdxRouterOutlet extends HTMLElement {}\ncustomElements.define('pdx-router-outlet', PdxRouterOutlet);\n");
-    afterAll(() => rmSync(root, { recursive: true, force: true }));
-
-    it('finds pdx-router-outlet from the compiler\'s own location', () => {
-        const tags = scanNoImportTags(join(scope, 'compiler', 'dist'));
-        expect(tags.has('pdx-router-outlet'), 'the outlet @pdxui/router defines was not found').toBe(true);
+    // The resolver's answer is the generated list, not a walk of whatever is on disk around it: the
+    // same in node_modules/@pdxui as in the monorepo (resolver-no-import-scan.test.ts holds that it
+    // walks nothing).
+    it('knows pdx-router-outlet, which @pdxui/router defines', () => {
+        expect(new ComponentResolver().knownWithoutImport('pdx-router-outlet'), 'the outlet @pdxui/router defines was not found').toBe(true);
     });
 
-    it('control — a tag defined nowhere is still not found', () => {
-        expect(scanNoImportTags(join(scope, 'compiler', 'dist')).has('pdx-not-a-real-component')).toBe(false);
+    it('control — a tag defined nowhere is still not known', () => {
+        expect(new ComponentResolver().knownWithoutImport('pdx-not-a-real-component')).toBe(false);
     });
 });

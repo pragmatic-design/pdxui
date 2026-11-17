@@ -1,31 +1,28 @@
 // Tags that are legitimate with nothing to import — the evidence behind
 // ComponentResolver.knownWithoutImport: element selectors the design system styles, and
 // custom elements another @pdxui package defines (pdx-router-outlet, from @pdxui/router).
+//
+// The scanner of scripts/gen-no-import-tags.mjs, which writes its answer to
+// no-import-tags.generated.ts: the resolver reads that list and walks nothing (#991). So the walk
+// runs in the monorepo only — an installed app gets the list inside the compiler it installed.
 
 import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, dirname, basename } from 'path';
+import { join, dirname } from 'path';
 
 /**
- * Walk the sibling @pdxui packages once, starting from `start` (the compiler's own directory),
- * collecting tags that need no import: element selectors in any CSS, and `component('pdx-x')` /
- * `define('pdx-x')` in any source.
+ * Walk the sibling @pdxui packages, from `start` (a directory inside the monorepo) up to its
+ * `packages/` folder, collecting tags that need no import: element selectors in any CSS, and
+ * `component('pdx-x')` / `define('pdx-x')` in any source.
  *
- * Best-effort by design: a package that cannot be read contributes nothing, which leaves the
- * diagnostic exactly as loud as without the scan. Failing to find a tag can only produce a
- * warning, never a broken build.
+ * A package that cannot be read contributes nothing; the drift test compares the generated list
+ * with this walk, so a package the walk misses is missed by both, and a warning is all it costs.
  */
 export function scanNoImportTags(start: string): Set<string> {
     const found = new Set<string>();
     let dir = start;
     for (let i = 0; i < 6; i++) {
-        // Where the sibling packages live: `packages/` in the monorepo, or — in an app that
-        // INSTALLED them — the `@pdxui` scope folder the compiler itself sits in
-        // (node_modules/@pdxui/compiler/dist → node_modules/@pdxui). With only the first, an
-        // installed app would find nothing, and <pdx-router-outlet> would be reported
-        // "will not be registered" while it renders. Published packages ship src/.
-        const packagesDir = join(dir, 'packages');
-        const root = existsSync(packagesDir) ? packagesDir : basename(dir) === '@pdxui' ? dir : null;
-        if (root) {
+        const root = join(dir, 'packages');
+        if (existsSync(root)) {
             for (const entry of safeReaddir(root)) {
                 const src = join(root, entry, 'src');
                 if (existsSync(src)) collectNoImportTags(src, found, 0);

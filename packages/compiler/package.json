@@ -29,7 +29,8 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "test": "vitest run",
     "test:perf": "vitest run --config vitest.perf.config.ts",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "no-import-tags": "node scripts/gen-no-import-tags.mjs"
   },
   "dependencies": {
     "typescript": "^5.8.0"

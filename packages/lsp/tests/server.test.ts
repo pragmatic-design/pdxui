@@ -216,9 +216,8 @@ describe('diagnostics on change', () => {
 
     // The language service's cold start — the lenient program and the strict one that checks the
     // template (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s (#536).
-    // So is the first tag nothing resolves: the resolver then scans the sibling packages once for the
-    // tags that need no import (`scanNoImportTags`, about 2,400 files), 0.6 s alone and up to 2.7 s
-    // under the parallel gate, where it timed the test below out (#716).
+    // The first tag nothing resolves used to cost a walk of the sibling packages too, which timed the
+    // test below out (#716); the resolver reads a generated list since #991.
     beforeAll(() => {
         diagnosticsFor(pageDoc);
         diagnosticsFor(open('warm-unresolved.pdx', '<template><pdx-warm-nope /></template>\n<script>\nlet a = $signal(1);\n</script>\n'));
