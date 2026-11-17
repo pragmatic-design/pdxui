@@ -16,11 +16,17 @@
  *   process naming vitest is `vitest`; any other node process is `node`. This process and its
  *   ancestors — the hook, git, the shell — are the gate's, and are left out.
  *
- *   node scripts/lib/machine-load.mjs        prints the line
+ * - Vitest workers per package: what `unitTestWorkers()` gives for the CPU free, beside what it gives
+ *   on an idle machine. The pre-push hands the free share to the suites in PDX_CPU_FREE, and every
+ *   vitest config sizes its pool from it (#991).
+ *
+ *   node scripts/lib/machine-load.mjs                 prints the line
+ *   node scripts/lib/machine-load.mjs --free-share    prints the line on stderr, the free share on stdout
  */
 import { execFileSync } from 'node:child_process';
 import { cpus, freemem, totalmem } from 'node:os';
 import { pathToFileURL } from 'node:url';
+import { unitTestWorkers } from '../../build/unit-test-workers.ts';
 
 /** Every core's busy and total time, summed. */
 function cpuTimes() {
@@ -95,19 +101,47 @@ export function foreignProcesses() {
 const gb = (bytes) => (bytes / 1024 ** 3).toFixed(1);
 
 /**
- * The line the pre-push prints: CPU in use over `ms`, free memory, and what already runs.
+ * The share of the CPU free, from the share in use, at two decimals: the value PDX_CPU_FREE carries,
+ * so the line and the vitest configs size the pools from the same number.
+ * @param {number} inUse
+ * @returns {number}
+ */
+export function freeShareOf(inUse) {
+    return Math.round((1 - inUse) * 100) / 100;
+}
+
+/**
+ * The machine as the gate starts: the line the pre-push prints, and the free share it hands on.
+ * @param {number} [ms]
+ * @returns {Promise<{ line: string, free: number }>}
+ */
+export async function readMachine(ms = 1000) {
+    // The CPU first: listing the processes spawns PowerShell, which would load the sample.
+    const inUse = await cpuInUse(ms);
+    const found = foreignProcesses();
+    const free = freeShareOf(inUse);
+    const line = `[machine-load] cpu in use ${Math.round(inUse * 100)}% over ${(ms / 1000).toFixed(1)} s`
+        + ` · free memory ${gb(freemem())} GB of ${gb(totalmem())} GB`
+        + ` · already running: ${found.vitest.length} vitest, ${found.playwright.length} playwright, ${found.node.length} node`
+        + ` · vitest workers per package: ${unitTestWorkers(free)} of ${unitTestWorkers(1)}`;
+    return { line, free };
+}
+
+/**
+ * The line the pre-push prints.
  * @param {number} [ms]
  * @returns {Promise<string>}
  */
 export async function loadLine(ms = 1000) {
-    // The CPU first: listing the processes spawns PowerShell, which would load the sample.
-    const inUse = await cpuInUse(ms);
-    const found = foreignProcesses();
-    return `[machine-load] cpu in use ${Math.round(inUse * 100)}% over ${(ms / 1000).toFixed(1)} s`
-        + ` · free memory ${gb(freemem())} GB of ${gb(totalmem())} GB`
-        + ` · already running: ${found.vitest.length} vitest, ${found.playwright.length} playwright, ${found.node.length} node`;
+    return (await readMachine(ms)).line;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-    console.log(await loadLine());
+    const { line, free } = await readMachine();
+    if (process.argv.includes('--free-share')) {
+        console.error(line);
+        console.log(String(free));
+    } else {
+        console.log(line);
+    }
 }

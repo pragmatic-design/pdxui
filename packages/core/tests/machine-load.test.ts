@@ -11,7 +11,8 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { cpus } from 'node:os';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { cpuInUse, foreignProcesses, loadLine } from '../../../scripts/lib/machine-load.mjs';
+import { cpuInUse, foreignProcesses, loadLine, freeShareOf } from '../../../scripts/lib/machine-load.mjs';
+import { unitTestWorkers } from '../../../build/unit-test-workers';
 import { KNOWN } from '../../../scripts/lib/known-failures.mjs';
 
 const REPO = join(__dirname, '..', '..', '..');
@@ -44,6 +45,13 @@ describe('the machine\'s load', () => {
 
         const found = foreignProcesses();
         for (const pid of pids) expect(found.node, `spinner ${pid} not counted`).toContain(pid);
+
+        // #991: the workers chosen from that share are fewer than on an idle machine. The spinners'
+        // share alone bounds the free share; on a machine where the idle cap is already 1, it stays 1.
+        const idle = unitTestWorkers(1);
+        const chosen = unitTestWorkers(freeShareOf(inUse));
+        if (idle > 1) expect(chosen, `${n} of ${cpus().length} cores spinning`).toBeLessThan(idle);
+        else expect(chosen).toBe(1);
     }, 30_000);
 
     it('the processes the gate started are not counted: this one and its ancestors', () => {
@@ -55,8 +63,14 @@ describe('the machine\'s load', () => {
 
     it('the line carries the three figures', async () => {
         const line = await loadLine(200);
-        expect(line).toMatch(/^\[machine-load\] cpu in use \d+% over 0\.2 s · free memory \d+\.\d GB of \d+\.\d GB · already running: \d+ vitest, \d+ playwright, \d+ node$/);
+        expect(line).toMatch(/^\[machine-load\] cpu in use \d+% over 0\.2 s · free memory \d+\.\d GB of \d+\.\d GB · already running: \d+ vitest, \d+ playwright, \d+ node · vitest workers per package: \d+ of \d+$/);
     }, 30_000);
+
+    it('the free share is what the CPU in use leaves, at two decimals', () => {
+        expect(freeShareOf(0)).toBe(1);
+        expect(freeShareOf(0.374)).toBe(0.63);
+        expect(freeShareOf(1)).toBe(0);
+    });
 });
 
 describe('where the line is printed', () => {
@@ -66,6 +80,15 @@ describe('where the line is printed', () => {
         expect(load, 'the hook does not print the load line').toBeGreaterThan(-1);
         expect(load).toBeLessThan(hook.indexOf('pnpm test ||'));
         expect(load).toBeLessThan(hook.indexOf('pnpm test:affected ||'));
+    });
+
+    it('the pre-push hands the free share to the suites, in PDX_CPU_FREE (#991)', () => {
+        const hook = readFileSync(join(REPO, '.githooks', 'pre-push'), 'utf8');
+        const exported = hook.indexOf('export PDX_CPU_FREE');
+        expect(exported, 'the suites never learn the free share').toBeGreaterThan(-1);
+        expect(hook).toContain('PDX_CPU_FREE=$(node scripts/lib/machine-load.mjs --free-share)');
+        expect(exported).toBeLessThan(hook.indexOf('pnpm test ||'));
+        expect(exported).toBeLessThan(hook.indexOf('pnpm test:affected ||'));
     });
 
     it('the [known-failure] line of a gate timeout points at it', () => {
