@@ -2324,13 +2324,16 @@ Usage:
 ```ts
 import { fromEvents } from '@pdxui/core';
 
-function fromEvents(target: EventTarget, eventNames: string[], options?: FromEventOptions<T>): DisposableSignal<T>
+function fromEvents(target: EventTarget | (() => EventTarget | null), eventNames: string[], options?: FromEventOptions<T>): DisposableSignal<T>
 ```
 
-Listen to multiple events on the same target, merged into one signal.
+Listen to multiple events on the same target, merged into one signal. The target is the element or,
+as for `fromEvent`, a getter for it that is followed: a `:ref` still empty in setup is listened to
+once it fills (#1158).
 
 Usage:
   const interaction = fromEvents(el, ['mousedown', 'touchstart', 'pointerdown']);
+  const focus = fromEvents(() => field, ['focus', 'blur'], { transform: e => e.type });
 
 ### `fromIntersection`
 

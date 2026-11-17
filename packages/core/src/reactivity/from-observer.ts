@@ -2,10 +2,29 @@
 // IntersectionObserver, ResizeObserver, MutationObserver as reactive signals.
 // Auto-cleanup, auto-tracked, zero boilerplate.
 
-import { signal } from './signal';
+import { signal, effect } from './signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 
 type DisposableSignal<T> = ReadonlySignal<T> & { dispose: Dispose };
+
+/**
+ * Observe `target`: the node itself, or a getter for it that is followed (#1158). The getter is read in
+ * an effect, as `fromEvent` reads its own, so a `:ref` still empty in setup is observed once it fills;
+ * a new node moves the observation, null lets go. Returns the bridge's `dispose`, which also stops the
+ * effect. Created in a component's setup, the effect is disposed with the component.
+ */
+function follow<N extends Node>(target: N | (() => N | null), observe: (node: N) => void, disconnect: () => void): Dispose {
+    if (typeof target !== 'function') {
+        if (target) observe(target);
+        return disconnect;
+    }
+    const stop = effect(() => {
+        const node = target();
+        if (node) observe(node);
+        else disconnect();
+    });
+    return () => { stop(); disconnect(); };
+}
 
 // ─── fromIntersection() ─────────────────────────────────────────
 
@@ -54,13 +73,11 @@ export function fromIntersection(
         currentEl = null;
     }
 
-    // Resolve target
-    const el = typeof target === 'function' ? target() : target;
-    if (el) observe(el);
+    const dispose = follow(target, observe, disconnect);
 
     const readable = (() => _value()) as DisposableSignal<IntersectionState>;
     readable.peek = () => _value.peek();
-    readable.dispose = disconnect;
+    readable.dispose = dispose;
     return readable;
 }
 
@@ -110,12 +127,11 @@ export function fromResize(
         currentEl = null;
     }
 
-    const el = typeof target === 'function' ? target() : target;
-    if (el) observe(el);
+    const dispose = follow(target, observe, disconnect);
 
     const readable = (() => _value()) as DisposableSignal<ResizeState>;
     readable.peek = () => _value.peek();
-    readable.dispose = disconnect;
+    readable.dispose = dispose;
     return readable;
 }
 
@@ -162,11 +178,10 @@ export function fromMutation(
         currentNode = null;
     }
 
-    const node = typeof target === 'function' ? target() : target;
-    if (node) observe(node);
+    const dispose = follow(target, observe, disconnect);
 
     const readable = (() => _value()) as DisposableSignal<MutationState>;
     readable.peek = () => _value.peek();
-    readable.dispose = disconnect;
+    readable.dispose = dispose;
     return readable;
 }
