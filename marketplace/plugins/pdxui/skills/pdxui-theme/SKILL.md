@@ -131,13 +131,15 @@ the two values with `--pdx-target-min-fine` and `--pdx-target-min-coarse`; do no
 
 ## 5. The token surface you style with
 
-**Semantic colors (30 — the whole surface):**
+**Semantic colors (43 — the whole surface):**
 - Neutrals/structure (10): `--pdx-color-` `bg` · `surface` · `inset` · `overlay` · `text` · `muted` ·
   `subtle` · `border` · `border-strong` · `focus`.
-- Fills (7 families), each with `-hover`, and with `-text` (the label) **except `accent`**:
-  `primary` · `secondary` · `danger` · `success` · `warning` · `info` (base + `-hover` + `-text`) ·
-  `accent` (base + `-hover` only — **there is no `--pdx-color-accent-text`**; label an accent fill with
-  `--pdx-color-text` or use `primary` if you need a guaranteed label token).
+- Fills (7 families), each with `-hover` and `-text` (the label on the fill): `primary` · `secondary`
+  · `accent` · `danger` · `success` · `warning` · `info`. An accent fill is labelled with
+  `--pdx-color-accent-text`, which the WCAG gate checks like the others.
+- Text in a semantic colour, and the tint behind it (12, derived from the fills, so a theme declares
+  none): `--pdx-color-{primary,accent,danger,success,warning,info}-ink` for the text,
+  `…-soft` for the tint. A fill is never a text colour.
 
 **Other families:** `--pdx-space-{2xs,xs,sm,md,lg,xl,2xl,3xl}` · `--pdx-radius-{sm,md,lg,xl,full}` ·
 `--pdx-shadow-{sm,md,lg,xl}` · `--pdx-text-{xs,sm,base,lg,xl,2xl,3xl,display}` · `--pdx-weight-*` ·

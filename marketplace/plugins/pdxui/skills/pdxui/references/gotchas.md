@@ -44,7 +44,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
   sanitiser runs on BOUND attributes), and **`blob:` passes** — `URL.createObjectURL(file)` is how
   you preview a file the user just picked. For an inline SVG icon use `pdx-icon`, or a
   `blob:` URL from a Blob you build yourself.
-- **A `:prop` that is a JSON string** (`pdx-chart`'s `series-config`, `filter-mode`, and so on): pass a **string**
+- **A `:prop` that is a JSON string** (`pdx-chart`'s `series-config`): pass a **string**
   (`JSON.stringify(...)`), not an object (the component calls `JSON.parse`).
 
 ## Design system and tokens
@@ -52,7 +52,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
   success, info, warning, subtle), plus `--pdx-space-*`, `--pdx-shadow-sm/md/lg/xl` and `--pdx-radius-*`. NOT `--ink` or `--surface`.
   Never a hardcoded fallback (they break dark mode). The theme goes on `<html>` through `pdx-theme`, the scheme through `pdx-scheme`.
 - **A `.pdx` scoped style does NOT reach light DOM created at runtime** by a component (a data-grid cell built through
-  `column.format`, say). Use a **global** stylesheet (imported in index.html) for those classes.
+  `cell:`, say). Use a **global** stylesheet (imported in index.html) for those classes.
 - To centre an icon inside a button: `pdx-icon { display:block; line-height:0 }`.
 
 ## Routing / guard
@@ -152,14 +152,14 @@ framework. Each line below is measured; the assertions live in `skill-claims.spe
   measured: the dropdown at left 1826 instead of 925 on a 1280 viewport — so do not set one on the panel
   yourself, or the trap comes back.
 - **Setting a signal inside a CUSTOM event's handler updates the template.** Measured twice: a `CustomEvent`
-  dispatched from outside any handler, and a component's own `@pdx-change`. Both update `{{ }}` **and** flip an
+  dispatched from outside any handler, and a component's own `@value-change`. Both update `{{ }}` **and** flip an
   `@if`. Write the handler normally; do not drive the DOM by hand.
 - **`:class` on a `data-region` element of `pdx-app-layout` is fine** — measured: `:class="x"` on the header
   leaves `class="x pdx-app-header"` with `grid-area: header` intact. It merges.
 - **`pdx-select` reflects the choice onto `.value`**: `reflectValue()` writes the selection back, so after
   picking, `el.value` IS the chosen value (single → scalar, `multiple` → an **array**). Read `el.value`; do not
   keep it in `el.__val` yourself. Do **not** copy `select-fix.ts` from the profiler app: it works around a bug
-  that does not exist. The event carries it too: `e.detail.value` single, `e.detail.values` with `multiple`.
+  that does not exist. The event carries it too: `value-change`, with `e.detail.value` (an array with `multiple`); or bind `::value`.
 - **A `pdx-drawer` opens when you set `.open = true` from JS**: `el.open = true` puts the host in
   `:state(open)` and slides the panel in at the `position` you asked for. Do not drive `[data-open]` by hand
   and do not copy `position`/`size` onto the panel yourself. `open` is a model: `::open="x"` follows the

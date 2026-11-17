@@ -10,7 +10,8 @@ and `pending()` — and what it passes:
 ```
 
 A click calls `save.execute(dto)`. While `save.pending()` is true the button is busy (`aria-busy`,
-the spinner) and refuses clicks, so a double click sends one write — the double-submit guard is the
+the spinner) and, under `concurrency` `'queue'` (the default) or `'drop'`, refuses clicks, so a
+double click sends one write — the double-submit guard is the
 button's, not something each form wires. `loading` and `disabled` set explicitly still win. A
 rejected write stays on `save.error()` for the form to show, is announced as `pdx-action-error`
 (`detail: { error }`), and the button is idle again. No `:loading="save.pending()"`, no `:disabled`,

@@ -46,7 +46,7 @@ keep the state in the route. This is what you want most of the time.
 <template>
   <div class="job-row" @click="open()">
     <strong>{{ customer }}</strong>
-    <pdx-badge :tone="tone">{{ status }}</pdx-badge>
+    <pdx-badge :variant="variant">{{ status }}</pdx-badge>
   </div>
 </template>
 
@@ -55,7 +55,7 @@ keep the state in the route. This is what you want most of the time.
 @prop status: string = 'aperto';
 @event selected: string;
 
-const tone = $derived(status === 'chiuso' ? 'neutral' : 'primary');
+const variant = $derived(status === 'chiuso' ? 'muted' : 'primary');
 function open() { selected(customer); }
 </script>
 ```

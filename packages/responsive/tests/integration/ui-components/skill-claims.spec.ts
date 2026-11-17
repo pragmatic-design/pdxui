@@ -204,7 +204,7 @@ test.describe('claims that are STILL true — each one has an issue, and this is
 
 test.describe('claims no page makes at all — measured so they can be written down', () => {
     test('in an app with pdx-app-layout the scroller is .pdx-app-main, not the window', async ({ page }) => {
-        // This costs time: pdx-affix and pdx-scroll-spy default to the window, every
+        // This costs time: pdx-affix defaults to the window, every
         // `position: sticky` resolves against the container that actually scrolls, and a check that
         // scrolls `window` moves nothing. No other page says so — the skills describe `fill-height`
         // for the grid and stop there.

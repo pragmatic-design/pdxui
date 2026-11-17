@@ -110,7 +110,9 @@ describe('hand-written notes survive a regeneration', () => {
     it('keeps the app-layout trap where a reader of the layout skill meets it', () => {
         const layout = areaText('layout');
         expect(layout).toContain('data-region');
-        expect(layout).toContain('out of the grid **silently**');
+        // The trap: an unknown region drops out of the grid, warned in development only.
+        expect(layout).toContain('out of the grid: no class, no `grid-area`');
+        expect(layout).toContain('In development a console warning names it');
         // The summary said "header, sidebar, content" — and there is no `sidebar` region.
         expect(layout).not.toContain('App shell: header, sidebar, content.');
     });

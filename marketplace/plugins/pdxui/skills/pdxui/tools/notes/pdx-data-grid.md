@@ -11,7 +11,7 @@ type lives in core rather than next to the component, so it is written out here:
   editable?: boolean | ((row) => boolean);
   align?: 'left' | 'center' | 'right';
   cell?: CellSpec;            // ← an OBJECT from a builder below, never a function
-  format?: string | ((value, row) => string);   // plain text: fine; HTML: @deprecated
+  format?: string | ((value, row) => string);   // shown as TEXT: markup is written out, not parsed
 }
 ```
 
@@ -56,8 +56,8 @@ rowMenu({
 ```
 
 **To relabel a value, use `format`.** A function that returns a **plain string** is supported:
-`format: (v) => (v ? 'Sì' : 'No')`. What `format` is deprecated for is returning HTML: that gets
-sanitised, warns once per column, and belongs in a builder. The grid applies `cell` first, then
+`format: (v) => (v ? 'Sì' : 'No')`. What `format` returns is always text: markup in it is shown
+literally (and, in development, warns once per column), so markup belongs in a builder. The grid applies `cell` first, then
 `format`, then the default for the column's `type`.
 
 ```html
