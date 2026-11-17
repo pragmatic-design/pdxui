@@ -6,7 +6,7 @@
 // The scans use a real temporary tree rather than a mocked fs: what they are actually asserting is
 // which files get skipped, and a mock would only re-state the filter it is supposed to check.
 
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -27,8 +27,8 @@ function enumFindings(tpl: string, r: ComponentResolver, _file: string): Validat
     return out;
 }
 
-// The real scan, counted: it reads every package's sources, and where it runs decides whose time
-// budget pays for the disk.
+// The real scan, counted: it reads every package's sources, so a path that runs it pays for the disk.
+// The warning path must not (#991).
 vi.mock('../src/no-import-tags', async (importOriginal) => {
     const real = await importOriginal<typeof import('../src/no-import-tags')>();
     return { ...real, scanNoImportTags: vi.fn(real.scanNoImportTags) };
@@ -199,16 +199,6 @@ describe('injecting the component imports for tags used in the template', () => 
         return r;
     };
 
-    // The first unknown tag makes a resolver scan every package's sources, once, and cache it on the
-    // instance. Done here, under the hook's own timeout: in a test it takes 185ms alone and 5249ms
-    // under a loaded machine, past the test's 5s. Not a longer test timeout — that
-    // would also let a genuinely slow warning path through.
-    let scanned: ComponentResolver;
-    beforeAll(() => {
-        scanned = uiResolver();
-        scanned.knownWithoutImport('pdx-warm-the-scan');
-    });
-
     it('does nothing when the resolver knows no components', () => {
         const code = 'export default {};';
         expect(injectComponentImports(code, 'a.pdx', '<template><pdx-button/></template>', new ComponentResolver()))
@@ -245,9 +235,12 @@ describe('injecting the component imports for tags used in the template', () => 
     it('warns about a pdx-* tag nothing can resolve', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
         const scansBefore = vi.mocked(scanNoImportTags).mock.calls.length;
-        injectComponentImports('x', 'a.pdx', '<template><pdx-nope-here/></template>', scanned);
+        injectComponentImports('x', 'a.pdx', '<template><pdx-nope-here/></template>', uiResolver());
+        // The resolver reads the generated list of tags that need no import (#991): deciding that a
+        // tag is unresolved walks nothing. It used to walk every package's sources here, 185 ms alone
+        // and over 5 s on a loaded machine.
         expect(vi.mocked(scanNoImportTags).mock.calls.length - scansBefore,
-            'the monorepo scan ran inside this test: its 5s budget paid for the disk, not for the warning').toBe(0);
+            'the monorepo walk ran inside this test: the warning path paid for the disk').toBe(0);
         expect(warn).toHaveBeenCalledTimes(1);
         expect(String(warn.mock.calls[0][0])).toContain('PDX_UNRESOLVED_COMPONENT');
         expect(String(warn.mock.calls[0][0])).toContain('pdx-nope-here');

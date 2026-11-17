@@ -11,7 +11,14 @@ import { deriveTag } from './compiler/codegen';
 import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
 import { tagPrefixFor } from './library-prefix';
 import { moduleDir } from './module-dir';
-import { scanNoImportTags } from './no-import-tags';
+import { NO_IMPORT_TAGS } from './no-import-tags.generated';
+
+/**
+ * The tags that need no import — see `knownWithoutImport`. Generated from the @pdxui packages' sources
+ * (`scripts/gen-no-import-tags.mjs`), not walked: the walk read 1,687 files in every process that
+ * asked, and timed the gate out (#991).
+ */
+const noImportTags: ReadonlySet<string> = new Set(NO_IMPORT_TAGS);
 import { componentPackages, type ComponentPackage } from './component-packages';
 import type { ValidationWarning } from './compiler/validate';
 import { jsQuote } from './compiler/js-literal';
@@ -43,11 +50,6 @@ const NO_MODELS: ReadonlySet<string> = new Set();
  */
 export class ComponentResolver {
     private map = new Map<string, ComponentEntry>();
-    /**
-     * Tags that are legitimate but have nothing to import — see `knownWithoutImport`.
-     * Lazily scanned, because most compilations never ask.
-     */
-    private noImportTags: Set<string> | null = null;
     /** tag → (prop name → allowed enum values), populated from the manifest. */
     private enums = new Map<string, Map<string, string[]>>();
     /** tag → the props a binding can set (manifest fields that are not read-only). */
@@ -170,11 +172,7 @@ export class ComponentResolver {
     knownWithoutImport(tag: string): boolean {
         const t = tag.toLowerCase();
         if (this.map.has(t)) return true;
-        // The scan collects `pdx-` tags only, so it cannot know any other: an unresolved `<app-…>`
-        // is answered without walking the sibling packages (#771).
-        if (!t.startsWith('pdx-')) return false;
-        if (this.noImportTags === null) this.noImportTags = scanNoImportTags(moduleDir());
-        return this.noImportTags.has(t);
+        return noImportTags.has(t);
     }
 
     get size(): number {
