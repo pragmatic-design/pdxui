@@ -339,7 +339,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 472 → 473 (owner's OK): pdx-scheduler's month, year and agenda views (#1020, part 4) — their
 // templates, the calendar model and the year's keys, in the scheduler's chunk, which the showcase's
 // scheduler page loads. Main sat on the ceiling; CI's Linux build measured the branch at 472.1 KB.
-const BUDGET_KB = { entry: 43.6, js: 473, css: 67, blocking: 103 };
+// js 473 → 473.2 (owner's OK): no code of ours — vite 6.4.4 → 6.4.6 brings rollup 4.64.3 → 4.68.5,
+// which no longer drops the default branches of a parameter every caller sets (flip()'s and shift()'s
+// `padding ?? …` in core's positioning.ts, public API with documented defaults). Measured on the same
+// tree: +140 bytes gzipped spread over 72 chunks, 472.9 → 473.0 KB locally, 473.1 on CI's Linux build.
+const BUDGET_KB = { entry: 43.6, js: 473.2, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
