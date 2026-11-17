@@ -34,7 +34,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.32.1",
+    "@modelcontextprotocol/sdk": "^1.32.2",
     "@pdxui/compiler": "workspace:*",
     "@pdxui/core": "workspace:*",
     "@pdxui/design": "workspace:*",
@@ -42,7 +42,8 @@
     "citty": "^0.2.2",
     "consola": "^3.4.0",
     "jiti": "^2.7.0",
-    "pathe": "^2.0.0"
+    "pathe": "^2.0.0",
+    "zod": "^4.6.6"
   },
   "peerDependencies": {
     "vite": "^6.4.3"
