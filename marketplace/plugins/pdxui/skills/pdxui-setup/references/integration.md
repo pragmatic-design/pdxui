@@ -15,7 +15,10 @@ to a full enterprise build. You pick the level that fits.
 | **4** | Enterprise | sub-path imports, tree-shaking, the `pdx` CLI, .NET source generation |
 
 The rest of these docs assume the compiler (`.pdx` files). This page is about the **no-compiler** and
-**interop** paths.
+**interop** paths. Level 2 is for code that imports `@pdxui/framework` itself: a compiled `.pdx`
+imports `@pdxui/core`, `@pdxui/ui` and `@pdxui/router` by name, so a project of `.pdx` files declares
+those, as `pdx new project` does — a strict installer such as pnpm does not resolve them through
+`@pdxui/framework`.
 
 ## Level 1 — drop-in, no build (like jQuery)
 

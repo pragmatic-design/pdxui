@@ -37,9 +37,14 @@ describe('pdx new project', () => {
             scripts: Record<string, string>; dependencies: Record<string, string>; devDependencies: Record<string, string>;
         };
         const range = `^${CLI_PKG.version}`;
-        // @pdxui/design because index.html imports it by name: reached only through @pdxui/framework,
-        // a strict installer (pnpm) does not resolve it.
-        expect(pkg.dependencies).toEqual({ '@pdxui/framework': range, '@pdxui/design': range });
+        // Every package the project's own files import by name, because a strict installer (pnpm)
+        // resolves only what is declared — reached through @pdxui/framework, none of them builds:
+        // @pdxui/design, which index.html imports; @pdxui/core, which every compiled .pdx imports;
+        // @pdxui/ui, whose module the compiler imports for each library tag and icon; and
+        // @pdxui/router, which it imports for @page, navigation and hydration.
+        expect(pkg.dependencies).toEqual({
+            '@pdxui/core': range, '@pdxui/design': range, '@pdxui/router': range, '@pdxui/ui': range,
+        });
         expect(pkg.devDependencies).toEqual({ '@pdxui/cli': range, '@pdxui/compiler': range, vite: CLI_PKG.peerDependencies.vite });
         // Every script calls the CLI the project now depends on.
         for (const script of Object.values(pkg.scripts)) expect(script).toMatch(/^pdx /);

@@ -1669,6 +1669,13 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A project made by `pdx new project` builds when it is installed with pnpm. It declared
+  `@pdxui/framework` and `@pdxui/design`, and the compiled `.pdx` imports `@pdxui/core`, a library
+  tag's module from `@pdxui/ui` and `@pdxui/router` by name: npm puts those at the top of
+  `node_modules`, pnpm does not, and the build stopped on `Rollup failed to resolve import
+  "@pdxui/core"`. It now declares `@pdxui/core`, `@pdxui/design`, `@pdxui/router` and `@pdxui/ui`. An
+  existing project of `.pdx` files installed with pnpm adds the same three to its dependencies.
+
 - An `@event` whose emitter would be a reserved word of JavaScript — `@event delete`, `@event 'import'`,
   `@event new` — is `PDX_EVENT_NAME_RESERVED` (error), named, with a name to use instead. It compiled to
   `const delete = …`, a module that does not parse, and the compiler stopped on `PDX_TS_UNSUPPORTED`

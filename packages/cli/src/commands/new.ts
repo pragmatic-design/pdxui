@@ -105,9 +105,12 @@ function scaffoldProject(name: string, baseDir: string, vars: Record<string, str
         version: '0.1.0',
         type: 'module',
         scripts: { dev: 'pdx dev', build: 'pdx build', check: 'pdx check' },
-        // @pdxui/design by name, because index.html imports it: through @pdxui/framework alone a
-        // strict installer (pnpm) does not resolve it.
-        dependencies: { '@pdxui/framework': range, '@pdxui/design': range },
+        // Every package the project's files import by name, because a strict installer (pnpm)
+        // resolves only what is declared, and through @pdxui/framework none of them builds:
+        // @pdxui/design (index.html), @pdxui/core (every compiled .pdx), @pdxui/ui (the module the
+        // compiler imports for each library tag and icon) and @pdxui/router (@page, navigation,
+        // hydration).
+        dependencies: { '@pdxui/core': range, '@pdxui/design': range, '@pdxui/router': range, '@pdxui/ui': range },
         devDependencies: { '@pdxui/cli': range, '@pdxui/compiler': range, 'vite': cli?.vite ?? '^6.4.3' },
     }, null, 2));
 
