@@ -87,3 +87,32 @@ test('a card keeps its border and loses its shadow', async ({ page }) => {
     expect(card.shadow, 'a shadow prints as a grey smear').toBe('none');
     expect(card.border, 'without the shadow the card needs its border to stay a card').not.toBe('0px');
 });
+
+// #1162: printing.md promises that an app's own unlayered `@media print` block overrides the print
+// layer without `!important` — its own example brings the sidebar back. An `!important` inside the layer
+// beats a normal unlayered declaration, so the chrome and the shadows carry none.
+test('an app\'s own @media print block brings the chrome and a shadow back, with no !important', async ({ page }) => {
+    await openPage(page, '/print.html');
+    // The sidebar sits in the shell's aside, which the print layer hides too: bringing the sidebar
+    // back means bringing its region back, as printing.md's example now says.
+    await page.addStyleTag({ content: '@media print { .pdx-app-aside, .pdx-sidebar { display: block; } .pdx-surface-card { box-shadow: 0 0 0 4px rgb(255, 0, 0); } }' });
+    await page.emulateMedia({ media: 'print' });
+
+    const sidebar = await box(page, '[data-test="sidebar"]');
+    expect(sidebar.h, 'the app asked for the sidebar on paper, and the print layer still hides it').toBeGreaterThan(0);
+    const shadow = await page.locator('[data-test="card"]').evaluate(el => getComputedStyle(el).boxShadow);
+    expect(shadow, 'the app asked for a shadow on paper, and the print layer still removes it').toContain('rgb(255, 0, 0)');
+});
+
+test('data-pdx-no-print wins even over an inline display', async ({ page }) => {
+    await printed(page);
+    const hidden = await page.evaluate(() => {
+        const el = document.createElement('div');
+        el.setAttribute('data-pdx-no-print', '');
+        el.style.display = 'flex';
+        el.textContent = 'not on paper';
+        document.body.appendChild(el);
+        return getComputedStyle(el).display;
+    });
+    expect(hidden).toBe('none');
+});

@@ -20,7 +20,9 @@
      * `.pdx-surface-card` carries `transition: box-shadow`, so the switch to print media animates
      * the shadow away rather than removing it, and the card reads a fractional shadow such as
      * `oklab(0 0 0 / 0.0719965) 0px 0.899956px 1.79991px`. What prints is whatever frame the
-     * printer caught.
+     * printer caught. `!important`, and it stays (#1162): components write transitions and animations
+     * inline while they run (an accordion opening, a drawer settling), and only an important
+     * declaration stops an inline one.
      */
     *,
     *::before,
@@ -61,7 +63,15 @@
     pdx-overlay-outlet,
     pdx-dialog,
     pdx-drawer,
-    pdx-bottom-sheet,
+    pdx-bottom-sheet {
+        /* No `!important`: an app's own unlayered `@media print` brings one back (#1162). None of
+           these sets its own display inline, so the layer order alone is enough here. */
+        display: none;
+    }
+
+    /* The escape hatch is "never printed, whatever it is": it wins over the element's own inline
+       display too, which only `!important` does. An app does not take it back; it removes the
+       attribute. */
     [data-pdx-no-print] {
         display: none !important;
     }
@@ -98,6 +108,10 @@
     pdx-scroll-area div:has(> .pdx-scroll-area-viewport),
     .pdx-dg-body,
     [data-pdx-collapse="expanded"] {
+        /* `!important`, and it stays (#1162): a scroll area's max-height is usually inline (the
+           component's viewport sets it, and markup writes `style="max-height: …"`), and only an
+           important declaration lifts an inline one. An app that wants a clip back on paper writes
+           its own `!important`. */
         max-height: none !important;
         height: auto !important;
         overflow: visible !important;
@@ -125,9 +139,11 @@
      * A shadow prints as a grey smear and a blur prints as a grey box, so surfaces fall back to
      * what survives a monochrome printer: a border. These rules live here, where the cascade
      * lets them win. */
+    /* No `!important` (#1162): the themes' shadows are in an earlier layer, which this one beats
+       already, and an app's own unlayered `@media print` can put a shadow back. */
     .pdx-surface-card,
     .pdx-card {
-        box-shadow: none !important;
+        box-shadow: none;
         border: 1px solid var(--pdx-color-border);
     }
 
@@ -136,7 +152,7 @@
     .pdx-elevation-2,
     .pdx-elevation-3,
     .pdx-elevation-4 {
-        box-shadow: none !important;
+        box-shadow: none;
     }
 
     .pdx-surface-glass {

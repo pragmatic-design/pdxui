@@ -71,14 +71,24 @@ enough that the design system would be promising something it cannot deliver eve
 
 For anything else, your own `@media print` block wins: the design system's rules live in the
 `pdx.print` layer, and **unlayered CSS beats every layer**. A plain `@media print { … }` in your
-application stylesheet overrides all of the above without a single `!important`.
+application stylesheet overrides the hidden chrome, the shadows and the layout without a single
+`!important`.
 
 ```css
 @media print {
-    /* keep the sidebar on the paper after all */
-    .pdx-sidebar { display: block; }
+    /* keep the sidebar on the paper after all: it sits in the shell's aside, which comes back too */
+    .pdx-app-aside, .pdx-sidebar { display: block; }
 }
 ```
+
+Three rules are `!important`, because what they win against is usually an inline style, which only
+an important declaration overrides:
+
+- **the lifted clips** of scrolling regions (`max-height`, `height`, `overflow`): a scroll area's
+  height is often in its `style`. Putting a clip back on paper takes your own `!important`;
+- **the stopped transitions and animations**: components write them inline while they run;
+- **`[data-pdx-no-print]`**: never printed, whatever its own `display`. To print it, remove the
+  attribute.
 
 ## Why it is its own layer
 
