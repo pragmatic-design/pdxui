@@ -96,6 +96,14 @@ pdx-pagination { display: block; }
     transition: all var(--pdx-transition);
 }
 
+/* pdx-wizard writes the number (or ✓, or the step's icon) as an attribute, drawn here: it is the
+   step's marker, not its name. As text it would join the label in the button's visible text («2Profile»)
+   while the accessible name is the label alone, which WCAG 2.5.3 (label in name) forbids; the position
+   is already in aria-posinset. A CSS-only stepper writes its number as text, and this rule leaves it be. */
+.pdx-step-number[data-number]::before {
+    content: attr(data-number);
+}
+
 .pdx-step-label {
     font-size: var(--pdx-text-sm);
     color: var(--pdx-color-muted);

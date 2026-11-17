@@ -75,7 +75,9 @@ export const dropdownMenu: ComponentManifest = {
     tag: 'pdx-dropdown-menu',
     tier: '1A',
     status: 'wip',
-    imports: ['@pdxui/ui/dropdown-menu'],
+    // The avatar is the custom trigger's content (dd-custom-trigger): a button named by the image of
+    // its person, not an aria-label over the initials it shows (WCAG 2.5.3).
+    imports: ['@pdxui/ui/dropdown-menu', '@pdxui/ui/avatar'],
 
     // ── Scenarios ──
     scenarios: [
@@ -120,8 +122,7 @@ export const dropdownMenu: ComponentManifest = {
             html: `
                 <pdx-dropdown-menu data-test="dd-custom"
                     items='[{"key":"profile","label":"Profile"},{"key":"out","label":"Sign out"}]'>
-                    <span slot="trigger" data-test="dd-avatar" aria-label="Account"
-                        style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--pdx-color-primary);color:var(--pdx-color-primary-text);cursor:pointer">AS</span>
+                    <span slot="trigger" data-test="dd-avatar" style="display:inline-flex;border-radius:50%;cursor:pointer"><pdx-avatar alt="Ada Smith" size="sm"></pdx-avatar></span>
                 </pdx-dropdown-menu>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-custom"]');

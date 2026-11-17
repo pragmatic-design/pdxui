@@ -187,7 +187,16 @@ describe('pdx-wizard', () => {
         await tick(100);
 
         const num = el.querySelector('[data-step-btn="0"] .pdx-step-number')!;
-        expect(num.textContent).toBe('✓');
+        expect(num.getAttribute('data-number')).toBe('✓');
+    });
+
+    it('draws the marker from an attribute, so the button\'s text is its label (WCAG 2.5.3)', async () => {
+        // As text the number joined the label («2Profile») and was not in the accessible name.
+        const el = await mountWizard();
+        const step = el.querySelector<HTMLElement>('[data-step-btn="1"]')!;
+        expect(step.querySelector('.pdx-step-number')!.getAttribute('data-number')).toBe('2');
+        expect(step.textContent!.trim()).toBe(step.querySelector('.pdx-step-label')!.textContent);
+        expect(step.getAttribute('aria-label')).toContain(step.textContent!.trim());
     });
 
     // ─── ARIA ────────────────────────────────────────────

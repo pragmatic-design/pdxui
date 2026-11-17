@@ -414,7 +414,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.50.0",
-    "@axe-core/playwright": "^4.13.0",
+    "@axe-core/playwright": "^4.14.0",
     "typescript": "^5.8.0"
   }
 }

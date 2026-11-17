@@ -59,6 +59,8 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // `toolbar` names the bar above the grid, `views` its view buttons; `daysView` is the N-days view,
     // `{count}` its days. `time` and `resource` name the grid's corner headers. `eventName` is an
     // event's accessible name: `{title}`, then `{when}` (its time or «All day», and its date).
+    // `eventNameTimeFirst` names a month's timed event, which shows `{time}` before `{title}`: the name
+    // says what is shown, in that order (WCAG 2.5.3), then `{when}`, its days.
     // `more` is the month's «+N» on a day, `moreName` its name (`{date}` the day it opens); `dayName` is
     // a day of the year view with `{count}` events; `noEvents` is the agenda with nothing in its period.
     // `instructions` is the off-screen text a movable event points at with aria-describedby; `lifted`
@@ -79,7 +81,7 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
         views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
-        allDay: 'All day', time: 'Time', resource: 'Resource', eventName: '{title}, {when}',
+        allDay: 'All day', time: 'Time', resource: 'Resource', eventName: '{title}, {when}', eventNameTimeFirst: '{time} {title}, {when}',
         more: '+{count} more', moreName: '{count, plural, one {# more event} other {# more events}}, {date}',
         dayName: '{date}, {count, plural, =0 {no events} one {# event} other {# events}}', noEvents: 'No events in this period',
         newEvent: 'New event', moved: '{title} moved', resized: '{title} resized', created: '{title} created',

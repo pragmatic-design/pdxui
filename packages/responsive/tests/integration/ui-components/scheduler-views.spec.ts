@@ -46,7 +46,8 @@ test.describe('the scheduler month', () => {
     test('a bar over several days is named by them', async ({ page }) => {
         const scheduler = await open(page, 'scheduler-month');
         await expect(scheduler.getByRole('button', { name: /^Trip, All day, Friday, September 25\s–\sSunday, September 27, 2026$/ })).toHaveCount(1);
-        await expect(scheduler.getByRole('button', { name: /^Call, 10:30\sAM, Tuesday, September 22, 2026$/ })).toHaveCount(1);
+        // A timed event shows its time before its title, and its name says them in that order (WCAG 2.5.3).
+        await expect(scheduler.getByRole('button', { name: /^10:30\sAM Call, Tuesday, September 22, 2026$/ })).toHaveCount(1);
     });
 
     test('Enter on a day goes into its events and its «+N»; on an empty day, slot-open for the day', async ({ page }) => {

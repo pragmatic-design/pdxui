@@ -671,8 +671,7 @@
         <h3>Dropdown Menu — Custom trigger (slot="trigger")</h3>
         <pdx-dropdown-menu data-test="dd-custom"
                     items='[{"key":"profile","label":"Profile"},{"key":"out","label":"Sign out"}]'>
-                    <span slot="trigger" data-test="dd-avatar" aria-label="Account"
-                        style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--pdx-color-primary);color:var(--pdx-color-primary-text);cursor:pointer">AS</span>
+                    <span slot="trigger" data-test="dd-avatar" style="display:inline-flex;border-radius:50%;cursor:pointer"><pdx-avatar alt="Ada Smith" size="sm"></pdx-avatar></span>
                 </pdx-dropdown-menu>
     </section>
 

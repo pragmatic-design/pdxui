@@ -365,6 +365,9 @@ component('pdx-nav-menu', {
                         badge.classList.add('pdx-nav-badge-' + item.badgeVariant);
                     }
                     badge.textContent = item.badge;
+                    // A space between the label and the count: run together, «Tickets12» is a word the
+                    // name below does not hold (WCAG 2.5.3). The item is flex: the space is not laid out.
+                    el.appendChild(document.createTextNode(' '));
                     el.appendChild(badge);
                     // A name of its own, or it reads the count glued to the label, "Inbox12".
                     // Captured for the reason `pdx-bottom-nav` gives at the same line.

@@ -137,7 +137,7 @@ test.describe('the scheduler from the keyboard, timeline and month', () => {
     test('in the month Right carries an event to the next day, at its own hour', async ({ page }) => {
         const s = await open(page, 'scheduler-month');
         await record(page, ['move']);
-        await s.getByRole('button', { name: /^Call, / }).focus();
+        await s.getByRole('button', { name: /^10:30\sAM Call, / }).focus();
         await page.keyboard.press('Space');
         await page.keyboard.press('ArrowRight');
         await page.keyboard.press('Enter');
