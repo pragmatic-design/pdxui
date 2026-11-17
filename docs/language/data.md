@@ -433,7 +433,7 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
 ```pdx
 <template>
   <form @submit="submit">
-    <input :value="signup.name.value()" @input="setName" @blur="signup.name.onBlur()" />
+    <input ::value="signup.name" />
     @if (signup.errors().name) {
       <p>{{ signup.errors().name }}</p>
     }
@@ -455,10 +455,6 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
 
 function checkAge(values: { age: number }) {
   return values.age > 120 ? { age: 'Check the age' } : {};
-}
-
-function setName(e: Event) {
-  signup.name.onChange((e.target as HTMLInputElement).value);
 }
 
 const submit = signup.handleSubmit(async (values) => {

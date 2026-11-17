@@ -24,8 +24,9 @@ instead of applying them.
 
 Each area is a section of [migration.md](../language/migration.md), with every row and its issue:
 
-- **The file and the configuration.** One script grammar: `<script setup>`, `defineProps`,
-  `defineEmits` and a top-level `return { … }` are removed (#158). An application's tags take the app
+- **The file and the configuration.** One script grammar (#158): `defineProps`, `defineEmits` and a
+  top-level `return { … }` are removed (`PDX_REMOVED_FORM`), and `setup` on `<script>` means nothing
+  (`PDX_SETUP_REDUNDANT`, info). An application's tags take the app
   prefix, `app-` by default, and `pdx-` is reserved for `@pdxui/*` (#136). `pdx({ inlineBindings })`
   selects nothing (#107).
 - **Script.**
@@ -41,7 +42,21 @@ Each area is a section of [migration.md](../language/migration.md), with every r
   - The library's value components announce `<model>-change` with `{ value }` (#125).
   - One spelling per template form: `:ref`, `@show`, an object `:class` and `:style` (#129).
   - `::x` binds only a `@model` (#124).
+  - `@expose` of a `$signal` or `$derived` is its value on the element: `ref.count`, not
+    `ref.count()` (#752).
   - The constructor prop form is removed from `component()` (#300, below).
+- **The library's components** take the beta contract (#286–#293, #512, #627–#633):
+  - An overlay's verbs are `show()`, `close()`, `toggle()` and `isOpen`, its `open` a model
+    announced by `open-change`.
+  - A component's look is an attribute of its host, a variant axis (`<pdx-input size="sm">`), and
+    its conditions are custom states (`:state(invalid)`); its pieces are parts (`[data-part="root"]`).
+    The classes it wrote on its own elements — `.pdx-input-sm`, `.pdx-input-wrap.error`,
+    `.pdx-primary` on pdx-button's inner button, `pdx-list-root` on pdx-list's host — are gone.
+  - `pdx-button`'s toggle mode is `<pdx-toggle>`; `pdx-filter-builder`, `pdx-fieldset` and
+    `pdx-field-group` announce models; `pdx-form-template`'s wizard is `next()`, `prev()`,
+    `goTo(n)`; a `pdx-data-grid` column's `format` is shown as text.
+  - Inside a native `<form>` every value component submits as a native control does (#135), which
+    changes what a server receives: see below.
 - **Data and routing.**
   - `@page` is the one home of every route field: `@route`, `@alias`, `@prefetch`, the script
     `@transition` and `@head` are removed (#277).
@@ -85,11 +100,46 @@ An import of one of these in a `.pdx` script is `PDX_REMOVED_FORM`, naming the r
 | `@pdxui/core` | `PropDefinition`, `TypedProp` (types) | `prop<T>()` and its spec; `PropMap` for a component's props | #300 |
 | `@pdxui/router` | `currentLoaderData` | the page's named loader, `user.data()`, or `loaderData('/pattern')` for a level by its pattern | #506 |
 | `@pdxui/router` | `currentLoaderState` | the page's named loader, `user.state()`, or `loaderState('/pattern')` for a level by its pattern | #506 |
+| `@pdxui/compiler` | `registerCompilerFormControl` | bind each control to its field, `::value="form.field"`: a control is no longer wired by its `name` | #613 |
+
+Two options went with it, with no replacement: `pdx({ formControls })`, which registered into a
+registry nothing read, and `compile()`'s `modelEventOf`. A `vite.config.ts` that still passes
+`formControls` is a type error; a JavaScript config passes an option the plugin no longer reads.
 
 ## Changes `pdx migrate` does not detect
 
 - **A listener above a `@pdxui/ui` component.** Library events no longer bubble (#138). A listener on
-  an ancestor, `<section @pdx-change>`, hears nothing: put it on the component itself.
+  an ancestor, `<section @value-change>`, hears nothing: put it on the component itself.
+- **A selector on a library component's own classes in a global stylesheet or a theme** (#286–#293,
+  #512, #627–#633). `pdx migrate` flags such a selector in a `<style scoped>` (`scoped-reaches-child`);
+  it does not read `.css` files. The classes the components wrote on their own elements are gone —
+  `.pdx-input-wrap.error`, `.pdx-input-sm`, `.pdx-primary` on pdx-button's inner button,
+  `pdx-list-root` on pdx-list's host, the classes on pdx-data-grid's inner wrapper — and a selector
+  on them matches nothing. Select the host's attribute, its state and its part:
+  `pdx-input:state(invalid) [data-part="root"]`,
+  `pdx-button[variant="primary"] > [data-part="root"]`. migration.md has a row per component.
+  Native markup styled with the classes keeps them.
+- **What a native `<form>` sends** (#135). A server that parsed the alpha's form entries reads
+  something else now, with no error on either side:
+  - a list is one entry per item under the name, not a JSON array, a comma-joined or a `start/end`
+    string: `pdx-tag-input`, `pdx-checkbox-group`, a multiple `pdx-select` or `pdx-tree-select`,
+    `pdx-transfer`, a range `pdx-date-picker`, a `pdx-cascader` path; a range `pdx-slider` sends the
+    low and the high, not `"20,80"`;
+  - an empty `pdx-otp-input`, `pdx-pin-input`, `pdx-masked-input` or `pdx-color-picker` sends an
+    empty entry, as a text input does, where it sent none;
+  - a picked `pdx-autocomplete` suggestion sends its value, not the label shown;
+  - `pdx-inline-edit` sends text, numbers and booleans as they are, JSON only for an object, and
+    nothing when it has no value;
+  - `pdx-rich-text` and `pdx-json-editor` submit under their `name`; an empty `pdx-file-upload`
+    sends what an empty file input does, one file with no name.
+
+  The CHANGELOG entry has the detail.
+- **A `pdx-data-grid` column's `format` that returns markup** is now shown as text (#292). Draw it
+  with a typed cell renderer or the grid's `cell` snippet. `format` is a function of the script,
+  which no rule reads.
+- **`ref.count()` on an exposed `$signal` outside a `.pdx`** (#752). The value is a property now,
+  `ref.count` and `ref.count = 5`. `pdx migrate` flags the call on the `:ref` of a project component
+  in a `.pdx`; a `.ts` module that reaches the element is not read.
 - **The context's `ctx.slot()`.** A hand-written component reads its parent's snippet with
   `declaredSnippet(ctx, name, args)` (#131, #492).
 - **A stepper or a push drawer written with the design system's classes alone** (#891). The attribute
