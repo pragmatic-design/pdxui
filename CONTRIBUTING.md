@@ -210,8 +210,9 @@ dependencies; the next run reuses it. PDX is built from your checkout: core, com
 in `scripts/bench-jfb/`. A PDX build that is not keyed stops the run before anything is measured.
 With `--runs N`, a run that fails loses only itself: each completed run is saved to disk as it
 completes, the table says how many runs it is the median of, the failed runs are listed under it,
-and the command exits 1. `node --test scripts/bench-jfb/summarize.test.mjs` tests the table, and
-`runs.test.mjs` the runs.
+and the command exits 1. `node --test scripts/bench-jfb/summarize.test.mjs` tests the table,
+`runs.test.mjs` the runs, and `select10k.test.mjs` how the select-10k step finds an app rendered
+inside a shadow root (lit's).
 
 The four benchmarks whose vanillajs script takes under a millisecond (update every 10th row, select,
 swap, remove one) take 100 samples each, the others the benchmark's own count: their spread is wide
