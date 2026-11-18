@@ -12,8 +12,9 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { takeSample, describeSample, recordLine, recordLines, failureLines, SLOW_TEST_MS, ON_CPU } from './setup/slow-test-sample';
+import { takeSample, describeSample, recordLine, recordLines, failureLines, hookOf, SLOW_TEST_MS, ON_CPU } from './setup/slow-test-sample';
 
 /** Keeps the event loop busy, on the CPU, for `ms`. */
 function spin(ms: number): void {
@@ -108,6 +109,54 @@ describe('the sample', () => {
 
     it('the threshold is two seconds, under vitest\'s five', () => {
         expect(SLOW_TEST_MS).toBe(2000);
+    });
+});
+
+// Two blind spots, both seen on 2026-11-17 (#1183). A beforeAll that timed out never reached the
+// test's onTestFailed, so server-dom-entry's 10 s hook left no record; and the sweep's work is in the
+// language server it spawns, so a starved server and a dead one both read "waiting, its event loop
+// idle" with cpuShare 0. The planted failures run through the real setup file, in a vitest of their own.
+
+/** Run one planted failure; the `[slow-test]` records it printed, parsed. */
+function plantedRecords(fixture: string): Record<string, unknown>[] {
+    const run = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'tests/slow-test-probe/vitest.config.ts', fixture], {
+        cwd: join(__dirname, '..'), encoding: 'utf8', shell: process.platform === 'win32', env: { ...process.env, CI: '1' },
+    });
+    expect(run.status, 'the planted failure passed').not.toBe(0);
+    return `${run.stdout}\n${run.stderr}`.split('\n').filter((l) => l.startsWith('[slow-test] '))
+        .map((l) => JSON.parse(l.slice('[slow-test] '.length)) as Record<string, unknown>);
+}
+
+describe('the blind spots of #1183', () => {
+    it('a beforeAll past its timeout prints a record that names the hook', () => {
+        const records = plantedRecords('hook-timeout');
+        expect(records, 'the hook timed out with no record').toHaveLength(1);
+        expect(records[0].test).toMatch(/^beforeAll hook \(hook-timeout\.fixture\.ts:\d+:\d+\)$/);
+        expect(records[0].file).toMatch(/hook-timeout\.fixture\.ts$/);
+        expect(records[0].wallMs as number).toBeGreaterThanOrEqual(SLOW_TEST_MS);
+    }, 60_000);
+
+    it('a test waiting on a child that spins reports the child\'s CPU, not 0', () => {
+        const records = plantedRecords('child-cpu');
+        expect(records).toHaveLength(1);
+        const children = records[0].children as { label: string; alive: boolean; cpuShare: number }[];
+        expect(children, 'the record does not name the child').toHaveLength(1);
+        expect(children[0]).toMatchObject({ label: 'spinner', alive: true });
+        // The child spun a core for the whole wait: its share is the work, the test's own is not.
+        expect(children[0].cpuShare).toBeGreaterThanOrEqual(ON_CPU);
+        expect(records[0].cpuShare as number).toBeLessThan(ON_CPU);
+        expect(records[0].reading).toBe('waiting on a child that works on the CPU');
+    }, 60_000);
+
+    it('the hook is read from the stack vitest gives its error', () => {
+        // As vitest 4.1 words it: the runner's frame names the hook, the next frame is where it was declared.
+        const stack = [
+            'Error: STACK_TRACE_ERROR',
+            '    at beforeAll (file:///C:/repo/node_modules/.pnpm/@vitest+runner@4.1.12/node_modules/@vitest/runner/dist/chunk-artifact.js:670:26)',
+            '    at C:/repo/packages/core/tests/server-dom-entry.test.ts:36:1',
+        ].join('\n');
+        expect(hookOf(stack)).toBe('beforeAll hook (server-dom-entry.test.ts:36:1)');
+        expect(hookOf('Error: x\n    at foo (a.ts:1:1)')).toBe('a hook');
     });
 });
 

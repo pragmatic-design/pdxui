@@ -8,6 +8,7 @@ import { pathToFileURL } from 'url';
 import { build } from 'esbuild';
 import { bundleOptions } from '../esbuild-options.mjs';
 import { StreamMessageReader, StreamMessageWriter, createProtocolConnection, type ProtocolConnection } from 'vscode-languageserver/node';
+import { waitOnChild, stopWaitingOn } from '../../core/tests/setup/slow-test-children';
 
 const LSP = join(__dirname, '..');
 // Inside the package, so the bundled server finds this monorepo's packages/ the way the compiler
@@ -41,6 +42,9 @@ export async function startServer(root: string, initializationOptions?: unknown,
         });
     }
     const server: ChildProcess = spawn(process.execPath, [bundle, '--stdio'], { stdio: ['pipe', 'pipe', 'inherit'] });
+    // The tests' work is the server's: a slow failure's record reads its CPU, and whether it is alive,
+    // beside the test's own idle loop (#1183).
+    waitOnChild(server.pid!, 'language server');
     // A server that dies says so: without this, a crash at start left `initialize` waiting until the
     // hook's timeout, which reads like slowness.
     const died = new Promise<never>((_, reject) => server.once('exit', (code) => reject(new Error(`the language server exited with ${code} before answering`))));
@@ -63,5 +67,5 @@ export async function startServer(root: string, initializationOptions?: unknown,
         waiting.set(uri, resolve);
         void conn.sendNotification('textDocument/didOpen', { textDocument: { uri, languageId: 'pdx', version: 1, text } });
     });
-    return { conn, diagnostics, openAndDiagnose, stop: () => { conn.dispose(); server.kill(); if (!shipped) rmSync(bundle, { force: true }); } };
+    return { conn, diagnostics, openAndDiagnose, stop: () => { stopWaitingOn(server.pid!); conn.dispose(); server.kill(); if (!shipped) rmSync(bundle, { force: true }); } };
 }
