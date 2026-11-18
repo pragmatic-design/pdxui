@@ -15,6 +15,7 @@ import { test, expect } from './fixture';
 import { createServer, type Server } from 'node:http';
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { join, resolve, extname, sep, dirname } from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 
@@ -61,7 +62,7 @@ const ONE_COMPONENT = `<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="${UNPKG}@pdxui/design">
 <script type="module">
     import '${UNPKG}@pdxui/ui/dist/browser/button/pdx-button.js';
-    import { signal, effect } from '${UNPKG}@pdxui/ui/dist/browser/core.js';
+    import { signal, effect } from '${UNPKG}@pdxui/ui/dist/browser/core/reactivity.js';
     const busy = signal(true);
     effect(() => { document.querySelector('pdx-button').disabled = busy(); });
     window.__release = () => busy.set(false);
@@ -136,14 +137,14 @@ test('one component and core\'s API load on their own, at the paths the page nam
     page.on('pageerror', (e) => errors.push(e.message));
     page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
     const before = served.length;
-    // The page's prose: `…/@pdxui/ui/dist/browser/button/pdx-button.js` and `…/dist/browser/core.js`.
+    // The page's prose: `…/@pdxui/ui/dist/browser/button/pdx-button.js` and `…/dist/browser/core/reactivity.js`.
     await page.goto(`${origin}/one-component`);
     await page.waitForFunction(() => customElements.get('pdx-button'), undefined, { timeout: 10_000 })
         .catch((e: Error) => { throw new Error(`${e.message}\npage errors: ${errors.join('\n') || '(none)'}`); });
 
     const button = page.locator('pdx-button [data-part="root"]');
     await expect(button).toBeDisabled();
-    // core.js's signal drives the button the button module registered: they run on one core.
+    // core/reactivity.js's signal drives the button the button module registered: they run on one core.
     await page.evaluate(() => (window as unknown as { __release: () => void }).__release());
     await expect(button).toBeEnabled();
     expect(await button.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toMatch(/^rgba\(0, 0, 0, 0\)$|^transparent$/);
@@ -152,4 +153,73 @@ test('one component and core\'s API load on their own, at the paths the page nam
     expect(await page.evaluate(() => Boolean(customElements.get('pdx-badge')))).toBe(false);
     expect(served.slice(before).filter((p) => p.endsWith('/pdx-ui.js'))).toEqual([]);
     expect(errors).toEqual([]);
+});
+
+// ─── What a page downloads before its modules run ────────────────
+//
+// A browser fetches a module's static imports, and theirs, before it runs any of them. A page that
+// took `signal` from `core.js` paid for all of core's API — the data layer, the xlsx export, the form
+// registry: 131 KB gzip with one button, against 32 KB for the button alone (#1203). Core's API is
+// also served by sub-path, `core/reactivity.js` and `core/i18n.js`, and those cost what they hold.
+
+const BROWSER = join(PACKAGES, 'ui', 'dist', 'browser');
+
+/** The files a browser fetches for these entries before running them: each, and its static imports. */
+function staticClosure(entries: string[]): Set<string> {
+    const seen = new Set<string>();
+    const stack = entries.map((e) => join(BROWSER, e));
+    while (stack.length) {
+        const file = stack.pop()!;
+        if (seen.has(file)) continue;
+        if (!existsSync(file)) throw new Error(`${file} is not in the browser build`);
+        seen.add(file);
+        // Static imports only: `import … from "./x.js"` and `import "./x.js"`, minified or not. An
+        // `import("./x.js")` call is fetched when it runs, not before.
+        for (const m of readFileSync(file, 'utf8').matchAll(/(?:\bfrom|\bimport)\s*["'](\.{1,2}\/[^"']+)["']/g)) {
+            stack.push(resolve(dirname(file), m[1]));
+        }
+    }
+    return seen;
+}
+
+const gzipKb = (files: Set<string>): number =>
+    [...files].reduce((sum, f) => sum + gzipSync(readFileSync(f), { level: 9 }).length, 0) / 1024;
+
+test('core\'s reactivity, by its sub-path, adds its own API to a page that loads a button, not all of core', () => {
+    const button = gzipKb(staticClosure(['button/pdx-button.js']));
+    const withReactivity = gzipKb(staticClosure(['button/pdx-button.js', 'core/reactivity.js']));
+    const withAllOfCore = gzipKb(staticClosure(['button/pdx-button.js', 'core.js']));
+    console.log(`[cdn] button ${button.toFixed(1)} KB · + core/reactivity.js ${withReactivity.toFixed(1)} KB · + core.js ${withAllOfCore.toFixed(1)} KB (gzip 9)`);
+    // Not nothing: core's reactivity sub-path is also its data layer — `resource`, `mutation`, the HTTP
+    // resource and its middleware, the query cache — which a button does not load, and a browser cannot
+    // take half of a module. Measured 2026-11-18: +5.9 KB (3.6 the sub-path's own chunk, 1.7 the HTTP
+    // middleware), against +102.5 KB for core.js. With only reactivity and i18n served by sub-path,
+    // +5.9 KB over a button of 32.6.
+    expect(withReactivity - button, 'core/reactivity.js brings more than its own API').toBeLessThanOrEqual(6.5);
+    // The control: all of core's API still weighs what it did, so the bound above can fail.
+    expect(withAllOfCore, 'core.js no longer weighs what this test was written against').toBeGreaterThan(100);
+});
+
+test('every sub-path of core\'s API is served from the same core as core.js', async ({ page }) => {
+    // A page that mixes them must still have one core. An export reached through two URLs is the same
+    // function only if both import the same module: a private copy would be a second core.
+    await page.goto(`${origin}/one-component`);
+    const base = `${origin}/@pdxui/ui/dist/browser`;
+    // Compared by value, not by name: the root may rename an export, and leaves some sub-path helpers
+    // out entirely (i18n's `resetI18n`).
+    const report = await page.evaluate(async (b) => {
+        const all = await import(`${b}/core.js`);
+        const rootValues = new Set(Object.values(all));
+        const out: Record<string, { compared: number; private: string[] }> = {};
+        for (const sub of ['reactivity', 'i18n']) {
+            const part = await import(`${b}/core/${sub}.js`);
+            const names = Object.keys(part).filter((n) => n in all);
+            out[sub] = { compared: names.length, private: names.filter((n) => !rootValues.has(part[n])) };
+        }
+        return out;
+    }, base);
+    for (const [sub, { compared, private: copies }] of Object.entries(report)) {
+        expect(compared, `core/${sub}.js shares no export with core.js — nothing was compared`).toBeGreaterThan(0);
+        expect(copies, `core/${sub}.js has its own copy of these`).toEqual([]);
+    }
 });

@@ -87,9 +87,20 @@ custom elements register themselves — then use them as plain HTML:
 ```
 
 `https://unpkg.com/@pdxui/ui` is `dist/browser/pdx-ui.js`, every component at once. A page that uses a
-few loads them one by one from the same folder, at the path the library build uses —
-`…/@pdxui/ui/dist/browser/button/pdx-button.js` — and core's API from `…/dist/browser/core.js`; they
-share one copy of core. `https://unpkg.com/@pdxui/design` is the flattened stylesheet, every
+few loads them one by one from the same folder, at the path the library build uses, and takes core's
+API by the part it needs:
+
+```html
+<script type="module">
+  import 'https://unpkg.com/@pdxui/ui/dist/browser/button/pdx-button.js';
+  import { signal, effect } from 'https://unpkg.com/@pdxui/ui/dist/browser/core/reactivity.js';
+</script>
+```
+
+Pick the file by what the page calls: `core/reactivity.js` for signals, effects and resources,
+`core/i18n.js` for the locale the components speak, `core.js` for anything else. `core.js` is all of
+core's API at once, about 100 KB gzip more than a button; a sub-path costs what it holds. Every file
+shares one copy of core. `https://unpkg.com/@pdxui/design` is the flattened stylesheet, every
 component's styles and the 13 themes. Pin the version in the URL (`@pdxui/ui@1.0.0-beta.1`) for a
 page that must not change under you. The browser build carries no development diagnostics, as core's
 script does not.
