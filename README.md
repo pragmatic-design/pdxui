@@ -4,7 +4,7 @@
 [![Component Certification](https://github.com/pragmatic-design/pdxui/actions/workflows/certify.yml/badge.svg)](https://github.com/pragmatic-design/pdxui/actions/workflows/certify.yml)
 [![npm](https://img.shields.io/npm/v/@pdxui/core?label=npm&logo=npm)](https://www.npmjs.com/package/@pdxui/core)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-1.0.0--beta.0-ffe088)](CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-1.0.0--beta.1-ffe088)](CHANGELOG.md)
 
 **[Documentation](https://pdxui.com)** · **[Theme builder](https://themebuilder.pdxui.com)** ·
 **[Packages](https://www.npmjs.com/org/pdxui)** ·
@@ -301,7 +301,7 @@ described: extracted CSS, stripped diagnostics and a preloaded landing route on 
 showcase, in [`compiler-claims.spec.ts`](packages/showcase/tests/compiler-claims.spec.ts) and the
 specs beside it; inlined bindings and the parity of the two modes in the compiler's own tests.
 
-**Maturity.** This is `1.0.0-beta.0`. The language, the runtime and the component APIs may still
+**Maturity.** This is `1.0.0-beta.1`. The language, the runtime and the component APIs may still
 change before 1.0; every change an application can notice is in the [CHANGELOG](CHANGELOG.md).
 Static generation with hydration ships (`pdx build --ssg`); rendering per request and streaming are
 on the roadmap.
