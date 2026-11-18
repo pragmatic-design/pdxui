@@ -86,9 +86,6 @@ importers:
       '@pdxui/design':
         specifier: workspace:*
         version: link:../design
-      '@pdxui/lsp':
-        specifier: workspace:*
-        version: link:../lsp
       citty:
         specifier: ^0.2.2
         version: 0.2.2
@@ -105,6 +102,9 @@ importers:
         specifier: ^4.6.6
         version: 4.6.7
     devDependencies:
+      '@pdxui/lsp':
+        specifier: workspace:*
+        version: link:../lsp
       typescript:
         specifier: ^5.8.0
         version: 5.9.3
