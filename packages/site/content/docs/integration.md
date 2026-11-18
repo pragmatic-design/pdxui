@@ -24,6 +24,12 @@ imports `@pdxui/core`, `@pdxui/ui` and `@pdxui/router` by name, so a project of 
 those, as `pdx new project` does — a strict installer such as pnpm does not resolve them through
 `@pdxui/framework`.
 
+What a Level 2 import costs depends on the entry. `@pdxui/framework` registers every component when
+it is imported, so code that takes one `signal` from it ships the whole library — about 340 KB gzip in
+a production build, against about 4 KB from `@pdxui/framework/core`. Code that needs the API imports
+`@pdxui/framework/core` (or `/router`); the root is for a page that wants every `<pdx-*>` registered.
+`packages/framework/tests/entry-cost.test.ts` holds these numbers.
+
 ## Level 1 — drop-in, no build (like jQuery)
 
 Include the runtime from a CDN and you get a global `Pragmatic`. No bundler, no build step — you

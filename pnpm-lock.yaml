@@ -189,6 +189,9 @@ importers:
       vite:
         specifier: '>=6.4.3 <7'
         version: 6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.33.0)
+      vitest:
+        specifier: '>=4.1.0'
+        version: 4.1.12(@types/node@26.6.6)(@vitest/coverage-v8@4.1.12)(happy-dom@21.0.4)(vite@6.4.6(@types/node@26.6.6)(jiti@2.7.0)(lightningcss@1.33.0))
 
   packages/lsp:
     dependencies:
@@ -3170,7 +3173,7 @@ snapshots:
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
-      '@jridgewell/sourcemap-codec': 1.5.5
+      '@jridgewell/sourcemap-codec': 1.6.0
       '@jridgewell/trace-mapping': 0.3.31
 
   '@jridgewell/remapping@2.3.5':
@@ -4572,7 +4575,7 @@ snapshots:
       postcss: 8.5.33
       postcss-nested: 7.0.2(postcss@8.5.33)
       semver: 7.7.4
-      tinyglobby: 0.2.15
+      tinyglobby: 0.2.17
     optionalDependencies:
       typescript: 5.9.3
 

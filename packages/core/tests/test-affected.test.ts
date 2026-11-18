@@ -39,13 +39,13 @@ describe('the browser suites', () => {
     });
 });
 
-// A suite reaches outside its package through its setup files (#1194): cli, compiler, lsp, router and
-// ui load `../core/tests/setup/slow-test-record.ts`, and compiler does not depend on core, so the push
+// A suite reaches outside its package through its setup files (#1194): cli, compiler, framework (#1212),
+// lsp, router and ui load `../core/tests/setup/slow-test-record.ts`, and compiler does not depend on core, so the push
 // of #1183, which rewrote that file, ran without compiler's 7107 tests. A changed file in a folder
 // another package's config loads a setup file from selects that package too. The folder, not the file:
 // slow-test-record.ts imports slow-test-sample.ts and slow-test-children.ts beside it.
 describe('the setup files a suite loads from another package', () => {
-    const LOADERS = ['cli', 'compiler', 'lsp', 'router', 'ui'];
+    const LOADERS = ['cli', 'compiler', 'framework', 'lsp', 'router', 'ui'];
 
     it('are read from the package configs', () => {
         const byCore = setupLoads().filter((l) => l.dir === 'packages/core/tests/setup').map((l) => l.by).sort();

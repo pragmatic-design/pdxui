@@ -213,7 +213,7 @@ describe('the blind spots of #1183', () => {
 describe('every vitest suite of the gate records its slow failures', () => {
     const PACKAGES = join(__dirname, '..', '..');
     // The suites `test:unit` runs: the packages whose `test` is `vitest run`, and their config.
-    const CONFIGS = ['cli/vitest.config.ts', 'compiler/vite.config.ts', 'core/vite.config.ts', 'lsp/vite.config.ts', 'router/vite.config.ts', 'ui/vite.config.ts'];
+    const CONFIGS = ['cli/vitest.config.ts', 'compiler/vite.config.ts', 'core/vite.config.ts', 'framework/vite.config.ts', 'lsp/vite.config.ts', 'router/vite.config.ts', 'ui/vite.config.ts'];
 
     it('the list is every package whose test is vitest run', () => {
         const packages = ['builder', 'cli', 'compiler', 'core', 'design', 'framework', 'lsp', 'responsive', 'router', 'showcase', 'site', 'ui', 'vscode-pdx'];

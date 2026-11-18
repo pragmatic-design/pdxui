@@ -8,11 +8,18 @@ pnpm add @pdxui/framework @pdxui/compiler
 pnpm add -D @pdxui/cli
 ```
 
-| Import | Contents |
-|--------|----------|
-| `@pdxui/framework` | Everything the four packages export |
-| `@pdxui/framework/core`, `/ui`, `/router` | One package at a time |
-| `@pdxui/framework/css` | Everything the design system styles — every component and all 13 themes — for a page that does not know which components it will render |
+| Import | Contents | An app that takes one export from it ships |
+|--------|----------|------|
+| `@pdxui/framework` | Everything the four packages export, and **every component registered on import** | ~340 KB gzip |
+| `@pdxui/framework/core` | Core's API | ~4 KB for a `signal` |
+| `@pdxui/framework/router` | The router | ~14 KB for `navigate` |
+| `@pdxui/framework/ui` | Every component registered | ~332 KB |
+| `@pdxui/framework/css` | Everything the design system styles — every component and all 13 themes — for a page that does not know which components it will render | CSS, not counted here |
+
+Registering is a side effect, so no bundler can drop a component the root registers: code that needs
+the API imports `/core` or `/router`. The numbers are a production build of a module that imports one
+export (`tests/entry-cost.test.ts`, which holds them). A `.pdx` app imports each component it uses
+through the compiler, not through this package.
 
 An app that knows what it renders imports `@pdxui/design/base` and one theme
 (`@pdxui/design/themes/neutral` applies with no `pdx-theme` on `<html>`), and each component
