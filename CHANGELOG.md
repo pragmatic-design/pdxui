@@ -40,6 +40,13 @@ semver.
   MB, core 10.2 → 5.3, compiler 8.4 → 5.1, router 0.7 → 0.5. In development nothing changes: Vite
   runs core from its sources, and an app's production maps name the packages' `dist/` either way.
 
+- `@pdxui/lsp`'s server runs on the project's own TypeScript instead of a copy bundled into it (#1214),
+  as the type-check already did: a project's types are answered by the version it pins. `typescript`
+  is a required peer of `@pdxui/lsp` now (the compiler, its other peer, already depends on it).
+  `dist/server.cjs` goes 11.3 → 1.4 MB and the package 12.0 → 2.1 MB unpacked; measured on ten pages,
+  first diagnostics, all ten and memory stay within 4% of the bundled server. The VS Code extension's
+  server still carries TypeScript, since an extension installs no dependencies.
+
 ## 1.0.0-beta.1 — 2026-11-18
 
 ### Features

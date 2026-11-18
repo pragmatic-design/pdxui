@@ -13,7 +13,9 @@ pnpm add -D @pdxui/lsp
 npx pdx-lsp --stdio
 ```
 
-It needs `@pdxui/compiler` installed next to it.
+It needs `@pdxui/compiler` installed next to it, and runs on the project's own TypeScript, which the
+compiler depends on: a project's types are answered by the version it pins. The VS Code extension's
+server carries its own TypeScript instead, because an extension installs no dependencies.
 
 ## License
 

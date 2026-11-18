@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';
 import { build } from 'esbuild';
-import { bundleOptions } from '../esbuild-options.mjs';
+import { bundleOptions, serverExternal, extensionServerExternal } from '../esbuild-options.mjs';
 
 const LSP = join(__dirname, '..');
 
@@ -18,15 +18,16 @@ async function bundle(entry: string, external: string[]) {
 
 describe('the LSP bundles', () => {
     it.each([
-        ['server.ts', ['vscode']],
+        ['server.ts', serverExternal],
+        ['server.ts', extensionServerExternal],
         ['typecheck.ts', ['typescript']],
-    ])('%s bundles with no warning', async (entry, external) => {
+    ])('%s with externals %j bundles with no warning', async (entry, external) => {
         const result = await bundle(entry, external);
         expect(result.warnings.map(w => w.text)).toEqual([]);
     }, 60_000);
 
     it('gives the bundled compiler a real import.meta.url', async () => {
-        const result = await bundle('server.ts', ['vscode']);
+        const result = await bundle('server.ts', serverExternal);
         const code = result.outputFiles[0].text;
         expect(/import_meta\s*=\s*\{\s*\}/.test(code), 'import.meta is bundled as an empty object').toBe(false);
         expect(code.includes('pathToFileURL(__filename)'), 'no import.meta.url derived from __filename').toBe(true);

@@ -50,8 +50,5 @@
   "peerDependencies": {
     "@pdxui/compiler": "workspace:*",
     "typescript": ">=5"
-  },
-  "peerDependenciesMeta": {
-    "typescript": { "optional": true }
   }
 }

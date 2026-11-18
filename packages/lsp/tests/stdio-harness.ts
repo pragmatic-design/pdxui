@@ -6,7 +6,7 @@ import { rmSync } from 'fs';
 import { spawn, type ChildProcess } from 'child_process';
 import { pathToFileURL } from 'url';
 import { build } from 'esbuild';
-import { bundleOptions } from '../esbuild-options.mjs';
+import { bundleOptions, serverExternal } from '../esbuild-options.mjs';
 import { StreamMessageReader, StreamMessageWriter, createProtocolConnection, type ProtocolConnection } from 'vscode-languageserver/node';
 import { waitOnChild, stopWaitingOn } from '../../core/tests/setup/slow-test-children';
 
@@ -46,7 +46,9 @@ export async function startServer(root: string, initializationOptions?: unknown,
     if (!shipped) {
         await build({
             ...bundleOptions,
-            entryPoints: [join(LSP, 'src', 'server.ts')], outfile: bundle, external: ['vscode'], logLevel: 'silent',
+            // The server this package publishes: TypeScript required from lsp's node_modules, as an
+            // installed server requires it from the project's (#1214).
+            entryPoints: [join(LSP, 'src', 'server.ts')], outfile: bundle, external: serverExternal, logLevel: 'silent',
         });
     }
     // stderr piped, not inherited: still written through, and its end kept for the error a crash gives.

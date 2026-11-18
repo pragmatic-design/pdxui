@@ -1,11 +1,13 @@
 import { build } from 'esbuild';
-import { bundleOptions } from './esbuild-options.mjs';
+import { bundleOptions, serverExternal } from './esbuild-options.mjs';
 
+// The server this package publishes, on the project's TypeScript (#1214). The VS Code extension builds
+// its own, with TypeScript inside: packages/vscode-pdx/scripts/bundle-server.mjs.
 await build({
     ...bundleOptions,
     entryPoints: ['src/server.ts'],
     outfile: 'dist/server.cjs',
-    external: ['vscode'],
+    external: serverExternal,
     sourcemap: true,
     logLevel: 'info',
 });
