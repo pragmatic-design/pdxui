@@ -446,8 +446,12 @@ const railInWindow = (page: Page) => page.evaluate(() => {
     return { foot: r('.rail-foot'), head: r('.rail-head'), vh: innerHeight, scrolled: scrollY };
 });
 
+// A window of 700 px, not 900. At 900 the document of /customers measured 900 px at its first paint
+// and 931 once its closed overlays rendered: it was longer than the window only by their gaps, and
+// since #1201 they render at the first idle moment, after the list, so a runner that measured before
+// them found nothing to scroll.
 test('with a long page scrolled to its end, the rail\'s foot is still in the window', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.setViewportSize({ width: 1440, height: 700 });
     await open(page, '/customers');
     await expect(page.locator('[data-test="customers"] [role="gridcell"]').first()).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -462,8 +466,8 @@ test('a page whose height ends in a fraction of a pixel scrolls to its end witho
     // The document's scroll extent is whole pixels and the content's height need not be: a page of
     // 931.5px scrolls to 32, half a pixel past the shell's bottom. A rail held by the shell — sticky
     // inside it — was pushed up by that half (-0.5 on the GitHub runner, whose fonts give such
-    // heights). Held by the window instead, it does not move.
-    await page.setViewportSize({ width: 1440, height: 900 });
+    // heights). Held by the window instead, it does not move. 700 px for the reason above.
+    await page.setViewportSize({ width: 1440, height: 700 });
     await open(page, '/customers');
     await expect(page.locator('[data-test="customers"] [role="gridcell"]').first()).toBeVisible();
     await page.evaluate(() => {

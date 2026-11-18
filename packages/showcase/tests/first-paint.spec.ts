@@ -172,7 +172,7 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
 /**
  * When each route's main content paints (#251). «App ready» says when the splash leaves; a page whose
  * largest element is a list or a record can be ready and still have its content arrive later. So
- * three routes, cold, under the same slow 4G, read the Largest Contentful Paint, and the LCP element
+ * each route below, cold, under the same slow 4G, read the Largest Contentful Paint, and the LCP element
  * has to be inside the route's own page: an LCP that is the shell's measures the shell, and the test
  * says so instead of passing.
  *
@@ -202,6 +202,10 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  * 948 and 1000. The budgets are the ones above, set against single loads: the median only takes the
  * outliers out.
  *
+ * `/customers` joined with #1201, which defers what its actions open as `/tickets` does. Measured
+ * 2026-11-18 locally, three cold loads each: before, 3660, 3620, 3608 ms; after, 2692, 2660, 2704
+ * alone and 2704, 2652, 2672 beside the other routes (2704 + 10% → 3000).
+ *
  * These are the HTTP/1.1 numbers: the preview server's six connections are most of what is left
  * on `/tickets`. The same routes over HTTP/2, the number a real host gives and #407's target, are
  * held in `first-paint-http2.spec.ts`; these stay as the second, looser number.
@@ -210,6 +214,7 @@ const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1100 },
     { route: '/tickets', root: 'tickets', budgetMs: 3300 },
     { route: '/tickets/1', root: 'ticket', budgetMs: 2500 },
+    { route: '/customers', root: 'customers', budgetMs: 3000 },
 ];
 
 test.describe('each route\'s main content paints within its budget', () => {

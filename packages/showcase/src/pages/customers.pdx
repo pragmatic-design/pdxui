@@ -42,6 +42,11 @@
 
 
 
+    <!-- WHAT AN ACTION OPENS, LOADED AFTER THE LIST, as on tickets (#407, #1201): the forms are most
+         of this route's graph, and the route mounts only once its whole static graph has arrived.
+         Each overlay reads the page's state when it renders, so one opened before the idle moment
+         opens when its chunk arrives. -->
+    @defer (idle) {
     <!-- CREATE IN A MODAL, a RECORD in the drawer its row opens — the same shapes as the first
          entity, and the same code: `createListActions`. Not «select, then Edit in the toolbar». -->
     <pdx-dialog
@@ -80,6 +85,7 @@
       @pdx-confirm="list.discardAndClose()"
       @pdx-cancel="list.keepEditing()"
       data-test="drawer-confirm"></pdx-alert-dialog>
+    }
     <!-- Rule 1's host. On the SCREEN, not in the shell, and that is measured rather
          than tidy: in `app.pdx` it joins the entry chunk, and the entry is what a visitor waits
          for before anything is painted — 81 KB against a budget of 78. A toast answers an action

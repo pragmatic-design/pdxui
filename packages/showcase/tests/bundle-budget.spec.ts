@@ -343,7 +343,14 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // which no longer drops the default branches of a parameter every caller sets (flip()'s and shift()'s
 // `padding ?? …` in core's positioning.ts, public API with documented defaults). Measured on the same
 // tree: +140 bytes gzipped spread over 72 chunks, 472.9 → 473.0 KB locally, 473.1 on CI's Linux build.
-const BUDGET_KB = { entry: 43.6, js: 473.2, css: 67, blocking: 103 };
+// js 473.2 → 477.3: every list page defers what a click opens, as /tickets does (#1201). No code is
+// added; the forms the routes imported statically now load behind `@defer (idle)`, so Rollup splits
+// what the routes shared into chunks of their own, and each gzipped alone loses the dictionary they
+// shared — the cost #449 measured. What a route loads before it paints fell, on top of the first
+// paint: /customers 175.0 → 105.2 KB, /sites 162.3 → 96.9, /employees 161.7 → 96.3, their contracts
+// 124.3 → 28.9, /assets 119.9 → 102.8, /services 105.1 → 98.0 (gzip level 9). The whole of the JS,
+// same machine, same level: main 472.5 → this branch 476.5 KB; this file's own measure reads 477.2.
+const BUDGET_KB = { entry: 43.6, js: 477.3, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
@@ -470,6 +477,53 @@ test('the entry does not carry a route the visitor has not asked for', () => {
         .filter(f => f.endsWith('.js') && f !== entryChunk())
         .some(f => readFileSync(join(DIST, f), 'utf8').includes(MARKER));
     expect(elsewhere, 'the page is in no chunk at all — the assertion above proves nothing').toBe(true);
+});
+
+// ─── What a list route loads before it can paint ────────────────
+//
+// A route mounts once its whole static graph has arrived. On a list page the create modal and the
+// record drawer open only on a click, but their forms — the auto form, its date picker, its relation
+// pickers — were most of that graph: /tickets painted at 3.9 s on slow 4G, and 3.0 s once its
+// overlays were in `@defer (idle)` (#407). Every list page defers them the same way (#1201).
+//
+// The closure is what the route table says to load for the route: its chunk and the entries of
+// Vite's preload map listed beside it. That is what the router waits for before it mounts the page.
+
+const LIST_ROUTES = ['/customers', '/sites', '/employees', '/employees/:id/contracts', '/assets', '/services', '/tickets'];
+/** The modules only an overlay of a list page needs. */
+const FORM_CHUNKS = ['pdx-auto-form', 'pdx-edit-drawer', 'pdx-date-picker'];
+const chunkOf = (name: string) => new RegExp(`^${name}-[\\w-]{8}\\.js$`);
+
+/** A route's chunk and the files Vite's preload map lists beside it, read off the entry's route table. */
+function routeClosure(path: string): string[] {
+    const entry = readFileSync(join(DIST, entryChunk()), 'utf8');
+    const preloadMap = entry.match(/m\.f=(\[[^\]]*\])/);
+    if (!preloadMap) throw new Error('the entry has no preload map (`__vite__mapDeps`) — nothing to read');
+    const files: string[] = JSON.parse(preloadMap[1]).map((p: string) => p.replace(/^assets\//, ''));
+    const escaped = path.replace(/[/:]/g, (c) => `\\${c}`);
+    const route = entry.match(new RegExp(`"${escaped}":\\(\\)=>\\w+\\(\\(\\)=>import\\("\\./([^"]+\\.js)"\\)(?:,__vite__mapDeps\\(\\[([\\d,]*)\\]\\))?`));
+    if (!route) throw new Error(`the route table has no loader for ${path}`);
+    const deps = route[2] ? route[2].split(',').map((i) => files[Number(i)]) : [];
+    return [route[1], ...deps];
+}
+
+test('the forms a list page opens on a click are not in what the route loads before it paints', () => {
+    // The control: the forms are in the build, so a closure without them means something.
+    const all = readdirSync(DIST);
+    for (const name of FORM_CHUNKS) {
+        expect(all.some((f) => chunkOf(name).test(f)), `${name} has no chunk of its own — the check below proves nothing`)
+            .toBe(true);
+    }
+    const found: string[] = [];
+    for (const path of LIST_ROUTES) {
+        const closure = routeClosure(path);
+        const gz = closure.reduce((sum, f) => sum + gzipSync(readFileSync(join(DIST, f))).length, 0);
+        console.log(`[bundle] route ${path}: ${closure.length} files, ${(gz / 1024).toFixed(1)} KB gzipped`);
+        for (const name of FORM_CHUNKS) {
+            if (closure.some((f) => chunkOf(name).test(f))) found.push(`${path} loads ${name}`);
+        }
+    }
+    expect(found, 'put the page\'s overlays inside one `@defer (idle)`, as tickets.pdx does').toEqual([]);
 });
 
 test('and the entry is smaller than the whole of the JavaScript', () => {

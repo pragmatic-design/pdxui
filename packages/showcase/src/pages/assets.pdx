@@ -26,6 +26,10 @@
       @pdx-row-click="e => openRecord(e.detail.row)"
       data-test="grid"></pdx-data-grid>
 
+    <!-- Loaded after the list, as on tickets (#407, #1201): the create form, its date pickers and
+         relation pickers are most of this route's graph, and a modal opened before the idle moment
+         opens when its chunk arrives. -->
+    @defer (idle) {
     <!-- NEW, in a modal: what it is, whose it is, where it is. The customer and the site
          come from their own paged sources, as the intake picks a customer; then the asset opens. -->
     <pdx-dialog ::open="createOpen" size="lg" :title="$t('assets.new')" data-test="create-dialog">
@@ -67,6 +71,7 @@
         </div>
       </pdx-form>
     </pdx-dialog>
+    }
   </section>
 </template>
 

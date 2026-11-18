@@ -37,6 +37,11 @@
       </div>
     }
 
+    <!-- WHAT AN ACTION OPENS, LOADED AFTER THE PERIODS, as on tickets (#407, #1201): the edit form, the
+         add modal and the end question all wait for a click, and their date pickers and forms are
+         most of this route's graph. Each reads the page's state when it renders, so one opened before
+         the idle moment opens when its chunk arrives. -->
+    @defer (idle) {
     <!-- EDIT, in the page: the URL does not move and no modal opens («create in a modal, edit in the
          page»). `@show` and not `@if`: the form projects its fields through a slot. -->
     @show (editing) {
@@ -93,6 +98,7 @@
         <pdx-date-picker editable :value="endDate" @value-change="e => periods.endDate.set(e.currentTarget.getDate())" data-test="end-date"></pdx-date-picker>
       </pdx-form-field>
     </pdx-alert-dialog>
+    }
 
     <!-- The toast's host is the SCREEN's, as on customers: it travels with what can raise one. -->
     <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
