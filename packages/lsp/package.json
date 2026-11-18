@@ -28,7 +28,7 @@
     "./package.json": "./package.json"
   },
 
-  "files": ["dist", "bin"],
+  "files": ["dist", "!dist/*.map", "bin"],
   "bin": {
     "pdx-lsp": "./bin/pdx-lsp.cjs"
   },

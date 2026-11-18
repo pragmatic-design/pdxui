@@ -45,6 +45,9 @@ export default defineConfig({
         target: 'es2022',
         rollupOptions: {
             external: [],
+            // The maps name `../src/…`, which the package ships: a debugger opens the TypeScript from
+            // there. Embedding it too was 4.5 MB, once per map (#1208).
+            output: { sourcemapExcludeSources: true },
         },
     },
     test: {

@@ -22,6 +22,8 @@ export default defineConfig({
         target: 'es2022',
         rollupOptions: {
             external: ['@pdxui/core', '@pdxui/core/server', '@pdxui/compiler'],
+            // The maps name `../src/…`, which the package ships (#1208).
+            output: { sourcemapExcludeSources: true },
         },
     },
     test: {

@@ -29,6 +29,9 @@ export default defineConfig({
         target: 'es2022',
         rollupOptions: {
             external: [],
+            // As the main build (#1208): the map names `../src/…`, which the package ships and a CDN
+            // serves beside this file.
+            output: { sourcemapExcludeSources: true },
         },
     },
 });

@@ -34,6 +34,12 @@ semver.
   `typescript` as an optional peer, as `@pdxui/lsp` does, since the check runs on the project's own
   TypeScript. An editor other than VS Code still installs `@pdxui/lsp` for `pdx-lsp`.
 
+- The source maps of `@pdxui/core`, `@pdxui/compiler` and `@pdxui/router` no longer embed the sources
+  (#1208): they name `../src/…`, which each package ships, so a debugger or a stack trace still reaches
+  the TypeScript. `@pdxui/lsp` publishes no maps; its code is not minified. Unpacked: lsp 30.8 → 12.0
+  MB, core 10.2 → 5.3, compiler 8.4 → 5.1, router 0.7 → 0.5. In development nothing changes: Vite
+  runs core from its sources, and an app's production maps name the packages' `dist/` either way.
+
 ## 1.0.0-beta.1 — 2026-11-18
 
 ### Features
