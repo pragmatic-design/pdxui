@@ -25,6 +25,13 @@ export default defineConfig({
                 // Their state is the root's: the modules they share are one shared chunk.
                 i18n: 'src/i18n/index.ts',
                 testing: 'src/testing/index.ts',
+                // Every public sub-path has its own entry (#1213). Pointed at the root bundle, a
+                // sub-path gave a bundler that cannot tree-shake one big module (esbuild) the whole of
+                // core, and gave the renderer's `pipe` — the template helper — the root's `pipe`, the
+                // reactivity operator of the same name.
+                reactivity: 'src/reactivity/index.ts',
+                renderer: 'src/renderer/index.ts',
+                component: 'src/component/index.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one
             // artefact with no bundler after it: it needs `process.env.NODE_ENV` replaced, and

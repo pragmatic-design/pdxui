@@ -16,6 +16,17 @@ semver.
   button and takes `signal` from `core.js` downloads all of core's API, 131 KB gzip; from
   `core/reactivity.js` it downloads 38.5 KB. `core.js` stays, and every file shares one copy of core.
 
+- `@pdxui/core/reactivity`, `/renderer` and `/component` are built as modules of their own (#1213),
+  sharing chunks and one reactive state with the root, as `/i18n` and `/testing` already were. One
+  `signal` from `@pdxui/core/reactivity` is 1.8 KB gzip in a production Vite build, and 9.4 KB with
+  esbuild, against 4.3 and 12.3 when the sub-path was the root bundle; the root itself fell to 3.6.
+
+### Fixes
+
+- `import { pipe } from '@pdxui/core/renderer'` gives the template helper in a build, as it does in
+  development and as its types say (#1213). The sub-path was the root bundle once built, and the
+  root's `pipe` is the reactivity operator; the root still names the helper `templatePipe`.
+
 ### Changed
 
 - `@pdxui/cli` no longer depends on `@pdxui/lsp` (#1202). `pdx check --types` runs the type-check the
