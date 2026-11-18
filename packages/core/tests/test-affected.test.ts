@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { selection, pnpmArgs, BROWSER } from '../../../scripts/test-affected.mjs';
+import { selection, pnpmArgs, setupLoads, BROWSER } from '../../../scripts/test-affected.mjs';
 
 const REPO = join(__dirname, '..', '..', '..');
 
@@ -36,6 +36,36 @@ describe('the browser suites', () => {
         const browser = [...scripts['test:browser'].matchAll(/--filter (\S+)/g)].map((m) => m[1]).sort();
         expect([...BROWSER].sort()).toEqual(excluded);
         expect([...BROWSER].sort()).toEqual(browser);
+    });
+});
+
+// A suite reaches outside its package through its setup files (#1194): cli, compiler, lsp, router and
+// ui load `../core/tests/setup/slow-test-record.ts`, and compiler does not depend on core, so the push
+// of #1183, which rewrote that file, ran without compiler's 7107 tests. A changed file in a folder
+// another package's config loads a setup file from selects that package too. The folder, not the file:
+// slow-test-record.ts imports slow-test-sample.ts and slow-test-children.ts beside it.
+describe('the setup files a suite loads from another package', () => {
+    const LOADERS = ['cli', 'compiler', 'lsp', 'router', 'ui'];
+
+    it('are read from the package configs', () => {
+        const byCore = setupLoads().filter((l) => l.dir === 'packages/core/tests/setup').map((l) => l.by).sort();
+        expect(byCore).toEqual(LOADERS);
+    });
+
+    it('a changed one selects every package that loads its folder, compiler too', () => {
+        for (const file of ['packages/core/tests/setup/slow-test-record.ts', 'packages/core/tests/setup/slow-test-sample.ts']) {
+            expect(selection([file]).folders, file).toEqual(['core', ...LOADERS].sort());
+        }
+        expect(pnpmArgs(selection(['packages/core/tests/setup/slow-test-record.ts']))).toContain('--filter=...{./packages/compiler}');
+    });
+
+    it('the control: a change to core outside that folder selects core alone', () => {
+        expect(selection(['packages/core/src/index.ts']).folders).toEqual(['core']);
+        expect(selection(['packages/core/tests/setup-x/a.ts']).folders).toEqual(['core']);
+    });
+
+    it('a package\'s own setup folder selects only that package', () => {
+        expect(selection(['packages/ui/tests/setup/settle-prefetch.ts']).folders).toEqual(['ui']);
     });
 });
 
