@@ -32,6 +32,23 @@ function frameworkUrl(jfb, port, name) {
     return `http://localhost:${port}/frameworks/keyed/${name}${custom}/`;
 }
 
+/**
+ * The first element `selector` matches under `root`, looking inside open shadow roots as well, as the
+ * benchmark's own puppeteer steps do with `pierce/`: lit renders the app into its element's shadow
+ * root (`useShadowRoot` in its package.json), where `document.querySelector` finds nothing (#1206).
+ * It runs in the page, installed from its source, so it refers to nothing but itself.
+ */
+export function deepQuery(root, selector) {
+    const found = root.querySelector(selector);
+    if (found) return found;
+    for (const el of root.querySelectorAll('*')) {
+        if (!el.shadowRoot) continue;
+        const inner = deepQuery(el.shadowRoot, selector);
+        if (inner) return inner;
+    }
+    return null;
+}
+
 /** Median selection time among 10,000 rows, in ms, for each framework. */
 export async function measureSelect10k({ jfb, port, frameworks, chrome, headless }) {
     // The benchmark's own puppeteer-core: its package.json's `import` entry.
@@ -46,36 +63,52 @@ export async function measureSelect10k({ jfb, port, frameworks, chrome, headless
     const results = {};
     try {
         for (const name of frameworks) {
-            const page = await browser.newPage();
-            await page.goto(frameworkUrl(jfb, port, name), { waitUntil: 'load' });
-            await page.click('#runlots');
-            await page.waitForSelector(`tbody tr:nth-child(${ROWS})`, { timeout: 60_000 });
-            const times = [];
-            for (let i = 0; i < WARMUP + SELECTIONS; i++) {
-                // Spread over the list: a different row each time, never the one already selected.
-                const row = 1 + ((i * 997) % ROWS);
-                const ms = await page.evaluate(async (n) => {
-                    const label = document.querySelector(`tbody tr:nth-child(${n}) td:nth-child(2) a`);
-                    const afterTask = () => new Promise((resolve) => {
-                        const channel = new MessageChannel();
-                        channel.port1.onmessage = () => resolve();
-                        channel.port2.postMessage(0);
-                    });
-                    const start = performance.now();
-                    label.click();
-                    await afterTask();
-                    return performance.now() - start;
-                }, row);
-                if (i >= WARMUP) times.push(ms);
+            try {
+                results[name] = await medianSelection(browser, frameworkUrl(jfb, port, name));
+            } catch (error) {
+                // Which framework failed: without it a failure here names a selector and nothing else.
+                throw new Error(`select-10k, ${name}: ${error.message}`, { cause: error });
             }
-            await page.close();
-            times.sort((a, b) => a - b);
-            results[name] = times[Math.floor(times.length / 2)];
         }
     } finally {
         await browser.close();
     }
     return results;
+}
+
+/** One framework's page: create 10,000 rows, then the median of the timed selections, in ms. */
+async function medianSelection(browser, url) {
+    const page = await browser.newPage();
+    try {
+        await page.goto(url, { waitUntil: 'load' });
+        await page.evaluate(`window.__pdxDeepQuery = ${deepQuery.toString()}`);
+        // `pierce/` looks inside shadow roots, as the benchmark's puppeteer steps do (#1206).
+        await page.waitForSelector('pierce/#runlots', { timeout: 30_000 });
+        await page.click('pierce/#runlots');
+        await page.waitForSelector(`pierce/tbody tr:nth-child(${ROWS})`, { timeout: 60_000 });
+        const times = [];
+        for (let i = 0; i < WARMUP + SELECTIONS; i++) {
+            // Spread over the list: a different row each time, never the one already selected.
+            const row = 1 + ((i * 997) % ROWS);
+            const ms = await page.evaluate(async (n) => {
+                const label = window.__pdxDeepQuery(document, `tbody tr:nth-child(${n}) td:nth-child(2) a`);
+                const afterTask = () => new Promise((resolve) => {
+                    const channel = new MessageChannel();
+                    channel.port1.onmessage = () => resolve();
+                    channel.port2.postMessage(0);
+                });
+                const start = performance.now();
+                label.click();
+                await afterTask();
+                return performance.now() - start;
+            }, row);
+            if (i >= WARMUP) times.push(ms);
+        }
+        times.sort((a, b) => a - b);
+        return times[Math.floor(times.length / 2)];
+    } finally {
+        await page.close();
+    }
 }
 
 /** The table, frameworks in the order measured. */

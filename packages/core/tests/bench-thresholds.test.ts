@@ -92,7 +92,8 @@ describe('checkThresholds', () => {
 // its own beside it, which no gate ran: found while doing #248. They run here, so `pnpm test` does.
 // And the runs of a comparison, kept as they complete when a later one fails (#374).
 // And the replay of a rule over runs already made (#736).
-for (const name of ['summarize.test.mjs', 'runs.test.mjs', 'bench-replay.test.mjs']) {
+// And the select-10k step's lookup inside a shadow root (#1206).
+for (const name of ['summarize.test.mjs', 'runs.test.mjs', 'bench-replay.test.mjs', 'select10k.test.mjs']) {
     describe(`scripts/bench-jfb/${name}`, () => {
         it('passes under node --test', () => {
             const file = join(__dirname, '..', '..', '..', 'scripts', 'bench-jfb', name);
