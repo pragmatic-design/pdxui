@@ -122,7 +122,9 @@ function plantedRecords(fixture: string): { records: Record<string, unknown>[]; 
     const run = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'tests/slow-test-probe/vitest.config.ts', fixture], {
         cwd: join(__dirname, '..'), encoding: 'utf8', shell: process.platform === 'win32', env: { ...process.env, CI: '1' },
     });
-    const output = `${run.stdout}\n${run.stderr}`;
+    // Without its colours: where the environment forces them (CI does), vitest prints the record's line
+    // after the escapes that colour it, and the line no longer starts with its prefix.
+    const output = `${run.stdout}\n${run.stderr}`.replace(/\u001b\[[0-9;]*m/g, '');
     expect(run.status, `the planted failure passed:\n${output}`).not.toBe(0);
     const records = output.split('\n').filter((l) => l.startsWith('[slow-test] '))
         .map((l) => JSON.parse(l.slice('[slow-test] '.length)) as Record<string, unknown>);
