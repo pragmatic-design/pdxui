@@ -9,6 +9,8 @@ semver.
 
 ## Unreleased
 
+## 1.0.0-beta.1 — 2026-11-18
+
 ### Features
 
 - `@pdxui/ui` ships a browser build, for a page that loads the library from a CDN with no build step

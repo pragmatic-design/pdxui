@@ -10,7 +10,7 @@ published.
 
 A useful report says:
 
-- the package and version (`@pdxui/core@1.0.0-beta.0`, …);
+- the package and version (`@pdxui/core@1.0.0-beta.1`, …);
 - what an attacker can do, and under what conditions;
 - the smallest reproduction you have: a `.pdx` file, a page, or a test.
 
