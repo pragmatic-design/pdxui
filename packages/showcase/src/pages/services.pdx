@@ -26,6 +26,9 @@
       @pdx-row-click="e => openRecord(e.detail.row)"
       data-test="grid"></pdx-data-grid>
 
+    <!-- Loaded after the list, as on tickets (#407, #1201): the create form is most of this route's
+         graph, and a modal opened before the idle moment opens when its chunk arrives. -->
+    @defer (idle) {
     <!-- NEW, in a modal: its terms, then the service opens. -->
     <pdx-dialog ::open="createOpen" size="lg" :title="$t('services.new')" data-test="create-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
@@ -61,6 +64,7 @@
         </div>
       </pdx-form>
     </pdx-dialog>
+    }
   </section>
 </template>
 

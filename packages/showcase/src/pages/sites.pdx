@@ -26,6 +26,9 @@
       @pdx-row-click="e => openRecord(e.detail.row)"
       data-test="grid"></pdx-data-grid>
 
+    <!-- Loaded after the list, as on tickets (#407, #1201): the create form is most of this route's
+         graph, and a modal opened before the idle moment opens when its chunk arrives. -->
+    @defer (idle) {
     <!-- CREATE IN A MODAL: a name and a city; the address is the Details', in the page. -->
     <pdx-dialog
       :open="createOpen"
@@ -39,6 +42,7 @@
         @pdx-submit="e => creating.create(e.detail?.values ?? {})"
         data-test="create-form"></pdx-auto-form>
     </pdx-dialog>
+    }
   </section>
 </template>
 

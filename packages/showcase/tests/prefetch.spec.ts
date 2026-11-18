@@ -76,13 +76,18 @@ test.describe('hovering a link to a split route', () => {
             { message: 'the hover\'s prefetch did not finish', timeout: 15_000 }).toBe(true);
 
         // Count only what happens from HERE: the prefetch is already done.
+        const prefetched = [...chunks];
         const after: string[] = [];
-        page.on('request', (r) => { if (r.url().endsWith('.js')) after.push(r.url()); });
+        page.on('request', (r) => { if (r.url().endsWith('.js')) after.push(r.url().split('/').pop()!); });
 
         await page.locator('[data-test="to-customers"]').click();
         await expect(page.locator('.app main [data-test="customers"]')).toBeVisible();
-        expect(after, 'the click fetched the chunk again — the prefetch did not reach the module cache')
-            .toEqual([]);
+        // What the page loads AFTER it mounts is not the click's: the list defers what its actions
+        // open to the first idle moment (#1201), and those chunks are fetched once the list is painted,
+        // prefetch or not. The subject is the route's own graph — none of it may be asked for twice.
+        expect(after.filter((f) => prefetched.includes(f)),
+            'the click fetched the chunk again — the prefetch did not reach the module cache').toEqual([]);
+        expect(hasPage(after, 'customers'), 'the click fetched the customers page chunk').toBe(false);
     });
 
     test('control — WITHOUT the hover, the same click does fetch it', async ({ page }) => {

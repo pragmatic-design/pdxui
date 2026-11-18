@@ -1,5 +1,5 @@
 /**
- * The same three routes as `first-paint.spec.ts`, over HTTP/2: the number a real host gives (#407).
+ * The same routes as `first-paint.spec.ts`, over HTTP/2: the number a real host gives (#407).
  *
  * The suite's preview server speaks HTTP/1.1, and a browser opens six connections to it: a route
  * whose first screen needs fifty modules waits for them six at a time, one round trip per batch. A
@@ -58,6 +58,10 @@ const CERT_DIR = join(PACKAGE, 'test-results', '.h2-cert');
  *   /tickets      1928    2004    2032    2128     2350         2450
  *   /tickets/1    1304    1376    1564    1584     1750         1850
  *
+ * `/customers` joined with #1201, which defers what its actions open as `/tickets` does. Measured
+ * 2026-11-18 locally, three cold loads each: before, 2404, 2380, 2400 ms; after, 1940, 1936, 1924
+ * alone and 1924, 1920, 1936 beside the other routes (1940 + 10% → 2150).
+ *
  * What 1200 still catches, measured locally on `/` (976 ms): an incompressible 50 KB gzip module
  * imported by the dashboard paints at 1220 ms and fails; 20 KB paints at 1060 ms and does not —
  * a difference of that size is the bundle budgets' (`bundle-budget.spec.ts`), held to the KB, and
@@ -67,6 +71,7 @@ const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1200 },
     { route: '/tickets', root: 'tickets', budgetMs: 2450 },
     { route: '/tickets/1', root: 'ticket', budgetMs: 1850 },
+    { route: '/customers', root: 'customers', budgetMs: 2150 },
 ];
 
 /** A self-signed certificate for localhost, for this run only. */
