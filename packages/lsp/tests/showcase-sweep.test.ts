@@ -19,6 +19,8 @@ import { pathToFileURL } from 'url';
 import { startServer, type StdioServer } from './stdio-harness';
 
 const SHOWCASE = join(__dirname, '..', '..', 'showcase');
+/** How long the sweep waits on the server before giving up; the test's timeout is ten seconds more. */
+const SWEEP_MS = 110_000;
 
 function pdxFilesUnder(dir: string): string[] {
     const out: string[] = [];
@@ -40,13 +42,21 @@ describe('the showcase, opened in the editor', () => {
         expect(files.length, 'the sweep found no file to open').toBeGreaterThan(40);
 
         const found: string[] = [];
-        for (const file of files) {
-            const published = await server.openAndDiagnose(pathToFileURL(file).href, readFileSync(file, 'utf-8'));
-            // No line number in the key: an edit that moves lines is not a new error.
-            for (const d of published.filter(d => d.source === 'pdx-ts')) {
-                found.push(`${relative(SHOWCASE, file).split('\\').join('/')} ${d.code} ${d.message.split('\n')[0]}`);
+        // Given up on before the test's own timeout, the sweep fails naming the file it had reached:
+        // the timeout alone read the same for a slow server as for a dead one (#1184). A server that
+        // exits fails the sweep at once, through the harness.
+        const giveUp = setTimeout(() => server.giveUp(`the sweep did not finish in ${SWEEP_MS / 1000} s`), SWEEP_MS);
+        try {
+            for (const file of files) {
+                const published = await server.openAndDiagnose(pathToFileURL(file).href, readFileSync(file, 'utf-8'));
+                // No line number in the key: an edit that moves lines is not a new error.
+                for (const d of published.filter(d => d.source === 'pdx-ts')) {
+                    found.push(`${relative(SHOWCASE, file).split('\\').join('/')} ${d.code} ${d.message.split('\n')[0]}`);
+                }
             }
+        } finally {
+            clearTimeout(giveUp);
         }
         expect(found, 'type errors in the showcase — a false one is an editor bug').toEqual([]);
-    }, 120_000);
+    }, SWEEP_MS + 10_000);
 });
