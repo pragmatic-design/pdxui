@@ -35,6 +35,12 @@ count.set(v => v + 1);                  // 4
 | `@pdxui/core/server` | `renderToString`, for static generation in Node |
 | `@pdxui/core/server-dom` | `installServerDom`, the server DOM, installed before anything else of core is imported |
 
+Each sub-path is a module of its own, sharing one reactive state with the root, so a `signal` from
+`@pdxui/core/reactivity` drives an `effect` from `@pdxui/core`. A sub-path costs what it holds: one
+`signal` is 1.8 KB gzip from `/reactivity` and 3.6 KB from the root in a production Vite build.
+`@pdxui/core/renderer` exports the template helper as `pipe`, which the root names `templatePipe`; the
+root's `pipe` is the reactivity operator.
+
 ## Documentation
 
 - [Reactivity](https://pdxui.com/docs/concepts) and [signal operators](https://pdxui.com/docs/signal-operators)

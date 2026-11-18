@@ -22,20 +22,20 @@
     "./reactivity": {
 "development": "./src/reactivity/index.ts",
       "types": "./dist/reactivity/index.d.ts",
-      "import": "./dist/pragmatic-core.es.js",
-      "require": "./dist/pragmatic-core.cjs"
+      "import": "./dist/reactivity.es.js",
+      "require": "./dist/reactivity.cjs"
     },
     "./renderer": {
 "development": "./src/renderer/index.ts",
       "types": "./dist/renderer/index.d.ts",
-      "import": "./dist/pragmatic-core.es.js",
-      "require": "./dist/pragmatic-core.cjs"
+      "import": "./dist/renderer.es.js",
+      "require": "./dist/renderer.cjs"
     },
     "./component": {
 "development": "./src/component/index.ts",
       "types": "./dist/component/index.d.ts",
-      "import": "./dist/pragmatic-core.es.js",
-      "require": "./dist/pragmatic-core.cjs"
+      "import": "./dist/component.es.js",
+      "require": "./dist/component.cjs"
     },
     "./devtools": {
 "development": "./src/devtools/overlay.ts",

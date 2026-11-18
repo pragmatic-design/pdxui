@@ -78,15 +78,16 @@ async function initialKb(code: string): Promise<{ kb: number; modules: string[] 
  * argued for in the commit that raises it.
  */
 const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
-    // 340.1: every component registered, for one signal.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; signal(0);", ceiling: 340.5 },
-    { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; signal(0);", ceiling: 4.5 },
-    { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 14 },
-    // 331.7: what `/ui` is for, an app that wants every component registered.
+    // 340.0: every component registered, for one signal.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 340.5 },
+    { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
+    { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
+    // 331.6: what `/ui` is for, an app that wants every component registered.
     { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 332 },
-    { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; signal(0);", ceiling: 4.5 },
-    // 4.3, the same as the root: Rollup takes from core's one ES module only what is used (#1213).
-    { name: '@pdxui/core/reactivity', code: "import { signal } from '@pdxui/core/reactivity'; signal(0);", ceiling: 4.5 },
+    { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 4 },
+    // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
+    // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
+    { name: '@pdxui/core/reactivity', code: "import { signal } from '@pdxui/core/reactivity'; globalThis.out = signal(0);", ceiling: 2 },
     { name: '@pdxui/ui/button', code: "import '@pdxui/ui/button';", ceiling: 16 },
 ];
 /** How far under its ceiling a measurement may sit before the ceiling must come down. */
@@ -100,6 +101,10 @@ describe('what each public entry costs an app', () => {
             const { kb, modules } = await initialKb(consumer.code);
             // The resolver reached the built packages, not their TypeScript sources.
             expect(modules.filter((m) => /[\\/]packages[\\/][^\\/]+[\\/]src[\\/]/.test(m)), `${name} was built from src/, not dist/`).toEqual([]);
+            // And the consumer survived the build: a call whose result nothing reads is dropped from a
+            // side-effect-free module, which measured `@pdxui/core/reactivity` at 0 KB (#1213). Each
+            // consumer keeps what it takes on `globalThis`.
+            expect(kb, `${name} measured ${kb} KB: the build dropped the consumer, so this measures nothing`).toBeGreaterThan(1);
             measured.set(name, kb);
         }
         return measured.get(name)!;
