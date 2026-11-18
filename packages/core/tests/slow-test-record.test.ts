@@ -12,7 +12,8 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { waitOnChild, stopWaitingOn, describeChildren } from './setup/slow-test-children';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { takeSample, describeSample, recordLine, recordLines, failureLines, hookOf, SLOW_TEST_MS, ON_CPU } from './setup/slow-test-sample';
 
@@ -43,6 +44,19 @@ describe('the sample', () => {
         const r = describeSample(start, takeSample());
         expect(r.loopBusy).toBeLessThan(0.3);
         expect(r.cpuShare).toBeLessThan(0.3);
+        expect(r.reading).toBe('waiting, its event loop idle');
+    });
+
+    it('the probe\'s own reads of the children are not the test\'s: they leave the window', () => {
+        // Built, not measured: of 3000 ms, 1000 were the probe reading a child (a synchronous Get-Process
+        // in afterEach, slow under the gate's load). Counted as the test's, they made an idle test read
+        // as held off the CPU (#1196).
+        const r = describeSample(
+            { at: 0, elu: { idle: 0, active: 0, utilization: 0 }, cpu: { user: 0, system: 0 }, gcMs: 0, probeMs: 0 },
+            { at: 3000, elu: { idle: 1900, active: 1100, utilization: 0.37 }, cpu: { user: 20_000, system: 0 }, gcMs: 0, probeMs: 1000 },
+        );
+        expect(r.wallMs, 'the wall time is still the whole window').toBe(3000);
+        expect(r.loopBusy).toBeLessThan(0.3);
         expect(r.reading).toBe('waiting, its event loop idle');
     });
 
@@ -152,6 +166,37 @@ describe('the blind spots of #1183', () => {
         expect(records[0].cpuShare as number).toBeLessThan(ON_CPU);
         expect(records[0].reading).toBe('waiting on a child that works on the CPU');
     }, 60_000);
+
+    // vitest runs a test's onTestFailed after its afterEach: a child stopped there was gone from the
+    // record, which then read "waiting, its event loop idle" with no children (#1196).
+    it('a child stopped in afterEach is still in its test\'s record, as it was when stopped, and not in the next', () => {
+        const { records, output } = plantedRecords('child-stopped-after-each');
+        expect(records, output).toHaveLength(2);
+        const children = records[0].children as { label: string; alive: boolean; cpuShare: number }[] | undefined;
+        expect(children, `the stopped child is missing from its record — ${output}`).toHaveLength(1);
+        expect(children![0]).toMatchObject({ label: 'spinner', alive: true });
+        expect(children![0].cpuShare).toBeGreaterThanOrEqual(ON_CPU);
+        expect(records[0].reading).toBe('waiting on a child that works on the CPU');
+        expect(records[1].children, 'the next test reports a child it never named').toBeUndefined();
+        expect(records[1].reading).toBe('waiting, its event loop idle');
+    }, 60_000);
+
+    it('a child that has exited reads as not alive, and the read does not throw', async () => {
+        // On Windows Get-Process exits 1 for a pid that is gone, even told to continue silently: read
+        // as a failure, it threw out of the probe and failed the test the probe was only describing.
+        const child = spawn(process.execPath, ['-e', "process.stdout.write('go'); setTimeout(() => {}, 60000)"], { stdio: ['ignore', 'pipe', 'ignore'] });
+        await new Promise((resolve) => child.stdout!.once('data', resolve));
+        waitOnChild(child.pid!, 'gone');
+        try {
+            const exited = new Promise((resolve) => child.once('exit', resolve));
+            child.kill();
+            await exited;
+            const report = describeChildren().find((c) => c.pid === child.pid);
+            expect(report).toMatchObject({ label: 'gone', alive: false, cpuShare: 0 });
+        } finally {
+            stopWaitingOn(child.pid!);
+        }
+    }, 30_000);
 
     it('the hook is read from the stack vitest gives its error', () => {
         // As vitest 4.1 words it: the runner's frame names the hook, the next frame is where it was declared.
