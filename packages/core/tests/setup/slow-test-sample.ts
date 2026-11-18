@@ -12,6 +12,7 @@ import { performance, PerformanceObserver, type EventLoopUtilization } from 'nod
 import { freemem } from 'node:os';
 import { getHeapStatistics } from 'node:v8';
 import { knownFailureLines } from '../../../../scripts/lib/known-failures.mjs';
+import type { ChildReport } from './slow-test-children';
 
 /** A failed test over this long gets a record: under vitest's 5 s timeout, over every scan alone. */
 export const SLOW_TEST_MS = 2000;
@@ -35,6 +36,8 @@ export interface SampleReport {
     heapUsedMB: number;
     heapLimitMB: number;
     freeMemMB: number;
+    /** The child processes the test named as the ones it waits on (#1183), when it named any. */
+    children?: ChildReport[];
     reading: string;
 }
 
@@ -67,8 +70,19 @@ export const LOOP_BUSY = 0.3;
  */
 export const ON_CPU = 0.3;
 
-/** What the process did from `start` to `end`. */
-export function describeSample(start: Sample, end: Sample): SampleReport {
+/**
+ * What a process whose loop idled was waiting on, when it named the children it waits on: a child
+ * gone, one working, or one that is itself held or waiting. Without children, null.
+ */
+function childReading(children: ChildReport[]): string | null {
+    if (children.length === 0) return null;
+    if (children.some((c) => !c.alive)) return 'waiting on a child that has exited';
+    if (children.some((c) => c.cpuShare >= ON_CPU)) return 'waiting on a child that works on the CPU';
+    return 'waiting on a child that is held off the CPU, or waiting itself';
+}
+
+/** What the process did from `start` to `end`, beside the children it waits on. */
+export function describeSample(start: Sample, end: Sample, children: ChildReport[] = []): SampleReport {
     const wallMs = Math.max(end.at - start.at, 0.001);
     const elu = performance.eventLoopUtilization(end.elu, start.elu);
     const cpuMs = (end.cpu.user - start.cpu.user + end.cpu.system - start.cpu.system) / 1000;
@@ -78,7 +92,7 @@ export function describeSample(start: Sample, end: Sample): SampleReport {
     const heap = getHeapStatistics();
     let reading: string;
     if (gcMs > wallMs / 2) reading = 'collecting garbage';
-    else if (loopBusy < LOOP_BUSY) reading = 'waiting, its event loop idle';
+    else if (loopBusy < LOOP_BUSY) reading = childReading(children) ?? 'waiting, its event loop idle';
     else if (cpuShare < ON_CPU) reading = 'held off the CPU: not scheduled, or in a synchronous wait';
     else reading = 'working on the CPU';
     return {
@@ -89,8 +103,28 @@ export function describeSample(start: Sample, end: Sample): SampleReport {
         heapUsedMB: Math.round(heap.used_heap_size / MB),
         heapLimitMB: Math.round(heap.heap_size_limit / MB),
         freeMemMB: Math.round(freemem() / MB),
+        ...(children.length > 0 ? { children } : {}),
         reading,
     };
+}
+
+/** The runner's frame that names a hook, as vitest 4.1 stacks a hook's timeout. */
+const HOOK_FRAME = /^\s*at (beforeAll|afterAll|beforeEach|afterEach) \(/;
+/** A frame's location: `at fn (path:line:col)` or `at path:line:col`. */
+const FRAME_AT = /^\s*at (?:.*?\()?(.*?):(\d+):(\d+)\)?\s*$/;
+
+/**
+ * The hook a suite's error came from, and where it was declared, read from the stack vitest gives a
+ * hook's timeout: its runner frame names the hook, and the frame after it is the declaration.
+ */
+export function hookOf(stack: string): string {
+    const lines = stack.split('\n');
+    const i = lines.findIndex((l) => HOOK_FRAME.test(l));
+    if (i < 0) return 'a hook';
+    const hook = HOOK_FRAME.exec(lines[i])![1];
+    const at = FRAME_AT.exec(lines[i + 1] ?? '');
+    if (!at) return `${hook} hook`;
+    return `${hook} hook (${at[1].replace(/\\/g, '/').split('/').pop()}:${at[2]}:${at[3]})`;
 }
 
 /** The line the gate log carries, searchable by its prefix. */
