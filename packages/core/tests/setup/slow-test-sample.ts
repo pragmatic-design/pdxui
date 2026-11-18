@@ -12,7 +12,7 @@ import { performance, PerformanceObserver, type EventLoopUtilization } from 'nod
 import { freemem } from 'node:os';
 import { getHeapStatistics } from 'node:v8';
 import { knownFailureLines } from '../../../../scripts/lib/known-failures.mjs';
-import type { ChildReport } from './slow-test-children';
+import { probeReadingMs, type ChildReport } from './slow-test-children';
 
 /** A failed test over this long gets a record: under vitest's 5 s timeout, over every scan alone. */
 export const SLOW_TEST_MS = 2000;
@@ -23,6 +23,8 @@ export interface Sample {
     elu: EventLoopUtilization;
     cpu: { user: number; system: number };
     gcMs: number;
+    /** The probe's own time reading children so far (#1196): taken out of the window. 0 when absent. */
+    probeMs?: number;
 }
 
 /** What the process did between two samples, and what that reads as. */
@@ -55,7 +57,7 @@ function watchGc(): void {
 /** The process now. */
 export function takeSample(): Sample {
     watchGc();
-    return { at: performance.now(), elu: performance.eventLoopUtilization(), cpu: process.cpuUsage(), gcMs: gcTotal };
+    return { at: performance.now(), elu: performance.eventLoopUtilization(), cpu: process.cpuUsage(), gcMs: gcTotal, probeMs: probeReadingMs() };
 }
 
 const round = (n: number, digits = 2): number => Math.round(n * 10 ** digits) / 10 ** digits;
@@ -87,8 +89,12 @@ export function describeSample(start: Sample, end: Sample, children: ChildReport
     const elu = performance.eventLoopUtilization(end.elu, start.elu);
     const cpuMs = (end.cpu.user - start.cpu.user + end.cpu.system - start.cpu.system) / 1000;
     const gcMs = end.gcMs - start.gcMs;
-    const loopBusy = elu.utilization;
-    const cpuShare = cpuMs / wallMs;
+    // The probe's own reads of the children held the loop with no CPU of this process (#1196): out of
+    // the window the test's loop and CPU are read over. The wall time stays the whole window.
+    const probeMs = Math.min(Math.max((end.probeMs ?? 0) - (start.probeMs ?? 0), 0), wallMs - 0.001);
+    const windowMs = wallMs - probeMs;
+    const loopBusy = probeMs > 0 ? Math.max(elu.active - probeMs, 0) / windowMs : elu.utilization;
+    const cpuShare = cpuMs / windowMs;
     const heap = getHeapStatistics();
     let reading: string;
     if (gcMs > wallMs / 2) reading = 'collecting garbage';
