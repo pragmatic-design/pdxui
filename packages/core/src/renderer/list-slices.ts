@@ -22,6 +22,13 @@
 //     10 000-row append's INP at 88-112 ms locally, on the CI runner's edge. Not a time budget
 //     either: the script of a row is a small part of its cost, layout and paint are the rest, so
 //     40 ms of script made about 5 000 rows and an INP of 184-208 ms.
+//
+// Measured again on 2026-11-18 (#1205), `pnpm bench:jfb --headless`, one Windows machine, one session,
+// median of three runs: create 10 000 is 1.33× vanillajs (510 ms against 383) at the commit that set
+// these numbers and 1.32× (508 against 384) on main, so nothing regressed; with the six default
+// frameworks in one run, 1.35× (509 against 377), where svelte, solid, lit and vue are 1.12-1.21×. The
+// script is 0.21× vanillajs's: the rest is the frames of a growing list. A run on a loaded machine had
+// measured 2.87×, with vanillajs itself at 497 ms: compare only inside one quiet run.
 
 import { processInSlices, yieldToBrowser } from '../utils/slices';
 import { placePartNodes } from './part-nodes';
