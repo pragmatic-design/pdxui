@@ -117,28 +117,31 @@ describe('the sample', () => {
 // language server it spawns, so a starved server and a dead one both read "waiting, its event loop
 // idle" with cpuShare 0. The planted failures run through the real setup file, in a vitest of their own.
 
-/** Run one planted failure; the `[slow-test]` records it printed, parsed. */
-function plantedRecords(fixture: string): Record<string, unknown>[] {
+/** Run one planted failure; the `[slow-test]` records it printed, parsed, and what it printed. */
+function plantedRecords(fixture: string): { records: Record<string, unknown>[]; output: string } {
     const run = spawnSync('pnpm', ['exec', 'vitest', 'run', '--config', 'tests/slow-test-probe/vitest.config.ts', fixture], {
         cwd: join(__dirname, '..'), encoding: 'utf8', shell: process.platform === 'win32', env: { ...process.env, CI: '1' },
     });
-    expect(run.status, 'the planted failure passed').not.toBe(0);
-    return `${run.stdout}\n${run.stderr}`.split('\n').filter((l) => l.startsWith('[slow-test] '))
+    const output = `${run.stdout}\n${run.stderr}`;
+    expect(run.status, `the planted failure passed:\n${output}`).not.toBe(0);
+    const records = output.split('\n').filter((l) => l.startsWith('[slow-test] '))
         .map((l) => JSON.parse(l.slice('[slow-test] '.length)) as Record<string, unknown>);
+    // What the child vitest said, so a run with no record says why rather than only that.
+    return { records, output: `the planted run printed:\n${output.slice(-4000)}` };
 }
 
 describe('the blind spots of #1183', () => {
     it('a beforeAll past its timeout prints a record that names the hook', () => {
-        const records = plantedRecords('hook-timeout');
-        expect(records, 'the hook timed out with no record').toHaveLength(1);
+        const { records, output } = plantedRecords('hook-timeout');
+        expect(records, `the hook timed out with no record — ${output}`).toHaveLength(1);
         expect(records[0].test).toMatch(/^beforeAll hook \(hook-timeout\.fixture\.ts:\d+:\d+\)$/);
         expect(records[0].file).toMatch(/hook-timeout\.fixture\.ts$/);
         expect(records[0].wallMs as number).toBeGreaterThanOrEqual(SLOW_TEST_MS);
     }, 60_000);
 
     it('a test waiting on a child that spins reports the child\'s CPU, not 0', () => {
-        const records = plantedRecords('child-cpu');
-        expect(records).toHaveLength(1);
+        const { records, output } = plantedRecords('child-cpu');
+        expect(records, output).toHaveLength(1);
         const children = records[0].children as { label: string; alive: boolean; cpuShare: number }[];
         expect(children, 'the record does not name the child').toHaveLength(1);
         expect(children[0]).toMatchObject({ label: 'spinner', alive: true });
