@@ -9,6 +9,20 @@ semver.
 
 ## Unreleased
 
+### Features
+
+- `@pdxui/ui`'s browser build serves the parts of core's API a page that drives the components calls
+  (#1203): `dist/browser/core/reactivity.js` and `dist/browser/core/i18n.js`. A page that loads one
+  button and takes `signal` from `core.js` downloads all of core's API, 131 KB gzip; from
+  `core/reactivity.js` it downloads 38.5 KB. `core.js` stays, and every file shares one copy of core.
+
+### Changed
+
+- `@pdxui/cli` no longer depends on `@pdxui/lsp` (#1202). `pdx check --types` runs the type-check the
+  CLI now ships in its own `dist/`; a new project's `node_modules` is about 31 MB smaller. The CLI names
+  `typescript` as an optional peer, as `@pdxui/lsp` does, since the check runs on the project's own
+  TypeScript. An editor other than VS Code still installs `@pdxui/lsp` for `pdx-lsp`.
+
 ## 1.0.0-beta.1 — 2026-11-18
 
 ### Features
