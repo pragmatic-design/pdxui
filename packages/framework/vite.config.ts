@@ -1,4 +1,6 @@
-import { defineConfig } from 'vite';
+// `vitest/config`, not `vite`: the file carries a `test` block, as router's does.
+import { defineConfig } from 'vitest/config';
+import { unitTestWorkers } from '../../build/unit-test-workers';
 
 // The meta-package is five files and 22 lines of re-export, which reads like an argument for having
 // no build at all. It is also the package a beginner installs first (`npm i @pdxui/framework`), and
@@ -27,5 +29,12 @@ export default defineConfig({
         rollupOptions: {
             external: ['@pdxui/core', '@pdxui/ui', '@pdxui/router', '@pdxui/design'],
         },
+    },
+    // What each public entry costs an app (#1212): Node, building consumers against the packages' dist.
+    test: {
+        include: ['tests/**/*.test.ts'],
+        // Its share of the machine, not all of it: `test:unit` runs four packages at once.
+        maxWorkers: unitTestWorkers(),
+        setupFiles: ['../core/tests/setup/slow-test-record.ts'],
     },
 });
