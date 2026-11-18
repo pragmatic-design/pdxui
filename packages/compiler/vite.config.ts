@@ -17,6 +17,8 @@ export default defineConfig({
             // typescript is external too (a runtime dependency: the AST signal-rewriter uses it,
             // and it's far too large to bundle).
             external: ['vite', 'path', 'fs', 'url', 'module', 'typescript'],
+            // The maps name `../src/…`, which the package ships; embedding it too was 3.1 MB (#1208).
+            output: { sourcemapExcludeSources: true },
         },
         minify: false,
         sourcemap: true,
