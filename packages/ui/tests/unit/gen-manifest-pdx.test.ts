@@ -56,3 +56,26 @@ describe('a .pdx component in the manifest, against its TypeScript version', () 
         expect(declarationOf('src/select/pdx-select.ts').map((d) => d.tagName)).toEqual(['pdx-select']);
     });
 });
+
+describe('the variant axes of a .pdx, each with its doc inside the @variants block (#1228)', () => {
+    const source = [
+        '<template><span data-part="root"></span></template>',
+        '<script>',
+        '/** A probe. */',
+        '@variants {',
+        '  /** sm, md (the default) or lg. */',
+        "  size: { md: '.x-md', sm: '.x-sm', lg: '.x-lg' } = md;",
+        '  /** pill (the default) or square. */',
+        "  shape: { pill: '.x-pill', square: '.x-square' } = pill;",
+        '}',
+        '@part root;',
+        '</script>',
+    ].join('\n');
+    const decl = (analyzeFile(join(UI, 'src', 'axes', 'pdx-axes.pdx'), source, parseCategories()) as Module[])[0].declarations[0];
+    const described = (name: string) => (decl.attributes as { name: string; description?: string }[]).find((a) => a.name === name)?.description;
+
+    it('writes each axis\'s description to the manifest', () => {
+        expect(described('size')).toBe('sm, md (the default) or lg.');
+        expect(described('shape')).toBe('pill (the default) or square.');
+    });
+});

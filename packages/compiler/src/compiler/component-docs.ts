@@ -6,7 +6,7 @@
 // comment between the two does not detach it, as TypeScript's JSDoc does not. The comments are
 // returned as written: the reader parses their tags, so a .pdx and a .ts are read the same way.
 
-import { skipNonCode } from './tokenizer';
+import { skipNonCode, findClosing } from './tokenizer';
 
 /** What a doc comment describes: a rune's declaration, or a script declaration (function, const, let). */
 export type DocTarget = 'prop' | 'model' | 'event' | 'slot' | 'state' | 'variant' | 'declaration';
@@ -47,6 +47,9 @@ const DECLARATIONS: [DocTarget, RegExp][] = [
     ['declaration', new RegExp(`^(?:export\\s+)?(?:const|let|var)\\s+(${NAME})`)],
 ];
 
+// Match: an axis of a `@variants` block, `size: { … }`, at the line's first token. Groups: [1]=the axis
+const AXIS = new RegExp(`^(${NAME})\\s*:\\s*\\{`);
+
 /** What the code starting at `text` declares, or null when it is none of DECLARATIONS. */
 function declaredAt(text: string): { kind: DocTarget; name: string } | null {
     for (const [kind, re] of DECLARATIONS) {
@@ -64,6 +67,9 @@ export function scriptDocComments(script: string): ScriptDocs {
     const out: ScriptDocs = { declarations: [] };
     let seenCode = false;
     let pending: string | null = null;
+    // The `{ … }` of the `@variants` block being read, as offsets: a doc inside it, above `axis: {`,
+    // describes that axis (#1228). Outside it, `name: {` is an object literal's key.
+    let variantsBlock: { open: number; close: number } | null = null;
     let i = 0;
     while (i < script.length) {
         const end = skipNonCode(script, i);
@@ -84,9 +90,18 @@ export function scriptDocComments(script: string): ScriptDocs {
         if (/\s/.test(script[i])) { i++; continue; }
         // The first character of code: what it declares takes the pending doc.
         seenCode = true;
+        if (variantsBlock && i > variantsBlock.close) variantsBlock = null;
+        if (!variantsBlock && script.startsWith('@variants', i)) {
+            const open = script.indexOf('{', i);
+            const close = open < 0 ? -1 : findClosing(script, open);
+            if (close > open) variantsBlock = { open, close };
+        }
         if (pending !== null) {
             const lineEnd = script.indexOf('\n', i);
-            const declared = declaredAt(script.slice(i, lineEnd === -1 ? undefined : lineEnd));
+            const line = script.slice(i, lineEnd === -1 ? undefined : lineEnd);
+            const inBlock = variantsBlock !== null && i > variantsBlock.open && i < variantsBlock.close;
+            const axis = inBlock ? AXIS.exec(line) : null;
+            const declared = axis ? { kind: 'variant' as const, name: axis[1] } : declaredAt(line);
             if (declared) out.declarations.push({ ...declared, doc: pending });
             pending = null;
         }

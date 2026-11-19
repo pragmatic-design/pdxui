@@ -44,6 +44,28 @@ describe('scriptDocComments', () => {
         ]);
     });
 
+    it('a doc inside a @variants block describes the axis below it, each axis its own (#1228)', () => {
+        const script = [
+            "import x from 'x';",
+            '@variants {',
+            '  /** sm, md or lg. */',
+            "  size: { md: '.x-md', sm: '.x-sm', lg: '.x-lg' } = md;",
+            '  /** pill or square. */',
+            "  shape: { pill: '.x-pill', square: '.x-square' } = pill;",
+            '  tone: { a, b };',
+            '}',
+        ].join('\n');
+        expect(scriptDocComments(script).declarations).toEqual([
+            { kind: 'variant', name: 'size', doc: '/** sm, md or lg. */' },
+            { kind: 'variant', name: 'shape', doc: '/** pill or square. */' },
+        ]);
+    });
+
+    it('the control: a doc above an object literal\'s key outside a @variants block is no axis', () => {
+        const script = "import x from 'x';\nconst sizes = {\n  /** The small one. */\n  sm: { px: 24 },\n};";
+        expect(scriptDocComments(script).declarations.filter(d => d.kind === 'variant')).toEqual([]);
+    });
+
     it('a line comment between the block and the declaration does not detach it, as in TypeScript', () => {
         const docs = scriptDocComments("import x from 'x';\n/** Parts. */\n// pdx-ignore X: why\n@prop a: string = '';");
         expect(docs.declarations).toEqual([{ kind: 'prop', name: 'a', doc: '/** Parts. */' }]);
