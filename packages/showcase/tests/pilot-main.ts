@@ -22,18 +22,33 @@ const WORKTREE = join(repoDir, 'node_modules', '.cache', 'pdx-main');
 const git = (args: string[], cwd = repoDir): string => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 
 /**
- * The root of a worktree at `origin/main`, installed, and its commit. Fetched first; when the fetch
- * fails — offline — the last `origin/main` this repository has is used, and the commit says which.
+ * What the worktree is: `origin/main`, or the ref `PDX_PORT_BASE` names (#1243) — a commit to measure
+ * against instead, as the TypeScript version of a component moved to `.pdx` since.
+ */
+const BASE = process.env.PDX_PORT_BASE || '';
+
+/**
+ * The root of a worktree at `origin/main` (or `PDX_PORT_BASE`), installed, and its commit. Fetched
+ * first; when the fetch of `main` fails — offline — the last `origin/main` this repository has is used,
+ * and the commit says which. A `PDX_PORT_BASE` that cannot be fetched or resolved stops the build: a
+ * measurement against some other commit would answer another question.
  */
 export function mainWorktree(): { root: string; commit: string } {
     // A shallow clone (CI's checkout) fetches main shallow too; a full clone is left full.
     const shallow = git(['rev-parse', '--is-shallow-repository']) === 'true';
-    try {
-        git(['fetch', '--no-tags', ...(shallow ? ['--depth=1'] : []), 'origin', 'main']);
-    } catch (e) {
-        console.warn(`[pilot-main] could not fetch origin/main (${(e as Error).message.split('\n')[0]}): the last one known is measured`);
+    let commit: string;
+    if (BASE) {
+        git(['fetch', '--no-tags', ...(shallow ? ['--depth=1'] : []), 'origin', BASE]);
+        commit = git(['rev-parse', 'FETCH_HEAD']);
+        console.log(`[pilot-main] PDX_PORT_BASE=${BASE}: main's side is ${commit}`);
+    } else {
+        try {
+            git(['fetch', '--no-tags', ...(shallow ? ['--depth=1'] : []), 'origin', 'main']);
+        } catch (e) {
+            console.warn(`[pilot-main] could not fetch origin/main (${(e as Error).message.split('\n')[0]}): the last one known is measured`);
+        }
+        commit = git(['rev-parse', 'origin/main']);
     }
-    const commit = git(['rev-parse', 'origin/main']);
     if (!existsSync(join(WORKTREE, '.git'))) {
         mkdirSync(dirname(WORKTREE), { recursive: true });
         git(['worktree', 'add', '--detach', '--force', WORKTREE, commit]);

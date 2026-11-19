@@ -28,7 +28,7 @@
  * be weighed as if it were today's.
  */
 import { build } from 'vite';
-import { rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, rmSync, writeFileSync } from 'node:fs';
 // With its extension: `tools/perf/lib.mjs` imports this file under Node's own type stripping, which
 // does not guess one, as Playwright's loader does.
 import { mainWorktree } from './pilot-main.ts';
@@ -97,6 +97,9 @@ export default async function buildScenarios(): Promise<void> {
         const root = join(main.root, 'packages', 'showcase', 'scenarios', dir);
         await build({ root, configFile: join(root, config), logLevel: 'warn', build: { outDir: scenarioDist(out), emptyOutDir: true } });
         writeFileSync(join(scenarioDist(out), 'commit.txt'), main.commit);
+        // Its library's manifest beside it: which tags `main` still has in TypeScript, for
+        // `scenario-port-mount.spec.ts` (#1243), read from the build rather than the worktree.
+        copyFileSync(join(main.root, 'packages', 'ui', 'custom-elements.json'), join(scenarioDist(out), 'custom-elements.json'));
     }
     // The CLI's own build, from its sources: the showcase does not depend on the CLI's package.
     const { buildSsg } = await import('../../cli/src/commands/build-ssg');
