@@ -600,6 +600,7 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 registerPropsChange: (fn) => this._propsChangeCallbacks.push(fn),
                 registerBeforeLeave: (fn) => this._beforeLeaveCallbacks.push(fn),
                 registerRouteChange: (fn) => this._routeChangeCallbacks.push(fn),
+                registerFrame: (fn) => this.frame(fn),
                 element: this,
             };
 

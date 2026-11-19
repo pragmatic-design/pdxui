@@ -210,7 +210,7 @@ export type { ErrorSource, ErrorContext, GlobalErrorHandler } from './component/
 export {
     onMount, onDestroy, onUpdated, onError, onShow, onHide,
     onPropsChange, onBeforeLeave, onRouteChange,
-    onVisible, onResize, useEffect,
+    onVisible, onResize, onNextFrame, useEffect,
 } from './component/lifecycle';
 export type { ComponentScope, PropChange } from './component/lifecycle';
 

@@ -32,6 +32,7 @@ function createTestScope(): ComponentScope & {
         registerPropsChange: (fn) => propsChangeCbs.push(fn),
         registerBeforeLeave: (fn) => beforeLeaveCbs.push(fn),
         registerRouteChange: (fn) => routeChangeCbs.push(fn),
+        registerFrame: () => {},
         element: document.createElement('div'),
         mountCbs, destroyCbs, showCbs, hideCbs, propsChangeCbs, beforeLeaveCbs, routeChangeCbs,
     };

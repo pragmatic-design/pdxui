@@ -58,8 +58,23 @@ with "reactivity".
 | `onShow` / `onHide` | keep-alive: frozen/resumed | pause/resume work |
 | `onVisible` | enters the viewport | lazy work, entrance animations |
 | `onResize` | the element's size changes | imperative responsive layout |
+| `onNextFrame` | the next animation frame, if the component is still mounted then | DOM work that waits for the page to lay out what this frame added |
 
 ## Examples that clarify the difference
+
+**Look at what is next to the component, once the page has drawn it** — `onNextFrame` runs once in the
+next frame, and not at all if the component was removed by then. A label can find the control placed
+after it this way, without a timer of its own or a flag to check:
+
+```pdx
+import { onNextFrame } from '@pdxui/core';
+
+let box = $signal(null);
+onNextFrame(() => {
+  const control = box?.parentElement?.nextElementSibling;
+  // …tie the label to it
+});
+```
 
 **Block leaving with unsaved changes** — `onBeforeLeave` can prevent navigation:
 
