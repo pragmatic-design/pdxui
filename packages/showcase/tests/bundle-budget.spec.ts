@@ -350,7 +350,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // paint: /customers 175.0 → 105.2 KB, /sites 162.3 → 96.9, /employees 161.7 → 96.3, their contracts
 // 124.3 → 28.9, /assets 119.9 → 102.8, /services 105.1 → 98.0 (gzip level 9). The whole of the JS,
 // same machine, same level: main 472.5 → this branch 476.5 KB; this file's own measure reads 477.2.
-const BUDGET_KB = { entry: 43.6, js: 477.3, css: 67, blocking: 103 };
+// entry 43.6 → 43.9 (owner's OK): static @for rows (#1233). The shell has a row that reads only its
+// item, so the entry carries what builds one — the renderer of list-static.ts, the rebuild of a row
+// whose kept key has a new item, collectIfAny — and list.ts's calls to it. A list without static rows
+// or @empty does not bundle that code (the jfb app stayed at 14.4 KB). The built dist: this branch
+// 44939 bytes gzipped locally, 43.9 KB on the CI's line, where main sat at 43.5.
+const BUDGET_KB = { entry: 43.9, js: 477.3, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -229,6 +229,22 @@ keyed selector (core's `selector`): when `selected` changes, the two rows it con
 every row. The comparison has to be exactly the `track` expression against the signal, either way
 round; anything else is read as written.
 
+A row that shows only its item — the item itself, its `track` key, literals — is **static**: it is
+built once, with nothing reactive in it (core's `eachStatic`), the way a hand-written `map()` builds
+rows. When an item is replaced by a new one under the same key, its row is built again. A row that
+reads anything else — a member of the item (`{{ todo.text }}`), the index, a prop or a signal — keeps
+its reactive bindings. To make a row static, compute what it shows first and loop over that:
+
+```pdx
+<script>
+@prop keys: string = '';
+const shown = $derived(keys.split('+').map(k => k.trim()));
+</script>
+<template>
+  @for (shown as key, i; track i) { <kbd>{{ key }}</kbd> }
+</template>
+```
+
 An event written in a row — `@click`, `@dblclick`, `@input`, `@change`, `@keydown`, `@keyup`,
 `@pointerdown`, `@pointerup`, `@contextmenu` — does not add a listener per row: the compiler stores
 the handler on the row's element, and the component listens once per event type (core's `delegate`).

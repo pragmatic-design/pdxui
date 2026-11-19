@@ -1019,7 +1019,35 @@ the `track` expression. A plain `item` compiles to `eachRow(() => ctx.items(), '
 (`{{ item.name }}` is `() => item().name`). A destructured binding compiles to `eachDestructured(…)`,
 its names bound once from the object the row was created with. `track item.field` is passed as the field name;
 any other key is a function, `(item, i) => …`. Rows are moved, not rebuilt, by a keyed
-reconciliation. `@empty` wraps the loop in `when(() => items?.length > 0, …, () => html\`…\`)`.
+reconciliation. `@empty` is given to the list (`eachRow(…, transitions, listEmpty(() => …))`), which
+renders it between its markers while it has no row, in its own scope, disposed when the first row
+comes (#1233). A source that is `null` or `undefined` shows `@empty`, like an empty array. A list
+without `@empty` does not carry its code into a bundle, nor does a list without static rows carry
+theirs.
+
+**A static row** (#1233) is built once from its item, with nothing reactive in it, and compiles to
+`eachStatic(…)`: each binding is written once, there is no item signal, and no scope is kept unless
+something in the row registers one. A row is static when every value it binds, in `{{ }}` or in a
+`:name`, is made only of these:
+- the item itself;
+- literals;
+- the script's top-level `const`s whose value is literals;
+- the `track` expression.
+
+A static row is reconciled by key like any other. A row whose key stays with the same item keeps its
+node, and a moved row moves. A row whose key stays with a **different** item is built again in its
+place, since nothing in it could update. Event handlers do not change this: they run when the event
+fires. A row stays reactive, as `eachRow`, when any of these holds:
+- it reads the index, a prop, a `$signal`, a `$derived` or a store;
+- it reads a member of the item: `{{ item.name }}` stays reactive, because an item may be a `$store`
+  proxy changed in place;
+- it calls a function, which may read a signal;
+- it holds a block (`@if`, a nested `@for`…), a `::` two-way binding, a `:ref`, a `:show`, an
+  `attach:` or a pipe;
+- the `@for` has a `@transition` or `@virtual`.
+
+To make a row static, compute what it shows in a `$derived` and loop over that:
+`@for (shown as key, i; track i) { <kbd>{{ key }}</kbd> }`.
 
 A change that adds more than 1 000 rows at once (`LIST_SLICE_THRESHOLD`) renders the first 250 in
 the same task (`LIST_FIRST_SLICE`), so they are painted in the next frame, and after that frame the

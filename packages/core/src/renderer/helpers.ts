@@ -3,7 +3,9 @@
 
 import { DEV } from '../utils/env';
 import { effect, signal, collectDisposers, onDispose } from '../reactivity/signal';
-import { repeat, repeatRows } from './list';
+import { repeat, repeatRows, mountList, type RepeatOptions } from './list';
+import { staticRowRenderer } from './list-static';
+import type { ListEmpty } from './list-empty';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
@@ -168,12 +170,18 @@ export function eachDestructured<T>(
     items: () => T[],
     key: string | ((item: T, index: number) => unknown),
     renderFn: (item: T, index: number) => Node,
-    options?: TransitionOptions
+    options?: TransitionOptions,
+    empty?: ListEmpty
 ): DocumentFragment {
     const keyFn = typeof key === 'string'
         ? (item: T) => (item as Record<string, unknown>)[key]
         : key;
-    return repeat(items, keyFn, renderFn, { transitions: options, slices: true });
+    return repeat(items, keyFn, renderFn, { transitions: options, slices: true, empty });
+}
+
+/** The list options of a compiled `@for`: its transitions and its `@empty` (#1233), when it has them. */
+function forOptions(transitions: TransitionOptions | undefined, empty: ListEmpty | undefined): RepeatOptions | undefined {
+    return transitions || empty ? { transitions, empty } : undefined;
 }
 
 /**
@@ -189,12 +197,31 @@ export function eachRow<T>(
     items: () => T[],
     key: string | ((item: T, index: number) => unknown),
     renderFn: (item: () => T, index: () => number) => Node,
-    options?: TransitionOptions
+    options?: TransitionOptions,
+    empty?: ListEmpty
 ): DocumentFragment {
     const keyFn = typeof key === 'string'
         ? (item: T) => (item as Record<string, unknown>)[key]
         : key;
-    return repeatRows(items, keyFn, renderFn, options ? { transitions: options } : undefined);
+    return repeatRows(items, keyFn, renderFn, forOptions(options, empty));
+}
+
+/**
+ * {@link eachRow} with static rows (#1233): what `@for` compiles to when the row's content follows only
+ * from its item. Each row is built once, its getter answering the item it was built from, with no item
+ * signal; a kept key whose item is replaced is a row built again.
+ */
+export function eachStatic<T>(
+    items: () => T[],
+    key: string | ((item: T, index: number) => unknown),
+    renderFn: (item: () => T, index: () => number) => Node,
+    options?: TransitionOptions,
+    empty?: ListEmpty
+): DocumentFragment {
+    const keyFn = typeof key === 'string'
+        ? (item: T) => (item as Record<string, unknown>)[key]
+        : key;
+    return mountList(items, keyFn, staticRowRenderer(renderFn), forOptions(options, empty));
 }
 
 /**

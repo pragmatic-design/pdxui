@@ -79,6 +79,17 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         const end = a.close(start, 'repeat-start', 'repeat-end');
         const list = untracked(items);
         const keys = list.map((item, i) => keyFn(item, i));
+        const empty = options?.empty;
+        if (empty && list.length === 0) {
+            // `@empty`, as the server wrote it with no row (#1233): adopted in its own scope, as a
+            // branch of when() is, and handed to its ListEmpty, which the list hides when a row comes.
+            const [, dispose] = collectDisposers(() => a.between(empty.render, parent, start, end));
+            const nodes: Node[] = [];
+            for (let n = start.nextSibling; n && n !== end; n = n.nextSibling) nodes.push(n);
+            empty.adopt(nodes, dispose);
+            followList(start, end, items, keyFn, renderer, options, { mapped: [], keys });
+            return end.nextSibling;
+        }
         let next: Node | null = start.nextSibling;
         const mapped = list.map((item, i) => {
             const row = adoptRow(a, renderer, keys[i], item, i, parent, next, end);

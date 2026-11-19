@@ -11,6 +11,7 @@ import { DEV } from '../utils/env';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
+import type { ListEmpty } from './list-empty';
 
 export { LIST_SLICE_THRESHOLD };
 
@@ -57,7 +58,22 @@ export function rowIndex(initial: number): RowIndex {
  */
 export type RowRenderer<T> =
     | { mode: 'value'; render: (item: T, index: number) => Node }
-    | { mode: 'getters'; render: (item: () => T, index: () => number) => Node };
+    | {
+        mode: 'getters'; render: (item: () => T, index: () => number) => Node;
+        /**
+         * Static rows (#1233, list-static.ts): how a row with no item signal is built, and built again
+         * when its kept key has a new item. Only the renderer `eachStatic` makes carries it, so a list of
+         * reactive rows does not bring that code into a bundle. The server and hydration read the rows
+         * as getter rows.
+         */
+        static?: StaticRows<T>;
+    };
+
+/** How a static row is built, and built again in its place for a new item (list-static.ts). */
+export interface StaticRows<T> {
+    build(item: T, i: number): [Node, (() => void) | undefined];
+    rebuild(m: MappedItem<T>, item: T, i: number): MappedItem<T>;
+}
 
 /** Options for repeat rendering. */
 export interface RepeatOptions {
@@ -67,6 +83,11 @@ export interface RepeatOptions {
      * to (#398). Off for a hand-written `repeat()`, whose caller may read the DOM right after.
      */
     slices?: boolean;
+    /**
+     * `@empty` (#1233, list-empty.ts): shown between the list's markers while it has no row, removed
+     * and disposed when the first row comes.
+     */
+    empty?: ListEmpty;
 }
 
 /**
@@ -121,7 +142,7 @@ export function mountList<T>(
 
 /**
  * Keep the list's rows between its markers, reconciled by key. `adopted`: the rows already there,
- * hydrated, and their keys; null when none is rendered yet.
+ * hydrated, and their keys; null when none is rendered yet. A hydrated `@empty` is in its ListEmpty.
  */
 export function followList<T>(
     startMarker: Comment,
@@ -134,6 +155,9 @@ export function followList<T>(
 ): void {
     let mapped: MappedItem<T>[] = adopted?.mapped ?? [];
     let prevKeys: unknown[] = adopted?.keys ?? [];
+    const empty = options?.empty;
+    // A static row with a new item is built again (#1233): only a static list's renderer says how.
+    const statics = renderer.mode === 'getters' ? renderer.static : undefined;
     // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
     let pending: AbortController | null = null;
     // Only what `@for` compiles to slices — row getters, or value rows that asked for it (#398): a
@@ -154,16 +178,31 @@ export function followList<T>(
         const n = list.length;
         const keys: unknown[] = new Array(n);
         for (let i = 0; i < n; i++) keys[i] = keyFn(list[i], i);
+        if (empty && n === 0) {
+            // Nothing to show: the rows go, as a reconciliation to none removes them, and `@empty` comes.
+            if (mapped.length > 0 || pending) {
+                pending?.abort();
+                pending = null;
+                mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys, slice);
+            }
+            prevKeys = keys;
+            empty.show(endMarker);
+            return;
+        }
+        empty?.hide();
         // While slices are pending `mapped` is shorter than the keys: the list always reconciles.
         if (mapped.length > 0 && n === prevKeys.length && !pending) {
             let same = true;
             for (let i = 0; i < n; i++) { if (keys[i] !== prevKeys[i]) { same = false; break; } }
             if (same && renderer.mode === 'getters') {
                 // Same keys, same positions: only the objects may have been replaced. Move each
-                // reused row's getter to its new object; its bindings re-run, its DOM stays.
+                // reused row's getter to its new object; its bindings re-run, its DOM stays. A static
+                // row cannot update: it is built again in its place.
                 for (let i = 0; i < n; i++) {
                     const m = mapped[i];
-                    if (m.item !== list[i]) { m.item = list[i]; m.row?.item.setRaw(list[i]); }
+                    if (m.item === list[i]) continue;
+                    if (statics) mapped[i] = statics.rebuild(m, list[i], i);
+                    else { m.item = list[i]; m.row?.item.setRaw(list[i]); }
                 }
                 return;
             }
@@ -205,6 +244,7 @@ export function followList<T>(
         pending = null;
         for (const m of mapped) m.dispose?.();
         mapped = [];
+        empty?.dispose();
     });
 }
 
@@ -219,11 +259,14 @@ let reconcileCounter = 0;
  * The scope is detached: NOT owned by the list's driver effect, so surviving rows are never disposed
  * when the driver re-runs.
  */
-function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number): MappedItem<T> {
+export function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number): MappedItem<T> {
     let row: RowSignals<T> | undefined;
     let node: Node;
-    let dispose: () => void;
-    if (renderer.mode === 'getters') {
+    let dispose: (() => void) | undefined;
+    if (renderer.mode === 'getters' && renderer.static) {
+        // A static row (#1233, list-static.ts): no item signal, no scope unless it registers one.
+        [node, dispose] = renderer.static.build(item, i);
+    } else if (renderer.mode === 'getters') {
         const r: RowSignals<T> = { item: signal(item), index: rowIndex(i) };
         row = r;
         // Untracked: reading item() while the row is built must not subscribe the LIST
@@ -237,7 +280,7 @@ function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number
     // of a list, which the outline may summarise — controls that merely share a role are not.
     // Development only: a production row carries no marker.
     if (DEV) for (const n of nodes) if (n.nodeType === 1) (n as Element).setAttribute('data-pdx-item', '');
-    return { key, item, nodes, dispose, row };
+    return { key, item, nodes, dispose: dispose ?? null, row };
 }
 
 /**
@@ -276,6 +319,8 @@ function reconcile<T>(
     // + a filter and allocations for every reconciliation in production.
     const trackingOn = isReconcileTrackingEnabled();
     const reconcileStart = trackingOn ? performance.now() : 0;
+    // A static row whose kept key has a new item is built again (#1233, list-static.ts).
+    const statics = renderer.mode === 'getters' ? renderer.static : undefined;
     const parent = endMarker.parentNode;
     if (!parent) return oldMapped;
 
@@ -318,7 +363,9 @@ function reconcile<T>(
             const result = oldMapped.slice();
             for (let i = 0; i < oldLen; i++) {
                 const kept = result[i];
-                if (kept.item !== newItems[i]) { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
+                if (kept.item === newItems[i]) continue;
+                if (statics) result[i] = statics.rebuild(kept, newItems[i], i);
+                else { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
             }
             // More new rows than one task should make (#242): a first slice now, the rest in slices
             // that yield to input. Not under a transition, whose timing is its own.
@@ -377,7 +424,12 @@ function reconcile<T>(
         const key = newKeys[i];
         const existing = oldMap.get(key);
 
-        if (existing) {
+        if (existing && statics && existing.item !== newItems[i]) {
+            // A static row whose item was replaced cannot update: it leaves as a removed row does
+            // (below, from oldMap), and a new row is built for the key.
+            newMapped[i] = createRow(renderer, key, newItems[i], i);
+            lisPositions[i] = -1;
+        } else if (existing) {
             // Reuse the old node for THIS key, then remove it from oldMap so a
             // DUPLICATE key later in newItems can't reuse the same MappedItem
             // (which would alias one DOM node to two list slots → corruption).

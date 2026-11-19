@@ -102,6 +102,20 @@ export function withRowKey<T>(node: { item: string; index?: string; track: strin
 }
 
 /**
+ * Generate a static row's body (#1233) with its item known as constant, beside the track key: in a
+ * static row the item cannot change — a row whose key keeps a new item is built again — so a binding
+ * of the item is written once.
+ */
+export function withRowValue<T>(item: string, ctx: CompileContext, generate: () => T): T {
+    ctx.rowKeys.push(item);
+    try {
+        return generate();
+    } finally {
+        ctx.rowKeys.pop();
+    }
+}
+
+/**
  * The names the script declares at its top level with `const` and a value of literals only —
  * `const MAX = 10;` — which the template reads as values that cannot change. A destructuring, a `let`
  * and anything initialised by a call or a name are left out.
