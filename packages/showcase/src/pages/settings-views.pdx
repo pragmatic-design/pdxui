@@ -48,17 +48,19 @@
     }
 
     <!-- A delete asks first: the view is someone's arrangement, and it does not come back. -->
-    <pdx-alert-dialog
-      :open="doomed !== null"
-      variant="danger"
-      :title="$t('settings.views.deleteTitle')"
-      :message="doomed ? $t('settings.views.deleteBody', { name: doomed.name }) : ''"
-      :confirm-label="$t('settings.views.delete')"
-      :cancel-label="$t('settings.views.keep')"
-      close-on-escape
-      @pdx-confirm="confirmDelete"
-      @pdx-cancel="doomed = null"
-      data-test="delete-dialog"></pdx-alert-dialog>
+    @defer (idle) {
+      <pdx-alert-dialog
+        :open="doomed !== null"
+        variant="danger"
+        :title="$t('settings.views.deleteTitle')"
+        :message="doomed ? $t('settings.views.deleteBody', { name: doomed.name }) : ''"
+        :confirm-label="$t('settings.views.delete')"
+        :cancel-label="$t('settings.views.keep')"
+        close-on-escape
+        @pdx-confirm="confirmDelete"
+        @pdx-cancel="doomed = null"
+        data-test="delete-dialog"></pdx-alert-dialog>
+    }
   </section>
 </template>
 

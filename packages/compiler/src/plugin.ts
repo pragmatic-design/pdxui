@@ -16,6 +16,7 @@ import { diagnosticUrl, DIAGNOSTICS } from './diagnostics/catalog';
 import { validateStyles } from './compiler/validate-styles';
 import { validateVariants } from './compiler/validate-variants';
 import { validateDesign } from './compiler/validate-design';
+import { checkOverlaysNotDeferred } from './compiler/validate-overlay-defer';
 import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
@@ -980,6 +981,10 @@ export function compile(
         }));
         // An @action offered to agents that no control of the template runs (#502, decision 31).
         allWarnings.push(...validateAgentActions(cachedAnalysis, ast));
+        // A page's closed overlays outside a @defer: loaded on the first visit (CD-D4, #1209).
+        if (cachedAnalysis.route?.page && descriptor.template) {
+            allWarnings.push(...checkOverlaysNotDeferred(ast, options?.modelsOf, options?.propsOf, source, descriptor.template.start));
+        }
         // The app's default layout, or none for `@layout 'none'`.
         if (cachedAnalysis.route?.page) {
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);

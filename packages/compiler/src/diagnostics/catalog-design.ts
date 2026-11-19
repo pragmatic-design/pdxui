@@ -48,6 +48,13 @@ export const DESIGN: Record<string, DiagnosticEntry> = {
         fix: 'Declare it with `$derived(…)`; keep effects for what leaves the component — storage, the URL, the DOM, a request.',
         reproducedIn: `${T}design-checks-data-flow.test.ts`,
     },
+    PDX_OVERLAY_NOT_DEFERRED: {
+        severity: 'warn', category: 'design',
+        summary: 'A `@page` renders a closed overlay outside a `@defer` (CD-D4).',
+        explanation: 'A dialog or a drawer that opens on a click is loaded on the first visit, with every component inside it, before anyone asks for it.',
+        fix: 'Wrap the run of overlays in `@defer (idle) { … }`: they load once the page is idle, before a click can open them. The quick fix writes it.',
+        reproducedIn: `${T}overlay-not-deferred.test.ts`,
+    },
     PDX_REPEATED_LOGIC: {
         severity: 'warn', category: 'design',
         summary: 'The same logic written in the same shape in several files (CD-L1, `pdx check --design`).',

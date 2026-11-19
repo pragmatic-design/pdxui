@@ -139,6 +139,7 @@ const ELSEWHERE: Record<string, string> = {
     PDX_INLINE_NODE_UNSUPPORTED: 'unreachable today (catalog)',
     PDX_LIBRARY_INTERNALS: 'carries its line from the style scan — design-checks.test.ts',
     PDX_EFFECT_STATE: 'carries its line from the data-flow scan — design-checks-data-flow.test.ts',
+    PDX_OVERLAY_NOT_DEFERRED: 'needs the library\'s models; carries the line of the run\'s first overlay — overlay-not-deferred.test.ts',
     PDX_SEVERAL_PIECES: 'pdx check heuristic, carries its line — design-heuristics.test.ts',
     PDX_VERSION_COUNTER: 'pdx check heuristic, carries its line — design-heuristics.test.ts',
     PDX_ROUTE_RENDERS: 'pdx check heuristic, carries its line — design-heuristics.test.ts',

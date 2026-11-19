@@ -8,6 +8,8 @@
 //   CD-C2  PDX_LIBRARY_INTERNALS an app's styles do not reach a library element's internal classes
 //   CD-S2  PDX_DERIVED_WRITE     what a $derived returns is not written (validate-data-flow.ts)
 //   CD-D2  PDX_EFFECT_STATE      an effect does not compute state, heuristic (validate-data-flow.ts)
+//   CD-D4  PDX_OVERLAY_NOT_DEFERRED a page's closed overlay is in a @defer (validate-overlay-defer.ts;
+//                                it reads the template and the library's models, so plugin.ts calls it)
 //
 // All are warnings: each has a legitimate exception somewhere (a portal, a deliberate override), and
 // a check that is wrong once and loud is a check people learn to skip.

@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 116 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 117 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1956,6 +1956,14 @@ A literal colour is right in one theme and wrong in the other twelve, and in dar
 If the value follows from its sources it is a `$derived`, and the effect is a second copy that can lag behind.
 
 **Fix.** Declare it with `$derived(…)`; keep effects for what leaves the component — storage, the URL, the DOM, a request.
+
+### PDX_OVERLAY_NOT_DEFERRED
+
+*warn* — A `@page` renders a closed overlay outside a `@defer` (CD-D4).
+
+A dialog or a drawer that opens on a click is loaded on the first visit, with every component inside it, before anyone asks for it.
+
+**Fix.** Wrap the run of overlays in `@defer (idle) { … }`: they load once the page is idle, before a click can open them. The quick fix writes it.
 
 ### PDX_REPEATED_LOGIC
 

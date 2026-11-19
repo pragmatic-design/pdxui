@@ -70,19 +70,21 @@
     </div>
 
     <!-- «End employment»: the open contract closes on the day given, and the record stays. -->
-    <pdx-alert-dialog
-      :open="ending"
-      :title="$t('employees.record.endTitle')"
-      :message="$t('employees.record.endBody')"
-      :confirm-label="$t('employees.record.endEmployment')"
-      :cancel-label="$t('employees.record.endCancel')"
-      @pdx-confirm="confirmEnd"
-      @pdx-cancel="ending = false"
-      data-test="end-employment-dialog">
-      <pdx-form-field :label="$t('employees.record.endDate')">
-        <pdx-date-picker editable :value="endDate" @value-change="e => endDate = e.currentTarget.getDate()" data-test="end-employment-date"></pdx-date-picker>
-      </pdx-form-field>
-    </pdx-alert-dialog>
+    @defer (idle) {
+      <pdx-alert-dialog
+        :open="ending"
+        :title="$t('employees.record.endTitle')"
+        :message="$t('employees.record.endBody')"
+        :confirm-label="$t('employees.record.endEmployment')"
+        :cancel-label="$t('employees.record.endCancel')"
+        @pdx-confirm="confirmEnd"
+        @pdx-cancel="ending = false"
+        data-test="end-employment-dialog">
+        <pdx-form-field :label="$t('employees.record.endDate')">
+          <pdx-date-picker editable :value="endDate" @value-change="e => endDate = e.currentTarget.getDate()" data-test="end-employment-date"></pdx-date-picker>
+        </pdx-form-field>
+      </pdx-alert-dialog>
+    }
   </section>
 </template>
 

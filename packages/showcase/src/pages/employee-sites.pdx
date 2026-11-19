@@ -60,49 +60,51 @@
 
     <!-- ADD, in a modal. The site comes from a PAGED, SEARCHED source, as intake picks a customer:
          the picker asks for a page, `siteTransport` answers with that page and a total. -->
-    <pdx-dialog
-      ::open="addOpen"
-      size="lg"
-      :title="$t('employees.sites.add')"
-      data-test="site-dialog">
-      <pdx-relation-picker
-        :source="sites"
-        :columns="siteColumns"
-        :add-label="$t('employees.sites.choose')"
-        searchable
-        @pdx-pick="onPicked"
-        data-test="site-picker"></pdx-relation-picker>
-      @show (chosen !== null) { <p class="chosen pdx-txt-small" data-test="site-chosen">{{ chosenLabel }}</p> }
-      @show (missingSite) { <p class="pdx-txt-small pdx-ink-danger" role="alert" data-test="site-missing">{{ $t('employees.sites.missing') }}</p> }
-      <pdx-form :form="adding" @pdx-submit="onAdd" data-test="site-add-form">
-        <div class="grid">
-          <pdx-form-field :field="adding.role" :label="$t('employees.sites.fields.role')">
-            <pdx-input name="role" ::value="adding.role" data-test="new-role"></pdx-input>
-          </pdx-form-field>
-          <pdx-form-field :field="adding.start" :label="$t('employees.sites.fields.start')">
-            <pdx-date-picker name="start" ::value="adding.start" editable data-test="new-start"></pdx-date-picker>
-          </pdx-form-field>
-        </div>
-        <div class="actions">
-          <pdx-button type="submit" variant="primary" data-test="site-assign">{{ $t('employees.sites.assign') }}</pdx-button>
-        </div>
-      </pdx-form>
-    </pdx-dialog>
+    @defer (idle) {
+      <pdx-dialog
+        ::open="addOpen"
+        size="lg"
+        :title="$t('employees.sites.add')"
+        data-test="site-dialog">
+        <pdx-relation-picker
+          :source="sites"
+          :columns="siteColumns"
+          :add-label="$t('employees.sites.choose')"
+          searchable
+          @pdx-pick="onPicked"
+          data-test="site-picker"></pdx-relation-picker>
+        @show (chosen !== null) { <p class="chosen pdx-txt-small" data-test="site-chosen">{{ chosenLabel }}</p> }
+        @show (missingSite) { <p class="pdx-txt-small pdx-ink-danger" role="alert" data-test="site-missing">{{ $t('employees.sites.missing') }}</p> }
+        <pdx-form :form="adding" @pdx-submit="onAdd" data-test="site-add-form">
+          <div class="grid">
+            <pdx-form-field :field="adding.role" :label="$t('employees.sites.fields.role')">
+              <pdx-input name="role" ::value="adding.role" data-test="new-role"></pdx-input>
+            </pdx-form-field>
+            <pdx-form-field :field="adding.start" :label="$t('employees.sites.fields.start')">
+              <pdx-date-picker name="start" ::value="adding.start" editable data-test="new-start"></pdx-date-picker>
+            </pdx-form-field>
+          </div>
+          <div class="actions">
+            <pdx-button type="submit" variant="primary" data-test="site-assign">{{ $t('employees.sites.assign') }}</pdx-button>
+          </div>
+        </pdx-form>
+      </pdx-dialog>
 
-    <!-- TERMINA, not delete: it asks for the last day, and the toast carries the way back. -->
-    <pdx-alert-dialog
-      :open="ending !== null"
-      :title="$t('employees.sites.endTitle')"
-      :message="$t('employees.sites.endBody')"
-      :confirm-label="$t('employees.sites.endConfirm')"
-      :cancel-label="$t('employees.sites.endCancel')"
-      @pdx-confirm="periods.confirmEnd()"
-      @pdx-cancel="periods.ending.set(null)"
-      data-test="site-end-dialog">
-      <pdx-form-field :label="$t('employees.sites.endDate')" :error="endError">
-        <pdx-date-picker editable :value="endDate" @value-change="e => periods.endDate.set(e.currentTarget.getDate())" data-test="site-end-date"></pdx-date-picker>
-      </pdx-form-field>
-    </pdx-alert-dialog>
+      <!-- TERMINA, not delete: it asks for the last day, and the toast carries the way back. -->
+      <pdx-alert-dialog
+        :open="ending !== null"
+        :title="$t('employees.sites.endTitle')"
+        :message="$t('employees.sites.endBody')"
+        :confirm-label="$t('employees.sites.endConfirm')"
+        :cancel-label="$t('employees.sites.endCancel')"
+        @pdx-confirm="periods.confirmEnd()"
+        @pdx-cancel="periods.ending.set(null)"
+        data-test="site-end-dialog">
+        <pdx-form-field :label="$t('employees.sites.endDate')" :error="endError">
+          <pdx-date-picker editable :value="endDate" @value-change="e => periods.endDate.set(e.currentTarget.getDate())" data-test="site-end-date"></pdx-date-picker>
+        </pdx-form-field>
+      </pdx-alert-dialog>
+    }
 
     <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
   </section>
