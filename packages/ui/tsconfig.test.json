@@ -33,6 +33,8 @@
     // not typecheck is a build that breaks on a rename nobody sees, as `builder` and `showcase`
     // also hold.
     // `pilot/` is the .pdx pilot's tooling (#137), run by its own vitest config and the scenario server.
-    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts", "pilot/**/*.ts", "../router/src/pdx-globals.d.ts"],
+    // The compiler's `client.d.ts` declares a `.pdx` module, which a source loads with import() (#1210):
+    // the build project names it in `types`; here `typeRoots` points elsewhere, so it is included by path.
+    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts", "pilot/**/*.ts", "../router/src/pdx-globals.d.ts", "../compiler/src/client.d.ts"],
     "exclude": ["node_modules", "dist"]
 }
