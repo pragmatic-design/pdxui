@@ -48,10 +48,14 @@ const INSTANCES = 1000;
 /** The tag the control measures against itself: on both sides, the same in every tree. */
 const CONTROL_TAG = 'pdx-badge';
 /**
- * How far from 1.0 the runner can tell, set from the control's ratio over CI runs. PROVISIONAL until
- * #1243's runs set it: the control reports, and a moved tag fails only beyond it.
+ * How far from 1.0 the runner can tell, set from the control's ratio over CI runs (#1243, 2026-11-19):
+ * 1.01, 1.01, 1.01, 1.01, 0.99 in five runs on AWS and Azure runners, its single pairs from 0.94 to
+ * 1.24 — the median of seven pairs is what holds still. Five times that spread, so a row fails on a
+ * component and not on the runner: one 6% slower than its TypeScript version fails. Measured with it on
+ * the same runners against the commit before #1241: pdx-divider 0.98, pdx-progress 0.85, pdx-spinner
+ * 0.98, and a divider made slower on purpose 3.08×.
  */
-const BAND = 0.1;
+const BAND = 0.05;
 
 interface Manifest { modules: { path: string; declarations?: { tagName?: string }[] }[] }
 const here = resolve(fileURLToPath(import.meta.url), '..');
