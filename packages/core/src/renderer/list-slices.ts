@@ -29,6 +29,14 @@
 // frameworks in one run, 1.35× (509 against 377), where svelte, solid, lit and vue are 1.12-1.21×. The
 // script is 0.21× vanillajs's: the rest is the frames of a growing list. A run on a loaded machine had
 // measured 2.87×, with vanillajs itself at 497 ms: compare only inside one quiet run.
+//
+// Where those frames went (#1222), from Chromium's long-animation-frame entries: after the first
+// slice's 250 rows, a 40 ms slice made ~6,600 rows and placed them, the next frame laid out ~6,850 rows
+// (223 ms of style and layout), and the last frame laid out all 10,000 (156 ms), where vanillajs lays
+// out 10,000 once (~317 ms). So the later slices' rows wait off the document and are placed with the
+// last slice: one long frame (~355 ms), 447-465 ms to the end against 481-534. bench:jfb, same
+// session, median of three runs: create 10 000 1.29× → 1.16× vanillajs; run, replace and
+// create-after-1k unchanged or faster. The INP of the 10 000-row append still holds under 200 ms.
 
 import { processInSlices, yieldToBrowser } from '../utils/slices';
 import { placePartNodes } from './part-nodes';
@@ -74,21 +82,31 @@ export function appendInSlices<R extends { nodes: Node[] }>(
     const controller = new AbortController();
     const chunks: number[] = [];
     for (let start = from; start < to; start += CHUNK) chunks.push(start);
+    // The rows the later slices make wait off the document and are placed once, with the last (#1222).
+    // Placed slice by slice, every frame between two slices laid out the whole list made so far: create
+    // 10,000 laid out ~6,850 rows in a frame nobody needed, 223 ms in Chromium, then all 10,000 — the
+    // list was laid out three times where a single pass lays it out once. Off the document a slice's
+    // rows cost no layout, so the frames between slices stay short and input runs in them.
+    const waiting: Node[] = [];
+    const place = (): void => {
+        const parent = endMarker.parentNode;
+        if (parent && waiting.length > 0) placePartNodes(parent, waiting.splice(0), endMarker);
+    };
+    // Stopped early — a newer reconciliation, the teardown — the rows made so far are placed at once:
+    // `rows` holds them, and what reconciles next expects every one of them between the markers.
+    controller.signal.addEventListener('abort', place, { once: true });
     // The first slice was this task's, and the frame after it paints those rows: the rest starts
     // after that frame. A slice queued at once runs ahead of that frame's rendering, and the
     // interaction that wrote the list waits for it (measured: INP 184-208 ms against 88-112).
     void afterNextPaint().then(() => processInSlices(chunks, (start) => {
-        const parent = endMarker.parentNode;
-        if (!parent) { controller.abort(); return; }
-        const added: Node[] = [];
+        if (!endMarker.parentNode) { controller.abort(); return; }
         const end = Math.min(start + CHUNK, to);
         for (let i = start; i < end; i++) {
             const row = create(i);
             rows.push(row);
-            for (const n of row.nodes) added.push(n);
+            for (const n of row.nodes) waiting.push(n);
         }
-        placePartNodes(parent, added, endMarker);
-    }, { signal: controller.signal, sliceMs: LIST_SLICE_MS })).then(onDone, (error: unknown) => {
+    }, { signal: controller.signal, sliceMs: LIST_SLICE_MS })).then(() => { place(); onDone(); }, (error: unknown) => {
         // Stopped on purpose: a newer reconciliation or the teardown owns the list now.
         if (controller.signal.aborted) return;
         throw error;

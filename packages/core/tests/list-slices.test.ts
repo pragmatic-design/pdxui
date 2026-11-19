@@ -76,6 +76,23 @@ describe('a @for that receives many rows at once', () => {
         list.ul.remove();
     });
 
+    it('places the rows the later slices make once, when the last slice is done (#1222)', async () => {
+        // Each frame between two slices laid out the whole list made so far: create 10,000 laid out
+        // ~6,850 rows in a frame nobody needed, 223 ms in Chromium, before laying out all 10,000.
+        // The later slices build into a fragment; the list is laid out twice, its first slice and
+        // the whole, as a single pass would be once.
+        const list = mount([]);
+        list.items.set(rows(1, 2000));
+        await Promise.resolve();
+        await waitUntil(() => list.created.size > FIRST + 100, 'later slices made rows', 1000);
+        expect(list.created.size, 'every row already made: the check below proves nothing').toBeLessThan(2000);
+        expect(list.ul.querySelectorAll('li').length, 'rows of the later slices placed before the last').toBe(FIRST);
+        await settled(list.ul, 2000);
+        expect(list.labels()).toEqual(rows(1, 2000).map((r) => r.label));
+        list.dispose();
+        list.ul.remove();
+    });
+
     it('slices an append to rows already there, and keeps the old rows', async () => {
         const list = mount(rows(1, 10));
         const old = list.ul.querySelector('li');
