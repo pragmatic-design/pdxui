@@ -115,25 +115,27 @@
     </app-record-detail>
 
     <!-- ADD, in a modal: an active service the customer does not have now, and the day it starts. -->
-    <pdx-dialog
-      ::open="subscribeOpen"
-      size="md"
-      :title="$t('customers.services.dialogTitle')"
-      data-test="subscription-dialog">
-      <pdx-form :form="subscribing" @pdx-submit="onSubscribe" data-test="subscription-form">
-        <div class="grid">
-          <pdx-form-field :field="subscribing.serviceId" :label="$t('customers.services.service')">
-            <pdx-select name="serviceId" ::value="subscribing.serviceId" :options="offered" data-test="new-service"></pdx-select>
-          </pdx-form-field>
-          <pdx-form-field :field="subscribing.since" :label="$t('customers.services.since')">
-            <pdx-date-picker name="since" ::value="subscribing.since" editable data-test="new-since"></pdx-date-picker>
-          </pdx-form-field>
-        </div>
-        <div class="actions">
-          <pdx-button type="submit" variant="primary" data-test="subscription-save">{{ $t('customers.services.save') }}</pdx-button>
-        </div>
-      </pdx-form>
-    </pdx-dialog>
+    @defer (idle) {
+      <pdx-dialog
+        ::open="subscribeOpen"
+        size="md"
+        :title="$t('customers.services.dialogTitle')"
+        data-test="subscription-dialog">
+        <pdx-form :form="subscribing" @pdx-submit="onSubscribe" data-test="subscription-form">
+          <div class="grid">
+            <pdx-form-field :field="subscribing.serviceId" :label="$t('customers.services.service')">
+              <pdx-select name="serviceId" ::value="subscribing.serviceId" :options="offered" data-test="new-service"></pdx-select>
+            </pdx-form-field>
+            <pdx-form-field :field="subscribing.since" :label="$t('customers.services.since')">
+              <pdx-date-picker name="since" ::value="subscribing.since" editable data-test="new-since"></pdx-date-picker>
+            </pdx-form-field>
+          </div>
+          <div class="actions">
+            <pdx-button type="submit" variant="primary" data-test="subscription-save">{{ $t('customers.services.save') }}</pdx-button>
+          </div>
+        </pdx-form>
+      </pdx-dialog>
+    }
 
     <pdx-toast position="bottom-right" data-test="toasts"></pdx-toast>
   </section>

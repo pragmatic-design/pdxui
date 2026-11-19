@@ -466,6 +466,23 @@ file does*, and *how many files do the same thing*.
 - **Check:** *candidate*, precise. `addEventListener` on `document` or `window` in a `.pdx` with no
   `removeEventListener` for the same event in an `onDestroy` of the same file.
 
+### CD-D4 — A page loads its closed overlays when it is idle, not on the first visit
+
+- **Mechanism:** the dialogs and drawers a `@page` opens on a click go inside one
+  `@defer (idle) { … }`, as `pages/tickets.pdx` does. They are there before a click can open them, and
+  the first paint does not wait for them.
+- **Why:** an overlay that is closed until a click is code the first visit does not use, with every
+  component inside it. Measured on the showcase (#1201): up to 175 KB gzip for one list page whose dialog
+  and drawer open only on a click; deferred, `/customers` painted its largest element 948 ms sooner
+  (3620 → 2672 ms, cold, slow 4G over HTTP/1.1, `first-paint.spec.ts`).
+- **Anti-pattern:** the list pages of the showcase before #1201, each with its edit drawer and its
+  filter dialog in the page's markup.
+- **Check:** precise, `PDX_OVERLAY_NOT_DEFERRED`. In a `@page`, an element whose tag has an `open`
+  model, with `open` bound to anything but `true`, outside every `@defer`. The quick fix writes the
+  `@defer (idle)` around the run of adjacent overlays. A `@defer`, not an implicit one: the compiler
+  does not take an element out of the DOM behind the developer's back, where a `:ref` or a query that
+  worked would stop working.
+
 ---
 
 ## 6. Styles
@@ -542,12 +559,13 @@ file does*, and *how many files do the same thing*.
 | `fetch` in a leaf component | loading in the wrong place | CD-D1 |
 | a `$watch` that only sets signals | a derivation one tick late | CD-D2 |
 | `addEventListener` on `document` with no removal | a leak | CD-D3 |
+| a page's closed dialog or drawer in its markup, outside a `@defer` | code the first visit loads unused | CD-D4 |
 | hundreds of style lines for several pieces | styles not following their component | CD-C1 |
 | `.pdx-dg-row`, `.pdx-nav-item` in an app's styles | reaching into a library's internals | CD-C2 |
 
 ## 8. What a tool can measure
 
-Precise enough for a diagnostic: CD-S2, CD-L1, CD-A1, CD-A2, CD-D3, CD-C2.
+Precise enough for a diagnostic: CD-S2, CD-L1, CD-A1, CD-A2, CD-D3, CD-D4, CD-C2.
 Heuristic, warning only: CD-B1, CD-B2, CD-S3, CD-D1, CD-D2, CD-C1.
 Grep today: CD-C3.
 Not measurable, review only: CD-B3, CD-A3, CD-A4. CD-S1 is measurable only at runtime, by a contract

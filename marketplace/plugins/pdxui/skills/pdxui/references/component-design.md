@@ -238,6 +238,19 @@ onMount(() => {
 });
 ```
 
+### CD-D4 — A page loads its closed overlays when it is idle, not on the first visit
+
+A page's dialogs and drawers that open on a click go inside one `@defer (idle)`: otherwise the first
+visit loads them, and every component inside, before anyone asks. `PDX_OVERLAY_NOT_DEFERRED` reports one
+left outside; its quick fix writes the block. Not a popover: it opens itself from the element before it.
+
+```pdx
+@defer (idle) {
+    <pdx-dialog ::open="editing" title="Edit">…</pdx-dialog>
+    <pdx-drawer ::open="filtersOpen" title="Filters">…</pdx-drawer>
+}
+```
+
 ## 6. Styles
 
 ### CD-C1 — A component's styles live in its own `<style scoped>`; the app's globals are few and named
