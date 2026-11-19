@@ -37,8 +37,8 @@ const DECLARATIONS: [DocTarget, RegExp][] = [
     ['event', new RegExp(`^@event(?:\\([^)]*\\))?\\s+(?:(${NAME})|['"]([^'"\\n]+)['"])`)],
     // Match: @slot row?: …   Groups: [1]=the name
     ['slot', new RegExp(`^@slot\\s+(${NAME})`)],
-    // Match: @state busy = …   Groups: [1]=the name
-    ['state', new RegExp(`^@state\\s+(${NAME})`)],
+    // Match: @state busy = …  /  @state label-left = … (#1230)   Groups: [1]=the name
+    ['state', /^@state\s+([A-Za-z][\w-]*)/],
     // Match: @variants { size: …   Groups: [1]=the first axis on the line
     ['variant', new RegExp(`^@variants\\s*\\{\\s*(${NAME})\\s*:`)],
     // Match: function focus(  /  async function* load(  /  export function x(   Groups: [1]=the name

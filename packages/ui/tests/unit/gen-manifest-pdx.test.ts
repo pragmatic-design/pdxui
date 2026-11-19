@@ -57,6 +57,24 @@ describe('a .pdx component in the manifest, against its TypeScript version', () 
     });
 });
 
+describe('a .pdx state whose name has a hyphen (#1230)', () => {
+    const source = [
+        '<template><span data-part="root"></span></template>',
+        '<script>',
+        '/** A probe. */',
+        "@prop pos: string = 'center';",
+        '/** `pos="left"`: the line before the label is short. */',
+        "@state label-left = pos === 'left';",
+        '@part root;',
+        '</script>',
+    ].join('\n');
+    const decl = (analyzeFile(join(UI, 'src', 'states', 'pdx-states.pdx'), source, parseCategories()) as Module[])[0].declarations[0];
+
+    it('is in the manifest under its name, with its doc', () => {
+        expect(decl.cssStates).toEqual([{ name: 'label-left', description: '`pos="left"`: the line before the label is short.' }]);
+    });
+});
+
 describe('the variant axes of a .pdx, each with its doc inside the @variants block (#1228)', () => {
     const source = [
         '<template><span data-part="root"></span></template>',

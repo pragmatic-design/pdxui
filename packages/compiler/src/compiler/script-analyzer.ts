@@ -821,9 +821,10 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── @state name = expression; — a visual state of the host (#132) ───
-        // Match: @state expanded = open;
+        // Match: @state expanded = open;  /  @state label-left = pos === 'left'; — a CSS custom state's
+        // name may hold a hyphen (#1230).
         // Groups: [1]=name [2]=expression
-        const stateMatch = trimmed.match(/^@state\s+(\w+)\s*=\s*(.+?)\s*;?\s*$/);
+        const stateMatch = trimmed.match(/^@state\s+([A-Za-z][\w-]*)\s*=\s*(.+?)\s*;?\s*$/);
         if (stateMatch) {
             states.push({ name: stateMatch[1], expr: stateMatch[2] });
             continue;

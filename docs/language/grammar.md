@@ -75,7 +75,8 @@ SlotDecl       ::= "@slot" S Identifier "?"? ( S? ":" S? SlotSignature )? End   
 SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type
 GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
-StateDecl      ::= "@state" S Identifier S? "=" S? Expression End                                   (β #132)
+StateDecl      ::= "@state" S StateName S? "=" S? Expression End                                    (β #132)
+StateName      ::= [A-Za-z] [A-Za-z0-9_-]*                                                          (a CSS custom state's name, #1230)
 HydrateDecl    ::= "@hydrate" S Triggers End                                                       (β #160: @defer's triggers, no `when`)
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
 HostDecl       ::= "@host" ( S Identifier )? ( S? "{" ( S? Attribute )* S? "}" | End )          (β #133: the template's attribute grammar; #750: a name)
