@@ -2,7 +2,7 @@
 // Uses LIS (Longest Increasing Subsequence) to minimize DOM mutations.
 // Supports FLIP move animations via TransitionOptions.move.
 
-import { effect, collectDisposers, collectIfAny, onDispose, signal, untracked } from '../reactivity/signal';
+import { effect, collectDisposers, onDispose, signal, untracked } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
 import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
 import { placePartNode, placePartNodes } from './part-nodes';
@@ -11,6 +11,7 @@ import { DEV } from '../utils/env';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
+import type { ListEmpty } from './list-empty';
 
 export { LIST_SLICE_THRESHOLD };
 
@@ -60,13 +61,19 @@ export type RowRenderer<T> =
     | {
         mode: 'getters'; render: (item: () => T, index: () => number) => Node;
         /**
-         * Static rows (#1233): the row's content follows only from its item, so the row holds no item
-         * signal — its getter answers the item it was built from — and a kept key whose item is replaced
-         * is a row built again, since nothing in it could update. What `@for` compiles to when the
-         * compiler can prove it. The server and hydration read it as getter rows.
+         * Static rows (#1233, list-static.ts): how a row with no item signal is built, and built again
+         * when its kept key has a new item. Only the renderer `eachStatic` makes carries it, so a list of
+         * reactive rows does not bring that code into a bundle. The server and hydration read the rows
+         * as getter rows.
          */
-        static?: boolean;
+        static?: StaticRows<T>;
     };
+
+/** How a static row is built, and built again in its place for a new item (list-static.ts). */
+export interface StaticRows<T> {
+    build(item: T, i: number): [Node, (() => void) | undefined];
+    rebuild(m: MappedItem<T>, item: T, i: number): MappedItem<T>;
+}
 
 /** Options for repeat rendering. */
 export interface RepeatOptions {
@@ -77,17 +84,10 @@ export interface RepeatOptions {
      */
     slices?: boolean;
     /**
-     * `@empty` (#1233): rendered between the list's markers while it has no row, in its own scope,
-     * disposed when the first row comes. The list renders it itself — a when() around the list was one
-     * more effect, two more markers and one more scope on every mount.
+     * `@empty` (#1233, list-empty.ts): shown between the list's markers while it has no row, removed
+     * and disposed when the first row comes.
      */
-    empty?: () => Node;
-}
-
-/** What the list shows while it has no row: `@empty`'s nodes and its scope's Dispose. */
-export interface ShownEmpty {
-    nodes: Node[];
-    dispose: () => void;
+    empty?: ListEmpty;
 }
 
 /**
@@ -123,41 +123,6 @@ export function repeatRows<T>(
     return mountList(items, keyFn, { mode: 'getters', render: renderFn }, options);
 }
 
-/**
- * {@link repeatRows} with static rows (#1233): each row built once from its item, with no item
- * signal, and built again when its key is kept with a new item. For a row whose content follows only
- * from its item — what `@for` compiles to when the compiler proves it.
- */
-export function repeatStaticRows<T>(
-    items: (() => T[]),
-    keyFn: (item: T, index: number) => unknown,
-    renderFn: (item: () => T, index: () => number) => Node,
-    options?: RepeatOptions
-): DocumentFragment {
-    return mountList(items, keyFn, { mode: 'getters', render: renderFn, static: true }, options);
-}
-
-/** Whether a kept row must be built again for `item`: a static row whose item was replaced. */
-function staleStatic<T>(renderer: RowRenderer<T>, m: MappedItem<T>, item: T): boolean {
-    return renderer.mode === 'getters' && renderer.static === true && m.item !== item;
-}
-
-/**
- * Build a static row again in the place of `m`, for its new item: the new nodes go where the old
- * ones were, and the old row's scope is disposed.
- */
-function rebuildRow<T>(renderer: RowRenderer<T>, m: MappedItem<T>, item: T, i: number): MappedItem<T> {
-    const next = createRow(renderer, m.key, item, i);
-    const at = m.nodes[0];
-    const parent = at?.parentNode;
-    if (parent) {
-        placePartNodes(parent, next.nodes, at);
-        for (const n of m.nodes) n.parentNode?.removeChild(n);
-    }
-    m.dispose?.();
-    return next;
-}
-
 export function mountList<T>(
     items: (() => T[]),
     keyFn: (item: T, index: number) => unknown,
@@ -177,7 +142,7 @@ export function mountList<T>(
 
 /**
  * Keep the list's rows between its markers, reconciled by key. `adopted`: the rows already there,
- * hydrated, and their keys — or the `@empty` the server wrote; null when nothing is rendered yet.
+ * hydrated, and their keys; null when none is rendered yet. A hydrated `@empty` is in its ListEmpty.
  */
 export function followList<T>(
     startMarker: Comment,
@@ -186,18 +151,13 @@ export function followList<T>(
     keyFn: (item: T, index: number) => unknown,
     renderer: RowRenderer<T>,
     options: RepeatOptions | undefined,
-    adopted: { mapped: MappedItem<T>[]; keys: unknown[]; empty?: ShownEmpty | null } | null,
+    adopted: { mapped: MappedItem<T>[]; keys: unknown[] } | null,
 ): void {
     let mapped: MappedItem<T>[] = adopted?.mapped ?? [];
     let prevKeys: unknown[] = adopted?.keys ?? [];
-    // `@empty`, while it is shown (#1233).
-    let shownEmpty: ShownEmpty | null = adopted?.empty ?? null;
-    const emptyFn = options?.empty;
-    const hideEmpty = (): void => {
-        for (const node of shownEmpty!.nodes) node.parentNode?.removeChild(node);
-        shownEmpty!.dispose();
-        shownEmpty = null;
-    };
+    const empty = options?.empty;
+    // A static row with a new item is built again (#1233): only a static list's renderer says how.
+    const statics = renderer.mode === 'getters' ? renderer.static : undefined;
     // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
     let pending: AbortController | null = null;
     // Only what `@for` compiles to slices — row getters, or value rows that asked for it (#398): a
@@ -218,25 +178,18 @@ export function followList<T>(
         const n = list.length;
         const keys: unknown[] = new Array(n);
         for (let i = 0; i < n; i++) keys[i] = keyFn(list[i], i);
-        if (emptyFn && n === 0) {
-            // Nothing to show: the rows go, as a reconciliation to none removes them, and `@empty`
-            // comes, built once in its own scope — not the driver's, which re-runs.
+        if (empty && n === 0) {
+            // Nothing to show: the rows go, as a reconciliation to none removes them, and `@empty` comes.
             if (mapped.length > 0 || pending) {
                 pending?.abort();
                 pending = null;
                 mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys, slice);
             }
             prevKeys = keys;
-            if (!shownEmpty) {
-                const [node, dispose] = collectDisposers(() => untracked(emptyFn));
-                const nodes = node instanceof DocumentFragment ? Array.from(node.childNodes) : [node];
-                const parent = endMarker.parentNode;
-                if (parent) placePartNodes(parent, nodes, endMarker);
-                shownEmpty = { nodes, dispose };
-            }
+            empty.show(endMarker);
             return;
         }
-        if (shownEmpty) hideEmpty();
+        empty?.hide();
         // While slices are pending `mapped` is shorter than the keys: the list always reconciles.
         if (mapped.length > 0 && n === prevKeys.length && !pending) {
             let same = true;
@@ -247,8 +200,9 @@ export function followList<T>(
                 // row cannot update: it is built again in its place.
                 for (let i = 0; i < n; i++) {
                     const m = mapped[i];
-                    if (staleStatic(renderer, m, list[i])) mapped[i] = rebuildRow(renderer, m, list[i], i);
-                    else if (m.item !== list[i]) { m.item = list[i]; m.row?.item.setRaw(list[i]); }
+                    if (m.item === list[i]) continue;
+                    if (statics) mapped[i] = statics.rebuild(m, list[i], i);
+                    else { m.item = list[i]; m.row?.item.setRaw(list[i]); }
                 }
                 return;
             }
@@ -290,8 +244,7 @@ export function followList<T>(
         pending = null;
         for (const m of mapped) m.dispose?.();
         mapped = [];
-        shownEmpty?.dispose();
-        shownEmpty = null;
+        empty?.dispose();
     });
 }
 
@@ -306,15 +259,13 @@ let reconcileCounter = 0;
  * The scope is detached: NOT owned by the list's driver effect, so surviving rows are never disposed
  * when the driver re-runs.
  */
-function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number): MappedItem<T> {
+export function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number): MappedItem<T> {
     let row: RowSignals<T> | undefined;
     let node: Node;
     let dispose: (() => void) | undefined;
     if (renderer.mode === 'getters' && renderer.static) {
-        // A static row (#1233): its getter answers the item it was built from; no signal, and no
-        // scope kept unless the row registered something in it.
-        const index = rowIndex(i);
-        [node, dispose] = collectIfAny(() => untracked(() => renderer.render(() => item, index)));
+        // A static row (#1233, list-static.ts): no item signal, no scope unless it registers one.
+        [node, dispose] = renderer.static.build(item, i);
     } else if (renderer.mode === 'getters') {
         const r: RowSignals<T> = { item: signal(item), index: rowIndex(i) };
         row = r;
@@ -368,6 +319,8 @@ function reconcile<T>(
     // + a filter and allocations for every reconciliation in production.
     const trackingOn = isReconcileTrackingEnabled();
     const reconcileStart = trackingOn ? performance.now() : 0;
+    // A static row whose kept key has a new item is built again (#1233, list-static.ts).
+    const statics = renderer.mode === 'getters' ? renderer.static : undefined;
     const parent = endMarker.parentNode;
     if (!parent) return oldMapped;
 
@@ -410,8 +363,9 @@ function reconcile<T>(
             const result = oldMapped.slice();
             for (let i = 0; i < oldLen; i++) {
                 const kept = result[i];
-                if (staleStatic(renderer, kept, newItems[i])) result[i] = rebuildRow(renderer, kept, newItems[i], i);
-                else if (kept.item !== newItems[i]) { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
+                if (kept.item === newItems[i]) continue;
+                if (statics) result[i] = statics.rebuild(kept, newItems[i], i);
+                else { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
             }
             // More new rows than one task should make (#242): a first slice now, the rest in slices
             // that yield to input. Not under a transition, whose timing is its own.
@@ -470,7 +424,7 @@ function reconcile<T>(
         const key = newKeys[i];
         const existing = oldMap.get(key);
 
-        if (existing && staleStatic(renderer, existing, newItems[i])) {
+        if (existing && statics && existing.item !== newItems[i]) {
             // A static row whose item was replaced cannot update: it leaves as a removed row does
             // (below, from oldMap), and a new row is built for the key.
             newMapped[i] = createRow(renderer, key, newItems[i], i);

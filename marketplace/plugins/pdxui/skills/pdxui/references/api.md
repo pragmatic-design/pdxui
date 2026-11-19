@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-489 value exports.
+490 value exports.
 
 ### `__adoptStyles`
 
@@ -1901,7 +1901,7 @@ Usage:
 ```ts
 import { eachDestructured } from '@pdxui/core';
 
-function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 {@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
@@ -1913,7 +1913,7 @@ a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398
 ```ts
 import { eachRow } from '@pdxui/core';
 
-function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 Keyed list whose rows see their CURRENT item — what `@for` compiles to.
@@ -1929,7 +1929,7 @@ inside a binding (`${() => item().name}`) — a read while the row is built is a
 ```ts
 import { eachStatic } from '@pdxui/core';
 
-function eachStatic(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachStatic(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 {@link eachRow} with static rows (#1233): what `@for` compiles to when the row's content follows only
@@ -3407,6 +3407,16 @@ function linkedSignal(optionsOrFn: LinkedSignalOptions<S, T> | (() => T)): Signa
 
 Create a writable derived signal.
  Shorthand: computation IS the source. Value recomputes on any dependency change.
+
+### `listEmpty`
+
+```ts
+import { listEmpty } from '@pdxui/core';
+
+function listEmpty(render: () => Node): ListEmpty
+```
+
+The `@empty` a compiled `@for … @empty` hands its list: `render` shown while the list has no row.
 
 ### `loadTranslations`
 

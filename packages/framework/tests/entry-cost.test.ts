@@ -82,16 +82,18 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // after). The library's move to .pdx (#1210) adds to it while both forms are in the bundle: the
     // first three atoms, each lighter than its TypeScript module alone, add 0.2 KB here, since html``'s
     // runtime stays for the other components and the compiled render comes with each moved one.
-    // 338.4 after #1233 (+0.9): core's static rows (eachStatic, a stale row rebuilt, collectIfAny) and
+    // 338.5 after #1233 (+1.0): core's static rows (eachStatic, a stale row rebuilt, collectIfAny) and
     // `@empty` rendered by the list on the client, the server and in hydration. What it buys: a row
     // that reads only its item mounts with no item signal and no scope, and a `@for … @empty` with no
-    // when() around it — pdx-kbd from 1.17–1.22× its TypeScript version to 0.92–0.96×.
+    // when() around it — pdx-kbd from 1.17–1.22× its TypeScript version to 0.92–0.99×. Both live in
+    // modules of their own (list-static.ts, list-empty.ts) that an app without them does not bundle;
+    // every component registered uses both, so here they are counted whole.
     { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 338.5 },
     { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
-    // 330.0 after #1233 (+1.0), for the same core code as the root's above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 330 },
+    // 330.1 after #1233 (+1.1), for the same core code as the root's above.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 330.5 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 4 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 83 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 84 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -445,7 +445,7 @@ Usage:
 ```ts
 import { eachDestructured } from '@pdxui/core';
 
-function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 {@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
@@ -457,7 +457,7 @@ a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398
 ```ts
 import { eachRow } from '@pdxui/core';
 
-function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 Keyed list whose rows see their CURRENT item — what `@for` compiles to.
@@ -473,7 +473,7 @@ inside a binding (`${() => item().name}`) — a read while the row is built is a
 ```ts
 import { eachStatic } from '@pdxui/core';
 
-function eachStatic(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+function eachStatic(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: ListEmpty): DocumentFragment
 ```
 
 {@link eachRow} with static rows (#1233): what `@for` compiles to when the row's content follows only
@@ -668,6 +668,16 @@ Usage:
     { offset: 0.5, transform: 'translateY(-20px)' },
     { offset: 1, transform: 'translateY(0)' },
   ], { duration: 500, easing: 'ease-out' });
+
+## `listEmpty`
+
+```ts
+import { listEmpty } from '@pdxui/core';
+
+function listEmpty(render: () => Node): ListEmpty
+```
+
+The `@empty` a compiled `@for … @empty` hands its list: `render` shown while the list has no row.
 
 ## `marker`
 

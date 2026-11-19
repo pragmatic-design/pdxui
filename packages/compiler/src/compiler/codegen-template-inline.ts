@@ -1049,9 +1049,10 @@ class InlineGen {
             // @empty — rendered by the list itself, between its markers, while it has no row (#1233):
             // a when() around the list was one more effect, two more markers and one more scope on
             // every mount. A missing source shows @empty, as the when() did (`?.length>0`).
+            this.imports.add('listEmpty');
             const emptyBody = this.sub(node.emptyBody);
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(${arrowOf(`(${items})??[]`)},${keyArg},(${params})=>{${body}}${transition || ',undefined'},()=>{${emptyBody}});`);
+            this.out(`const ${cf}=${helper}(${arrowOf(`(${items})??[]`)},${keyArg},(${params})=>{${body}}${transition || ',undefined'},listEmpty(()=>{${emptyBody}}));`);
             this.place(cf);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);

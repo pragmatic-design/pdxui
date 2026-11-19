@@ -42,7 +42,7 @@ export const serverBlocks: BlockVisitor<ServerBlock> = {
         // With no row, `@empty` between the same markers (#1233), as the client renders it: content,
         // not rows, so it carries no row mark.
         const empty = options?.empty && items().length === 0 ? options.empty : null;
-        if (empty) return serverBlock('repeat-start', 'repeat-end', () => [empty()]);
+        if (empty) return serverBlock('repeat-start', 'repeat-end', () => [empty.render()]);
         return serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
             ? renderer.render(() => item, () => i)
             : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null);
