@@ -1,0 +1,72 @@
+<template>
+  <!-- The text the author wrote inside the tag is the label when `label` is not set, kept here through
+       a <slot> rather than replaced by the line and lost. The separator is drawn beside it, on the
+       host: the late-children watcher leaves what the template placed there, where it would move a
+       redrawn line into this holder over and over, freezing the page in Chromium. -->
+  <span data-divider-text hidden :ref="holder"><slot></slot></span>
+  @if (orientation === 'vertical') {
+    <div role="separator" aria-orientation="vertical" data-part="line"></div>
+  } @else if (collecting) {
+  } @else if (labelText) {
+    <div role="separator" class="pdx-divider-labeled">
+      <span data-part="line"></span>
+      <span data-part="label">{{ labelText }}</span>
+      <span data-part="line"></span>
+    </div>
+  } @else {
+    <hr role="separator" data-part="line" />
+  }
+</template>
+
+<script>
+/**
+ * A separator, horizontal or vertical, with an optional label.
+ *
+ * @csspart line - A line: the `<hr>`, the vertical rule, or each line beside the label.
+ * @csspart label - The label between the two lines.
+ *
+ * @cssstate vertical - `orientation="vertical"`: an inline rule between items on a line.
+ * @cssstate label-left - `labelPosition="left"`: the line before the label is short.
+ * @cssstate label-right - `labelPosition="right"`: the line after the label is short.
+ */
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/divider';
+import { onDestroy, onMount } from '@pdxui/core';
+
+// The line's style (#290, #153): reflected on the host and drawn by divider.css with `@variant`.
+@variants {
+  /** solid (the default), dashed or dotted. */
+  variant: { solid, dashed, dotted } = solid;
+}
+// On the host as custom states (#132): divider.css lays the divider out from them — a block, or an
+// inline-block when vertical: the host CE is inline by default, and a horizontal <hr> in it would have
+// no width.
+@state vertical = orientation === 'vertical';
+@state label-left = labelPosition === 'left';
+@state label-right = labelPosition === 'right';
+@part line, label;
+@prop orientation: string = 'horizontal';
+/** The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`. */
+@prop label: string = '';
+@prop labelPosition: string = 'center';
+
+let holder = $signal(null);
+// The text in the holder: read on mount, and again when it changes — text that arrives after the
+// connect (a parser or a framework that appends children late) or a bound text node that updates.
+let text = $signal('');
+let textRead = $signal(false);
+function readText() { text = (holder?.textContent ?? '').trim(); }
+onMount(() => {
+  readText();
+  textRead = true;
+  if (!holder) return;
+  const observer = new MutationObserver(readText);
+  observer.observe(holder, { childList: true, characterData: true, subtree: true });
+  onDestroy(() => { observer.disconnect(); });
+});
+
+const labelText = $derived(label || text);
+/** Before the mount has read the text, and with no label: draw nothing yet, not a bare line. */
+const collecting = $derived(!textRead && !label);
+</script>

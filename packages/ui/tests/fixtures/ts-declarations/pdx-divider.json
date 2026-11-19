@@ -1,0 +1,138 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDivider",
+  "tagName": "pdx-divider",
+  "category": "Atoms",
+  "order": 9,
+  "description": "A separator, horizontal or vertical, with an optional label.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "Layout orientation — horizontal or vertical.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'center'",
+      "attribute": "labelposition"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "solid (the default), dashed or dotted.",
+      "type": {
+        "text": "'solid' | 'dashed' | 'dotted'"
+      },
+      "default": "'solid'",
+      "attribute": "variant"
+    }
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "solid",
+        "dashed",
+        "dotted"
+      ],
+      "default": "solid"
+    }
+  ],
+  "roles": [
+    "separator"
+  ],
+  "attributes": [
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "Layout orientation — horizontal or vertical.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "labelposition",
+      "fieldName": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'center'"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "solid (the default), dashed or dotted.",
+      "type": {
+        "text": "'solid' | 'dashed' | 'dotted'"
+      },
+      "default": "'solid'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "line",
+      "description": "A line: the `<hr>`, the vertical rule, or each line beside the label."
+    },
+    {
+      "name": "label",
+      "description": "The label between the two lines."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "vertical",
+      "description": "`orientation=\"vertical\"`: an inline rule between items on a line."
+    },
+    {
+      "name": "label-left",
+      "description": "`labelPosition=\"left\"`: the line before the label is short."
+    },
+    {
+      "name": "label-right",
+      "description": "`labelPosition=\"right\"`: the line after the label is short."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-divider-style"
+    }
+  ]
+}

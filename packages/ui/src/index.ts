@@ -14,7 +14,7 @@ import './chip/pdx-chip';
 import './avatar/pdx-avatar.pdx';
 import './avatar-group/pdx-avatar-group';
 import './spinner/pdx-spinner';
-import './divider/pdx-divider';
+import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';
 import './input/pdx-input';
