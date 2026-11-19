@@ -6,7 +6,7 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/avatar-group';
-import '../avatar/pdx-avatar'; // rendered by this component, and registered by nobody else
+import '../avatar/pdx-avatar.pdx'; // rendered by this component, and registered by nobody else
 
 /**
  * Make `el` a focusable button: a click, Enter or Space all run `activate`. `name` names it when its

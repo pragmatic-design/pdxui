@@ -11,7 +11,7 @@ import './button-group/pdx-button-group';
 import './progress/pdx-progress';
 import './badge/pdx-badge.pdx';
 import './chip/pdx-chip';
-import './avatar/pdx-avatar';
+import './avatar/pdx-avatar.pdx';
 import './avatar-group/pdx-avatar-group';
 import './spinner/pdx-spinner';
 import './divider/pdx-divider';

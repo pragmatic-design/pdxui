@@ -64,11 +64,6 @@
       "types": "./dist/chip/pdx-chip.d.ts",
       "import": "./dist/chip/pdx-chip.js"
     },
-    "./avatar": {
-      "development": "./src/avatar/pdx-avatar.ts",
-      "types": "./dist/avatar/pdx-avatar.d.ts",
-      "import": "./dist/avatar/pdx-avatar.js"
-    },
     "./avatar-group": {
       "development": "./src/avatar-group/pdx-avatar-group.ts",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/kbd/pdx-kbd.pdx",
       "types": "./dist/kbd/pdx-kbd.d.ts",
       "import": "./dist/kbd/pdx-kbd.js"
+    },
+    "./avatar": {
+      "development": "./src/avatar/pdx-avatar.pdx",
+      "types": "./dist/avatar/pdx-avatar.d.ts",
+      "import": "./dist/avatar/pdx-avatar.js"
     },
     "./package.json": "./package.json"
   },

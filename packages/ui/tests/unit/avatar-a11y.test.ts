@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/avatar/pdx-avatar';
+import '../../src/avatar/pdx-avatar.pdx';
 import '../../src/avatar-group/pdx-avatar-group';
 
 const PEOPLE = [{ name: 'Ada Lovelace' }, { name: 'Grace Hopper' }, { name: 'Alan Turing' }, { name: 'Edsger Dijkstra' }];

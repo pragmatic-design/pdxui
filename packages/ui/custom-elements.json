@@ -2447,7 +2447,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/avatar/pdx-avatar.ts",
+      "path": "src/avatar/pdx-avatar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2641,7 +2641,7 @@
           "name": "pdx-avatar",
           "declaration": {
             "name": "PdxAvatar",
-            "module": "src/avatar/pdx-avatar.ts"
+            "module": "src/avatar/pdx-avatar.pdx"
           }
         }
       ]

@@ -5,7 +5,7 @@
 // renders would never receive it, and the avatar would show the initials.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { html } from '@pdxui/core';
-import '../../src/avatar/pdx-avatar';
+import '../../src/avatar/pdx-avatar.pdx';
 import { tick } from './helpers';
 
 const BLOB = 'blob:http://localhost/7c9f2e1a-4b3d-4e5f-9a8b-1c2d3e4f5a6b';
