@@ -30,6 +30,16 @@ describe('@variants in the script', () => {
         });
     });
 
+    it('a comment inside the block, an axis\'s doc above it (#1228), is not an axis', () => {
+        expect(parseVariantsBlock("@variants {\n  /** sm or md. */\n  size: { sm: '.x-sm', md: '.x-md' } = md;\n  // the shape\n  shape: { pill, square };\n}")).toEqual({
+            axes: [
+                { name: 'size', values: ['sm', 'md'], default: 'md', native: { sm: '.x-sm', md: '.x-md' } },
+                { name: 'shape', values: ['pill', 'square'], default: 'pill' },
+            ],
+            errors: [],
+        });
+    });
+
     it('says what it cannot read: a default that is not a value, an axis twice, a line that is not an axis', () => {
         expect(parseVariantsBlock('@variants { size: { sm, md } = xl; }').errors).toEqual(["the default of 'size', 'xl', is not one of its values (sm, md)"]);
         expect(parseVariantsBlock('@variants { a: { x }; a: { y }; }').errors).toEqual(["the axis 'a' is declared twice"]);

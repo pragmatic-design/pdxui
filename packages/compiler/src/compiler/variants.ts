@@ -17,6 +17,7 @@
 
 import type { PropInfo } from './script-analyzer-types';
 import { attributeTest, expandVariantBlocks, testValues, VARIANT_TEST } from './variant-css';
+import { maskComments } from './tokenizer';
 
 /**
  * One axis of `@variants`: its name, its values in order, and the default (always one of them). A
@@ -74,7 +75,8 @@ function readValues(list: string): { value: string; native?: string }[] | null {
 export function parseVariantsBlock(text: string): VariantsBlock {
     const open = text.indexOf('{');
     const close = text.lastIndexOf('}');
-    const inner = open >= 0 && close > open ? text.slice(open + 1, close) : '';
+    // Comments blanked, strings kept: an axis's doc above it (#1228) is no axis, and a selector is quoted.
+    const inner = open >= 0 && close > open ? maskComments(text.slice(open + 1, close)) : '';
     const axes: VariantAxis[] = [];
     const errors: string[] = [];
     let rest = inner;
