@@ -1,7 +1,7 @@
 <template>
   <kbd class="pdx-kbd-combo" data-part="root">
-    @for (parts as key, i; track i) {
-      <kbd class="pdx-kbd">{{ displayKey(key, symbols) }}</kbd>
+    @for (shown as key, i; track i) {
+      <kbd class="pdx-kbd">{{ key }}</kbd>
     } @empty {
       <kbd class="pdx-kbd"><slot></slot></kbd>
     }
@@ -31,5 +31,7 @@ import { displayKey } from './kbd-symbols';
 // ⚠️ Without `keys`, the children are the shortcut: `<pdx-kbd>Ctrl</pdx-kbd>` is the form anyone
 // writes, and the slot keeps them. `keys` still wins when given — it is explicit, and it splits on
 // `+`, which raw children cannot.
-const parts = $derived(keys.split('+').map(k => k.trim()).filter(Boolean));
+// The keys as shown, symbols applied: each row then reads its key alone, and is static (#1233) —
+// built once, with nothing reactive, as the TypeScript version's keys were.
+const shown = $derived(keys.split('+').map(k => k.trim()).filter(Boolean).map(k => displayKey(k, symbols)));
 </script>

@@ -27,7 +27,8 @@ import { originMark } from './sourcemap';
 import { arrowOf, jsQuote, jsString } from './js-literal';
 import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
-import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
+import { isConstantBinding, withRowKey, withRowValue } from './codegen-constant-bindings';
+import { isStaticRow } from './static-rows';
 import { specialisedClassBinding } from './inline-class-binding';
 import { delegableHandler } from './inline-event-delegation';
 import { rewriteKeyedSelectors, selectorName } from './inline-keyed-selector';
@@ -1001,12 +1002,18 @@ class InlineGen {
         if (node.virtual) { this.virtualForN(node); return; }
         // Row getters for a plain item, as in codegen-template.ts.
         const rows = isRowBinding(node);
+        // A row whose content follows only from its item is built once, with nothing reactive
+        // (static-rows.ts, #1233): its item is a constant while it is generated, so each binding is
+        // written once, and core's eachStatic builds the row again when its key keeps a new item.
+        const isStatic = rows && isStaticRow(node, this.ctx);
         // A destructured binding: value rows, sliced as eachRow's are (#398).
-        const helper = rows ? 'eachRow' : 'eachDestructured';
+        const helper = isStatic ? 'eachStatic' : rows ? 'eachRow' : 'eachDestructured';
         this.imports.add(helper);
         const items = callSignals(prefixCtx(node.items, this.ctx), this.ctx);
         const keyArg = trackKeyArg(node, this.ctx);
-        let body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx, () => this.sub(node.body))));
+        const generate = () => this.sub(node.body);
+        let body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx,
+            isStatic ? () => withRowValue(node.item.trim(), this.ctx, generate) : generate)));
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const transition = generateTransition(node.transition);
         const cf = this.v('cf');
@@ -1039,16 +1046,13 @@ class InlineGen {
             }
         }
         if (node.emptyBody) {
-            // @empty fallback — when() picks the rows or the empty body. The list is built INSIDE its
-            // branch, as any branch's content is: built once outside, it was a fragment that emptied
-            // into the page the first time it was shown, so a list emptied and filled again showed
-            // nothing; and the server (#160) could not render a branch that built a fragment by hand.
-            this.imports.add('when');
+            // @empty — rendered by the list itself, between its markers, while it has no row (#1233):
+            // a when() around the list was one more effect, two more markers and one more scope on
+            // every mount. A missing source shows @empty, as the when() did (`?.length>0`).
             const emptyBody = this.sub(node.emptyBody);
-            const wf = this.v('wf');
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${wf}=when(${arrowOf(`${items}?.length>0`)},()=>${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition}),()=>{${emptyBody}});`);
-            this.place(wf);
+            this.out(`const ${cf}=${helper}(${arrowOf(`(${items})??[]`)},${keyArg},(${params})=>{${body}}${transition || ',undefined'},()=>{${emptyBody}});`);
+            this.place(cf);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);
             this.out(`const ${cf}=${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition});`);

@@ -189,7 +189,7 @@ function save() { throw new Error('nope'); }
             ['@click="save"', "__el2.addEventListener('click'"],
             [':value="name"', 'bindNativeProperty(__el3, "value"'],
             ['label }}', 'bindInterpolation(__t5,'],
-            ['items as item', 'const __cf8=eachRow('],
+            ['items as item', 'const __cf8=eachStatic('],
             ['item }}</li>', 'bindInterpolation(__t7,'],
             ['show) {', 'const __cf11=when('],
         ])).toEqual([]);
@@ -202,7 +202,7 @@ function save() { throw new Error('nope'); }
                 ['@click="save"', "__el1.addEventListener('click'"],
                 [':value="name"', 'bindNativeProperty(__el2, "value"'],
                 ['label }}', 'bindInterpolation(__t4,'],
-                ['items as item', 'const __cf7=eachRow('],
+                ['items as item', 'const __cf7=eachStatic('],
                 ['item }}</li>', 'bindInterpolation(__t6,'],
                 ['show) {', 'const __cf10=when('],
             ])).toEqual([]);

@@ -21,7 +21,8 @@ describe('@empty — fallback for empty lists', () => {
         expect(forNode.emptyBody.length).toBeGreaterThan(0);
     });
 
-    it('compiles @for with @empty to when() wrapper', () => {
+    // The list renders @empty itself (#1233): no when() around it.
+    it('compiles @for with @empty to a list that is given its @empty', () => {
         const { code } = c(`
 <template>
   @for (items as item; track item.id) {
@@ -33,8 +34,8 @@ describe('@empty — fallback for empty lists', () => {
 <script>
   let items = $signal([]);
 </script>`);
-        expect(code).toContain('when(');
-        expect(code).toContain('eachRow(');
+        expect(code).not.toContain('when(');
+        expect(code).toMatch(/eachRow\(\(\)=>\(ctx\.items\(\)\)\?\?\[\],'id',.*,undefined,\(\)=>\{const __frag=__blk\d+\(\);return __frag;\}\);/);
         expect(code).toContain('No items yet');
     });
 

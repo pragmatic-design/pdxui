@@ -38,9 +38,15 @@ export const serverBlocks: BlockVisitor<ServerBlock> = {
      * Every row of the list as it is now, each marked as list.ts `createRow` marks it. A sliced append
      * ends in the same rows, so slices do not apply.
      */
-    list: (items, _keyFn, renderer) => serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
-        ? renderer.render(() => item, () => i)
-        : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null),
+    list: (items, _keyFn, renderer, options) => {
+        // With no row, `@empty` between the same markers (#1233), as the client renders it: content,
+        // not rows, so it carries no row mark.
+        const empty = options?.empty && items().length === 0 ? options.empty : null;
+        if (empty) return serverBlock('repeat-start', 'repeat-end', () => [empty()]);
+        return serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
+            ? renderer.render(() => item, () => i)
+            : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null);
+    },
 
     /** A virtual list: the first window of rows and the spacers around it (server/virtual.ts). */
     virtual: (call) => serverVirtual(call),

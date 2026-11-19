@@ -165,6 +165,20 @@ export const ROWS: Row[] = [
             for (const n of [1, 2, 3]) { click(`button:nth-of-type(${n})`)(h); await settle(); }
         },
     },
+    // Static rows (#1233): a row that reads only its item is built once; a kept key with a new item
+    // is a row built again, and a moved key keeps its row.
+    {
+        name: '@for static rows, a kept index with a new item', expected: "<ul><li title=\"Cmd\">Cmd</li><li title=\"K\">K</li></ul><button>b</button>",
+        template: "<ul>@for (keys as k, i; track i) { <li :title=\"k\">{{ k }}</li> }</ul><button @click=\"keys = ['Cmd', 'K']\">b</button>",
+        script: "let keys = $signal(['Ctrl', 'K']);",
+        act: async (h) => { click('button')(h); await settle(); },
+    },
+    {
+        name: '@for static rows, moved and removed', expected: '<ul><li>c</li><li>a</li></ul><button>m</button>',
+        template: "<ul>@for (items as it; track it) { <li>{{ it }}</li> }</ul><button @click=\"items = ['c', 'a']\">m</button>",
+        script: "let items = $signal(['a', 'b', 'c']);",
+        act: async (h) => { click('button')(h); await settle(); },
+    },
     // With rows, as the server renders it (#160): the rows' branch is what a build writes.
     { name: '@for with @empty, with rows', expected: '<ul><li>a</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: "let items = $signal(['a']);" },
     // #283: no template-path recording exists — it landed after #238. happy-dom lays nothing out, so

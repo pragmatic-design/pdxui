@@ -71,12 +71,14 @@ describe('an expression of literals is written once', () => {
 
     it('a script const whose value is literals counts as one; a let, a call and a loop name do not', () => {
         const script = "let rows = $signal([]);\nconst MAX = 10;\nlet limit = 5;\nconst made = String(3);";
-        const out = render('<p>{{ MAX }} {{ limit }} {{ made }}</p>@for (rows as MAX; track MAX.id) {<i>{{ MAX }}</i>}', script);
+        // The row reads a member of its item, so it is not a static row (#1233): the binding shows
+        // whether MAX is read as the row or as the const.
+        const out = render('<p>{{ MAX }} {{ limit }} {{ made }}</p>@for (rows as MAX; track MAX.id) {<i>{{ MAX.label }}</i>}', script);
         expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.MAX,true\)/);
         expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.limit\)/);
         expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.made\)/);
         // Inside the loop MAX is the row, not the const.
-        expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>MAX\(\)\)/);
+        expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>MAX\(\)\.label\)/);
     });
 
     it('a word inside a string is not a name; a name inside a template literal\'s ${} is', () => {

@@ -864,7 +864,7 @@ exports[`compile golden — demo corpus > infra/demo-focus.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, effect, eventHandler, focusGroup, focusRestore, focusTrap, manageFocusOrder, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachStatic, effect, eventHandler, focusGroup, focusRestore, focusTrap, manageFocusOrder, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4zdqcj");
@@ -996,14 +996,14 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     __el12.addEventListener('click', eventHandler(ctx.deactivateTrap, ctx.el, 'click'));
     bindInterpolation(__t14,()=>ctx.trapLog());
     bindRef(__el18,ctx.verticalRef);
-    const __cf21=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el19,__t20]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el19.removeAttribute("aria-disabled"); else { __el19.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t20,()=>fruit(),true);return __frag;});
+    const __cf21=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el19,__t20]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el19.removeAttribute("aria-disabled"); else { __el19.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t20,()=>fruit(),true);return __frag;});
     __m22.replaceWith(__cf21);
     bindInterpolation(__t24,()=>ctx.groupLog());
     bindRef(__el28,ctx.horizontalRef);
-    const __cf31=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk1();const [__t30]=__walk1(__frag);bindInterpolation(__t30,()=>tab(),true);return __frag;});
+    const __cf31=eachStatic(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk1();const [__t30]=__walk1(__frag);bindInterpolation(__t30,()=>tab(),true);return __frag;});
     __m32.replaceWith(__cf31);
     bindRef(__el36,ctx.typeaheadRef);
-    const __cf39=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t38]=__walk1(__frag);bindInterpolation(__t38,()=>c(),true);return __frag;});
+    const __cf39=eachStatic(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t38]=__walk1(__frag);bindInterpolation(__t38,()=>c(),true);return __frag;});
     __m40.replaceWith(__cf39);
     __el45.addEventListener('click', eventHandler(ctx.trackTarget, ctx.el, 'click'));
     __el46.addEventListener('click', eventHandler(ctx.trackTarget, ctx.el, 'click'));
@@ -14314,7 +14314,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-chip/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, bindRef, component, eachRow, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, bindRef, component, eachStatic, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 import { useChipConsole } from './state.pdx';
 
 {
@@ -14369,7 +14369,7 @@ const chipConsole = useChipConsole();
     const __frag=__blk2();
     const [__el6,__m10,__m13,__el14]=__walk2(__frag);
     bindRef(__el6,ctx.tagRow);
-    const __cf9=eachRow(()=>ctx.tags(),(tag) => tag,(tag)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);{ assignBoundProperty(__el7, "value", tag()); }__el7.addEventListener('pdx-remove', eventHandler(ctx.removeTag, ctx.el, 'pdx-remove'));bindInterpolation(__t8,()=>tag(),true);return __frag;});
+    const __cf9=eachStatic(()=>ctx.tags(),(tag) => tag,(tag)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);{ assignBoundProperty(__el7, "value", tag()); }__el7.addEventListener('pdx-remove', eventHandler(ctx.removeTag, ctx.el, 'pdx-remove'));bindInterpolation(__t8,()=>tag(),true);return __frag;});
     __m10.replaceWith(__cf9);
     const __cf12=when(()=>ctx.tags().length === 0,()=>{const __frag=__blk1();return __frag;},null);
     __m13.replaceWith(__cf12);
@@ -18362,7 +18362,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-entit
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { columns, people } from './state.pdx';
 
 {
@@ -18405,7 +18405,7 @@ const schema = { fields: [
     __el4.addEventListener('pdx-create', eventHandler(ctx.onCreate, ctx.el, 'pdx-create'));
     __el4.addEventListener('pdx-update', eventHandler(ctx.onUpdate, ctx.el, 'pdx-update'));
     __el4.addEventListener('pdx-delete', eventHandler(ctx.onDelete, ctx.el, 'pdx-delete'));
-    const __cf10=eachRow(()=>ctx.logLines(),(line) => line,(line)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>line(),true);return __frag;});
+    const __cf10=eachStatic(()=>ctx.logLines(),(line) => line,(line)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>line(),true);return __frag;});
     __m11.replaceWith(__cf10);
     effect(()=>{__el12.style.display=(ctx.logLines().length === 0)?'':'none';});
     return __frag;
@@ -21455,7 +21455,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-icon/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachStatic, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { getPragmaticIconNames, PRAGMATIC_ICON_COUNT } from '@pdxui/ui/icon/pragmatic-icons';
 
 {
@@ -21480,7 +21480,7 @@ component('app-demo-comp-icon-built-in', {
     const __frag=__blk1();
     const [__t3,__m11]=__walk1(__frag);
     bindInterpolation(__t3,()=>ctx.iconCount());
-    const __cf10=eachRow(()=>ctx.iconNames(),(name) => name,(name)=>{const __frag=__blk0();const [__el7,__t9]=__walk0(__frag);{ assignBoundProperty(__el7, "name", name()); }bindInterpolation(__t9,()=>name(),true);return __frag;});
+    const __cf10=eachStatic(()=>ctx.iconNames(),(name) => name,(name)=>{const __frag=__blk0();const [__el7,__t9]=__walk0(__frag);{ assignBoundProperty(__el7, "name", name()); }bindInterpolation(__t9,()=>name(),true);return __frag;});
     __m11.replaceWith(__cf10);
     return __frag;
   })(),
@@ -38281,7 +38281,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/design-the
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, eachRow, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, component, eachStatic, staticBlock, staticMarkup } from '@pdxui/core';
 import { THEME_INHERITED } from '@pdxui/design/engine';
 
 {
@@ -38308,7 +38308,7 @@ component('app-demo-design-themes-themes', {
     const __frag=__blk1();
     const [__t2,__m22]=__walk1(__frag);
     bindInterpolation(__t2,()=>ctx.themes.length);
-    const __cf21=eachRow(()=>ctx.themes,(t) => t,(t)=>{const __frag=__blk0();const [__el6,__t9]=__walk0(__frag);{ const __v = t(); if (__v == null || __v === false) __el6.removeAttribute("pdx-theme"); else { __el6.setAttribute("pdx-theme", __v === true ? '' : String(__v)); } }bindInterpolation(__t9,()=>t(),true);return __frag;});
+    const __cf21=eachStatic(()=>ctx.themes,(t) => t,(t)=>{const __frag=__blk0();const [__el6,__t9]=__walk0(__frag);{ const __v = t(); if (__v == null || __v === false) __el6.removeAttribute("pdx-theme"); else { __el6.setAttribute("pdx-theme", __v === true ? '' : String(__v)); } }bindInterpolation(__t9,()=>t(),true);return __frag;});
     __m22.replaceWith(__cf21);
     return __frag;
   })(),
@@ -39250,7 +39250,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-focu
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachStatic, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-r8whg7");
@@ -39283,7 +39283,7 @@ const tabNames = ['Dashboard', 'Users', 'Settings', 'Reports'];
     const __frag=__blk1();
     const [__el3,__m7]=__walk1(__frag);
     bindRef(__el3,ctx.horizontalRef);
-    const __cf6=eachRow(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>tab(),true);return __frag;});
+    const __cf6=eachStatic(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>tab(),true);return __frag;});
     __m7.replaceWith(__cf6);
     return __frag;
   })(),
@@ -39295,7 +39295,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-focu
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachStatic, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-sc5nid");
@@ -39333,7 +39333,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     const __frag=__blk1();
     const [__el3,__m7,__t9]=__walk1(__frag);
     bindRef(__el3,ctx.verticalRef);
-    const __cf6=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el4.removeAttribute("aria-disabled"); else { __el4.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t5,()=>fruit(),true);return __frag;});
+    const __cf6=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el4,__t5]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el4.removeAttribute("aria-disabled"); else { __el4.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t5,()=>fruit(),true);return __frag;});
     __m7.replaceWith(__cf6);
     bindInterpolation(__t9,()=>ctx.groupLog());
     return __frag;
@@ -39468,7 +39468,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-focu
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachStatic, focusGroup, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-jfthpg");
@@ -39502,7 +39502,7 @@ const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'Chile', 'Denma
     const __frag=__blk1();
     const [__el3,__m7]=__walk1(__frag);
     bindRef(__el3,ctx.typeaheadRef);
-    const __cf6=eachRow(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>c(),true);return __frag;});
+    const __cf6=eachStatic(()=>ctx.countries,(c) => c,(c)=>{const __frag=__blk0();const [__t5]=__walk0(__frag);bindInterpolation(__t5,()=>c(),true);return __frag;});
     __m7.replaceWith(__cf6);
     return __frag;
   })(),

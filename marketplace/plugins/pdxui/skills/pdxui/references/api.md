@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-488 value exports.
+489 value exports.
 
 ### `__adoptStyles`
 
@@ -1901,7 +1901,7 @@ Usage:
 ```ts
 import { eachDestructured } from '@pdxui/core';
 
-function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions): DocumentFragment
+function eachDestructured(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: T, index: number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
 ```
 
 {@link each}, as a destructured `@for` — `@for (rows as { id, label }; track id)` — compiles to:
@@ -1913,7 +1913,7 @@ a large append renders in slices, as a plain `@for`'s `eachRow` does (#242, #398
 ```ts
 import { eachRow } from '@pdxui/core';
 
-function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions): DocumentFragment
+function eachRow(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
 ```
 
 Keyed list whose rows see their CURRENT item — what `@for` compiles to.
@@ -1923,6 +1923,18 @@ same key keeps its DOM node, and its getters move to the new object and position
 update (`rows.map(r => r.id === id ? { ...r, done: true } : r)`) reaches the row's bindings. With
 `each()` the row's closures keep the object it was created with. Read the getters
 inside a binding (`${() => item().name}`) — a read while the row is built is a snapshot.
+
+### `eachStatic`
+
+```ts
+import { eachStatic } from '@pdxui/core';
+
+function eachStatic(items: () => T[], key: string | ((item: T, index: number) => unknown), renderFn: (item: () => T, index: () => number) => Node, options?: TransitionOptions, empty?: () => Node): DocumentFragment
+```
+
+{@link eachRow} with static rows (#1233): what `@for` compiles to when the row's content follows only
+from its item. Each row is built once, its getter answering the item it was built from, with no item
+signal; a kept key whose item is replaced is a row built again.
 
 ### `eachVirtual`
 

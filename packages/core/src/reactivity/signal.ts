@@ -271,20 +271,52 @@ export function collectDisposers<T>(fn: () => T): [T, Dispose] {
     const scope: OwnerScope = { parent: currentScope(), disposers: [], suspended: false, parked: null, hooks: 0 };
     currentOwner = scope;
     try {
-        const result = fn();
-        const owned = scope.disposers;
-        const dispose: Dispose = () => {
-            // Disposed while suspended — a frozen page destroyed: nothing is held any more.
-            if (scope.suspended) { scope.suspended = false; suspendedCount--; }
-            scope.parked = null;
-            if (scope.hooks !== 0) removeHooksOf(scope);
-            for (let i = 0; i < owned.length; i++) owned[i]();
-            owned.length = 0;
-        };
-        return [result, dispose];
+        return [fn(), disposerOf(scope)];
     } finally {
         currentOwner = prev;
     }
+}
+
+/** The idempotent Dispose of `scope`: what it holds torn down. */
+function disposerOf(scope: OwnerScope): Dispose {
+    const owned = scope.disposers;
+    return () => {
+        // Disposed while suspended — a frozen page destroyed: nothing is held any more.
+        if (scope.suspended) { scope.suspended = false; suspendedCount--; }
+        scope.parked = null;
+        if (scope.hooks !== 0) removeHooksOf(scope);
+        for (let i = 0; i < owned.length; i++) owned[i]();
+        owned.length = 0;
+    };
+}
+
+/** The scope {@link collectIfAny} lends a body, kept while no body has registered anything in it. */
+let spareScope: { parent: OwnerScope | null; disposers: Dispose[]; suspended: boolean; parked: Set<Subscriber> | null; hooks: number } | null = null;
+
+/**
+ * {@link collectDisposers} for a body that usually registers nothing — a static `@for` row (#1233):
+ * its Dispose, or `undefined` when the body registered no effect, disposer or hook, and then no scope
+ * is kept for it. The body runs in a scope as any other does — a spare one, lent while nothing is
+ * registered in it — so a body that does register something gets that scope as its own.
+ */
+export function collectIfAny<T>(fn: () => T): [T, Dispose | undefined] {
+    const scope = spareScope ?? { parent: null, disposers: [], suspended: false, parked: null, hooks: 0 };
+    spareScope = null;
+    scope.parent = currentScope();
+    const prev = currentOwner;
+    currentOwner = scope;
+    let result: T;
+    try {
+        result = fn();
+    } finally {
+        currentOwner = prev;
+    }
+    if (scope.disposers.length === 0 && scope.hooks === 0) {
+        scope.parent = null;
+        spareScope = scope;
+        return [result, undefined];
+    }
+    return [result, disposerOf(scope)];
 }
 
 /** {@link collectDisposers}, and the scope it collected into: what a container suspends. */
