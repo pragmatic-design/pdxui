@@ -64,8 +64,9 @@ function literalType(value: string): 'String' | 'Number' | 'Boolean' | null {
     const v = value.trim();
     // Match: a whole single- or double-quoted string with no unescaped quote of its kind inside.
     if (/^'(?:[^'\\\n]|\\.)*'$/.test(v) || /^"(?:[^"\\\n]|\\.)*"$/.test(v)) return 'String';
-    // Match: a decimal number, signed or not: `0`, `-1`, `2.5`, `1e3`.
-    if (/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(v)) return 'Number';
+    // Match: a decimal number, signed or not: `0`, `-1`, `2.5`, `1e3`. The fraction is optional as a
+    // whole, `(?:\.\d*)?`, so there is one way to read the digits: no backtracking over them.
+    if (/^-?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?$/i.test(v)) return 'Number';
     if (v === 'true' || v === 'false') return 'Boolean';
     return null;
 }
