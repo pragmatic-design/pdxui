@@ -168,6 +168,17 @@ What the numbers mean:
     dynamic attribute.
   - The `.pdx` filter popover content alone weighs more than the whole TypeScript module, helpers
     included.
+  - Measured again on 2026-11-19 (#1207), the same way: the switch 1411 B gzip and the select
+    8981 B, against 1120 B for the TypeScript switch before #1008 and 7650 B for the TypeScript
+    select today. The largest construct the compiler wrote was the binding of a dynamic attribute,
+    about ten lines of effect each: 19% of the switch, 18% of the select. It is one call to core now
+    (`bindAttribute`, `bindNativeProperty`, `bindAttributeOrProperty`), and so are a handler
+    (`eventHandler`) and the `@state` runes (`ctx.states`). Blocks and walks with the same code are
+    declared once per module, a literal default no longer writes the type core infers from it, and a
+    prop named only in a comment gets no accessor. After: the switch **1204 B** (1.07× its TypeScript
+    version), the select **7741 B** (1.01×). The bytes left are the walks, the static blocks and
+    the `when` calls a compiled render carries where `html``` parses at run time.
+    `tests/unit/pdx-compiled-weight.test.ts` holds both weights.
 - **Mount.** On the dev server the `.pdx` versions were slower everywhere: 1.4× the switch, 2.5× the
   select, 2.1–2.6× the popover. On a production build (#685) they are not: the switch mounts at 0.74×
   and the select at 0.92× of their TypeScript versions. The popover's conditions were 1.85×, because

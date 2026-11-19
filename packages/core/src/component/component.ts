@@ -115,6 +115,12 @@ export interface ComponentContextBase {
      * the host, which CSS matches with `:state(name)`.
      */
     state(name: string, on: boolean): void;
+    /**
+     * Keep each declared state in `map` on while its function returns a truthy value (#1207): one
+     * tracked effect per state, as `ctx.track(() => ctx.state(name, …))` would be. What a compiled
+     * `@state` emits.
+     */
+    states(map: Record<string, () => unknown>): void;
 }
 
 /** The events a descriptor declares, by name. */
@@ -425,6 +431,13 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
         }
 
         body(): DocumentFragment | Node | null {
+            const setState = (name: string, on: boolean): void => {
+                if (!declaredStates?.has(name)) {
+                    if (DEV) console.warn(`[pdx] <${tag}> set the state '${name}', which its descriptor does not declare in \`states\` (declared: ${declaredStates ? [...declaredStates].join(', ') : 'none'}). It is not set.`);
+                    return;
+                }
+                if (on) this._customStates?.add(name); else this._customStates?.delete(name);
+            };
             const ctx: Record<string, unknown> = {
                 el: this,
                 emit: (event: string, detail?: unknown, emitOptions?: EmitOptions) => {
@@ -440,12 +453,12 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 track: (fn: () => void | (() => void), options?: EffectOptions) => this.track(fn, options),
                 frame: (fn: () => void) => this.frame(fn),
                 expose: (api: Record<string, unknown>) => exposeOnElement(this, api),
-                state: (name: string, on: boolean) => {
-                    if (!declaredStates?.has(name)) {
-                        if (DEV) console.warn(`[pdx] <${tag}> set the state '${name}', which its descriptor does not declare in \`states\` (declared: ${declaredStates ? [...declaredStates].join(', ') : 'none'}). It is not set.`);
-                        return;
+                state: setState,
+                states: (map: Record<string, () => unknown>) => {
+                    for (const name of Object.keys(map)) {
+                        const read = map[name];
+                        this.track(() => { setState(name, Boolean(read())); });
                     }
-                    if (on) this._customStates?.add(name); else this._customStates?.delete(name);
                 },
             };
             // Form-associated: expose form methods on context

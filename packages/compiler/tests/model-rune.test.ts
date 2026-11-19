@@ -26,7 +26,7 @@ for (const [name, opts] of Object.entries({ dev: {}, build: { production: true }
     describe(`@model — ${name}`, () => {
         it('goes into the descriptor\'s models, not its props', () => {
             const { code } = compile(sfc(FIELD), 'field.pdx', [], undefined, opts);
-            expect(code).toMatch(/models: \{\s*value: prop\('', \{ type: String \}\)\s*\}/);
+            expect(code).toMatch(/models: \{\s*value: prop\(''\)\s*\}/);
             const props = code.match(/props: (\{[\s\S]*?\n {2}\}|\{\})/)?.[1] ?? '';
             expect(props).toContain('label');
             expect(props).not.toContain('value');
@@ -182,7 +182,7 @@ describe('@model … { form }', () => {
     for (const [name, opts] of Object.entries({ dev: {}, build: { production: true } })) {
         it(`goes into the descriptor with core's form wiring, imported — ${name}`, () => {
             const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, opts);
-            expect(code).toMatch(/models: \{\s*value: \{ \.\.\.prop\('', \{ type: String \}\), form: wireFormModel \}\s*\}/);
+            expect(code).toMatch(/models: \{\s*value: \{ \.\.\.prop\(''\), form: wireFormModel \}\s*\}/);
             expect(code).toMatch(/import \{[^}]*\bwireFormModel\b[^}]*\} from '@pdxui\/core'/);
         });
     }

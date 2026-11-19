@@ -29,6 +29,14 @@ semver.
 
 ### Changed
 
+- A component compiled from `.pdx` is lighter (#1207): a bound attribute, a handler and the `@state`
+  runes are one call to core each (`bindAttribute`, `bindNativeProperty`, `bindAttributeOrProperty`,
+  `eventHandler`, `ctx.states`) instead of code written out where each is used, and identical blocks
+  and walks are declared once per module. `pdx-switch` went from 1411 to 1204 B gzip, the select the
+  library is porting from 8981 to 7741 B; mounting them is no slower. A module compiled by this
+  compiler needs a core that has those calls, the core released with it; a module compiled before
+  still runs on the new core, which keeps everything such a module calls.
+
 - `@pdxui/cli` no longer depends on `@pdxui/lsp` (#1202). `pdx check --types` runs the type-check the
   CLI now ships in its own `dist/`; a new project's `node_modules` is about 31 MB smaller. The CLI names
   `typescript` as an optional peer, as `@pdxui/lsp` does, since the check runs on the project's own

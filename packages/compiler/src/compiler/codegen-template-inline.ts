@@ -16,7 +16,7 @@ import { renderSnippetCall, snippetSourceOf } from './snippet-calls';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { BindingDedup } from './inline-dedup';
-import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
+import { buildEventHandler, templateEventHandler, dynamicComponentCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
 import { soleControlFlow } from './inline-sole-block';
@@ -580,9 +580,14 @@ class InlineGen {
             this.out(`{ ${this.assign(el, this.boundName(prop, kind), this.read(expr), kind)} }`);
             return;
         }
-        this.imports.add('effect');
         // Pre-rewritten values are already final JS (often a `() => …` getter from form-binding).
         const value = preRewritten ? `(${expr})()` : this.shared(this.read(expr));
+        // A plain element's binding is one call to core's (#1207): the effect, the last value and the
+        // write are the same in every binding, and written out each was the heaviest construct of a
+        // compiled component. Which of the three writes it is stays decided here.
+        const helper = this.boundAttributeCall(el, this.boundName(prop, kind), value, kind);
+        if (helper !== null) { this.out(helper); return; }
+        this.imports.add('effect');
         // The value this binding wrote last, as core's binding keeps it (`template.ts`): the effect
         // re-runs when anything it READ changes — the row object a field comes from, replaced after
         // another field's save — and writing the same value again would put it back over what the
@@ -590,6 +595,29 @@ class InlineGen {
         // Named after the element and the prop (one binding each), on the binding's own line.
         const written = `${el}w_${prop.replace(/\W/g, '_')}`;
         this.out(`let ${written} = {}; effect(() => { const __b = ${value}; if (Object.is(__b, ${written})) return; ${written} = __b; ${this.assign(el, this.boundName(prop, kind), '__b', kind)} });`);
+    }
+
+    /**
+     * The call to core's binding of a plain element's attribute or property (`bound-attribute.ts`), the
+     * same three writes `assign` spells out: the attribute, a property the element certainly has, or
+     * the property asked for with `in`. Null for what `assign` keeps inline: a component's prop, which
+     * goes through `assignBoundProperty`, and a URL name, which goes through `sanitizeBoundUrl`.
+     */
+    private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind): string | null {
+        if (kind.custom || URL_BINDINGS.has(prop.toLowerCase())) return null;
+        // Parenthesised when the value starts with `{`: `() => { a: 'x' }['a']` is a block (render-parity).
+        const getter = arrowOf(value);
+        if (isAttributeBinding(prop, kind)) {
+            this.imports.add('bindAttribute');
+            return `bindAttribute(${el}, ${jsString(prop)}, ${getter});`;
+        }
+        const p = jsString(propName(prop, kind));
+        if (hasNativeProperty(kind.tag, propName(prop, kind))) {
+            this.imports.add('bindNativeProperty');
+            return `bindNativeProperty(${el}, ${jsString(prop)}, ${p}, ${getter});`;
+        }
+        this.imports.add('bindAttributeOrProperty');
+        return `bindAttributeOrProperty(${el}, ${jsString(prop)}, ${p}, ${getter});`;
     }
 
     /**
@@ -724,13 +752,12 @@ class InlineGen {
         // as signal writes, and two statements kept as two statements.
         //
         // A `${…}` value arrives already rewritten by the caller and is passed through untouched.
-        const rawHandler = preRewritten ? expr
-            : hoisted ? buildScopedEventHandler(expr, this.ctx, scopeNames)
-            : buildEventHandler(expr, this.ctx);
-        if (!preRewritten) this.imports.add('batchHandler');
-        // Wrap with safeHandler for global error interception
-        this.imports.add('safeHandler');
-        const handler = `safeHandler(${rawHandler}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(ev)})`;
+        // Batched and its errors routed, through core's `eventHandler` (#1207). A pre-rewritten value is
+        // not batched, as before, and keeps `safeHandler` alone.
+        if (preRewritten) this.imports.add('safeHandler'); else this.imports.add('eventHandler');
+        const handler = preRewritten
+            ? `safeHandler(${expr}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(ev)})`
+            : templateEventHandler(expr, this.ctx, ev, hoisted ? scopeNames : undefined);
 
         const optP: string[] = [];
         if (mods.has('once')) optP.push('once:true');

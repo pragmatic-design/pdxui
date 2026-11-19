@@ -58,6 +58,8 @@ for (const [path, opts] of Object.entries({ dev: {}, build: { production: true }
             expect(code).toContain('untracked(');
             expect(code).not.toContain('title.once');
             expect(code).not.toMatch(/effect\(\(\) => \{ const __b = [^;]*name/);
+            // A tracked binding is core's call now (#1207): none for the title either.
+            expect(code).not.toMatch(/bind\w+\(__el\d+, "title"/);
         });
     });
 }

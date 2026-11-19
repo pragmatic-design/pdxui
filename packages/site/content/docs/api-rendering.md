@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 79 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 82 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -156,6 +156,28 @@ class AwaitTimeoutError
 
 `@await`'s `maxMs` ran out with no result. The source is not cancelled; a later result replaces it.
 
+## `bindAttribute`
+
+```ts
+import { bindAttribute } from '@pdxui/core';
+
+function bindAttribute(el: Element, attr: string, value: () => unknown): void
+```
+
+`:attr` that is an attribute — `aria-*`, `data-*`, a hyphenated name, `role` on SVG.
+
+## `bindAttributeOrProperty`
+
+```ts
+import { bindAttributeOrProperty } from '@pdxui/core';
+
+function bindAttributeOrProperty(el: Element, attr: string, prop: string, value: () => unknown): void
+```
+
+`:attr` on an element that may or may not have the property: asked at each write, as core's
+`bindProperty` asks (`prop in el`). A name the element does not have — `:itemprop`, `:for` on a
+<div> — is its attribute; assigning it would set an expando nothing reads.
+
 ## `bindGesture`
 
 ```ts
@@ -185,6 +207,16 @@ read `a,b` in a production build and `ab` in dev (#100).
 `constant`: the compiler knows the value cannot change — a literal, or a `@for` row's track key
 (#110). It is written once, by the same rule, outside any tracking: no effect is created, and what
 it reads does not subscribe the render it sits in.
+
+## `bindNativeProperty`
+
+```ts
+import { bindNativeProperty } from '@pdxui/core';
+
+function bindNativeProperty(el: Element, attr: string, prop: string, value: () => unknown): void
+```
+
+`:attr` that the element certainly has as a property (`disabled` on an <input>), bound as `attr`.
 
 ## `bindParts`
 

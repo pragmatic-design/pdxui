@@ -46,9 +46,9 @@ describe('inlineBindings: a URL binding is sanitised', () => {
 describe('the controls', () => {
     it(':title and :value still compile to a direct assignment, with no sanitiser', () => {
         const code = inline('<input :title="url" :value="url" />');
-        // The value read once into __b, then __v: null goes to core's clearBoundProperty, as core does.
-        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*const __v = __b; if \(__v == null\) clearBoundProperty\(\w+, "title", "title"\); else \w+\["title"\] = __v;/);
-        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*const __v = __b; if \(__v == null\) clearBoundProperty\(\w+, "value", "value"\); else \w+\["value"\] = __v;/);
+        // Core's property binding (#1207): null goes to clearBoundProperty, anything else is assigned.
+        expect(code).toMatch(/bindNativeProperty\(\w+, "title", "title", \(\)=>ctx\.url\(\)\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.url\(\)\)/);
         expect(code).not.toContain('sanitizeBoundUrl');
     });
 });

@@ -26,16 +26,16 @@ describe('the track key of a @for row is written once', () => {
 
     it('a property bound to the key is assigned once, with no effect', () => {
         const out = render('@for (rows as row; track row.id) {<p :data-id="row.id" :title="row.label"></p>}');
-        expect(out).not.toMatch(/effect\(\(\) => \{ const __b = row\(\)\.id;/);
+        expect(out).not.toMatch(/bind\w+\(__el\d+, "data-id"/);
         expect(out).toMatch(/__el\d+\.setAttribute\("data-id"/);
-        // The control: the label is not the key, and keeps its effect.
-        expect(out).toMatch(/effect\(\(\) => \{ const __b = row\(\)\.label;/);
+        // The control: the label is not the key, and keeps its binding.
+        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>row\(\)\.label\)/);
     });
 
     it('the key with literals is constant too; the key with anything else is not', () => {
         const out = render('@for (rows as row; track row.id) {<p :data-test="\'row-\' + row.id" :title="row.id + row.label"></p>}');
-        expect(out).not.toMatch(/effect\(\(\) => \{ const __b = 'row-' \+ row\(\)\.id;/);
-        expect(out).toMatch(/effect\(\(\) => \{ const __b = row\(\)\.id \+ row\(\)\.label;/);
+        expect(out).not.toMatch(/bind\w+\(__el\d+, "data-test"/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>row\(\)\.id \+ row\(\)\.label\)/);
     });
 
     it('track item: the item itself is the key', () => {
@@ -58,6 +58,8 @@ describe('an expression of literals is written once', () => {
     it(':title="\'x\'" is an assignment, not an effect', () => {
         const out = render('<p :title="\'x\'"></p>');
         expect(out).not.toContain('effect(');
+        // A binding is core's call now (#1207): it is no effect in the module, and no binding either.
+        expect(out).not.toMatch(/bind(?:Attribute|NativeProperty|AttributeOrProperty)\(/);
         expect(out).toMatch(/__el\d+\.setAttribute\("title"|__el\d+\["title"\]/);
     });
 
@@ -79,8 +81,8 @@ describe('an expression of literals is written once', () => {
 
     it('a word inside a string is not a name; a name inside a template literal\'s ${} is', () => {
         const out = render('<p :title="\'label\'" :lang="`${label}`"></p>');
-        expect(out).not.toMatch(/effect\(\(\) => \{ const __b = 'label';/);
-        expect(out).toMatch(/let __el\d+w_lang = \{\}; effect\(/);
+        expect(out).not.toMatch(/bind\w+\(__el\d+, "title"/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "lang", "lang", \(\)=>`\$\{ctx\.label\(\)\}`\)/);
     });
 
     it('a call is never constant, even of literals: it may read a signal ($t reads the locale)', () => {

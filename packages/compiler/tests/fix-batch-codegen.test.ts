@@ -26,7 +26,7 @@ function save() {}
         expect(code).not.toMatch(/__li\d+_el\b/);
         // The handler is never hoisted/invoked at render.
         expect(code).not.toMatch(/__li\d+_save\b/);
-        expect(code).toContain('safeHandler');
+        expect(code).toContain('eventHandler(');
     });
 
     // Regression: nested @for loops both reading the same signal must not produce a

@@ -20,17 +20,24 @@ describe('@state compiles into the descriptor and an effect', () => {
     it('declares the state, and sets it from its expression whenever that changes', () => {
         const { code } = compile(pdx('let open = $signal(false);\n@state expanded = open;'), 'test.pdx');
         expect(code).toContain("states: ['expanded'],");
-        expect(code).toContain("ctx.track(() => { ctx.state('expanded', __open()); });");
+        // Core's ctx.states tracks each in its own effect (#1207; component-states.test.ts in core).
+        expect(code).toContain('ctx.states({ expanded: ()=>__open() });');
     });
 
     it('takes any boolean expression, read reactively', () => {
         const { code } = compile(pdx('let count = $signal(0);\n@state busy = count > 0;'), 'test.pdx');
-        expect(code).toContain("ctx.state('busy', __count() > 0)");
+        expect(code).toContain('busy: ()=>__count() > 0');
+    });
+
+    it('several states are one call, each its own entry', () => {
+        const { code } = compile(pdx('let a = $signal(false);\nlet b = $signal(0);\n@state on = a;\n@state many = b > 1;'), 'test.pdx');
+        expect(code).toContain('ctx.states({ on: ()=>__a(), many: ()=>__b() > 1 });');
     });
 
     it('the control: a component with no @state declares no states and sets none', () => {
         const { code } = compile(pdx('let open = $signal(false);'), 'test.pdx');
         expect(code).not.toContain('states:');
+        expect(code).not.toContain('ctx.states(');
         expect(code).not.toContain('ctx.state(');
     });
 });

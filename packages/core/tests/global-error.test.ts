@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { onGlobalError, dispatchGlobalError, safeHandler, clearGlobalErrorHandlers } from '../src/component/global-error';
+import { onGlobalError, dispatchGlobalError, safeHandler, eventHandler, clearGlobalErrorHandlers } from '../src/component/global-error';
 import { signal, effect } from '../src/reactivity/signal';
 import { waitUntil } from './wait-until';
 
@@ -122,6 +122,32 @@ describe('Global Error Interceptor', () => {
 
             expect(wrapped(3, 4)).toBe(7);
             expect(fn).toHaveBeenCalledWith(3, 4);
+        });
+    });
+
+    describe('eventHandler: a template\'s handler, batched and its errors routed (#1207)', () => {
+        it('routes a throw naming the host\'s tag and the event', () => {
+            const handler = vi.fn();
+            onGlobalError(handler);
+            const host = document.createElement('pdx-select');
+            eventHandler(() => { throw new Error('boom'); }, host, 'click')();
+            expect(handler).toHaveBeenCalledOnce();
+            expect(handler.mock.calls[0][1]).toEqual({ source: 'event', component: 'pdx-select', event: 'click' });
+        });
+
+        it('runs the handler in one batch: an effect reading two signals it writes runs once, on both', () => {
+            const a = signal(0);
+            const b = signal(0);
+            const seen: string[] = [];
+            effect(() => { seen.push(`${a()}-${b()}`); });
+            eventHandler(() => { a.set(1); b.set(1); }, undefined, 'click')();
+            expect(seen).toEqual(['0-0', '1-1']);
+        });
+
+        it('keeps the call\'s arguments and its return value', () => {
+            const fn = vi.fn((e: string) => `got ${e}`);
+            expect(eventHandler(fn, undefined, 'input')('x')).toBe('got x');
+            expect(fn).toHaveBeenCalledWith('x');
         });
     });
 

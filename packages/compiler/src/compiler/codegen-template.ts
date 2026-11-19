@@ -42,10 +42,12 @@ export function virtualOptions(node: ForNode, getters: boolean, empty: string | 
  * does, through `ctx.nonSignalNames`.
  */
 export function extractLoopInvariants(bodyCode: string, loopVar: string, ctx: CompileContext): string[] {
-    // Names used as event handlers: safeHandler(ctx.NAME, ...) or safeHandler(() => ...).
-    // Capture the bare-ref form which is the dangerous one (gets invoked when hoisted).
+    // Names used as event handlers: eventHandler(ctx.NAME, …), safeHandler(ctx.NAME, …) or
+    // safeHandler(batchHandler(ctx.NAME), …). Capture the bare-ref form which is the dangerous one
+    // (gets invoked when hoisted).
     const handlerNames = new Set<string>();
-    const handlerRe = /safeHandler\(\s*ctx\.([\w$]+)\s*,/g;
+    // Match: a handler wrapper whose first argument is a bare `ctx.NAME`.  Groups: [1]=NAME
+    const handlerRe = /(?:eventHandler|safeHandler)\(\s*(?:batchHandler\(\s*)?ctx\.([\w$]+)\s*[,)]/g;
     let hm: RegExpExecArray | null;
     while ((hm = handlerRe.exec(bodyCode)) !== null) handlerNames.add(hm[1]);
     // A `:ref` target is the signal itself, written by the binding, never a read of its value:

@@ -19,6 +19,9 @@ import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
 import { clearBoundProperty, assignBoundProperty, interpolationText } from '../../core/src/renderer/template';
+import { bindAttribute, bindNativeProperty, bindAttributeOrProperty } from '../../core/src/renderer/bound-attribute';
+import { signal, effect, batch } from '../../core/src/reactivity/signal';
+import type { Signal } from '../../core/src/utils/types';
 
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);"): string {
     const source = `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
@@ -31,14 +34,15 @@ function parses(code: string): void {
 }
 
 /**
- * A plain element's property write: `read` taken once into `__b` (the value the binding last wrote
- * is kept beside it, #44), null handed to core's `clearBoundProperty` with the bound attribute
- * `attr` and the property `prop`, anything else assigned to `prop`.
+ * A plain element's property write (#1207): one call to core's binding of the property `prop`, bound
+ * as `attr`, reading `read` — `bindNativeProperty` where the element certainly has it,
+ * `bindAttributeOrProperty` where it is asked. Core keeps the value it wrote last (#44) and hands null
+ * to `clearBoundProperty`; the `live` cases below run that.
  */
 function writesProperty(code: string, attr: string, prop: string, read: string): void {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     expect(code).toMatch(new RegExp(
-        `const __b = ${esc(read)}; .*?const __v = __b; if \\(__v == null\\) clearBoundProperty\\(__el\\d+, "${attr}", "${prop}"\\); else __el\\d+\\["${prop}"\\] = __v;`,
+        `bind(?:NativeProperty|AttributeOrProperty)\\(__el\\d+, "${attr}", "${prop}", \\(\\)=>${esc(read)}\\);`,
     ));
 }
 
@@ -96,15 +100,14 @@ class StubElement {
 }
 
 /**
- * Run the inline construction of `template` with `values` read as signals (the generator calls
- * `ctx.label()`), a document that makes stub elements, and effects that `set` runs again when a
- * value they READ changes — only those, as the reactive runtime does: re-running every effect would
- * let a `:class.x` put back what a `:class` write had just dropped. `el` is the first element built.
+ * Run the inline construction of `template` with `values` held in core's signals (the generator calls
+ * `ctx.label()`), a document that makes stub elements, and core's own `effect`, which `set` runs again
+ * when a value it READ changes — only those: re-running every effect would let a `:class.x` put back
+ * what a `:class` write had just dropped. `el` is the first element built.
  */
 function live(template: string, values: Record<string, unknown>): { el: StubElement; set(next: Record<string, unknown>): void } {
-    const current = { ...values };
-    let reading: Set<string> | null = null;
-    const ctx = Object.fromEntries(Object.keys(values).map(k => [k, () => { reading?.add(k); return current[k]; }]));
+    const signals: Record<string, Signal<unknown>> = Object.fromEntries(Object.keys(values).map(k => [k, signal(values[k])]));
+    const ctx = Object.fromEntries(Object.keys(values).map(k => [k, () => signals[k]()]));
     // DOM calls, not the HTML form (#369): the stub elements cannot parse markup.
     const iife = generateInlineNodes(parseTemplate(template), new Set(), createCompileContext({ staticMarkup: false }));
     const document = withBlockCopies({
@@ -113,15 +116,15 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
         createElementNS: (_ns: string, t: string) => new StubElement(t),
         createTextNode: (t: string) => ({ data: t }),
     }, (n) => (n instanceof StubElement ? Object.assign(new StubElement(n.tagName), { attrs: new Map(n.attrs) }) : { ...n }));
-    const effects: { fn: () => void; deps: Set<string> }[] = [];
-    const run = (e: { fn: () => void; deps: Set<string> }) => { reading = e.deps; try { e.fn(); } finally { reading = null; } };
-    const effect = (fn: () => void) => { const e = { fn, deps: new Set<string>() }; effects.push(e); run(e); };
-    const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', 'interpolationText', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty, interpolationText) as StubElement;
+    const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', 'interpolationText',
+        'bindAttribute', 'bindNativeProperty', 'bindAttributeOrProperty', `return ${iife};`)(
+        document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty, interpolationText,
+        bindAttribute, bindNativeProperty, bindAttributeOrProperty) as StubElement;
     return {
         el: frag.children[0],
         set(next) {
-            Object.assign(current, next);
-            for (const e of effects) if (Object.keys(next).some(k => e.deps.has(k))) run(e);
+            // A value is written as it is: `set` would call a function value as an updater.
+            batch(() => { for (const [k, v] of Object.entries(next)) signals[k].setRaw(v); });
         },
     };
 }
@@ -290,10 +293,10 @@ describe('inlineBindings: a property going to null is cleared by its type, as co
         expect(el.checked).toBe(false);
     });
 
-    it('the module imports clearBoundProperty from core, and parses', () => {
+    it('the module imports core\'s property binding, which clears through clearBoundProperty, and parses', () => {
         const code = inline('<input :value="label" />');
         parses(code);
-        expect(code).toMatch(/import \{[^}]*\bclearBoundProperty\b[^}]*\} from '@pdxui\/core'/);
+        expect(code).toMatch(/import \{[^}]*\bbindNativeProperty\b[^}]*\} from '@pdxui\/core'/);
     });
 });
 

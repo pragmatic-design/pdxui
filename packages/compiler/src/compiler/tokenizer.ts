@@ -61,6 +61,27 @@ export function maskNonCode(code: string): string {
     return out;
 }
 
+/**
+ * Return a copy of `code` with its COMMENTS blanked (newlines kept), strings and template literals as
+ * they are: a template literal's `${…}` is code, and a scan for what the code reads must see it.
+ */
+export function maskComments(code: string): string {
+    let out = '';
+    let i = 0;
+    while (i < code.length) {
+        const end = skipNonCode(code, i);
+        if (end !== null && end > i) {
+            const comment = code[i] === '/' && (code[i + 1] === '/' || code[i + 1] === '*');
+            for (let j = i; j < end; j++) out += !comment || code[j] === '\n' ? code[j] : ' ';
+            i = end;
+        } else {
+            out += code[i];
+            i++;
+        }
+    }
+    return out;
+}
+
 // ─── High-Level Utilities ───────────────────────────────────────────
 
 /**

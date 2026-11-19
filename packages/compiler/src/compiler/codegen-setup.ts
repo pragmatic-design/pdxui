@@ -12,8 +12,8 @@ import { rewriteAst, parsesCleanly, type WarningSink } from './signal-rewrite-as
 import { emitWatchSource } from './watch-source';
 import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSignalMarkers, dependencyOrder } from './setup-signal-placement';
 import { originMark } from './sourcemap';
-import { maskNonCode } from './tokenizer';
-import { jsQuote, jsString } from './js-literal';
+import { maskNonCode, maskComments } from './tokenizer';
+import { arrowOf, jsQuote, jsString } from './js-literal';
 import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 import { splitUnion } from './model-options';
 import { escapeForRegExp } from './regexp-escape';
@@ -36,9 +36,12 @@ export function buildPropsObject(props: { name: string; tsType?: string; runtime
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const type = `{ type: ${p.runtimeType} }`;
+        // A literal default whose kind IS the runtime type leaves the type out (#1207): core's `prop`
+        // infers it from that default, the same type, decided here. Any other default keeps it written.
+        const typeArg = p.default !== undefined && literalType(p.default) === p.runtimeType ? '' : `, ${type}`;
         // Core reports a required prop the host did not set, in development (#123, #130).
         const spec = p.required ? `${PROP_BUILDER}.required(${type})`
-            : p.default !== undefined ? `${PROP_BUILDER}(${defaultEntry(p.runtimeType, p.default)}, ${type})`
+            : p.default !== undefined ? `${PROP_BUILDER}(${defaultEntry(p.runtimeType, p.default)}${typeArg})`
             // Absent, a prop whose type says `null` holds null, not its kind's empty value (#960):
             // `'top' | 'bottom' | null` is a String now, and '' is not a value its type allows.
             : p.runtimeType !== 'Object' && p.tsType !== undefined && splitUnion(p.tsType).includes('null')
@@ -49,6 +52,22 @@ export function buildPropsObject(props: { name: string; tsType?: string; runtime
         return `    ${p.name}: ${p.form ? `{ ...${spec}, form: wireFormModel }` : spec}`;
     });
     return `{\n${entries.join(',\n')}\n  }`;
+}
+
+/**
+ * The runtime type core's `prop` infers from a default written as a literal (`inferType` in
+ * component-descriptor.ts): a quoted string is String, a number is Number, `true`/`false` is Boolean.
+ * Null for any other default — a name, an expression, a template literal, an array — whose inference
+ * the compiler does not take for granted.
+ */
+function literalType(value: string): 'String' | 'Number' | 'Boolean' | null {
+    const v = value.trim();
+    // Match: a whole single- or double-quoted string with no unescaped quote of its kind inside.
+    if (/^'(?:[^'\\\n]|\\.)*'$/.test(v) || /^"(?:[^"\\\n]|\\.)*"$/.test(v)) return 'String';
+    // Match: a decimal number, signed or not: `0`, `-1`, `2.5`, `1e3`.
+    if (/^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i.test(v)) return 'Number';
+    if (v === 'true' || v === 'false') return 'Boolean';
+    return null;
 }
 
 /**
@@ -64,10 +83,12 @@ function defaultEntry(runtimeType: string, value: string): string {
 
 /** The script code setup() runs: the body, the effects, the lifecycle hooks, the watches, the reactive fetch URLs. */
 function setupSourceText(analysis: ScriptAnalysis): string {
-    return analysis.body + analysis.effects.join(' ') +
-        analysis.lifecycle.onMount.join(' ') + analysis.lifecycle.onDestroy.join(' ') +
-        analysis.watches.map(w => `${w.source} ${w.callback} ${w.options ?? ''}`).join(' ') +
-        analysis.fetches.filter(f => f.hasReactiveParams).map(f => f.url).join(' ');
+    // One piece a line: a piece that ends in a `//` comment does not swallow the next when comments
+    // are blanked (propAccessors).
+    return [analysis.body, ...analysis.effects,
+        ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy,
+        ...analysis.watches.map(w => `${w.source}\n${w.callback}\n${w.options ?? ''}`),
+        ...analysis.fetches.filter(f => f.hasReactiveParams).map(f => f.url)].join('\n');
 }
 
 /**
@@ -606,10 +627,12 @@ export function buildSetupBody(
 
     // @state — a custom state of the host, kept in sync with its expression (#132). After the body
     // and the deriveds, so the expression can read anything the script declares.
-    if (!scriptOnly) {
-        for (const s of analysis.states) {
-            parts.push(`    ctx.track(() => { ctx.state(${jsQuote(s.name)}, ${rewriteAll(s.expr)}); });`);
-        }
+    // One call for all of them (#1207): core's `ctx.states` tracks each in its own effect, as a
+    // `ctx.track(() => { ctx.state(…) })` per state did, written out once per state.
+    if (!scriptOnly && analysis.states.length > 0) {
+        const entries = analysis.states.map(s =>
+            `${/^[A-Za-z_$][\w$]*$/.test(s.name) ? s.name : jsQuote(s.name)}: ${arrowOf(rewriteAll(s.expr))}`);
+        parts.push(`    ctx.states({ ${entries.join(', ')} });`);
     }
 
     // keepAlive pages need onShow for resume lifecycle (title refresh, state reconciliation)
@@ -705,12 +728,16 @@ const PROP_ACCESSORS_SLOT = '/*__pdx_prop_accessors__*/';
  */
 function propAccessors(analysis: ScriptAnalysis, bodyText: string, generated: string): string {
     const lines: string[] = [];
+    // A prop named in a comment is not read (#1207): the switch's JSDoc names `label`, `size` and
+    // `value`, and each was an accessor nothing called. Strings stay: a template literal's `${…}` reads.
+    const code = maskComments(bodyText);
+    const generatedCode = maskComments(generated);
     for (const p of analysis.props) {
         if (p.model) continue;
         const word = new RegExp(`\\b${escapeForRegExp(p.name)}\\b`);
         const read = new RegExp(`(?<![\\w$.])${escapeForRegExp(p.name)}(?![\\w$])`);
-        if (word.test(bodyText) || analysis.signals.some(s => word.test(s.initialExpr))
-            || analysis.deriveds.some(d => word.test(d.expr)) || read.test(generated)) {
+        if (word.test(code) || analysis.signals.some(s => word.test(s.initialExpr))
+            || analysis.deriveds.some(d => word.test(d.expr)) || read.test(generatedCode)) {
             lines.push(`    const ${p.name} = ctx.${p.name};`);
         }
     }

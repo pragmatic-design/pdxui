@@ -59,17 +59,17 @@ describe('a delegated row handler is declared once per @for, not once per row', 
     it('the row stores its getter with a handler declared before the list', () => {
         const out = render(ROW('@click="pick(r.id)"'));
         const row = rowOf(out);
-        expect(row, 'the row still builds its own handler').not.toContain('batchHandler(');
+        expect(row, 'the row still builds its own handler').not.toContain('eventHandler(');
         expect(row).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,r\);/);
         const declared = out.slice(0, out.indexOf('eachRow('));
-        expect(declared.match(/const __rh\d+=safeHandler\(batchHandler\(/g)).toHaveLength(1);
+        expect(declared.match(/const __rh\d+=eventHandler\(/g)).toHaveLength(1);
     });
 
     it('a nested loop\'s handler takes the outer row and the index too, and is declared outside both', () => {
         const out = render('@for (rows as r; track r.id) { <ul>@for (r.kids as k, i; track k) {<li @click="pick(r.id + k + i)">x</li>}</ul> }');
         const outer = out.indexOf('eachRow(');
-        expect(out.slice(outer), 'a handler is still built inside a row').not.toContain('batchHandler(');
-        expect(out.slice(0, outer)).toMatch(/const __rh\d+=safeHandler\(batchHandler\(/);
+        expect(out.slice(outer), 'a handler is still built inside a row').not.toContain('eventHandler(');
+        expect(out.slice(0, outer)).toMatch(/const __rh\d+=eventHandler\(/);
         expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,\[r,k,i\]\);/);
     });
 
@@ -81,13 +81,13 @@ describe('a delegated row handler is declared once per @for, not once per row', 
 
     it('a destructured @for passes its names', () => {
         const out = render('<ul>@for (rows as { id, label }; track id) {<li @click="pick(id)">{{ label }}</li>}</ul>');
-        expect(rowOf(out, 'each')).not.toContain('batchHandler(');
+        expect(rowOf(out, 'each')).not.toContain('eventHandler(');
         expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',__rh\d+,\[id,label\]\);/);
     });
 
     it('a handler outside any @for is not hoisted: it is built once already', () => {
         const out = render(`<div @click="n++">${ROW('@click="pick(r.id)"')}</div>`);
-        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',safeHandler\(batchHandler\(\(\) => ctx\.n\.set/);
+        expect(out).toMatch(/delegate\(ctx\.el,__el\d+,'click',eventHandler\(\(\) => ctx\.n\.set/);
     });
 });
 

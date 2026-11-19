@@ -49,12 +49,13 @@ function save(x) {} function a() {} function b() {} function onClick() {} functi
 </script>`;
 
 /**
- * The handler expression each path hands to `safeHandler`, inside the `batchHandler(…)` every
- * compiled handler is wrapped in (#114) — required here, so a path that stopped batching fails.
+ * The handler expression each path hands to core's `eventHandler`, which batches it (#114) and routes
+ * its errors (#1207; core's event-handler.test.ts holds both) — required here, so a path that stopped
+ * going through it fails.
  */
 function handlerOf(handler: string, inline: boolean): string {
     const { code } = compile(SOURCE(handler, inline), 'p.pdx', [], undefined, { production: true });
-    const m = /addEventListener\('click', safeHandler\(batchHandler\(([\s\S]*?)\), ctx\.el/.exec(code);
+    const m = /addEventListener\('click', eventHandler\(([\s\S]*?), ctx\.el, 'click'\)/.exec(code);
     if (!m) throw new Error(`no click handler found in the ${inline ? 'top-level' : 'snippet body'} output for ${handler}`);
     return m[1];
 }
@@ -102,7 +103,7 @@ describe('an event with modifiers and no handler', () => {
             const { code } = compile(`<template>${template}</template>\n<script>\nlet n = $signal(0);\n</script>`, 'p.pdx', [], undefined, { production: true });
             expect(() => new Function(code.replace(/^\s*import\b.*$/gm, '')), 'the module does not parse').not.toThrow();
             expect(code).toContain('e.stopPropagation();');
-            expect(code).toContain('batchHandler(() => {})');
+            expect(code).toContain("eventHandler(() => {}, ctx.el, 'click')");
         });
     }
 });
