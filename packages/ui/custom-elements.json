@@ -18078,7 +18078,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/kbd/pdx-kbd.ts",
+      "path": "src/kbd/pdx-kbd.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -18185,7 +18185,7 @@
           "name": "pdx-kbd",
           "declaration": {
             "name": "PdxKbd",
-            "module": "src/kbd/pdx-kbd.ts"
+            "module": "src/kbd/pdx-kbd.pdx"
           }
         }
       ]

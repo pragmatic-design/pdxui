@@ -1,0 +1,98 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxKbd",
+  "tagName": "pdx-kbd",
+  "category": "Atoms",
+  "order": 10,
+  "description": "Shows a keyboard shortcut, written as keys joined by +, optionally with modifier symbols.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "keys",
+      "description": "The key combination to render (e.g. 'Ctrl+K').",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "keys"
+    },
+    {
+      "kind": "field",
+      "name": "symbols",
+      "description": "Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "symbols"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-kbd-md",
+        "sm": ".pdx-kbd-sm",
+        "lg": ".pdx-kbd-lg"
+      }
+    }
+  ],
+  "attributes": [
+    {
+      "name": "keys",
+      "fieldName": "keys",
+      "description": "The key combination to render (e.g. 'Ctrl+K').",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "symbols",
+      "fieldName": "symbols",
+      "description": "Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The combination (`<kbd class=\"pdx-kbd-combo\">`) around its keys."
+    }
+  ]
+}

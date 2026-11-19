@@ -20,6 +20,7 @@ interface Module { path: string; declarations: Declaration[]; exports: { declara
 /** Each moved tag, and the .pdx it lives in now. */
 const PORTED: Record<string, string> = {
     'pdx-badge': 'src/badge/pdx-badge.pdx',
+    'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
 };
 
 const manifest = read('custom-elements.json') as { modules: Module[] };

@@ -84,11 +84,6 @@
       "types": "./dist/divider/pdx-divider.d.ts",
       "import": "./dist/divider/pdx-divider.js"
     },
-    "./kbd": {
-      "development": "./src/kbd/pdx-kbd.ts",
-      "types": "./dist/kbd/pdx-kbd.d.ts",
-      "import": "./dist/kbd/pdx-kbd.js"
-    },
     "./label": {
       "development": "./src/label/pdx-label.ts",
       "types": "./dist/label/pdx-label.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/badge/pdx-badge.pdx",
       "types": "./dist/badge/pdx-badge.d.ts",
       "import": "./dist/badge/pdx-badge.js"
+    },
+    "./kbd": {
+      "development": "./src/kbd/pdx-kbd.pdx",
+      "types": "./dist/kbd/pdx-kbd.d.ts",
+      "import": "./dist/kbd/pdx-kbd.js"
     },
     "./package.json": "./package.json"
   },
