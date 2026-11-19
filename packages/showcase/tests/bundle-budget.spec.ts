@@ -355,7 +355,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // whose kept key has a new item, collectIfAny — and list.ts's calls to it. A list without static rows
 // or @empty does not bundle that code (the jfb app stayed at 14.4 KB). The built dist: this branch
 // 44939 bytes gzipped locally, 43.9 KB on the CI's line, where main sat at 43.5.
-const BUDGET_KB = { entry: 43.9, js: 477.3, css: 67, blocking: 103 };
+// js 477.3 → 477.6 (owner's OK, standing for #1210's batches, ≤ +1 KB each): pdx-divider, pdx-spinner
+// and pdx-progress moved to .pdx, each lighter alone (0.93×, 0.78×, 0.86×). While the library is half
+// moved, a bundle carries both renderers — html``'s engine for the components still in TypeScript, the
+// compiled render's helpers for the moved ones — and each move brings helpers no chunk had yet. The
+// built dist: 477.3 KB locally, 477.5 on the CI's line. The engine (~4–5 KB) leaves when the last
+// component does; the budget comes down then.
+const BUDGET_KB = { entry: 43.9, js: 477.6, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
