@@ -145,7 +145,8 @@ export function checkOverlaysNotDeferred(
         // An overlay inside one already found is in its run: the outer @defer covers it.
         if (last && o.start < last.end) continue;
         // Adjacent: nothing but whitespace and HTML comments between them — a comment loads nothing.
-        if (last && !/\S/.test(source.slice(last.end, o.start).replace(/<!--[\s\S]*?-->/g, ''))) runs[runs.length - 1].push(o);
+        // Match: whitespace and whole HTML comments, nothing else.
+        if (last && /^(?:\s|<!--[\s\S]*?-->)*$/.test(source.slice(last.end, o.start))) runs[runs.length - 1].push(o);
         else runs.push([o]);
         last = o;
     }

@@ -95,8 +95,8 @@ test('the component-design rules are in the docs sidebar, and the page shows all
 
     const outlet = page.locator('pdx-router-outlet');
     await expect(outlet.getByRole('heading', { level: 1, name: 'Component Design' })).toBeVisible();
-    // 18 rules, each a heading carrying its id: the same set the doc and the skill carry.
-    await expect(outlet.getByRole('heading', { level: 3, name: /^CD-[A-Z]\d+ — / })).toHaveCount(18);
+    // 19 rules, each a heading carrying its id: the same set the doc and the skill carry (CD-D4, #1209).
+    await expect(outlet.getByRole('heading', { level: 3, name: /^CD-[A-Z]\d+ — / })).toHaveCount(19);
 });
 
 // A modified click is the browser's: a route that follows every click on a site link in the page,
