@@ -8,7 +8,7 @@ import './icon/pragmatic-all';
 import './icon/pdx-icon';
 import './button/pdx-button';
 import './button-group/pdx-button-group';
-import './progress/pdx-progress';
+import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';
 import './chip/pdx-chip';
 import './avatar/pdx-avatar.pdx';

@@ -23,6 +23,7 @@ const PORTED: Record<string, string> = {
     'pdx-badge': 'src/badge/pdx-badge.pdx',
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
+    'pdx-progress': 'src/progress/pdx-progress.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
 };
 

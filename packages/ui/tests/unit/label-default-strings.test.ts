@@ -10,7 +10,7 @@ import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import '../../src/shared/i18n';
 import '../../src/split-button/pdx-split-button';
 import '../../src/scroll-area/pdx-scroll-area';
-import '../../src/progress/pdx-progress';
+import '../../src/progress/pdx-progress.pdx';
 import '../../src/rating/pdx-rating';
 import '../../src/fab/pdx-fab';
 import '../../src/file-upload/pdx-file-upload';

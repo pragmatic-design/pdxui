@@ -1,0 +1,221 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxProgress",
+  "tagName": "pdx-progress",
+  "category": "Atoms",
+  "order": 3,
+  "description": "A linear or circular progress indicator, determinate with a value or indeterminate and animated.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Current value (0-100). Omit or -1 for indeterminate.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Max value (default 100)",
+      "type": {
+        "text": "number"
+      },
+      "default": "100",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Color variant: primary (default), success, warning, danger",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "showLabel",
+      "description": "Show percentage label",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showlabel"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "striped",
+      "description": "Striped animation on the bar",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "striped"
+    },
+    {
+      "kind": "field",
+      "name": "circular",
+      "description": "Circular/ring mode instead of linear bar",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "circular"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible label for screen readers. Empty: the progress.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-progress-md",
+        "sm": ".pdx-progress-sm",
+        "lg": ".pdx-progress-lg"
+      }
+    }
+  ],
+  "roles": [
+    "progressbar"
+  ],
+  "attributes": [
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "Current value (0-100). Omit or -1 for indeterminate.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Max value (default 100)",
+      "type": {
+        "text": "number"
+      },
+      "default": "100"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Color variant: primary (default), success, warning, danger",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showlabel",
+      "fieldName": "showLabel",
+      "description": "Show percentage label",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "striped",
+      "fieldName": "striped",
+      "description": "Striped animation on the bar",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "circular",
+      "fieldName": "circular",
+      "description": "Circular/ring mode instead of linear bar",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible label for screen readers. Empty: the progress.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The track: `.pdx-progress` (linear) or `.pdx-progress-circular`, with\n`.pdx-progress-indeterminate` while there is no value."
+    },
+    {
+      "name": "bar",
+      "description": "The linear bar."
+    },
+    {
+      "name": "ring",
+      "description": "The circular ring (`<svg>`), which spins while there is no value."
+    },
+    {
+      "name": "label",
+      "description": "The percentage or `label`, with `showLabel`."
+    }
+  ]
+}

@@ -22914,7 +22914,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/progress/pdx-progress.ts",
+      "path": "src/progress/pdx-progress.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23144,7 +23144,7 @@
           "name": "pdx-progress",
           "declaration": {
             "name": "PdxProgress",
-            "module": "src/progress/pdx-progress.ts"
+            "module": "src/progress/pdx-progress.pdx"
           }
         }
       ]
