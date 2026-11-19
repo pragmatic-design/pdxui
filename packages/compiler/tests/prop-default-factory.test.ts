@@ -22,7 +22,8 @@ describe('an array or object prop default', () => {
     it('control — a name, a primitive or a function default stays as written', () => {
         const code = descriptorOf("import { EMPTY } from './empty';\n@prop shared: string[] = EMPTY;\n@prop label: string = 'x';\n@prop n: number = 2;\n@prop on: boolean = false;");
         expect(code).toContain('shared: prop(EMPTY, { type: Array })');
-        expect(code).toContain("label: prop('x', { type: String })");
-        expect(code).toContain('n: prop(2, { type: Number })');
+        // A literal of the type's kind: core infers the same type, so it is not written (#1207).
+        expect(code).toContain("label: prop('x')");
+        expect(code).toContain('n: prop(2)');
     });
 });

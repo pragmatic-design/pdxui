@@ -8,7 +8,7 @@
 // Sources captured: render errors, effect errors, event handler errors,
 // unhandled promise rejections, uncaught exceptions.
 
-import { getTopErrorHandler } from '../reactivity/signal';
+import { getTopErrorHandler, batchHandler } from '../reactivity/signal';
 import { DEV } from '../utils/env';
 import { devRecordError } from '../debug/devtools-api';
 import type { DevtoolsErrorSource } from '../debug/devtools-api';
@@ -163,6 +163,15 @@ export function safeHandler(fn: (...args: any[]) => any, component?: string, eve
             routeError(err, { source: 'event', component, event });
         }
     };
+}
+
+/**
+ * A template's `@event` handler, as the compiler emits it (#1207): `fn` run inside `batch()`
+ * (`batchHandler`, #114) and its errors routed (`safeHandler`), naming the component `host` and the
+ * event. One call where each handler spelled out both wrappers and the host's tag name.
+ */
+export function eventHandler(fn: Parameters<typeof safeHandler>[0], host: Element | undefined, event: string): ReturnType<typeof safeHandler> {
+    return safeHandler(batchHandler(fn), host?.tagName?.toLowerCase(), event);
 }
 
 /**

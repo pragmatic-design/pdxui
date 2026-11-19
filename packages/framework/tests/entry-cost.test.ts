@@ -78,12 +78,12 @@ async function initialKb(code: string): Promise<{ kb: number; modules: string[] 
  * argued for in the commit that raises it.
  */
 const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
-    // 340.0: every component registered, for one signal.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 340.5 },
+    // 336.9: every component registered, for one signal (340.0 before #1207's lighter codegen).
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 337 },
     { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
-    // 331.6: what `/ui` is for, an app that wants every component registered.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 332 },
+    // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 329 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 4 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

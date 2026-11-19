@@ -31,6 +31,6 @@ describe('the module a .pdx compiles to parses', () => {
         parses(code);
         expect(code).not.toMatch(/ctx\.async|ctx\.await/);
         // The handler itself, not a function returning it: wrapped in `() => …` it never called go().
-        expect(code).toMatch(/batchHandler\(async ev => \{ await ctx\.go\(ev\.detail\) \}\)/);
+        expect(code).toMatch(/eventHandler\(async ev => \{ await ctx\.go\(ev\.detail\) \}, ctx\.el, 'pdx-go'\)/);
     });
 });

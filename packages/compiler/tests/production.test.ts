@@ -475,7 +475,7 @@ describe('inline bindings (Phase 3)', () => {
         expect(code).not.toContain("html\`");
     });
 
-    it('generates effect for :prop bindings', () => {
+    it('generates a binding for :prop bindings: core\'s, tracked in its own effect (#1207)', () => {
         const source = `<template>
 <button :disabled="loading">Save</button>
 </template>
@@ -484,8 +484,7 @@ let loading = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-prop.pdx', [], undefined, { production: true });
         expect(builds(code, 'button')).toBe(true);
-        expect(code).toContain("effect(");
-        expect(code).toContain('disabled');
+        expect(code).toContain('bindNativeProperty(__el0, "disabled", "disabled", ()=>ctx.loading())');
     });
 
     it('generates addEventListener for @event', () => {

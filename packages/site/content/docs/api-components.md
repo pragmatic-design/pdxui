@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 100 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 101 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -468,6 +468,18 @@ function event(options?: { bubbles?: boolean; cancelable?: boolean }): EventSpec
 
 Declare an event: `event<number>()`; `event<void>({ bubbles: true })` for one ancestors hear;
 `event<Move>({ cancelable: true })` for one a listener can refuse, which `ctx.emit` answers false.
+
+## `eventHandler`
+
+```ts
+import { eventHandler } from '@pdxui/core';
+
+function eventHandler(fn: Parameters<typeof safeHandler>[0], host: Element | undefined, event: string): ReturnType<typeof safeHandler>
+```
+
+A template's `@event` handler, as the compiler emits it (#1207): `fn` run inside `batch()`
+(`batchHandler`, #114) and its errors routed (`safeHandler`), naming the component `host` and the
+event. One call where each handler spelled out both wrappers and the host's tag name.
 
 ## `exposeOnElement`
 

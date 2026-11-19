@@ -187,7 +187,7 @@ function save() { throw new Error('nope'); }
         const { code, map } = compile(SLOT, 'tpl.pdx', [], undefined, {});
         expect(probe(SLOT, code, map, [
             ['@click="save"', "__el2.addEventListener('click'"],
-            [':value="name"', 'let __el3w_value = {}; effect('],
+            [':value="name"', 'bindNativeProperty(__el3, "value"'],
             ['label }}', 'bindInterpolation(__t5,'],
             ['items as item', 'const __cf8=eachRow('],
             ['item }}</li>', 'bindInterpolation(__t7,'],
@@ -200,7 +200,7 @@ function save() { throw new Error('nope'); }
             const { code, map } = compile(TEMPLATE, 'tpl.pdx', [], undefined, options);
             expect(probe(TEMPLATE, code, map, [
                 ['@click="save"', "__el1.addEventListener('click'"],
-                [':value="name"', 'let __el2w_value = {}; effect('],
+                [':value="name"', 'bindNativeProperty(__el2, "value"'],
                 ['label }}', 'bindInterpolation(__t4,'],
                 ['items as item', 'const __cf7=eachRow('],
                 ['item }}</li>', 'bindInterpolation(__t6,'],

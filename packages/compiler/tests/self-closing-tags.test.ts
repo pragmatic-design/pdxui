@@ -32,8 +32,8 @@ function inlineTree(template: string): Node {
     }, (n) => (n instanceof Stub ? new Stub(n.tagName) : { ...n }));
     const noop = () => {};
     const id = (f: unknown) => f;
-    return new Function('document', 'staticBlock', 'effect', 'ctx', 'assignBoundProperty', 'safeHandler', 'batchHandler', `return ${iife};`)(
-        document, stubStaticBlock(document), noop, { v: () => 'x' }, noop, id, id) as Node;
+    return new Function('document', 'staticBlock', 'effect', 'ctx', 'assignBoundProperty', 'eventHandler', `return ${iife};`)(
+        document, stubStaticBlock(document), noop, { v: () => 'x' }, noop, id) as Node;
 }
 const tags = (n: Node) => n.children.map((c) => c.tagName).filter((t) => t !== '#text');
 

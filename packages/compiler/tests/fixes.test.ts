@@ -316,6 +316,8 @@ function go() {}
         const out = compile(SRC, 'x.pdx').code;
         const render = out.slice(out.indexOf('render:'));
         expect(render).not.toContain('safeHandler');
+        // A handler is core's eventHandler since #1207: none was compiled from the comment either.
+        expect(render).not.toContain('eventHandler');
         expect(render).not.toContain('draft');
         expect(render).not.toContain('html');
         expect(render.match(/bindInterpolation\(/g) ?? []).toHaveLength(1);

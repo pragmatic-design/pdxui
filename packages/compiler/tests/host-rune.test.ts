@@ -24,7 +24,7 @@ describe('@host compiles into the descriptor', () => {
         ].join('\n')), 'test.pdx');
         expect(code).toContain(`'role': "combobox"`);
         expect(code).toContain(`':aria-expanded': (ctx) => ctx.open()`);
-        expect(code).toContain(`'@keydown.enter': (ctx, e) => (safeHandler(batchHandler(() => ctx.open.setRaw(!ctx.open())), ctx.el?.tagName?.toLowerCase(), 'keydown'))(e)`);
+        expect(code).toContain(`'@keydown.enter': (ctx, e) => (eventHandler(() => ctx.open.setRaw(!ctx.open()), ctx.el, 'keydown'))(e)`);
     });
 
     it('a block spread over several lines is read whole', () => {

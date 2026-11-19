@@ -6,7 +6,7 @@
 import type { CompileContext } from './compile-context';
 import type { HostAttr } from './script-analyzer-types';
 import { prefixCtx, callSignals } from './codegen-prefix';
-import { buildEventHandler } from './codegen-template-rewrite';
+import { templateEventHandler } from './codegen-template-rewrite';
 import { decodeEntities } from './codegen-template-inline';
 import { invalidHostAttribute } from './host-block';
 import { jsQuote, jsString } from './js-literal';
@@ -26,9 +26,8 @@ export function hostDescriptor(attrs: readonly HostAttr[], ctx: CompileContext, 
         } else if (name.startsWith('@')) {
             if (value === undefined) continue;
             const event = name.slice(1).split('.')[0];
-            imports.add('batchHandler');
-            imports.add('safeHandler');
-            const handler = `safeHandler(${buildEventHandler(value, ctx)}, ctx.el?.tagName?.toLowerCase(), ${jsQuote(event)})`;
+            imports.add('eventHandler');
+            const handler = templateEventHandler(value, ctx, event);
             entries.push(`${jsQuote(name)}: (ctx, e) => (${handler})(e)`);
         } else {
             entries.push(`${jsQuote(name)}: ${jsString(decodeEntities(value ?? ''))}`);

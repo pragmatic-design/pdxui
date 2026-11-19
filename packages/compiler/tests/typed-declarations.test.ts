@@ -27,7 +27,7 @@ describe('a typed top-level declaration is returned to the template', () => {
 
         it(`${decl} — read as a value in the render, not called`, () => {
             const code = build(decl);
-            expect(code).toContain('ctx.NAME;');
+            expect(code).toContain('()=>ctx.NAME)');
             expect(code).not.toContain('ctx.NAME()');
         });
     }

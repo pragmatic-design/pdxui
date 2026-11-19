@@ -46,11 +46,13 @@ import { bindInterpolation, component, computed, prop, signal, staticBlock, stat
 // the template's static markup, as HTML → parsed once, on first render, then copied;
 // each <!----> is an empty text node the render binds
 const __blk0=staticBlock(staticMarkup('<div><!----> <!----> <!----></div>'));
-// the walk → from the copy to the nodes the render binds, computed at compile time
-const __walk0=(r)=>{const __el0=r.firstChild;const __t1=__el0.firstChild;const __t2=__t1.nextSibling.nextSibling;const __t3=__t2.nextSibling.nextSibling;return [__t1,__t2,__t3];};
+// the walk → from the copy to the nodes the render binds, computed at compile time;
+// a block whose nodes sit at the same places shares it
+const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild;const n2=n1.nextSibling.nextSibling;const n3=n2.nextSibling.nextSibling;return [n1,n2,n3];};
 component('app-counter', {
   props: {
-    label: prop('Hello', { type: String })           // @prop → declared prop + attribute sync
+    label: prop('Hello')                             // @prop → declared prop + attribute sync;
+                                                     //         its type, String, is the default's
   },
   events: { 'changed': {} },                         // @event → declared in the descriptor
   setup(ctx) {
@@ -84,6 +86,15 @@ parsed once and copied per render (a block the HTML parser would not keep exactl
 `<tr>` written straight in a `<table>` for two, is built with one DOM call per node instead), and the render does only what changes — binds what reads through
 `ctx`, which is why you never write `count()` in markup; and `$store` is the one
 that is *not* rewritten, because a store is a proxy and its keys are properties, not signals.
+
+What the compiler decides stays in the module, and what is the same in every component is a call to
+core. A bound attribute on an element compiles to `bindAttribute(el, 'aria-label', () => …)`; a
+property the element certainly has, `:disabled` on an `<input>`, to `bindNativeProperty`; a name the
+element may or may not have to `bindAttributeOrProperty`, which asks it. The compiler picks which of the
+three from the element and the name; core holds the effect, the value written last, and what `null`
+does. A handler is `eventHandler(fn, ctx.el, 'click')`, which runs it in one batch and routes what it
+throws; the `@state` runes are one `ctx.states({ … })`. Written out in every component, each of these
+weighed more than the component's own markup.
 
 A module can also be compiled to take over markup that static generation wrote for it, instead of
 building its own: that is hydration. Then each block's render starts with `hydrationRange()`, the

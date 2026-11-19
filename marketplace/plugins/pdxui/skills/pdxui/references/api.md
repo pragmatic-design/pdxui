@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-483 value exports.
+487 value exports.
 
 ### `__adoptStyles`
 
@@ -561,6 +561,28 @@ function batchHandler(handler: (...args: A) => R): (...args: A) => R
 on the finished state. The call keeps its `this` and returns what the handler returns — the
 promise of an async handler, which is batched up to its first `await`.
 
+### `bindAttribute`
+
+```ts
+import { bindAttribute } from '@pdxui/core';
+
+function bindAttribute(el: Element, attr: string, value: () => unknown): void
+```
+
+`:attr` that is an attribute — `aria-*`, `data-*`, a hyphenated name, `role` on SVG.
+
+### `bindAttributeOrProperty`
+
+```ts
+import { bindAttributeOrProperty } from '@pdxui/core';
+
+function bindAttributeOrProperty(el: Element, attr: string, prop: string, value: () => unknown): void
+```
+
+`:attr` on an element that may or may not have the property: asked at each write, as core's
+`bindProperty` asks (`prop in el`). A name the element does not have — `:itemprop`, `:for` on a
+<div> — is its attribute; assigning it would set an expando nothing reads.
+
 ### `bindGesture`
 
 ```ts
@@ -590,6 +612,16 @@ read `a,b` in a production build and `ab` in dev (#100).
 `constant`: the compiler knows the value cannot change — a literal, or a `@for` row's track key
 (#110). It is written once, by the same rule, outside any tracking: no effect is created, and what
 it reads does not subscribe the render it sits in.
+
+### `bindNativeProperty`
+
+```ts
+import { bindNativeProperty } from '@pdxui/core';
+
+function bindNativeProperty(el: Element, attr: string, prop: string, value: () => unknown): void
+```
+
+`:attr` that the element certainly has as a property (`disabled` on an <input>), bound as `attr`.
 
 ### `bindParts`
 
@@ -2011,6 +2043,18 @@ function event(options?: { bubbles?: boolean; cancelable?: boolean }): EventSpec
 
 Declare an event: `event<number>()`; `event<void>({ bubbles: true })` for one ancestors hear;
 `event<Move>({ cancelable: true })` for one a listener can refuse, which `ctx.emit` answers false.
+
+### `eventHandler`
+
+```ts
+import { eventHandler } from '@pdxui/core';
+
+function eventHandler(fn: Parameters<typeof safeHandler>[0], host: Element | undefined, event: string): ReturnType<typeof safeHandler>
+```
+
+A template's `@event` handler, as the compiler emits it (#1207): `fn` run inside `batch()`
+(`batchHandler`, #114) and its errors routed (`safeHandler`), naming the component `host` and the
+event. One call where each handler spelled out both wrappers and the host's tag name.
 
 ### `exhaustSignal`
 

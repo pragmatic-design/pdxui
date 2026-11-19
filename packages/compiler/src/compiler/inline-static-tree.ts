@@ -52,6 +52,23 @@ export interface TemplateHoists {
     count: number;
     /** The `@defer` code loaders hoisted so far, `const __codeN=deferCode(…);` (#685). */
     codes?: number;
+    /**
+     * The name each builder and walk was declared under, by its code (#1207): two blocks with the same
+     * markup — the `<slot></slot>` of an `@if` and of its `@else` — share one builder, and two walks
+     * that reach the same paths share one function. Both are stateless: a builder hands out a copy per
+     * call, a walk only reads.
+     */
+    declared?: Map<string, string>;
+}
+
+/** Declare `const name=code;` in `hoists`, or answer the name the same code was declared under. */
+function hoistOnce(hoists: TemplateHoists, name: string, code: string): string {
+    const declared = (hoists.declared ??= new Map());
+    const earlier = declared.get(code);
+    if (earlier !== undefined) return earlier;
+    declared.set(code, name);
+    hoists.lines.push(`const ${name}=${code};`);
+    return name;
 }
 
 /** The static markup of one block, as the generator walks it. */
@@ -215,30 +232,28 @@ export class StaticTree {
         // builder is the markup as HTML where the parser keeps it exactly, DOM calls otherwise.
         imports.add('staticBlock');
         const html = asHtml ? blockHtml(this.root) : null;
-        if (html !== null) {
-            imports.add('staticMarkup');
-            hoists.lines.push(`const __blk${n}=staticBlock(staticMarkup(${htmlLiteral(html)}));`);
-        } else {
-            hoists.lines.push(`const __blk${n}=staticBlock((__frag,__d)=>{${this.mk.join('')}});`);
-        }
+        if (html !== null) imports.add('staticMarkup');
+        const blk = hoistOnce(hoists, `__blk${n}`, html !== null
+            ? `staticBlock(staticMarkup(${htmlLiteral(html)}))`
+            : `staticBlock((__frag,__d)=>{${this.mk.join('')}})`);
         if (!hydrate) {
-            const lines = [`const __frag=__blk${n}();`];
+            const lines = [`const __frag=${blk}();`];
             if (this.targets.length > 0) {
-                hoists.lines.push(`const __walk${n}=${this.walk()};`);
-                lines.push(`const [${this.targets.join(',')}]=__walk${n}(__frag);`);
+                const walk = hoistOnce(hoists, `__walk${n}`, this.walk());
+                lines.push(`const [${this.targets.join(',')}]=${walk}(__frag);`);
             }
             return lines;
         }
         // Hydrating (#160): the block takes over the range it is handed instead of cloning, when it is
         // handed one, and walks it with the same paths (`hydrationWalk`).
         imports.add('hydrationRange');
-        hoists.lines.push(`const __hwalk${n}=${this.hydrationWalk(imports)};`);
-        const lines = ['const __h=hydrationRange();', `const __frag=__h?null:__blk${n}();`];
+        const hwalk = hoistOnce(hoists, `__hwalk${n}`, this.hydrationWalk(imports));
+        const lines = ['const __h=hydrationRange();', `const __frag=__h?null:${blk}();`];
         if (this.targets.length > 0) {
-            hoists.lines.push(`const __walk${n}=${this.walk()};`);
-            lines.push(`const [${this.targets.join(',')}]=__h?__hwalk${n}(__h):__walk${n}(__frag);`);
+            const walk = hoistOnce(hoists, `__walk${n}`, this.walk());
+            lines.push(`const [${this.targets.join(',')}]=__h?${hwalk}(__h):${walk}(__frag);`);
         } else {
-            lines.push(`if(__h)__hwalk${n}(__h);`);
+            lines.push(`if(__h)${hwalk}(__h);`);
         }
         return lines;
     }
@@ -304,9 +319,14 @@ export class StaticTree {
         return `(r)=>{${decls.join('')}return [${this.targets.join(',')}];}`;
     }
 
-    /** `(r)=>{…; return [targets]}`: from the block's root to every node the render binds. */
+    /**
+     * `(r)=>{…; return [targets]}`: from the block's root to every node the render binds. Its locals are
+     * named by position (`n0`, `n1`…), not after the render's variables, so two blocks whose nodes sit at
+     * the same paths write the same walk, and the module declares it once (`hoistOnce`, #1207).
+     */
     private walk(): string {
         const decls: string[] = [];
+        const local = new Map<string, string>();
         const reaches = (n: StaticNode): boolean => n.target || n.kids.some(reaches);
         const visit = (n: StaticNode, expr: string): void => {
             let prev: string | null = null;
@@ -316,13 +336,15 @@ export class StaticTree {
                 const from = prev === null
                     ? `${expr}.firstChild${'.nextSibling'.repeat(i)}`
                     : `${prev}${'.nextSibling'.repeat(i - prevAt)}`;
-                decls.push(`const ${kid.v}=${from};`);
-                prev = kid.v;
+                const name = `n${local.size}`;
+                local.set(kid.v, name);
+                decls.push(`const ${name}=${from};`);
+                prev = name;
                 prevAt = i;
-                visit(kid, kid.v);
+                visit(kid, name);
             });
         };
         visit(this.root, 'r');
-        return `(r)=>{${decls.join('')}return [${this.targets.join(',')}];}`;
+        return `(r)=>{${decls.join('')}return [${this.targets.map((t) => local.get(t)).join(',')}];}`;
     }
 }

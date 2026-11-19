@@ -134,6 +134,7 @@ export { DEV } from './utils/env';
 
 // Renderer
 export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, bindRef, interpolationText } from './renderer/template';
+export { bindAttribute, bindNativeProperty, bindAttributeOrProperty } from './renderer/bound-attribute';
 export { bindParts } from './renderer/bind-parts';
 export { attach, autofocus, trapFocus, clickOutside } from './renderer/attach';
 export type { Attachment } from './renderer/attach';
@@ -202,7 +203,7 @@ export { context, provide, inject, clearProviders, installContextProtocol } from
 export type { Context, ContextValue } from './component/context';
 
 // Global Error Interceptor
-export { onGlobalError, dispatchGlobalError, safeHandler, clearGlobalErrorHandlers } from './component/global-error';
+export { onGlobalError, dispatchGlobalError, safeHandler, eventHandler, clearGlobalErrorHandlers } from './component/global-error';
 export type { ErrorSource, ErrorContext, GlobalErrorHandler } from './component/global-error';
 
 // Composable Lifecycle

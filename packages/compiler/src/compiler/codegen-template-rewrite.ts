@@ -53,13 +53,17 @@ export function buildEventHandler(expr: string, ctx: CompileContext): string {
 }
 
 /**
- * A @for row's handler, declared once for every row (#375): the same handler, taking after the event
- * the scope the row stores with it — `names`, the names in scope where it is written, as one value
- * when there is one and as an array when there are more. Core's `delegate` passes it.
+ * A template's handler as one call to core's `eventHandler` (#1207): `batchHandler` and `safeHandler`
+ * in one, naming the component and `event`. The caller imports `eventHandler`.
+ *
+ * With `scopeNames`, a @for row's handler, declared once for every row (#375): the same handler,
+ * taking after the event the scope the row stores with it — the names in scope where it is written,
+ * as one value when there is one and as an array when there are more. Core's `delegate` passes it.
  */
-export function buildScopedEventHandler(expr: string, ctx: CompileContext, names: string[]): string {
-    const scope = names.length === 1 ? names[0] : `[${names.join(',')}]`;
-    return `batchHandler((__e,${scope})=>(${unbatchedHandler(expr, ctx)})(__e))`;
+export function templateEventHandler(expr: string, ctx: CompileContext, event: string, scopeNames?: string[]): string {
+    const fn = scopeNames === undefined ? unbatchedHandler(expr, ctx)
+        : `(__e,${scopeNames.length === 1 ? scopeNames[0] : `[${scopeNames.join(',')}]`})=>(${unbatchedHandler(expr, ctx)})(__e)`;
+    return `eventHandler(${fn}, ctx.el, ${jsQuote(event)})`;
 }
 
 /** The handler itself, before `buildEventHandler` puts it inside `batch()`. */

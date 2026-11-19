@@ -8,6 +8,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
+import { signal } from '../src/reactivity/signal';
 
 let seq = 0;
 const tag = () => `x-states-${++seq}`;
@@ -54,6 +55,35 @@ describe('a declared state', () => {
         expect([...statesOf(el)!]).toEqual(['open']);
         set(false);
         expect([...statesOf(el)!]).toEqual([]);
+    });
+
+    it('ctx.states keeps each state in step with its function, each tracked on its own (#1207)', () => {
+        const name = tag();
+        const open = signal(false);
+        const count = signal(0);
+        let runs = { open: 0, busy: 0 };
+        component(name, {
+            states: ['open', 'busy'],
+            setup(ctx) {
+                ctx.states({
+                    open: () => { runs.open++; return open(); },
+                    busy: () => { runs.busy++; return count() > 0; },
+                });
+            },
+            render: () => html`<p>x</p>`,
+        });
+        const el = mount(name);
+        expect([...statesOf(el)!]).toEqual([]);
+        open.set(true);
+        expect([...statesOf(el)!]).toEqual(['open']);
+        count.set(2);
+        expect([...statesOf(el)!].sort()).toEqual(['busy', 'open']);
+        open.set(false);
+        expect([...statesOf(el)!]).toEqual(['busy']);
+        // One effect per state: a change of `count` did not re-run `open`'s function.
+        runs = { open: 0, busy: 0 };
+        count.set(3);
+        expect(runs).toEqual({ open: 0, busy: 1 });
     });
 
     it('a component that declares no state attaches no internals', () => {

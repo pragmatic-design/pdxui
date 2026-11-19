@@ -33,12 +33,12 @@ function parses(code: string): void {
 }
 
 describe('inlineBindings: bound names with - or :', () => {
-    it(':aria-label and :data-id compile to setAttribute, in a module that parses', () => {
+    it(':aria-label and :data-id compile to core\'s attribute binding, in a module that parses', () => {
         const code = inline('<div :aria-label="label" :data-id="id"></div>');
         parses(code);
-        expect(code).toMatch(/setAttribute\("aria-label", /);
-        expect(code).toMatch(/setAttribute\("data-id", /);
-        expect(code).toMatch(/removeAttribute\("aria-label"\)/);
+        // bindAttribute sets it, and removes it for null or false (#1207; bound-attribute.ts).
+        expect(code).toMatch(/bindAttribute\(\w+, "aria-label", \(\)=>ctx\.label\(\)\)/);
+        expect(code).toMatch(/bindAttribute\(\w+, "data-id", \(\)=>ctx\.id\(\)\)/);
         expect(code, 'the name was cut at the hyphen').not.toMatch(/\["aria"\]|\["data"\]|"-label"|"-id"/);
     });
 
@@ -92,7 +92,7 @@ describe('inlineBindings: SVG is created in the SVG namespace', () => {
     it('a bound attribute on an SVG element is set as the attribute, and a static class too', () => {
         const code = inline('<svg><rect :width="id" class="bar"></rect></svg>');
         parses(code);
-        expect(code).toMatch(/setAttribute\("width", /);
+        expect(code).toMatch(/bindAttribute\(\w+, "width", \(\)=>ctx\.id\(\)\)/);
         expect(code, 'className is read-only on SVG').not.toMatch(/\.className = /);
         expect(code).toMatch(/setAttribute\("class", "bar"\)/);
     });
@@ -107,21 +107,20 @@ describe('inlineBindings: SVG is created in the SVG namespace', () => {
 describe('the controls', () => {
     // A plain element is asked at run time, as core asks it: the property when the element has it,
     // the attribute otherwise. An <input> certainly has `disabled` and `value`
-    // (native-properties.ts, #685), so for it the question is not written: the binding is the
-    // property's branch alone, which hands null to core's clearBoundProperty, as core's does, and
-    // assigns anything else.
+    // (native-properties.ts, #685), so for it the question is not asked: the binding is core's
+    // `bindNativeProperty`, the property's branch alone, which hands null to clearBoundProperty and
+    // assigns anything else (#1207). Elsewhere it is `bindAttributeOrProperty`, which asks.
     it(':disabled and :value still assign the property', () => {
         const code = inline('<input :disabled="id" :value="label" />');
         parses(code);
-        // The value is read once into __b, beside the value the binding last wrote (#44).
-        expect(code).toMatch(/const __b = ctx\.id\(\); [^\n]*__el\w*w_disabled = __b; const __v = __b; if \(__v == null\) clearBoundProperty\((\w+), "disabled", "disabled"\); else \1\["disabled"\] = __v; \}\);/);
-        expect(code).toMatch(/const __b = ctx\.label\(\); [^\n]*__el\w*w_value = __b; const __v = __b; if \(__v == null\) clearBoundProperty\((\w+), "value", "value"\); else \1\["value"\] = __v; \}\);/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "disabled", "disabled", \(\)=>ctx\.id\(\)\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.label\(\)\)/);
     });
 
     it('a camelCase DOM property keeps the property path, on HTML and on SVG: :textContent', () => {
         const code = inline('<p :textContent="label"></p><svg><text :textContent="label"></text></svg>');
         parses(code);
-        expect(code.match(/const __b = ctx\.label\(\); [^\n]*if \("textContent" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "textContent", "textContent"\); else \1\["textContent"\] = __v; \}/g)).toHaveLength(2);
+        expect(code.match(/bindAttributeOrProperty\(\w+, "textContent", "textContent", \(\)=>ctx\.label\(\)\)/g)).toHaveLength(2);
     });
 
     it('an HTML element is still created with createElement', () => {
