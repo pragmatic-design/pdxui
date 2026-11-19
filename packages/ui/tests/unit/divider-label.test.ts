@@ -7,7 +7,7 @@
 // responsive/.../divider-late-text.spec.ts.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/divider/pdx-divider';
+import '../../src/divider/pdx-divider.pdx';
 
 async function place(text: string, attrs: Record<string, string> = {}): Promise<HTMLElement> {
     const el = document.createElement('pdx-divider');

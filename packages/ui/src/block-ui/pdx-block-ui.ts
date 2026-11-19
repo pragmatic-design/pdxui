@@ -130,7 +130,7 @@ component('pdx-block-ui', {
         function block(on: boolean): void {
             // The spinner is drawn past `delay` from here on; its element is in the overlay already and
             // upgrades when its module lands. `variant: 'none'` builds none.
-            if (on && ctx.variant() !== 'none' && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
+            if (on && ctx.variant() !== 'none' && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
             // Busy while blocked and not otherwise (A4): no `aria-busy="false"` on a region at rest.
             if (on) ctx.el.setAttribute('aria-busy', 'true'); else ctx.el.removeAttribute('aria-busy');
             ctx.state('blocked', on);

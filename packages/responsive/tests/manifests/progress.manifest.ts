@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-progress
  *
- * Contracts WRITTEN by inspecting the source (packages/ui/src/progress/pdx-progress.ts)
+ * Contracts WRITTEN by inspecting the source (packages/ui/src/progress/pdx-progress.pdx)
  * and the CSS (packages/design/src/components/progress.css). Progress is a NON-interactive
  * indicator (no keyboard).
  *

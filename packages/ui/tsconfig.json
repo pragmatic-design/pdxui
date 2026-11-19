@@ -2,7 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    // A component written in .pdx is a module TypeScript does not read: a .ts that loads one with
+    // import() (the spinner, loaded only while something loads) needs its declaration (#1210).
+    "types": ["@pdxui/compiler/client"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "tests"]

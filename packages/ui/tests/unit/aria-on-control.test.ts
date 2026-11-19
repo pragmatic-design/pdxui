@@ -10,7 +10,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/button/pdx-button';
 import '../../src/popover/pdx-popover';
 import '../../src/tooltip/pdx-tooltip';
-import '../../src/progress/pdx-progress';
+import '../../src/progress/pdx-progress.pdx';
 
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 function key(target: EventTarget, k: string): void {

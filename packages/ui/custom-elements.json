@@ -11349,7 +11349,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/divider/pdx-divider.ts",
+      "path": "src/divider/pdx-divider.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -11496,7 +11496,7 @@
           "name": "pdx-divider",
           "declaration": {
             "name": "PdxDivider",
-            "module": "src/divider/pdx-divider.ts"
+            "module": "src/divider/pdx-divider.pdx"
           }
         }
       ]
@@ -22914,7 +22914,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/progress/pdx-progress.ts",
+      "path": "src/progress/pdx-progress.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23144,7 +23144,7 @@
           "name": "pdx-progress",
           "declaration": {
             "name": "PdxProgress",
-            "module": "src/progress/pdx-progress.ts"
+            "module": "src/progress/pdx-progress.pdx"
           }
         }
       ]
@@ -28749,7 +28749,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/spinner/pdx-spinner.ts",
+      "path": "src/spinner/pdx-spinner.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -28885,7 +28885,7 @@
           "name": "pdx-spinner",
           "declaration": {
             "name": "PdxSpinner",
-            "module": "src/spinner/pdx-spinner.ts"
+            "module": "src/spinner/pdx-spinner.pdx"
           }
         }
       ]

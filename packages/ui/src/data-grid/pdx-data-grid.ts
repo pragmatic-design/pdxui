@@ -257,7 +257,7 @@ component('pdx-data-grid', {
             // asked, not the overlay: the grid writes the overlay in a frame of its own, which may come
             // after this one.
             requestAnimationFrame(() => {
-                if (gc.grid?.isLoading.peek() && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
+                if (gc.grid?.isLoading.peek() && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
             });
         }
 

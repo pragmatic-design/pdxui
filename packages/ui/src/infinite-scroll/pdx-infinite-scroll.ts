@@ -188,7 +188,7 @@ component('pdx-infinite-scroll', {
                 _loadingEl.style.display = loading ? '' : 'none';
                 if (loading && !_loadingEl.firstChild) {
                     // The element upgrades when its module lands.
-                    if (!customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
+                    if (!customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
                     const spinner = document.createElement('pdx-spinner');
                     spinner.setAttribute('size', 'sm');
                     const text = document.createElement('span');

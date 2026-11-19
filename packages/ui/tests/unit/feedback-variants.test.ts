@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/badge/pdx-badge.pdx';
 import '../../src/banner/pdx-banner';
-import '../../src/progress/pdx-progress';
+import '../../src/progress/pdx-progress.pdx';
 import { toast } from '../../src/toast/pdx-toast';
 
 describe('pdx-badge\'s axes', () => {

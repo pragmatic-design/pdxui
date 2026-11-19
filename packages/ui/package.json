@@ -69,16 +69,6 @@
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
       "import": "./dist/avatar-group/pdx-avatar-group.js"
     },
-    "./spinner": {
-      "development": "./src/spinner/pdx-spinner.ts",
-      "types": "./dist/spinner/pdx-spinner.d.ts",
-      "import": "./dist/spinner/pdx-spinner.js"
-    },
-    "./divider": {
-      "development": "./src/divider/pdx-divider.ts",
-      "types": "./dist/divider/pdx-divider.d.ts",
-      "import": "./dist/divider/pdx-divider.js"
-    },
     "./label": {
       "development": "./src/label/pdx-label.ts",
       "types": "./dist/label/pdx-label.d.ts",
@@ -203,11 +193,6 @@
       "development": "./src/field-list/pdx-field-list.ts",
       "types": "./dist/field-list/pdx-field-list.d.ts",
       "import": "./dist/field-list/pdx-field-list.js"
-    },
-    "./progress": {
-      "development": "./src/progress/pdx-progress.ts",
-      "types": "./dist/progress/pdx-progress.d.ts",
-      "import": "./dist/progress/pdx-progress.js"
     },
     "./card": {
       "development": "./src/card/pdx-card.ts",
@@ -658,6 +643,21 @@
       "development": "./src/avatar/pdx-avatar.pdx",
       "types": "./dist/avatar/pdx-avatar.d.ts",
       "import": "./dist/avatar/pdx-avatar.js"
+    },
+    "./divider": {
+      "development": "./src/divider/pdx-divider.pdx",
+      "types": "./dist/divider/pdx-divider.d.ts",
+      "import": "./dist/divider/pdx-divider.js"
+    },
+    "./spinner": {
+      "development": "./src/spinner/pdx-spinner.pdx",
+      "types": "./dist/spinner/pdx-spinner.d.ts",
+      "import": "./dist/spinner/pdx-spinner.js"
+    },
+    "./progress": {
+      "development": "./src/progress/pdx-progress.pdx",
+      "types": "./dist/progress/pdx-progress.d.ts",
+      "import": "./dist/progress/pdx-progress.js"
     },
     "./package.json": "./package.json"
   },

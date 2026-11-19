@@ -1,0 +1,86 @@
+<template>
+  @if (circular) {
+    <div :class="rootClass" data-part="root" role="progressbar" :aria-label="name"
+      aria-valuemin="0" :aria-valuemax="max" :aria-valuenow="valueNow" :aria-valuetext="valueText">
+      <svg class="pdx-progress-ring" data-part="ring" viewBox="0 0 100 100">
+        <circle class="pdx-progress-ring-track" cx="50" cy="50" r="40" fill="none" stroke-width="8" />
+        <circle class="pdx-progress-ring-value" cx="50" cy="50" r="40" fill="none" stroke-width="8"
+          stroke-linecap="round" :style="{ 'stroke-dasharray': RING_DASH, 'stroke-dashoffset': ringOffset }" :data-variant="variant || null" />
+      </svg>
+      @if (showLabel) {
+        <span class="pdx-progress-circular-label" data-part="label">{{ text }}</span>
+      }
+    </div>
+  } @else {
+    <div role="progressbar" :aria-label="name"
+      aria-valuemin="0" :aria-valuemax="max" :aria-valuenow="valueNow" :aria-valuetext="valueText"
+      style="display:flex;align-items:center;gap:var(--pdx-space-sm);width:100%">
+      <div :class="rootClass" data-part="root">
+        <div class="pdx-progress-bar" data-part="bar" :style="{ width: barWidth }" :variant="variant || null"></div>
+      </div>
+      @if (showLabel) {
+        <span class="pdx-progress-label" data-part="label" style="font-size:var(--pdx-text-xs);color:var(--pdx-color-muted);white-space:nowrap;min-width:3ch;text-align:right">{{ text }}</span>
+      }
+    </div>
+  }
+</template>
+
+<script>
+/**
+ * A linear or circular progress indicator, determinate with a value or indeterminate and animated.
+ *
+ * @csspart root - The track: `.pdx-progress` (linear) or `.pdx-progress-circular`, with
+ *   `.pdx-progress-indeterminate` while there is no value.
+ * @csspart bar - The linear bar.
+ * @csspart ring - The circular ring (`<svg>`), which spins while there is no value.
+ * @csspart label - The percentage or `label`, with `showLabel`.
+ */
+import { uiString } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/progress';
+import { percentOf, ringOffsetOf, RING_DASH } from './progress-math';
+
+@part root, bar, ring, label;
+// The axis progress.css keys by (#631), reflected on the host; each value maps the class that draws
+// the same track on native markup. `md` is the base look. The colour `variant` stays a prop: it is
+// passed to the bar and the ring as attributes, which progress.css draws natively.
+@variants {
+  /** sm, md (the default) or lg. */
+  size: { md: '.pdx-progress-md', sm: '.pdx-progress-sm', lg: '.pdx-progress-lg' } = md;
+}
+/** Current value (0-100). Omit or -1 for indeterminate. */
+@prop value: number = -1;
+/** Max value (default 100) */
+@prop max: number = 100;
+/** Color variant: primary (default), success, warning, danger */
+@prop variant: string = '';
+/** Show percentage label */
+@prop showLabel: boolean = false;
+/** Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext). */
+@prop label: string = '';
+/** Striped animation on the bar */
+@prop striped: boolean = false;
+/** Circular/ring mode instead of linear bar */
+@prop circular: boolean = false;
+/** Accessible label for screen readers. Empty: the progress.label component string. */
+@prop ariaLabel: string = '';
+
+const percent = $derived(percentOf(value, max));
+const indeterminate = $derived(percent < 0);
+const rootClass = $derived((circular ? 'pdx-progress-circular' : 'pdx-progress')
+  + (indeterminate ? ' pdx-progress-indeterminate' : '')
+  + (striped ? ' pdx-progress-striped' : ''));
+/** The label shown: `label`, else the rounded percentage, else nothing while indeterminate. */
+const text = $derived(label || (indeterminate ? '' : Math.round(percent) + '%'));
+const name = $derived(ariaLabel || uiString('progress', 'label'));
+// The value on the element with role="progressbar", in its own range (valuemin 0, valuemax `max`),
+// not on the host as a percentage, where a bar reads "Progress, progress bar" with no value. None
+// while indeterminate; `label` is the value in words ("3 of 5 steps"), read instead of the number.
+const valueNow = $derived(indeterminate ? null : String(Math.max(0, Math.min(max, value))));
+const valueText = $derived(indeterminate ? null : (label || null));
+// The bar's width and the ring's undrawn part. While indeterminate the bar has no width: progress.css
+// animates it.
+const barWidth = $derived(indeterminate ? '' : percent + '%');
+const ringOffset = $derived(ringOffsetOf(percent));
+</script>

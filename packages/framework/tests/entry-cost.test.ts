@@ -88,7 +88,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // when() around it — pdx-kbd from 1.17–1.22× its TypeScript version to 0.92–0.99×. Both live in
     // modules of their own (list-static.ts, list-empty.ts) that an app without them does not bundle;
     // every component registered uses both, so here they are counted whole.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 338.5 },
+    // 338.8 after #1210's second atoms (+0.3): pdx-divider, pdx-spinner and pdx-progress, each lighter
+    // than its TypeScript module alone (0.93×, 0.78×, 0.86×), for the reason the first three added 0.2.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339 },
     { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).

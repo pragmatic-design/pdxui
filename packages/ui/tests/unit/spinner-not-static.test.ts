@@ -13,19 +13,23 @@ import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 
 const SRC = resolve(__dirname, '..', '..', 'src');
-const SPINNER = join(SRC, 'spinner', 'pdx-spinner.ts');
+const SPINNER = join(SRC, 'spinner', 'pdx-spinner.pdx');
 
 // Match: a static import's specifier — `import x from '…'`, `import { a } from '…'`, `import '…'`,
 // `export … from '…'` — at the start of a line, never `import(` and never `import type`.
 // Groups: [1]=the specifier
 const STATIC = /^\s*(?:import(?!\s+type\b)(?:\s+[^'"();]+?\s+from)?|export\s+[^'"();]+?\s+from)\s*['"]([^'"]+)['"]/gm;
 
-/** The package source a relative specifier names, or null for a package import or a stylesheet. */
+/**
+ * The package source a relative specifier names, or null for a package import or a stylesheet. A
+ * component written in `.pdx` is imported by its full name (#1004), and its script's imports are
+ * read like a module's.
+ */
 function resolveFrom(file: string, spec: string): string | null {
     if (!spec.startsWith('.')) return null;
     const base = resolve(dirname(file), spec);
     for (const candidate of [base, `${base}.ts`, join(base, 'index.ts')]) {
-        if (candidate.endsWith('.ts') && existsSync(candidate)) return candidate;
+        if ((candidate.endsWith('.ts') || candidate.endsWith('.pdx')) && existsSync(candidate)) return candidate;
     }
     return null;
 }
@@ -53,13 +57,16 @@ describe('a component that draws a spinner only while loading', () => {
         ['pdx-infinite-scroll', 'infinite-scroll/pdx-infinite-scroll.ts'],
         ['pdx-block-ui', 'block-ui/pdx-block-ui.ts'],
     ])('%s does not load pdx-spinner statically', (_tag, file) => {
-        expect(staticClosure(join(SRC, file)).has(SPINNER), `${file} reaches spinner/pdx-spinner.ts through static imports`).toBe(false);
+        expect(staticClosure(join(SRC, file)).has(SPINNER), `${file} reaches spinner/pdx-spinner.pdx through static imports`).toBe(false);
     });
 
     it('control — the walk finds a static import where there is one', () => {
         // `pdx-spinner` imports its own stylesheet and `@pdxui/core`; a module that imports the spinner
         // statically is the one the rows above say none of them is.
-        expect(staticClosure(join(SRC, 'spinner', 'pdx-spinner.ts')).has(SPINNER)).toBe(true);
+        expect(staticClosure(join(SRC, 'spinner', 'pdx-spinner.pdx')).has(SPINNER)).toBe(true);
         expect(staticClosure(join(SRC, 'list', 'pdx-list.ts')).size, 'the walk followed nothing').toBeGreaterThan(1);
+        // The barrel imports the spinner statically, by its `.pdx` name (#1210): the walk follows a
+        // component written in `.pdx` as it follows a `.ts` one, or the rows above say nothing.
+        expect(staticClosure(join(SRC, 'index.ts')).has(SPINNER), 'the walk does not follow a .pdx import').toBe(true);
     });
 });
