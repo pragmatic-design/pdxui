@@ -2,7 +2,7 @@
  * MANIFEST — pdx-divider
  *
  * Contracts DERIVED by inspecting the source (they are NOT in universal.ts):
- *   - Source: packages/ui/src/divider/pdx-divider.ts
+ *   - Source: packages/ui/src/divider/pdx-divider.pdx
  *       · orientation 'horizontal' (the default) with no label → <hr role="separator"> with
  *         inline `border:none;border-top:1px <variant> var(--pdx-color-border);margin:8px 0`.
  *         → an effective height of ~1px (a border-top only), and a large width (it fills the parent).
