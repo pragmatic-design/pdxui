@@ -29,6 +29,13 @@ describe('@state compiles into the descriptor and an effect', () => {
         expect(code).toContain('busy: ()=>__count() > 0');
     });
 
+    it('a name with a hyphen is a state, as CSS custom states allow (#1230)', () => {
+        const r = compile(pdx("@prop pos: string = 'center';\n@state label-left = pos === 'left';"), 'test.pdx');
+        expect(r.warnings.filter(w => w.code === 'PDX_MALFORMED_STATE')).toEqual([]);
+        expect(r.code).toContain("states: ['label-left'],");
+        expect(r.code).toContain("ctx.states({ 'label-left': ()=>pos() === 'left' });");
+    });
+
     it('several states are one call, each its own entry', () => {
         const { code } = compile(pdx('let a = $signal(false);\nlet b = $signal(0);\n@state on = a;\n@state many = b > 1;'), 'test.pdx');
         expect(code).toContain('ctx.states({ on: ()=>__a(), many: ()=>__b() > 1 });');
