@@ -4,7 +4,7 @@
 // fallback of an unnamed dot. Without it, every presence dot in the galleries reads out a colour word.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/badge/pdx-badge';
+import '../../src/badge/pdx-badge.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

@@ -1,0 +1,35 @@
+<template>
+  <kbd class="pdx-kbd-combo" data-part="root">
+    @for (parts as key, i; track i) {
+      <kbd class="pdx-kbd">{{ displayKey(key, symbols) }}</kbd>
+    } @empty {
+      <kbd class="pdx-kbd"><slot></slot></kbd>
+    }
+  </kbd>
+</template>
+
+<script>
+/**
+ * Shows a keyboard shortcut, written as keys joined by +, optionally with modifier symbols.
+ *
+ * @csspart root - The combination (`<kbd class="pdx-kbd-combo">`) around its keys.
+ */
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/kbd';
+import { displayKey } from './kbd-symbols';
+
+// The axis kbd.css keys by (#632), reflected on the host and drawn on the combo, the root part;
+// each value maps the class that draws the same on a native key. `md` is the base look.
+/** sm, md (the default) or lg. */
+@variants { size: { md: '.pdx-kbd-md', sm: '.pdx-kbd-sm', lg: '.pdx-kbd-lg' } = md; }
+@part root;
+@prop keys: string = '';
+/** Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false. */
+@prop symbols: boolean = false;
+
+// ⚠️ Without `keys`, the children are the shortcut: `<pdx-kbd>Ctrl</pdx-kbd>` is the form anyone
+// writes, and the slot keeps them. `keys` still wins when given — it is explicit, and it splits on
+// `+`, which raw children cannot.
+const parts = $derived(keys.split('+').map(k => k.trim()).filter(Boolean));
+</script>

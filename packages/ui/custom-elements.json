@@ -2447,7 +2447,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/avatar/pdx-avatar.ts",
+      "path": "src/avatar/pdx-avatar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2641,14 +2641,14 @@
           "name": "pdx-avatar",
           "declaration": {
             "name": "PdxAvatar",
-            "module": "src/avatar/pdx-avatar.ts"
+            "module": "src/avatar/pdx-avatar.pdx"
           }
         }
       ]
     },
     {
       "kind": "javascript-module",
-      "path": "src/badge/pdx-badge.ts",
+      "path": "src/badge/pdx-badge.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2910,7 +2910,7 @@
           "name": "pdx-badge",
           "declaration": {
             "name": "PdxBadge",
-            "module": "src/badge/pdx-badge.ts"
+            "module": "src/badge/pdx-badge.pdx"
           }
         }
       ]
@@ -18078,7 +18078,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/kbd/pdx-kbd.ts",
+      "path": "src/kbd/pdx-kbd.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -18185,7 +18185,7 @@
           "name": "pdx-kbd",
           "declaration": {
             "name": "PdxKbd",
-            "module": "src/kbd/pdx-kbd.ts"
+            "module": "src/kbd/pdx-kbd.pdx"
           }
         }
       ]

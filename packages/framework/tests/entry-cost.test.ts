@@ -78,8 +78,11 @@ async function initialKb(code: string): Promise<{ kb: number; modules: string[] 
  * argued for in the commit that raises it.
  */
 const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
-    // 336.9: every component registered, for one signal (340.0 before #1207's lighter codegen).
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 337 },
+    // 337.1: every component registered, for one signal (340.0 before #1207's lighter codegen, 336.9
+    // after). The library's move to .pdx (#1210) adds to it while both forms are in the bundle: the
+    // first three atoms, each lighter than its TypeScript module alone, add 0.2 KB here, since html``'s
+    // runtime stays for the other components and the compiled render comes with each moved one.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 337.5 },
     { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).

@@ -4,7 +4,7 @@
 // drop its children in silence — leaving an empty 19×6 box, which on a dark masthead reads as a
 // coloured rectangle beside the search field.
 import { describe, it, expect, afterEach } from 'vitest';
-import '../../src/kbd/pdx-kbd';
+import '../../src/kbd/pdx-kbd.pdx';
 
 function mount(html: string): HTMLElement {
     const host = document.createElement('div');

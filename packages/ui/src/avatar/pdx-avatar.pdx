@@ -1,0 +1,62 @@
+<template>
+  <!-- With a name, an image named by it; without one, or decorative, hidden with no role. An unnamed
+       role="img" showing "?" fails axe's role-img-alt.
+       `pdx-avatar-box` is how pdx.reset sees the element, and keeps a page's bare `span { border }` off
+       it (#413); avatar.css draws it by its part. `.pdx-avatar` is the CSS-only avatar. -->
+  <span class="pdx-avatar-box" data-part="root" :style="boxStyle"
+    :role="spokenName ? 'img' : null"
+    :aria-label="spokenName || null"
+    :aria-hidden="spokenName ? null : 'true'">
+    @if (showImage) {
+      <img data-part="image" :src="src" :alt="alt" @error="imgError = true" />
+    } @else {
+      <span data-part="fallback">{{ initials }}</span>
+    }
+  </span>
+</template>
+
+<script>
+/**
+ * A user avatar that shows an image, or falls back to initials colored from the name.
+ *
+ * @cssstate broken - Its image failed to load: the initials show in its place.
+ * @csspart root - The avatar's box, `role="img"` when it has a name.
+ * @csspart image - The picture, when `src` is set and has loaded.
+ * @csspart fallback - The initials, shown without a picture or when it fails.
+ */
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/avatar';
+import { colorStyle, initialsOf } from './avatar-color';
+
+// The axes avatar.css keys by (#291), reflected on the host: it draws the box at the same sizes it
+// had inline. No native class is kept: the CSS-only avatar is `.pdx-avatar`, a different element.
+@variants {
+  /** xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px). */
+  size: { md, xs, sm, lg, xl } = md;
+  /** circle (the default) or square (the theme's medium radius). */
+  shape: { circle, square } = circle;
+}
+@state broken = imgError;
+@part root, image, fallback;
+@prop src: string = '';
+/** The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden. */
+@prop alt: string = '';
+/** 'auto' generates color from name. Or pass a CSS color. Default: 'auto'. */
+@prop color: string = 'auto';
+/**
+ * Beside the person's name written out: the initials and the colour still come from `alt`, but
+ * the avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).
+ */
+@prop decorative: boolean = false;
+
+let imgError = $signal(false);
+// A new source is a new chance: the failure of the last one does not keep the initials up.
+$watch(src, () => { imgError = false; });
+
+const showImage = $derived(!!src && !imgError);
+const initials = $derived(initialsOf(alt));
+const boxStyle = $derived(colorStyle(color, alt));
+/** The name it is announced by: `alt`, unless it is decorative. */
+const spokenName = $derived(decorative ? '' : alt);
+</script>

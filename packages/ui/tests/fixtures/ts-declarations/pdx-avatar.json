@@ -1,0 +1,185 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAvatar",
+  "tagName": "pdx-avatar",
+  "category": "Atoms",
+  "order": 6,
+  "description": "A user avatar that shows an image, or falls back to initials colored from the name.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "src",
+      "description": "Image URL; falls back to initials if it fails.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "src"
+    },
+    {
+      "kind": "field",
+      "name": "alt",
+      "description": "The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "alt"
+    },
+    {
+      "kind": "field",
+      "name": "color",
+      "description": "'auto' generates color from name. Or pass a CSS color. Default: 'auto'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "color"
+    },
+    {
+      "kind": "field",
+      "name": "decorative",
+      "description": "Beside the person's name written out: the initials and the colour still come from `alt`, but\nthe avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "decorative"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px).",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "shape",
+      "description": "circle (the default) or square (the theme's medium radius).",
+      "type": {
+        "text": "'circle' | 'square'"
+      },
+      "default": "'circle'",
+      "attribute": "shape"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md"
+    },
+    {
+      "name": "shape",
+      "values": [
+        "circle",
+        "square"
+      ],
+      "default": "circle"
+    }
+  ],
+  "roles": [
+    "img"
+  ],
+  "attributes": [
+    {
+      "name": "src",
+      "fieldName": "src",
+      "description": "Image URL; falls back to initials if it fails.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "alt",
+      "fieldName": "alt",
+      "description": "The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "color",
+      "fieldName": "color",
+      "description": "'auto' generates color from name. Or pass a CSS color. Default: 'auto'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "decorative",
+      "fieldName": "decorative",
+      "description": "Beside the person's name written out: the initials and the colour still come from `alt`, but\nthe avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px).",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "shape",
+      "fieldName": "shape",
+      "description": "circle (the default) or square (the theme's medium radius).",
+      "type": {
+        "text": "'circle' | 'square'"
+      },
+      "default": "'circle'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The avatar's box, `role=\"img\"` when it has a name."
+    },
+    {
+      "name": "image",
+      "description": "The picture, when `src` is set and has loaded."
+    },
+    {
+      "name": "fallback",
+      "description": "The initials, shown without a picture or when it fails."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "broken",
+      "description": "Its image failed to load: the initials show in its place."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-avatar-bg"
+    },
+    {
+      "name": "--pdx-avatar-fg"
+    },
+    {
+      "name": "--pdx-avatar-radius"
+    },
+    {
+      "name": "--pdx-avatar-size"
+    }
+  ]
+}
