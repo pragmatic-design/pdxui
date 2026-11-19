@@ -2648,7 +2648,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/badge/pdx-badge.ts",
+      "path": "src/badge/pdx-badge.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2910,7 +2910,7 @@
           "name": "pdx-badge",
           "declaration": {
             "name": "PdxBadge",
-            "module": "src/badge/pdx-badge.ts"
+            "module": "src/badge/pdx-badge.pdx"
           }
         }
       ]

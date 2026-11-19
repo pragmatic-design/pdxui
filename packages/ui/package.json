@@ -59,11 +59,6 @@
       "types": "./dist/button-group/pdx-button-group.d.ts",
       "import": "./dist/button-group/pdx-button-group.js"
     },
-    "./badge": {
-      "development": "./src/badge/pdx-badge.ts",
-      "types": "./dist/badge/pdx-badge.d.ts",
-      "import": "./dist/badge/pdx-badge.js"
-    },
     "./chip": {
       "development": "./src/chip/pdx-chip.ts",
       "types": "./dist/chip/pdx-chip.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/flag/pdx-flag.pdx",
       "types": "./dist/flag/pdx-flag.d.ts",
       "import": "./dist/flag/pdx-flag.js"
+    },
+    "./badge": {
+      "development": "./src/badge/pdx-badge.pdx",
+      "types": "./dist/badge/pdx-badge.d.ts",
+      "import": "./dist/badge/pdx-badge.js"
     },
     "./package.json": "./package.json"
   },

@@ -1,0 +1,253 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBadge",
+  "tagName": "pdx-badge",
+  "category": "Atoms",
+  "order": 4,
+  "description": "A notification badge that shows a count or a dot, on its own or overlaid on another element.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "99",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "dot",
+      "description": "Renders a small dot instead of a count.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "dot"
+    },
+    {
+      "kind": "field",
+      "name": "pulse",
+      "description": "Adds a pulsing animation.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "pulse"
+    },
+    {
+      "kind": "field",
+      "name": "hideZero",
+      "description": "Hides the badge when the value is 0.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "hidezero"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "What the badge means, read instead of its colour or its bare number: \"Online\", \"3 unread messages\". A dot without it is read as its variant (\"success indicator\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour.",
+      "type": {
+        "text": "'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'muted' | 'outline' | 'outline-primary' | 'outline-success' | 'outline-danger' | 'outline-warning'"
+      },
+      "default": "'primary'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "shape",
+      "description": "pill (the default, full radius) or square (a rounded rectangle).",
+      "type": {
+        "text": "'pill' | 'square'"
+      },
+      "default": "'pill'",
+      "attribute": "shape"
+    }
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "primary",
+        "secondary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "muted",
+        "outline",
+        "outline-primary",
+        "outline-success",
+        "outline-danger",
+        "outline-warning"
+      ],
+      "default": "primary",
+      "native": {
+        "primary": ".pdx-badge-primary",
+        "secondary": ".pdx-badge-secondary",
+        "success": ".pdx-badge-success",
+        "danger": ".pdx-badge-danger",
+        "warning": ".pdx-badge-warning",
+        "info": ".pdx-badge-info",
+        "muted": ".pdx-badge-muted",
+        "outline": ".pdx-badge-outline",
+        "outline-primary": ".pdx-badge-outline-primary",
+        "outline-success": ".pdx-badge-outline-success",
+        "outline-danger": ".pdx-badge-outline-danger",
+        "outline-warning": ".pdx-badge-outline-warning"
+      }
+    },
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-badge-md",
+        "sm": ".pdx-badge-sm",
+        "lg": ".pdx-badge-lg"
+      }
+    },
+    {
+      "name": "shape",
+      "values": [
+        "pill",
+        "square"
+      ],
+      "default": "pill",
+      "native": {
+        "pill": ".pdx-badge-pill",
+        "square": ".pdx-badge-square"
+      }
+    }
+  ],
+  "roles": [
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "99"
+    },
+    {
+      "name": "dot",
+      "fieldName": "dot",
+      "description": "Renders a small dot instead of a count.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "pulse",
+      "fieldName": "pulse",
+      "description": "Adds a pulsing animation.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "hidezero",
+      "fieldName": "hideZero",
+      "description": "Hides the badge when the value is 0.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "What the badge means, read instead of its colour or its bare number: \"Online\", \"3 unread messages\". A dot without it is read as its variant (\"success indicator\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour.",
+      "type": {
+        "text": "'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'muted' | 'outline' | 'outline-primary' | 'outline-success' | 'outline-danger' | 'outline-warning'"
+      },
+      "default": "'primary'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "shape",
+      "fieldName": "shape",
+      "description": "pill (the default, full radius) or square (a rounded rectangle).",
+      "type": {
+        "text": "'pill' | 'square'"
+      },
+      "default": "'pill'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The badge or the dot (`role=\"status\"`), hidden while it has nothing to show."
+    }
+  ]
+}

@@ -23,7 +23,7 @@ import '../../src/field-group/pdx-field-group';
 import '../../src/data-grid/pdx-data-grid';
 import '../../src/infinite-scroll/pdx-infinite-scroll';
 import '../../src/password-input/pdx-password-input';
-import '../../src/badge/pdx-badge';
+import '../../src/badge/pdx-badge.pdx';
 import '../../src/select/pdx-select';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/file-upload/pdx-file-upload';

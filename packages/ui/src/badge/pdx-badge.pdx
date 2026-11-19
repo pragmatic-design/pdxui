@@ -1,0 +1,59 @@
+<template>
+  <span
+    :class="cssClass"
+    data-part="root"
+    :style="isHidden ? 'display:none' : ''"
+    role="status"
+    aria-live="polite"
+    :aria-label="accessibleName">{{ display }}</span>
+</template>
+
+<script>
+/**
+ * A notification badge that shows a count or a dot, on its own or overlaid on another element.
+ *
+ * @csspart root - The badge or the dot (`role="status"`), hidden while it has nothing to show.
+ */
+import { uiString, format } from '../shared/i18n';
+
+// The axes feedback.css keys by (#631), reflected on the host; each value maps the class that draws
+// the same counter on a native badge. A dot draws its variant from the host alone, and on native
+// markup with its own `.pdx-dot-{variant}`. `md` and `pill` are the base look.
+@variants {
+  /** primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour. */
+  variant: {
+    primary: '.pdx-badge-primary', secondary: '.pdx-badge-secondary', success: '.pdx-badge-success',
+    danger: '.pdx-badge-danger', warning: '.pdx-badge-warning', info: '.pdx-badge-info', muted: '.pdx-badge-muted',
+    outline: '.pdx-badge-outline', outline-primary: '.pdx-badge-outline-primary',
+    outline-success: '.pdx-badge-outline-success', outline-danger: '.pdx-badge-outline-danger',
+    outline-warning: '.pdx-badge-outline-warning'
+  } = primary;
+  /** sm, md (the default) or lg. */
+  size: { md: '.pdx-badge-md', sm: '.pdx-badge-sm', lg: '.pdx-badge-lg' } = md;
+  /** pill (the default, full radius) or square (a rounded rectangle). */
+  shape: { pill: '.pdx-badge-pill', square: '.pdx-badge-square' } = pill;
+}
+@part root;
+@prop value: string = '';
+@prop max: number = 99;
+@prop dot: boolean = false;
+@prop pulse: boolean = false;
+@prop hideZero: boolean = true;
+/** What the badge means, read instead of its colour or its bare number: "Online", "3 unread messages". A dot without it is read as its variant ("success indicator"). */
+@prop label: string = '';
+
+const display = $derived(() => {
+  if (dot) return '';
+  const num = Number(value);
+  if (!isNaN(num) && max > 0 && num > max) return max + '+';
+  return value;
+});
+
+const isHidden = $derived(!dot && !!(hideZero && (value === '' || value === '0')));
+
+const cssClass = $derived(dot ? (pulse ? 'pdx-dot pdx-dot-pulse' : 'pdx-dot') : 'pdx-badge');
+
+// The label says what the badge means: without one, every presence dot reads "success
+// indicator". A dot with no label falls back to its variant word, and a counter to its own text.
+const accessibleName = $derived(label ? label : dot ? format(uiString('badge', 'indicator'), { variant }) : null);
+</script>
