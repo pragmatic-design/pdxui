@@ -25,7 +25,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | # | Guarantee | Target |
 |---|---|---|
 | O1 | Static structure is **cloned** from a `<template>`, dynamic nodes reached by index | create 10 000 rows: script ≤ 75 ms, then ≤ 45 ms (135–149 ms measured on 2026-10-10) |
-| O2 | An expression that reads no signal creates **no effect**; a `track` key is not reactive (#110) | memory per 1 000 rows ≤ 3.5 MB (4.8 MB measured) |
+| O2 | An expression that reads no signal creates **no effect**; a `track` key is not reactive (#110) | memory per 1 000 rows ≤ 3.5 MB (4.0 MB measured, #1204) |
 | O3 | Whitespace HTML ignores is not emitted (`table`, `tr`, between cells), except where it renders | node count of the benchmark table |
 | O4 | `:class` compiles to the cheapest DOM write its shape allows (`className`, `classList.toggle`) | select benchmark |
 | O5 | Events inside an `@for` are **delegated**: one listener per type on the component's host (#113), and a row's handler is declared once per `@for`, not once per row (#375) | memory, create |
@@ -123,7 +123,7 @@ move onto this one; that move is not part of the beta.
 |---|---|
 | Every cache has a maximum and an eviction: resource cache (**landed**: 200 entries LRU, 5 min `gcTime`), kept-alive pages and `@keepAlive` instances (lifecycle.md) | unit tests per cache |
 | Mount and destroy a page with `@fetch`, `@for`, `attach:` and child components 100 times → retained heap returns within 5% of the first iteration, and the resource cache holds no subscription for the destroyed instances (**landed**, #243) | the heap after a forced GC, Chromium, on a production build: `packages/showcase/tests/scenario-memory.spec.ts`, with a page that leaks on purpose as its control; the subscriptions, case 8 of `packages/core/tests/async-contract.test.ts` |
-| Memory per 1 000 benchmark rows ≤ 3.5 MB (4.8 MB measured on 2026-10-10) | `pnpm bench:jfb` |
+| Memory per 1 000 benchmark rows ≤ 3.5 MB (4.0 MB measured on 2026-11-19, #1204: what is left per row is in that pull request) | `pnpm bench:jfb` |
 
 ## Requests
 

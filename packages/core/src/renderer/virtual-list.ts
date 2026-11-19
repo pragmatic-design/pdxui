@@ -17,6 +17,7 @@
 import { signal, effect, collectDisposers, onDispose, untracked } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
 import { createVirtualizer } from './virtualizer';
+import { rowIndex, type RowIndex } from './list';
 import { DEV } from '../utils/env';
 import { isDeferring, deferredBlock } from './deferred-block';
 import { isPaged, listOf, setSize, implicitRole, rowAttributes, DEFAULT_ESTIMATE, ROW_ROLES, KEY_ROLES, type PagedSource } from './virtual-set';
@@ -53,7 +54,8 @@ export interface VirtualRow<T> {
     node: HTMLElement;
     dispose: () => void;
     item?: Signal<T>;
-    index?: Signal<number>;
+    /** A signal only once the row reads it, as a `@for` row's (#1204). */
+    index?: RowIndex;
 }
 type Row<T> = VirtualRow<T>;
 
@@ -184,7 +186,7 @@ export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adop
         let row: Row<T>;
         if (options.getters) {
             const itemSig = signal(item);
-            const indexSig = signal(index);
+            const indexSig = rowIndex(index);
             const r = render as (item: () => T, index: () => number) => Node;
             const [node, dispose] = collectDisposers(() => untracked(() => r(itemSig, indexSig)));
             row = { key: k, node: rootOf(node), dispose, item: itemSig, index: indexSig };

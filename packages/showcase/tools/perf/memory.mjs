@@ -42,6 +42,23 @@ export async function heapUsed(page) {
     return (await page.__cdp.send('Runtime.getHeapUsage')).usedSize;
 }
 
+/** Total self size and count of each `type name` in a parsed heap snapshot. */
+export function byKind(snap) {
+    const { node_fields: nf, node_types: [types] } = snap.snapshot.meta;
+    const NF = nf.length, iType = nf.indexOf('type'), iName = nf.indexOf('name'), iSize = nf.indexOf('self_size');
+    const kinds = new Map();
+    for (let i = 0; i < snap.nodes.length; i += NF) {
+        const type = types[snap.nodes[i + iType]];
+        const name = /string|number/.test(type) ? `(${type})` : snap.strings[snap.nodes[i + iName]].slice(0, 70);
+        const key = `${type} ${name}`;
+        const k = kinds.get(key) ?? { count: 0, size: 0 };
+        k.count++;
+        k.size += snap.nodes[i + iSize];
+        kinds.set(key, k);
+    }
+    return kinds;
+}
+
 /** A heap snapshot after a GC, parsed. */
 export async function snapshot(page) {
     await gc(page);

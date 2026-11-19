@@ -10,7 +10,7 @@
 import { collectDisposers, signal, untracked } from '../reactivity/signal';
 import { when, match, show, portal, followWhen, followMatch, showNodes, caseFor } from '../renderer/helpers';
 import { whenChain, followChain } from '../renderer/when-chain';
-import { followList, mountList, type MappedItem, type RowRenderer, type RowSignals } from '../renderer/list';
+import { followList, mountList, rowIndex, type MappedItem, type RowRenderer, type RowSignals } from '../renderer/list';
 import { defer, followDefer } from '../renderer/defer';
 import { awaitBlock, followAwait } from '../renderer/await';
 import { errorBoundary, followBoundary } from '../renderer/error-boundary';
@@ -300,7 +300,7 @@ function adoptRow<T>(
         const range = { parent, at, next: null };
         let content: Node;
         if (renderer.mode === 'getters') {
-            const r: RowSignals<T> = { item: signal(item), index: signal(i) };
+            const r: RowSignals<T> = { item: signal(item), index: rowIndex(i) };
             row = r;
             content = offerRange(range, () => untracked(() => renderer.render(r.item, r.index)));
         } else {

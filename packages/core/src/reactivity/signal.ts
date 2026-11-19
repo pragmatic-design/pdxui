@@ -95,8 +95,10 @@ let notifyingMaybe = false;
  * runs. A property rather than a Set: it is set and read once per queued effect, on the hot path.
  */
 type Flagged = Subscriber & { __pdx_definite?: boolean };
+/** The computeds an effect read, each with the value it gave: what a «maybe» is checked against. */
+type ComputedReads = [() => unknown, unknown][];
 /** The computeds the running effect reads, with the value each gave it. Null outside an effect. */
-let currentComputedReads: [() => unknown, unknown][] | null = null;
+let currentComputedReads: ComputedReads | null = null;
 
 // --- Pending effects: array-based for zero-alloc flush ---
 let pendingArr: Subscriber[] = [];
@@ -782,21 +784,12 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     const tracker = newTracker(run);
     (run as Tracked).__pdx_tracker = tracker;
 
-    /**
-     * Whether a «maybe» is a change: true when a computed the last run read now gives another value.
-     * Reading it brings it up to date. With nothing recorded there is nothing to compare, and it runs.
-     */
-    // Declared here, with the check, so the function keeps one shape: the flag added later, on the
-    // first write, would change it on the hot path.
+    // Declared here, with the computeds it read, so the function keeps one shape: the flag added
+    // later, on the first write, would change it on the hot path. The reads are the array itself, which
+    // `shouldRun` checks: a closure per effect only to read it was one more allocation per binding,
+    // two per row of a benchmark list (#1204).
     (run as Flagged).__pdx_definite = false;
-    (run as { __pdx_check?: () => boolean }).__pdx_check = () => {
-        if (computedReads.length === 0) return true;
-        for (let i = 0; i < computedReads.length; i++) {
-            const [peek, seen] = computedReads[i];
-            if (!Object.is(peek(), seen)) return true;
-        }
-        return false;
-    };
+    (run as { __pdx_reads?: ComputedReads }).__pdx_reads = computedReads;
 
     if (boundaryHandler) (run as { __pdx_errh?: ErrorRoute }).__pdx_errh = boundaryHandler;
     // The scope it belongs to, captured like the error route: the flush parks it while that scope is
@@ -895,9 +888,22 @@ function shouldRun(sub: Subscriber): boolean {
         (sub as Flagged).__pdx_definite = false;
         return true;
     }
-    const check = (sub as { __pdx_check?: () => boolean }).__pdx_check;
-    if (!check) return true;
-    try { return check(); } catch { return true; }
+    const reads = (sub as { __pdx_reads?: ComputedReads }).__pdx_reads;
+    if (!reads) return true;
+    try { return computedChanged(reads); } catch { return true; }
+}
+
+/**
+ * Whether a «maybe» is a change: true when a computed the last run read now gives another value.
+ * Reading it brings it up to date. With nothing recorded there is nothing to compare, and it runs.
+ */
+function computedChanged(reads: ComputedReads): boolean {
+    if (reads.length === 0) return true;
+    for (let i = 0; i < reads.length; i++) {
+        const [peek, seen] = reads[i];
+        if (!Object.is(peek(), seen)) return true;
+    }
+    return false;
 }
 
 /**
