@@ -26,6 +26,7 @@ function makeFakeScope(el: HTMLElement): ComponentScope {
         registerPropsChange: () => {},
         registerBeforeLeave: () => {},
         registerRouteChange: () => {},
+        registerFrame: () => {},
         element: el,
     };
 }

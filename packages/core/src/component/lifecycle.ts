@@ -28,6 +28,8 @@ export interface ComponentScope {
     registerPropsChange(fn: (changes: PropChange[]) => void): void;
     registerBeforeLeave(fn: () => boolean | 'destroy' | Promise<boolean>): void;
     registerRouteChange(fn: (params: Record<string, string>) => void): void;
+    /** Run `fn` in the next animation frame, only if this mount is still alive then (`ctx.frame`). */
+    registerFrame(fn: () => void): void;
     element: HTMLElement;
 }
 
@@ -79,6 +81,18 @@ export function onMount(fn: () => void | (() => void) | Promise<unknown>): void 
             popScope();
         }
     });
+}
+
+/**
+ * Run `fn` in the next animation frame, only if this mount is still alive then (#1231): what
+ * `ctx.frame` does, for a script that has no `ctx` — a `.pdx` component's. For DOM work that has to
+ * wait for the page to have laid out what this frame added — the element after the host, a size.
+ * Called from setup() or from inside onMount(); a component disconnected before the frame runs nothing.
+ */
+export function onNextFrame(fn: () => void): void {
+    const scope = getCurrentScope();
+    if (!scope) throw new Error('onNextFrame() called outside component setup()');
+    scope.registerFrame(fn);
 }
 
 /**

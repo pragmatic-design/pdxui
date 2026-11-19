@@ -79,6 +79,11 @@ that implemented it; «Today» says how the runtime came to it.
   outlet keeps at most `keep-alive-max` frozen pages (default 10), the least recently used
   destroyed past it; `@page { keepAlive: n }` stays a timeout (`core/tests/keepalive-max-dynamic.test.ts`,
   `router/tests/outlet-keepalive-max.test.ts`).
+- A `.pdx` script had no counterpart of `ctx.frame`, which runs a function in the next animation frame
+  only if the mount is still alive then. Since #1231 `onNextFrame(fn)` from `@pdxui/core` is that
+  function for a script: called in setup or in `onMount`, it runs `fn` once in the next frame, and not
+  at all when the component was disconnected first, the mount generation `ctx.frame` checks
+  (`core/src/component/lifecycle.ts`; `core/tests/on-next-frame.test.ts`, a compiled `.pdx` included).
 - `@show` hid only the block's root elements: a root text node stayed visible. Since #265 a root
   text node is swapped for a placeholder while hidden and put back, still bound, when shown
   (`core/src/renderer/helpers.ts`, `show`); acceptance case 7 is `core/tests/show-root-text.test.ts`.

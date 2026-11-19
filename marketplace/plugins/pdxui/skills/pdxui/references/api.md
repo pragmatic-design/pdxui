@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-487 value exports.
+488 value exports.
 
 ### `__adoptStyles`
 
@@ -3851,6 +3851,19 @@ The callback may be async — `onMount(async () => { data = await load(); })`. I
 awaited and is not a cleanup: return a function from a synchronous callback for that, and register
 an `onDestroy()` before the first `await`, since the scope is restored only while the callback runs
 synchronously.
+
+### `onNextFrame`
+
+```ts
+import { onNextFrame } from '@pdxui/core';
+
+function onNextFrame(fn: () => void): void
+```
+
+Run `fn` in the next animation frame, only if this mount is still alive then (#1231): what
+`ctx.frame` does, for a script that has no `ctx` — a `.pdx` component's. For DOM work that has to
+wait for the page to have laid out what this frame added — the element after the host, a size.
+Called from setup() or from inside onMount(); a component disconnected before the frame runs nothing.
 
 ### `onPinch`
 
