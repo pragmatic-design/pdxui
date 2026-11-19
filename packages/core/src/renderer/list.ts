@@ -25,7 +25,30 @@ export interface MappedItem<T> {
     row?: RowSignals<T>;
 }
 
-export interface RowSignals<T> { item: Signal<T>; index: Signal<number> }
+export interface RowSignals<T> { item: Signal<T>; index: RowIndex }
+
+/** A row's `index()` getter, and how the reconciler moves it. */
+export interface RowIndex {
+    (): number;
+    set(index: number): void;
+}
+
+/**
+ * A row's position, as a signal only once something reads it (#1204). Most rows never read their
+ * index — js-framework-benchmark's do not — and a signal is a Set and five closures, 1,000 times in its
+ * memory case. Until the first read the position is a number the reconciler overwrites; the first read
+ * makes the signal from it, and from then on a move notifies whoever reads it, as before.
+ */
+export function rowIndex(initial: number): RowIndex {
+    let position = initial;
+    let tracked: Signal<number> | null = null;
+    const read = (() => (tracked ??= signal(position))()) as RowIndex;
+    read.set = (index: number) => {
+        position = index;
+        tracked?.set(index);
+    };
+    return read;
+}
 
 /**
  * How a row is rendered. `value` hands it the item — what hand-written `each()` code expects.
@@ -201,7 +224,7 @@ function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i: number
     let node: Node;
     let dispose: () => void;
     if (renderer.mode === 'getters') {
-        const r: RowSignals<T> = { item: signal(item), index: signal(i) };
+        const r: RowSignals<T> = { item: signal(item), index: rowIndex(i) };
         row = r;
         // Untracked: reading item() while the row is built must not subscribe the LIST
         // driver to the row's own signal.

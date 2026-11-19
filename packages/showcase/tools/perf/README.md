@@ -20,6 +20,7 @@ runs from the repository root; the outputs are from one run on the `pilot-mount`
 | `detached.mjs <dir> [tag …] [--mounts <n>]` | detached elements each component leaves alive after its removal ([Memory](#memory)) |
 | `retainers.mjs <dir> <tag> [paths] [--mounts <n>]` | the strong reference chains that keep a removed component alive |
 | `heap-diff.mjs <dir> <tag> [rounds]` | the kinds of object that grow between two heap snapshots of a tag's mounts |
+| `bench-heap.mjs <jfb clone> <page> [top]` | what a js-framework-benchmark row costs in the heap, by kind of object ([bench-heap.mjs](#bench-heapmjs)) |
 | `css-retention.mjs <css> [from to] \| --each … \| --inner …` | bisects a stylesheet for the rules that make Chromium keep removed elements |
 
 An **action** is `name[:arg,arg…]`, a call of the page's `window.__<name>(…args)`: `mount:conditions,100`
@@ -271,6 +272,22 @@ pdx-rich-text: 1000 mounts between the two snapshots
       2 KB  +     45    0.04/mount  code system / TrustedWeakFixedArray
       2 KB  +      1    0.00/mount  code (instruction stream for reapplyUiAttrs)
 ```
+
+### bench-heap.mjs
+
+What a row of js-framework-benchmark costs beyond its DOM (#1204): two snapshots of a framework's
+benchmark page, one with the table cleared and one after "Create 1,000 rows", diffed by kind of object,
+per row. The table is filled and cleared once first, so the code a row runs is loaded in both. The pages
+load their assets by absolute path from the benchmark's clone, so the clone is served; `pnpm bench:jfb`
+prints where it is. A build with `--minify false` names the closures (`read`, `run`, `dispose`).
+
+```
+node packages/showcase/tools/perf/bench-heap.mjs <jfb clone> frameworks/keyed/pdx/dist/index.html
+node packages/showcase/tools/perf/bench-heap.mjs <jfb clone> frameworks/keyed/vanillajs/index.html
+```
+
+Measured 2026-11-19: vanillajs adds 220 B of JS heap a row, PDX 2308 on `main` before #1204. Their DOM
+costs the same; PDX's difference is three signals and two effects a row.
 
 ### css-retention.mjs
 
