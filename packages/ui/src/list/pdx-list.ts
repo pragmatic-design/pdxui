@@ -102,7 +102,7 @@ component('pdx-list', {
             ctx.state('loading', loading);
             if (!blockEl) return;
             // Its element is in the overlay already; it upgrades when its module lands.
-            if (loading && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
+            if (loading && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
             blockEl.classList.toggle('pdx-block-ui-visible', loading);
             if (loading) blockEl.removeAttribute('aria-hidden');
             else blockEl.setAttribute('aria-hidden', 'true');

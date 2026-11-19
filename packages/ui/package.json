@@ -69,11 +69,6 @@
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
       "import": "./dist/avatar-group/pdx-avatar-group.js"
     },
-    "./spinner": {
-      "development": "./src/spinner/pdx-spinner.ts",
-      "types": "./dist/spinner/pdx-spinner.d.ts",
-      "import": "./dist/spinner/pdx-spinner.js"
-    },
     "./label": {
       "development": "./src/label/pdx-label.ts",
       "types": "./dist/label/pdx-label.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/divider/pdx-divider.pdx",
       "types": "./dist/divider/pdx-divider.d.ts",
       "import": "./dist/divider/pdx-divider.js"
+    },
+    "./spinner": {
+      "development": "./src/spinner/pdx-spinner.pdx",
+      "types": "./dist/spinner/pdx-spinner.d.ts",
+      "import": "./dist/spinner/pdx-spinner.js"
     },
     "./package.json": "./package.json"
   },

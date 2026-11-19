@@ -13,7 +13,7 @@ import './badge/pdx-badge.pdx';
 import './chip/pdx-chip';
 import './avatar/pdx-avatar.pdx';
 import './avatar-group/pdx-avatar-group';
-import './spinner/pdx-spinner';
+import './spinner/pdx-spinner.pdx';
 import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';

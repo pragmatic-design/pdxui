@@ -1,0 +1,127 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSpinner",
+  "tagName": "pdx-spinner",
+  "category": "Atoms",
+  "order": 8,
+  "description": "A loading indicator, drawn as a spinner, dots or a bar.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the\ncomponent renders, and spinner.css has nothing to key by it (decision 51's reasoning for\npdx-button-group's own props).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'spinner'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The accessible name. Empty means \"use the translated default\" — a prop default cannot be\na literal here, because the spinners the LIBRARY builds have no author to pass one: a\npdx-list puts a pdx-block-ui over itself while its source loads, and nothing on that path\nreaches the spinner inside it. An app in Italian would be left with an English \"Loading\"\nit could not override.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "showLabel",
+      "description": "Shows a text label beside the spinner.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showlabel"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px).",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md"
+    }
+  ],
+  "roles": [
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the\ncomponent renders, and spinner.css has nothing to key by it (decision 51's reasoning for\npdx-button-group's own props).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'spinner'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The accessible name. Empty means \"use the translated default\" — a prop default cannot be\na literal here, because the spinners the LIBRARY builds have no author to pass one: a\npdx-list puts a pdx-block-ui over itself while its source loads, and nothing on that path\nreaches the spinner inside it. An app in Italian would be left with an English \"Loading\"\nit could not override.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showlabel",
+      "fieldName": "showLabel",
+      "description": "Shows a text label beside the spinner.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px).",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The status (`role=\"status\"`), named by the label."
+    },
+    {
+      "name": "indicator",
+      "description": "The ring, the dots or the bar."
+    },
+    {
+      "name": "label",
+      "description": "The visible label, with `show-label`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-spinner-size"
+    },
+    {
+      "name": "--pdx-spinner-speed"
+    }
+  ]
+}

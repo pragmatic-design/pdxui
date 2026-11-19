@@ -28749,7 +28749,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/spinner/pdx-spinner.ts",
+      "path": "src/spinner/pdx-spinner.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -28885,7 +28885,7 @@
           "name": "pdx-spinner",
           "declaration": {
             "name": "PdxSpinner",
-            "module": "src/spinner/pdx-spinner.ts"
+            "module": "src/spinner/pdx-spinner.pdx"
           }
         }
       ]

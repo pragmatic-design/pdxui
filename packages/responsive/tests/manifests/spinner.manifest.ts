@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS.
  *
- * The source (ui/src/spinner/pdx-spinner.ts):
+ * The source (ui/src/spinner/pdx-spinner.pdx):
  *   - Sizes px: xs(12) sm(16) md(24) lg(32) xl(48). default 'md'.
  *   - The `variant` prop: 'spinner' (SVG), 'dots' (.pdx-dot), 'bar' (.pdx-progress). default 'spinner'.
  *   - DOM: <span data-part="root" role="status" aria-live="polite" :aria-label> > <span data-part="indicator">
