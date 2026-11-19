@@ -116,6 +116,22 @@ function overlaysOf(ast: TemplateNode[], modelsOf: ModelsLookup, propsOf: PropsL
     return out.sort((a, b) => a.start - b.start);
 }
 
+/**
+ * Whether `source[from, to)` holds only whitespace and whole HTML comments: two overlays with that
+ * between them are one run, since a comment loads nothing. A scan, one pass, no backtracking.
+ */
+function onlySpaceAndComments(source: string, from: number, to: number): boolean {
+    let i = from;
+    while (i < to) {
+        if (/\s/.test(source[i])) { i++; continue; }
+        if (!source.startsWith('<!--', i)) return false;
+        const close = source.indexOf('-->', i + 4);
+        if (close < 0 || close + 3 > to) return false;
+        i = close + 3;
+    }
+    return true;
+}
+
 /** The fix: the run's lines, indented one step more, inside `@defer (idle) { … }`. */
 function wrapInDefer(source: string, start: number, end: number): ValidationWarning['fix'] {
     const lineStart = source.lastIndexOf('\n', start - 1) + 1;
@@ -145,8 +161,7 @@ export function checkOverlaysNotDeferred(
         // An overlay inside one already found is in its run: the outer @defer covers it.
         if (last && o.start < last.end) continue;
         // Adjacent: nothing but whitespace and HTML comments between them — a comment loads nothing.
-        // Match: whitespace and whole HTML comments, nothing else.
-        if (last && /^(?:\s|<!--[\s\S]*?-->)*$/.test(source.slice(last.end, o.start))) runs[runs.length - 1].push(o);
+        if (last && onlySpaceAndComments(source, last.end, o.start)) runs[runs.length - 1].push(o);
         else runs.push([o]);
         last = o;
     }
