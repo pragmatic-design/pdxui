@@ -4,7 +4,7 @@
  *
  * The fixture, `tests/fixtures/host-labels/`, is a page of its own served by the dev server: a compiled
  * `.pdx` that names its inner field after its label through `self.labels`, and two descriptor
- * components, one form-associated and named by no label, one not form-associated.
+ * components, one form-associated and named by no label, one not form-associated, which has no labels.
  */
 import { test, expect, type Page } from './fixture';
 
@@ -43,8 +43,9 @@ test('one named by no label holds an empty list', async ({ page }) => {
     expect(await labelsOf(page, '#other')).toEqual([]);
 });
 
-test('one that is not form-associated holds an empty list, not an error, whatever labels point at it', async ({ page }) => {
-    expect(await labelsOf(page, '#plain')).toEqual([]);
+test('one that is not form-associated has no labels, as a native element that is not a form control, whatever labels point at it', async ({ page }) => {
+    // The form API is FormPdxElement's, the base of a form-associated component only (#1246).
+    expect(await labelsOf(page, '#plain')).toBeNull();
 });
 
 test('pdx-select: a <label for> its host names the combobox, read from its labels', async ({ page }) => {
