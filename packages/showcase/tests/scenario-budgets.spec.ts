@@ -71,6 +71,12 @@ import { scenarioDist } from './scenarios-build';
  * #1246's part 3a, HMR's bookkeeping behind DEV (the setup's signal map, the live-instance registry,
  * the state save and restore): hello 7.8 → 7.6, benchmark 13.0 → 12.8, crud 51.4 → 51.2, dashboard
  * 19.8 → 19.7, each budget the measurement + 0.3.
+ *
+ * #1246's part 3b, a prop's property the class's accessor instead of one defined on every instance at
+ * every mount: hello 7.6 → 7.9, benchmark 12.8 → 13.1, crud 51.2 → 51.4, dashboard 19.7 → 19.9, within
+ * the budgets above. The accessor is more code than the closures, once per app; a mount of 1,000
+ * components takes 0.73–0.80× the time and their removal 0.54–0.64× (the showcase's bundle budget has
+ * the measurements).
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 7.9, css: 0 },

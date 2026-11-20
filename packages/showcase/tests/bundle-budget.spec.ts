@@ -377,7 +377,15 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // entry 43.2 → 43.0, blocking 102.2 → 102.0, js 477.3 → 476.9 (#1246, part 3a): HMR's bookkeeping —
 // each setup's signal map, the live-instance registry, the state save and restore — behind DEV. The
 // built dist: entry 42.9 KB, blocking 101.9 KB, js 476.8 KB locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.0, js: 476.9, css: 67, blocking: 102.0 };
+// entry 43.0 → 43.2, js 476.9 → 477.1, blocking 102.0 → 102.2 (#1246, part 3b): a prop's property is
+// the class's accessor, defined once, not an accessor and two closures defined on every instance at
+// every mount. The accessor reads the instance's signals by index, and while unmounted holds a value
+// set early or defers to the HTMLElement member a prop is named after: more code than the closures,
+// once per app. What it buys, measured beside main in Chromium: 1,000 components with six props mount
+// in 0.73–0.80× the time and are removed in 0.54–0.64×; the filter popover's value list mounts in 0.91×
+// main's, the conditions and pdx-select in 0.94× (scenario-pilot-mount). The built dist: entry 43.1 KB,
+// blocking 102.1 KB, js 477.0 KB locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.2, js: 477.1, css: 67, blocking: 102.2 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

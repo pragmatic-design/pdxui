@@ -388,6 +388,15 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
          */
         _setupSignals: Map<string, Signal<unknown>> | null = null;
 
+        /**
+         * The props' signals, by the prop's index, which the class's accessors read and write (#1246,
+         * 3b): made by a mount, kept after it, so a later mount carries their values over.
+         */
+        _propSignals: Signal<unknown>[] | null = null;
+
+        /** The values set on a prop while the element had no signals yet: the next mount takes them. */
+        _propPending: Map<string, unknown> | null = null;
+
         constructor() {
             super();
             // Internals are attached once, for a form-associated component and for declared states.
@@ -452,21 +461,28 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
             // This ensures both patterns work:
             //   <pdx-stats total="6">                    → attribute
             //   <pdx-stats :total="store.stats().total"> → JS property via bindProperty
-            for (const name of propNames) {
+            // The property's accessor is the class's, defined once (`propAccessors`, #1246 3b): this
+            // mount gives it the signals it reads and writes, by the prop's index.
+            const prevSignals = this._propSignals;
+            const pending = this._propPending;
+            this._propPending = null;
+            const signals: Signal<unknown>[] = new Array(propNames.length);
+            this._propSignals = signals;
+            for (let i = 0; i < propNames.length; i++) {
+                const name = propNames[i];
                 const def = propDefs[name];
                 const isPropOnly = PROP_ONLY_TYPES.has(def.type);
                 // HTML lowercases attributes — read from lowercase key, or from an alias of it
                 const attrRaw = isPropOnly ? this.getAttribute(name.toLowerCase()) : attrValue(this, name.toLowerCase());
 
-                // Re-parent/reconnect: an earlier mount has already defined the accessor.
+                // Re-parent/reconnect: an earlier mount's signals are still the element's.
                 // Attributes survive the move in the DOM, values set through a JS property
                 // do not — without this carry-over `el.showActions = false` would go back to the default after
-                // a drawer or dialog re-parented the content. The previous getter reads
-                // the last propSig, so it returns the last known value.
+                // a drawer or dialog re-parented the content: the last signal holds the last known value.
                 const existingDesc = Object.getOwnPropertyDescriptor(this, name);
-                const carriedFromPrevMount = existingDesc?.get
-                    ? { value: existingDesc.get.call(this) }
-                    : null;
+                // By index: a hot update that changed the props has no previous signal for a new one.
+                const prevSignal = prevSignals?.[i];
+                const carriedFromPrevMount = prevSignal ? { value: prevSignal.peek() } : null;
 
                 const kebab = jsonPropKebab.get(name);
                 const initialRaw = attrRaw ?? (kebab ? this.getAttribute(kebab) : null);
@@ -476,6 +492,7 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                         ? coerce(initialRaw, def)
                         : resolveDefault(def);
                 const propSig = signal(initial);
+                signals[i] = propSig;
                 // A global attribute the browser acts on is read into the prop, then taken off the
                 // host. `stripping` marks our own removal, which Sync 1 must not read as
                 // the author's: removing an attribute resets a prop, or sets a Boolean to false.
@@ -523,39 +540,18 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 }
 
                 // Sync 2: JS property setter → update prop signal directly
-                // This is how :attr bindings from parent templates work.
-                // IMPORTANT: capture any pre-upgrade property value set before CE upgraded
-                const preUpgradeDesc = existingDesc;
-                const hasPreUpgrade = preUpgradeDesc && 'value' in preUpgradeDesc;
-                if (hasPreUpgrade) delete (this as unknown as Record<string, unknown>)[name]; // remove data property before defining accessor
-
-                Object.defineProperty(this, name, {
-                    get: () => propSig(),
-                    set: (value: unknown) => {
-                        const oldValue = propSig.peek();
-                        const coerced = value !== null && value !== undefined
-                            ? (typeof value === 'string' ? coerce(value, def) : value)
-                            : resolveDefault(def);
-                        // Use setRaw to avoid signal.set() treating functions as updaters
-                        propSig.setRaw(coerced as never);
-                        // Notify onPropsChange callbacks
-                        if (oldValue !== coerced && this._propsChangeCallbacks.length > 0) {
-                            for (const fn of this._propsChangeCallbacks) {
-                                fn([{ name, oldValue, newValue: coerced }]);
-                            }
-                        }
-                    },
-                    configurable: true,
-                });
-
-                // Apply pre-upgrade value through the new setter
-                if (hasPreUpgrade && preUpgradeDesc.value !== undefined) {
-                    (this as unknown as Record<string, unknown>)[name] = preUpgradeDesc.value;
-                }
+                // This is how :attr bindings from parent templates work: the class's accessor.
+                // A value set before this mount goes through it now — one set before the element was
+                // upgraded, an own data property over the accessor, or one the accessor held while
+                // the element was not mounted.
+                const hasPreUpgrade = existingDesc !== undefined && 'value' in existingDesc;
+                if (hasPreUpgrade) delete (this as unknown as Record<string, unknown>)[name];
+                const early = hasPreUpgrade ? existingDesc.value : pending?.get(name);
+                if (early !== undefined) (this as unknown as Record<string, unknown>)[name] = early;
 
                 // A required prop (`prop.required()`) the host did not set by the time it mounts (#123).
                 if (DEV && (def as PropSpec<unknown>).required && initialRaw === null && !carriedFromPrevMount
-                    && !(hasPreUpgrade && preUpgradeDesc.value !== undefined)) {
+                    && early === undefined) {
                     console.warn(`[pdx] <${tag}> mounted without its required prop '${name}'.`);
                 }
 
@@ -656,11 +652,61 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
         }
     }
 
+    // Each prop's property, once, on the class (#1246, 3b): it was an accessor and two closures defined
+    // on every instance at every mount — measured, a third of the mount's own time. After the check above,
+    // which reads the class's members before these are among them.
+    for (let i = 0; i < propNames.length; i++) {
+        const name = propNames[i];
+        const def = propDefs[name];
+        // A prop named after an HTMLElement member kept on purpose (`id`, `title`, `prefix`): unmounted,
+        // it is that member, as it was before the component had defined the prop on the instance.
+        const native = nativeDescriptor(PdxElement.prototype, name);
+        Object.defineProperty(Comp.prototype, name, {
+            get(this: Comp) {
+                const signals = this._propSignals;
+                if (signals) return signals[i]();
+                if (native?.get) return native.get.call(this);
+                return this._propPending?.get(name);
+            },
+            set(this: Comp, value: unknown) {
+                const signals = this._propSignals;
+                if (!signals) {
+                    if (native?.set) native.set.call(this, value);
+                    else (this._propPending ??= new Map()).set(name, value);
+                    return;
+                }
+                const propSig = signals[i];
+                const oldValue = propSig.peek();
+                const coerced = value !== null && value !== undefined
+                    ? (typeof value === 'string' ? coerce(value, def) : value)
+                    : resolveDefault(def);
+                // Use setRaw to avoid signal.set() treating functions as updaters
+                propSig.setRaw(coerced as never);
+                // Notify onPropsChange callbacks
+                if (oldValue !== coerced && this._propsChangeCallbacks.length > 0) {
+                    for (const fn of this._propsChangeCallbacks) {
+                        fn([{ name, oldValue, newValue: coerced }]);
+                    }
+                }
+            },
+            configurable: true,
+        });
+    }
+
     // HMR's state save and restore (#1246, part 3a): on the prototype in development only, where a hot
     // update reads them (`__pdx_hmr_save`, `__pdx_hmr_restore` call them only if they are there).
     if (DEV) Object.assign(Comp.prototype, HMR_STATE);
 
     define(tag, Comp as unknown as new () => PdxElement);
+}
+
+/** The accessor or value `name` has on `proto`'s chain, the nearest one, or null. */
+function nativeDescriptor(proto: object, name: string): PropertyDescriptor | null {
+    for (let p: object | null = proto; p; p = Object.getPrototypeOf(p)) {
+        const d = Object.getOwnPropertyDescriptor(p, name);
+        if (d) return d;
+    }
+    return null;
 }
 
 /** What a hot update keeps of an instance: its setup's signals, saved and restored by name. */
