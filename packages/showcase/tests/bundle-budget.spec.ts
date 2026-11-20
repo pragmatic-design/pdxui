@@ -374,7 +374,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // the devtools API out of the production bundle, every call into them behind DEV and the flush's
 // level-1 counters through hooks only `setTelemetryLevel` installs. The built dist: entry 43.1 KB,
 // blocking 102.1 KB, js 477.2 KB locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.2, js: 477.3, css: 67, blocking: 102.2 };
+// entry 43.2 → 43.0, blocking 102.2 → 102.0, js 477.3 → 476.9 (#1246, part 3a): HMR's bookkeeping —
+// each setup's signal map, the live-instance registry, the state save and restore — behind DEV. The
+// built dist: entry 42.9 KB, blocking 101.9 KB, js 476.8 KB locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.0, js: 476.9, css: 67, blocking: 102.0 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
