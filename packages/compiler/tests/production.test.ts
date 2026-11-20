@@ -144,7 +144,7 @@ let count = $signal(0);
         const prodCode = compileSFC(descriptor, ast, 'about.pdx', null, { production: true });
         // staticBlock is the markup built once and copied (#109), staticMarkup the HTML it is
         // written as (#369): nothing reactive.
-        expect(prodCode).toMatch(/^import \{ component, staticBlock, staticMarkup \} from '@pdxui\/core';/);
+        expect(prodCode).toMatch(/^import \{ defineComponent, staticBlock, staticMarkup \} from '@pdxui\/core';/);
         expect(prodCode).not.toMatch(/effect\(|bindInterpolation\(/);
     });
 });
@@ -772,7 +772,7 @@ describe('production output size benchmarks', () => {
         const { code: devCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(staticSrc, 'about.pdx', [], undefined, { production: true });
         expect(prodCode.length).toBeLessThanOrEqual(devCode.length);
-        expect(prodCode).toMatch(/^import \{ component, staticBlock, staticMarkup \} from '@pdxui\/core';/);
+        expect(prodCode).toMatch(/^import \{ defineComponent, staticBlock, staticMarkup \} from '@pdxui\/core';/);
     });
 
     it('dead signal elimination reduces output size', () => {

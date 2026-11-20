@@ -77,12 +77,17 @@ import { scenarioDist } from './scenarios-build';
  * the budgets above. The accessor is more code than the closures, once per app; a mount of 1,000
  * components takes 0.73–0.80× the time and their removal 0.54–0.64× (the showcase's bundle budget has
  * the measurements).
+ *
+ * #1246's part 3c, a compiled component defined with `defineComponent` and the features it declares
+ * (`expose`, `host`): an app whose components declare neither carries neither. hello 7.9 → 7.3,
+ * dashboard 19.9 → 19.3, benchmark 13.1 as it was; crud 51.4 → 51.5, the cost of the definition's
+ * indirection in an app whose components use both. Each budget the measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 7.9, css: 0 },
+    hello: { js: 7.6, css: 0 },
     benchmark: { js: 13.1, css: 0 },
-    crud: { js: 51.5, css: 1.6 },
-    dashboard: { js: 20.0, css: 21.9 },
+    crud: { js: 51.8, css: 1.6 },
+    dashboard: { js: 19.6, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the

@@ -45,7 +45,7 @@ afterAll(async () => {
 describe('a typed .pdx through the dev server', () => {
     it('is served as JavaScript: no type syntax, and it parses as a JS module', async () => {
         const code = (await server.transformRequest('/src/typed.pdx'))?.code ?? '';
-        expect(code, 'the server returned nothing').toContain('component(');
+        expect(code, 'the server returned nothing').toContain('defineComponent(');
         expect(code).not.toMatch(/interface User|as Record|a: string|<number>|import type/);
         // And it parses: the module as the browser gets it, read by the TypeScript parser.
         const sf = ts.createSourceFile('typed.js', code, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);

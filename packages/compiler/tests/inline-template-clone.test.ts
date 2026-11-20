@@ -31,7 +31,7 @@ function pick(id) {}
 `;
 
 const render = (code: string) => code.slice(code.indexOf('render:'));
-const hoisted = (code: string) => code.slice(0, code.indexOf("component('"));
+const hoisted = (code: string) => code.slice(0, code.indexOf("defineComponent('"));
 
 describe('a block clones its static DOM', () => {
     it('a row\'s static markup is built once, outside the render, and cloned in it', () => {

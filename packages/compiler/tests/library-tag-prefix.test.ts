@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os';
 import { pdx } from '../src/plugin';
 
 const SFC = '<template><p>x</p></template>\n<script>\n@prop label: string = \'\';\n</script>\n';
-const registered = (code: string) => /component\('([\w-]+)'/.exec(code)?.[1];
+const registered = (code: string) => /defineComponent\('([\w-]+)'/.exec(code)?.[1];
 
 let root: string | null = null;
 afterEach(() => { if (root) rmSync(root, { recursive: true, force: true }); root = null; });

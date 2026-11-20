@@ -259,6 +259,15 @@ export function assembleModule(
     if (setupBody.includes('__adoptStyles(')) imports.add('__adoptStyles');
     // The descriptor's `slots` below are core's `slot()`.
     if (slots.length > 0) imports.add('slot');
+    // The features the definition is given (#1246), and imported: the ones its declarations use, so a
+    // bundle carries no feature none of its components declares. `ctx.expose` is read from the emitted
+    // body, as `__adoptStyles` above; `host` is the descriptor's `host` and the variant axes it reflects.
+    const features: [string, string][] = [];
+    if (setupBody.includes('ctx.expose(')) features.push(['expose', 'exposeOnElement']);
+    if (hostCode || variantsCode) features.push(['host', 'bindHost']);
+    for (const [, fn] of features) imports.add(fn);
+    // None is no third argument: most components (every page) declare none, and pay nothing for it.
+    const featuresCode = features.length > 0 ? `, { ${features.map(([name, fn]) => `${name}: ${fn}`).join(', ')} }` : '';
 
     // @loader: lift the named function to module scope so the route below can reference it.
     // Done before the setup body is written out, and `loaderRef` records whether it worked —
@@ -327,7 +336,7 @@ export function assembleModule(
     code += generateStyles(descriptor, filename, production || ssr, target);
     code += hoistedLoader;
     if (hasModuleHoists) code += MODULE_HOISTS_SLOT + '\n';
-    code += `component(${jsQuote(tag)}, {\n`;
+    code += `defineComponent(${jsQuote(tag)}, {\n`;
     code += `  props: ${propsCode},\n`;
     // The descriptor's `models` (#124): props the component writes, each with its `<name>-change`.
     if (modelsCode) code += `  models: ${modelsCode},\n`;
@@ -365,7 +374,7 @@ export function assembleModule(
     code += setupBody + '\n';
     code += `  },\n`;
     code += `  ${frameMark(descriptor.template)}render: (ctx) => ${renderCode},\n`;
-    code += `});\n`;
+    code += `}${featuresCode});\n`;
 
     // Auto-register route from @page declaration — zero manual createRouter() needed
     if (route?.page) {

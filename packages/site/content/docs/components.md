@@ -677,6 +677,20 @@ descriptor and sets one with `ctx.state('expanded', true)`. The manifest lists a
 `cssStates`. Inside the component's own `<style scoped>` the host is not reachable yet, so `:state()`
 is written from a theme or the page.
 
+## A component carries the features it declares
+
+`@expose` and `@host` are features of the definition, and the code that implements them ships only
+with a component that declares them. A compiled `.pdx` is defined with core's
+`defineComponent(tag, descriptor, features)`, naming the features its declarations use: a component
+with an `@expose` passes `{ expose: exposeOnElement }`, and one with `@host` or `@variants` (whose axes
+are reflected on the host) passes `{ host: bindHost }`; one with neither passes nothing. An app none of
+whose components exposes anything does not carry `exposeOnElement`, and one with no host bindings does
+not carry `bindHost`.
+
+A component written in TypeScript is defined with `component(tag, descriptor)`, which is
+`defineComponent` with every feature, so a hand-written descriptor never names one. `defineComponent`
+given a `host` or variant axes without `{ host: bindHost }` throws in development.
+
 ## Icons: a page ships the ones it draws
 
 `<pdx-icon name="search">` needs no setup: the built-in set registers itself. It is not loaded whole.

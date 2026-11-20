@@ -322,7 +322,7 @@ function go() {}
         expect(render).not.toContain('html');
         expect(render.match(/bindInterpolation\(/g) ?? []).toHaveLength(1);
         // The static markup is built by the block's module-level builder (#109): the comment is not there either.
-        const builder = out.slice(0, out.indexOf("component('"));
+        const builder = out.slice(0, out.indexOf("defineComponent('"));
         expect(builds(builder, 'span')).toBe(true);
         expect(builder).not.toContain('draft');
         expect(builder).not.toContain('go');

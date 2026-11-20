@@ -16,7 +16,7 @@ const minimalPdx = `
 describe('compiler plugin system', () => {
     it('compiles normally without plugins', () => {
         const { code } = compile(minimalPdx, 'test.pdx');
-        expect(code).toContain("component('app-test'");
+        expect(code).toContain("defineComponent('app-test'");
     });
 
     it('transformScript hook modifies script before analysis', () => {
@@ -118,7 +118,7 @@ describe('compiler plugin system', () => {
 
         // Warning is logged to console but doesn't break compilation
         const { code } = compile(minimalPdx, 'test.pdx', [plugin]);
-        expect(code).toContain("component('app-test'");
+        expect(code).toContain("defineComponent('app-test'");
     });
 
     it('works with legacy mode too', () => {

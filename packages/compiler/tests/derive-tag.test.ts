@@ -1,6 +1,6 @@
 // One filename→tag rule, exported, and it gives a name the browser accepts.
 //
-// `App.pdx` must not compile to `component('app-App', …)`: a custom element name may not contain an
+// `App.pdx` must not compile to `defineComponent('app-App', …)`: a custom element name may not contain an
 // uppercase letter, so `customElements.define` throws and the component never exists. Four other
 // places derive the tag — the CLI's manifest and .d.ts, the LSP, the plugin's own-tag check — and
 // one rule keeps any of them from lowercasing where the compiler does not.
@@ -23,6 +23,6 @@ describe('deriveTag', () => {
 
     it('the compiled component registers a valid element name', () => {
         const { code } = compile('<template><p>x</p></template>\n', '/app/src/App.pdx');
-        expect(code).toContain("component('app-app'");
+        expect(code).toContain("defineComponent('app-app'");
     });
 });

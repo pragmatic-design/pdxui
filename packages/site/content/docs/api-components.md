@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 102 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 104 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -156,6 +156,18 @@ function autoUpdate(reference: HTMLElement | VirtualElement, floating: HTMLEleme
 
 Listen for scroll/resize events and call `update` whenever the position
 may have changed. Returns a Dispose function to remove listeners.
+
+## `bindHost`
+
+```ts
+import { bindHost } from '@pdxui/core';
+
+function bindHost(el: HTMLElement, host: HostBindings, ctx: unknown, track: (fn: () => void | (() => void)) => unknown): void
+```
+
+Apply a descriptor's `host` to its element. Static attributes are set unless the element already
+carries them — the page's `role` or `tabindex` wins. Bound ones are written in an effect, and a
+listener is added in one, so both stop when the component disconnects.
 
 ## `clearGlobalErrorHandlers`
 
@@ -414,6 +426,19 @@ Register a Custom Element. If already defined, swaps prototype for HMR.
 Where there is no custom element registry (Node: a build tool, a test, static generation) it
 registers nothing. Every compiled `.pdx` and every `@pdxui/ui` module calls `component()` when it is
 imported, so throwing here would make the whole module graph unimportable.
+
+## `defineComponent`
+
+```ts
+import { defineComponent } from '@pdxui/core';
+
+function defineComponent(tag: string, options: ComponentOptions<P, E, M, V>, features: ComponentFeatures = {}): void
+```
+
+Define a component with the features given and no other (#1246): the definition a compiled `.pdx`
+emits, naming the features its declarations use. A descriptor written by hand is defined with
+{@link component}, which carries every feature; given a declaration whose feature it was not given,
+this throws in development.
 
 ## `device`
 

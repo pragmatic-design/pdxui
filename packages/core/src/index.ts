@@ -194,7 +194,8 @@ export { generatedId } from './utils/generated-id';
 export { PdxElement, moveMounted } from './component/element';
 export type { EmitOptions } from './component/element';
 export { define, __pdx_hmr_swap, __pdx_hmr_rerender } from './component/define';
-export { component, __pdx_hmr_save, __pdx_hmr_restore } from './component/component';
+export { component, defineComponent, __pdx_hmr_save, __pdx_hmr_restore } from './component/component';
+export type { ComponentFeatures } from './component/component';
 export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, ComponentContextBase, TypedComponentContext, PropMap, ComponentDeclarations, EventMap, HostOf } from './component/component';
 export { prop, event, model, slot } from './component/component-descriptor';
 export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, ModelOptions, SlotSpec, EventDetail, EmitOf } from './component/component-descriptor';
@@ -217,6 +218,9 @@ export type { ComponentScope, PropChange } from './component/lifecycle';
 
 // Component Communication
 export { exposeOnElement } from './component/channel';
+
+// A feature `defineComponent` is given (#1246), beside `exposeOnElement`: what a compiled `.pdx` names for `@host`.
+export { bindHost } from './component/host';
 
 // Permissions
 export { setPermissions, hasPermission, requirePermission } from './component/permissions';

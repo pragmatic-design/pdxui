@@ -15,7 +15,7 @@ import { LANGUAGE_CHANGES } from '../src/language/changes';
 import { projectTagRenames } from '../src/language/app-prefix';
 
 const sfc = (script = '', template = '<p>x</p>') => `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
-const registered = (code: string) => /component\('([\w-]+)'/.exec(code)?.[1];
+const registered = (code: string) => /defineComponent\('([\w-]+)'/.exec(code)?.[1];
 
 describe('the tag a file derives', () => {
     it('is app- + the file name, a special file keeping its parent', () => {

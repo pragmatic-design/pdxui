@@ -25,7 +25,8 @@ export function compilePdx(src: string): { tag: string } {
     const ast = descriptor.template ? parseTemplate(descriptor.template.content, 1) : [];
     let code = compileSFC(descriptor, ast, filename);
 
-    const m = code.match(/component\(\s*['"]([a-z][a-z0-9-]*)['"]/);
+    // Match: the tag the module defines, `defineComponent('pg-1'` (#1246). Groups: [1]=the tag
+    const m = code.match(/\bdefineComponent\(\s*['"]([a-z][a-z0-9-]*)['"]/);
     if (!m) throw new Error('No component found. The playground compiles a single component (template + script setup).');
     const tag = m[1];
 

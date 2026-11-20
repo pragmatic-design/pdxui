@@ -18,7 +18,7 @@ function run(script: string, props: Record<string, unknown>) {
     const src = `<template><p></p></template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, 'peek-probe.pdx', [], undefined, {});
     let options: Options | undefined;
-    const fake = { ...core, component: (_tag: string, o: Options) => { options = o; } };
+    const fake = { ...core, defineComponent: (_tag: string, o: Options) => { options = o; } };
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(fake);
     const propSignals = Object.fromEntries(Object.entries(props).map(([k, v]) => [k, core.signal(v)]));

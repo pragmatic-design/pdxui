@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-490 value exports.
+492 value exports.
 
 ### `__adoptStyles`
 
@@ -595,6 +595,18 @@ Wire a gesture directive the compiler emits — `@__swipe` with `[direction, han
 and `@__pinch` with a handler — to the pointer gesture it names. `name` is the attribute without
 its `@`. False for any other name, which is an ordinary event. Both render paths call it: the
 template path's `bindAttribute` before its generic event branch, the inline path directly (#99).
+
+### `bindHost`
+
+```ts
+import { bindHost } from '@pdxui/core';
+
+function bindHost(el: HTMLElement, host: HostBindings, ctx: unknown, track: (fn: () => void | (() => void)) => unknown): void
+```
+
+Apply a descriptor's `host` to its element. Static attributes are set unless the element already
+carries them — the page's `role` or `tabindex` wins. Bound ones are written in an effect, and a
+listener is added in one, so both stop when the component disconnects.
 
 ### `bindInterpolation`
 
@@ -1714,6 +1726,19 @@ Register a Custom Element. If already defined, swaps prototype for HMR.
 Where there is no custom element registry (Node: a build tool, a test, static generation) it
 registers nothing. Every compiled `.pdx` and every `@pdxui/ui` module calls `component()` when it is
 imported, so throwing here would make the whole module graph unimportable.
+
+### `defineComponent`
+
+```ts
+import { defineComponent } from '@pdxui/core';
+
+function defineComponent(tag: string, options: ComponentOptions<P, E, M, V>, features: ComponentFeatures = {}): void
+```
+
+Define a component with the features given and no other (#1246): the definition a compiled `.pdx`
+emits, naming the features its declarations use. A descriptor written by hand is defined with
+{@link component}, which carries every feature; given a declaration whose feature it was not given,
+this throws in development.
 
 ### `delayTransport`
 

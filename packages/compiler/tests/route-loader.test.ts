@@ -106,7 +106,7 @@ describe('@loader reaches the route as a function', () => {
  */
 async function evaluateRoutes(code: string): Promise<Record<string, unknown>[]> {
     const core = {
-        component: () => {},
+        defineComponent: () => {},
         html: (s: TemplateStringsArray, ...v: unknown[]) => String.raw({ raw: s }, ...v),
         signal: (v: unknown) => Object.assign(() => v, { set: () => {}, peek: () => v }),
         __staticHTML: (s: string) => s,
