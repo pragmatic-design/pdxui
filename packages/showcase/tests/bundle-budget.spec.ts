@@ -385,7 +385,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // in 0.73–0.80× the time and are removed in 0.54–0.64×; the filter popover's value list mounts in 0.91×
 // main's, the conditions and pdx-select in 0.94× (scenario-pilot-mount). The built dist: entry 43.1 KB,
 // blocking 102.1 KB, js 477.0 KB locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.2, js: 477.1, css: 67, blocking: 102.2 };
+// entry 43.2 → 43.3, js 477.1 → 477.3, blocking 102.2 → 102.3 (#1246, part 3c): a compiled component is
+// defined with `defineComponent` and the features it declares, `{ expose, host }`, so an app whose
+// components declare neither carries neither (the hello scenario 8,064 → 7,508 B gzip). This app uses
+// both, through `@pdxui/ui`'s components, and pays the definition's indirection once and the features
+// object in each component that names one. The built dist: entry 43.2 KB, blocking 102.2 KB, js 477.2 KB
+// locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.3, js: 477.3, css: 67, blocking: 102.3 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

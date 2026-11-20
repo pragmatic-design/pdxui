@@ -37,7 +37,7 @@ function reset() { count = 5; }
 and here is what the compiler emits for it — not a paraphrase, the actual output:
 
 ```js
-import { bindInterpolation, component, computed, prop, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
+import { bindInterpolation, computed, defineComponent, exposeOnElement, prop, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
 
 // the template's static markup, as HTML → parsed once, on first render, then copied;
 // each <!----> is an empty text node the render binds
@@ -45,7 +45,7 @@ const __blk0=staticBlock(staticMarkup('<div><!----> <!----> <!----></div>'));
 // the walk → from the copy to the nodes the render binds, computed at compile time;
 // a block whose nodes sit at the same places shares it
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild;const n2=n1.nextSibling.nextSibling;const n3=n2.nextSibling.nextSibling;return [n1,n2,n3];};
-component('app-counter', {
+defineComponent('app-counter', {
   props: {
     label: prop('Hello')                             // @prop → declared prop + attribute sync;
                                                      //         its type, String, is the default's
@@ -73,7 +73,7 @@ component('app-counter', {
     bindInterpolation(__t3,()=>ctx.doubled());
     return __frag;
   })(),
-});
+}, { expose: exposeOnElement });                               // the features it uses: @expose's
 ```
 
 Three things to read off it. The variable you declared is now `__count` and every **read** of it —

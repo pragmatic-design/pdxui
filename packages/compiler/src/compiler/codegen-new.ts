@@ -33,7 +33,7 @@ export function compileNewMode(
     scriptOnly?: boolean,
 ): string {
     const production = ctx.production;
-    const imports = new Set<string>(['html', 'component']);
+    const imports = new Set<string>(['html', 'defineComponent']);
     for (const f of analysis.usedFeatures) imports.add(f);
     for (const name of analysis.coreImportNames) imports.add(name);
     // @fetch needs resource + getDefaultClient

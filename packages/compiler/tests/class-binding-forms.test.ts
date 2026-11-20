@@ -65,7 +65,7 @@ describe(':class specialised forms', () => {
     it('the generic routine reads its value through interpolationText: `a || b` is valid JavaScript', () => {
         const out = render('<p class="base" :class="name || other">s</p>');
         expect(out).toContain('interpolationText(ctx.name() || ctx.other())');
-        const body = out.replace(/^render: /, '').replace(/,\s*\}\);\s*$/, '');
+        const body = out.replace(/^render: /, '').replace(/,\s*\}(?:, \{[^}]*\})?\);\s*$/, '');
         expect(() => new Function('ctx', `return ${body}`), 'the render does not parse').not.toThrow();
     });
 });

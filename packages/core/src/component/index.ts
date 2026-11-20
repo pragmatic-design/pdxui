@@ -1,7 +1,8 @@
 // @pdxui/core/component — Web Component API, services, device detection
 export { PdxElement } from './element';
 export { define } from './define';
-export { component } from './component';
+export { component, defineComponent } from './component';
+export type { ComponentFeatures } from './component';
 export { context, provide, inject } from './context';
 export type { Context, ContextValue } from './context';
 export { setPermissions, hasPermission, requirePermission } from './permissions';

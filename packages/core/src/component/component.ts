@@ -264,6 +264,41 @@ export function component<P extends PropMap, S extends Record<string, unknown>, 
 export function component<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
     tag: string, options: ComponentOptions<P, E, M, V>): void;
 export function component<P extends PropMap, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>): void {
+    defineComponent(tag, options, EVERY_FEATURE);
+}
+
+/**
+ * The features of a definition a component may not use, each the function that implements it (#1246):
+ * {@link defineComponent} carries the ones it is given, so a bundle carries the modules of the features
+ * its components use, and no other.
+ */
+export interface ComponentFeatures {
+    /** `ctx.expose`: the methods and getters a parent reaches through a ref (`@expose`). */
+    expose?: typeof exposeOnElement;
+    /** The descriptor's `host` (`@host`), and the attributes that reflect its variant axes. */
+    host?: typeof bindHost;
+}
+
+/** What `component()` defines with: every feature, for a descriptor written by hand. */
+const EVERY_FEATURE: ComponentFeatures = { expose: exposeOnElement, host: bindHost };
+
+/**
+ * Define a component with the features given and no other (#1246): the definition a compiled `.pdx`
+ * emits, naming the features its declarations use. A descriptor written by hand is defined with
+ * {@link component}, which carries every feature; given a declaration whose feature it was not given,
+ * this throws in development.
+ */
+export function defineComponent<P extends PropMap, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+    tag: string, options: ComponentOptionsWithSetup<P, S, E, M, V>, features?: ComponentFeatures): void;
+export function defineComponent<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+    tag: string, options: ComponentOptions<P, E, M, V>, features?: ComponentFeatures): void;
+export function defineComponent<P extends PropMap, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>, features: ComponentFeatures = {}): void {
+    const { expose, host: hostFeature } = features;
+    // A descriptor whose `host` or variant axes nothing would bind: the definition was not given the
+    // host feature. The compiler gives it to every component that declares either.
+    if (DEV && !hostFeature && (Object.keys(options.host ?? {}).length > 0 || Object.keys(options.variants ?? {}).length > 0)) {
+        throw new Error(`[pdx] <${tag}>'s descriptor declares \`host\` or \`variants\`, and defineComponent was not given the host feature. Pass it ({ host: bindHost }), or define the component with component(), which carries every feature.`);
+    }
     // A model is a prop (#124): the same attribute, property and coercion, plus the event its own
     // writes dispatch. A prop and a model of one name would be two accessors on one property.
     const modelDefs = (options.models ?? {}) as Record<string, ModelSpec<unknown>>;
@@ -440,7 +475,9 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 },
                 track: (fn: () => void | (() => void), options?: EffectOptions) => this.track(fn, options),
                 frame: (fn: () => void) => this.frame(fn),
-                expose: (api: Record<string, unknown>) => exposeOnElement(this, api),
+                // `ctx.expose`, when the definition was given the feature (#1246). In the literal, so
+                // every context of the class has one shape: a property added after it would change it.
+                expose: expose ? (api: Record<string, unknown>) => expose(this, api) : undefined,
                 state: setState,
                 states: (map: Record<string, () => unknown>) => {
                     for (const name of Object.keys(map)) {
@@ -597,7 +634,7 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 }
                 // The host's declared attributes, bindings and listeners (#133), and its variant axes,
                 // after setup: a binding reads what setup returned, as the render does.
-                bindHost(this, host, ctx, (fn) => this.track(fn));
+                if (hostFeature) hostFeature(this, host, ctx, (fn) => this.track(fn));
                 // Register signals for HMR save/restore: development only, as HMR is (#1246, part 3a).
                 if (DEV) {
                     const signalMap = new Map<string, Signal<unknown>>();

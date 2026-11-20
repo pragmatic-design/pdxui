@@ -2,7 +2,7 @@
 // served too. Asserted against a real Vite dev server, not a stand-in.
 //
 // The failure it guards against: after the reload, the server serving
-// `component('pdx-x', { props: {}, render: … <div></div> })` — no setup — and ignoring every later
+// `defineComponent('pdx-x', { props: {}, render: … <div></div> })` — no setup — and ignoring every later
 // edit until a restart. The three ways a file comes into existence below are each served as the real
 // component and then as its edits. This file keeps that scripted repro so the claim cannot go stale.
 //
@@ -96,7 +96,7 @@ describe('a .pdx created while the dev server runs', () => {
 
         expect(await served('app.pdx'), 'the page that uses the tag imports the new module').toMatch(/import ["'][^"']*\/late-full\.pdx/);
         const first = await served('late-full.pdx');
-        expect(first).toContain("component('app-late-full'");
+        expect(first).toContain("defineComponent('app-late-full'");
         expect(first, 'the setup is compiled, not a stub').toContain('setup(ctx)');
         expect(first).toContain('full first version');
 
@@ -126,7 +126,7 @@ describe('a .pdx created while the dev server runs', () => {
         writeFileSync(join(root, 'src', 'late-stub.pdx'), STUB);
         await reported('add', 'late-stub.pdx');
         const stub = await served('late-stub.pdx');
-        expect(stub).toContain("component('app-late-stub'");
+        expect(stub).toContain("defineComponent('app-late-stub'");
         expect(stub, 'control — the stub really is a stub').not.toContain('stub first version');
 
         writeFileSync(join(root, 'src', 'late-stub.pdx'), V1('stub'));

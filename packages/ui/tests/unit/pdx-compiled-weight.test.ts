@@ -10,7 +10,11 @@
 // compiled modules were 1411 B and 8981 B (1.26×, 1.17×); after #1207, 1204 B and 7741 B (1.07×,
 // 1.01×). What is left, per construct, is in the pull request of #1207 and in PILOT.md. select 7741 →
 // 7746 B after #1237: one of its two lists is a value row (eachStatic, no item signal per row), the
-// other keeps eachRow, and the module imports both.
+// other keeps eachRow, and the module imports both. 1204 → 1243 B and 7746 → 7787 B with #1246 (3c):
+// a module names the features its declarations use, `defineComponent(…, { expose: exposeOnElement,
+// host: bindHost })`, so an app whose components use neither does not carry them (hello: 8064 → 7508 B).
+// Weighed here with every import external, the module pays the two imports' names; in an app's bundle
+// they are local identifiers, and the showcase's whole JavaScript grew 0.2 KB.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -27,8 +31,8 @@ const UI = join(__dirname, '..', '..');
 
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
-    'src/switch-toggle/pdx-switch.pdx': 1204,
-    'pilot/select.pdx': 7746,
+    'src/switch-toggle/pdx-switch.pdx': 1243,
+    'pilot/select.pdx': 7787,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

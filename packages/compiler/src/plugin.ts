@@ -587,7 +587,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 output = injectComponentImports(output, id, code, componentResolver, result.resolvedTemplate, shiftMap, result.internalTags);
 
                 // Tag collision detection: two .pdx files must not derive the same CE tag
-                const tagMatch = output.match(/component\('([\w-]+)'/);
+                // Match: the tag the module defines, `defineComponent('app-x'` (#1246). Groups: [1]=the tag
+                const tagMatch = output.match(/\bdefineComponent\('([\w-]+)'/);
                 if (tagMatch) {
                     const tag = tagMatch[1];
                     const existingFile = tagRegistry.get(tag);
@@ -1184,9 +1185,9 @@ function compileScriptOnly(
         scriptOnly: true,
     }, codegenAnalysis());
 
-    // Strip component() wrapper — extract imports + setup body as module exports
-    // Generated code shape: import {...} from '@pdxui/core';\n...component('tag', {\n  props: {},\n  setup(ctx) {\n    BODY\n  },\n  render: ...\n});\n
-    const componentIdx = code.indexOf("component('");
+    // Strip the defineComponent() wrapper — extract imports + setup body as module exports
+    // Generated code shape: import {...} from '@pdxui/core';\n...defineComponent('tag', {\n  props: {},\n  setup(ctx) {\n    BODY\n  },\n  render: ...\n}, { … });\n
+    const componentIdx = code.indexOf("defineComponent('");
     if (componentIdx !== -1) {
         const imports = code.slice(0, componentIdx).trim();
         // Extract setup body between setup(ctx) {\n and \n  },\n  render:
@@ -1199,10 +1200,10 @@ function compileScriptOnly(
             body = body.split('\n').map(l => l.startsWith('    ') ? l.slice(4) : l).join('\n');
             // Remove the auto-return: return { ... };
             body = body.replace(/\n\s*return\s*\{[^}]*\};\s*$/, '');
-            // Remove 'component' and 'html' from the core import specifier list (not
+            // Remove 'defineComponent' and 'html' from the core import specifier list (not
             // needed for a pure module). Only EXACT specifiers are removed — names like
             // `componentUtils` or `htmlEscape` must survive.
-            const cleanImports = stripImportSpecifiers(imports, ['component', 'html']);
+            const cleanImports = stripImportSpecifiers(imports, ['defineComponent', 'html']);
             code = cleanImports + '\n\n' + body.trim() + '\n';
         }
     }

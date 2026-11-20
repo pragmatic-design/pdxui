@@ -64,7 +64,7 @@ describe('compile() source map integration', () => {
   @prop name: string = 'World';
 </script>`, 'test.pdx');
 
-        expect(code).toContain('component(');
+        expect(code).toContain('defineComponent(');
         expect(map).toBeDefined();
         expect(map.version).toBe(3);
         expect(map.sources).toEqual(['test.pdx']);

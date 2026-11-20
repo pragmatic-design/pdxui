@@ -77,7 +77,7 @@ describe('a build with hydrate', () => {
     it('installs them before the app\'s own code runs', () => {
         const installed = on.js.search(/\binstallHydration\(\);/);
         expect(installed, 'not installed').toBeGreaterThan(-1);
-        expect(installed, 'a component is defined before hydration is installed').toBeLessThan(on.js.indexOf('component("app-card"'));
+        expect(installed, 'a component is defined before hydration is installed').toBeLessThan(on.js.indexOf('defineComponent("app-card"'));
         expect(installed).toBeLessThan(on.js.indexOf('app entry ran'));
     });
 

@@ -3,7 +3,7 @@
 // not exist (a `$signal` is emitted as `__page`), and a prop read only by the URL had no accessor.
 //
 // The component is compiled, and its setup run against the real core with two stand-ins: the
-// `component()` call is captured instead of defining an element, and the default HTTP client
+// `defineComponent()` call is captured instead of defining an element, and the default HTTP client
 // records the URLs it is asked for.
 
 import { describe, it, expect } from 'vitest';
@@ -20,12 +20,12 @@ function run(script: string, props: Record<string, unknown> = {}) {
     let options: Options | undefined;
     const fake = {
         ...core,
-        component: (_tag: string, o: Options) => { options = o; },
+        defineComponent: (_tag: string, o: Options) => { options = o; },
         getDefaultClient: () => ({ get: (url: string) => { requests.push(url); return Promise.resolve([]); } }),
     };
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(fake);
-    expect(options, 'the module did not call component()').toBeDefined();
+    expect(options, 'the module did not call defineComponent()').toBeDefined();
     const propSignals = Object.fromEntries(Object.entries(props).map(([k, v]) => [k, core.signal(v)]));
     const exposed = options!.setup({ ...propSignals, el: null, track: core.effect });
     return { requests, props: propSignals, exposed, code };
