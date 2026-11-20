@@ -389,8 +389,8 @@ export abstract class PdxElement extends HTMLElementBase {
                 this._watchLateSlots();
 
                 trackInstance(this.tagName.toLowerCase(), this);
-                registerComponent(this);
-                emitDevTools('component:mount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
+                if (DEV) registerComponent(this);
+                if (DEV) emitDevTools('component:mount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
                 this.connected();
                 for (const fn of this._mountCallbacks) fn();
             } finally {
@@ -416,7 +416,7 @@ export abstract class PdxElement extends HTMLElementBase {
             // once, and the framework's polling and timers start again (#269).
             this._frozenWithAncestor = false;
             if (this._scope) resumeScope(this._scope);
-            emitDevTools('component:show', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
+            if (DEV) emitDevTools('component:show', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             for (const fn of this._showCallbacks) fn();
         } else if (this._scope) {
             // Moved out with `_keepAlive` set only for the move — a parent taking its light-DOM children
@@ -442,7 +442,7 @@ export abstract class PdxElement extends HTMLElementBase {
             // A frozen page costs no CPU (#269): its effects are parked, its polling and timers paused.
             // After onHide, which may still write the state a resume reads.
             if (this._scope) suspendScope(this._scope);
-            emitDevTools('component:hide', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
+            if (DEV) emitDevTools('component:hide', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             return;
         }
 
@@ -451,8 +451,8 @@ export abstract class PdxElement extends HTMLElementBase {
         for (const fn of this._destroyCallbacks) fn();
         this.disconnected();
         untrackInstance(this.tagName.toLowerCase(), this);
-        unregisterComponent(this);
-        emitDevTools('component:unmount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
+        if (DEV) unregisterComponent(this);
+        if (DEV) emitDevTools('component:unmount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
         for (const d of this._disposers) d();
         this._disposers = [];
         this._attrHandlers = null;

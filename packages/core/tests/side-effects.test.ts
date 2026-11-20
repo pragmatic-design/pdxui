@@ -75,8 +75,9 @@ describe('sideEffects declarations', () => {
     // Calibration: the scanner is a heuristic, so pin what it finds in a package whose modules are
     // known. If this number moves, read the list before trusting anything else in this file.
     it('the scanner finds exactly the four side-effectful modules of core', () => {
-        // Each was opened and confirmed to run something at load: the two boot modules, and the
-        // `__PDX_DEVTOOLS__` global with its error listeners and the inspector's window global.
+        // Each was opened and confirmed to run something at load: the two boot modules, and, in
+        // development only, the `__PDX_DEVTOOLS__` global with its error listeners and the
+        // inspector's reading of the level asked for (CORE_UNDECLARED below).
         // `form/form-registry.ts` left the list in #244: its built-in controls are the registry's
         // initial value now, not registrations run at load. Seven more left it in #1246 —
         // viewport, adaptive, online, rtl, overlay-stack, context, style — each now starting on its
@@ -98,8 +99,6 @@ describe('sideEffects declarations', () => {
     const CORE_SIDE_EFFECTS: Record<string, string> = {
         'src/boot/theme.ts': 'restores the stored theme on <html>: what it is for, imported by the pdx() plugin into an app with the design system',
         'src/boot/splash.ts': 'takes the start-up splash down once the app is ready: imported into an app whose page has the splash',
-        'src/debug/inspector.ts': 'the inspector\'s window global; out of production builds in #1246\'s second part',
-        'src/debug/devtools-api.ts': 'the `__PDX_DEVTOOLS__` global and its error listeners; out of production builds in #1246\'s second part',
         'dist/boot-theme.es.js': 'the theme boot module, published',
         'dist/boot-theme.cjs': 'the theme boot module, published',
         'dist/boot-splash.es.js': 'the splash boot module, published',
@@ -108,6 +107,26 @@ describe('sideEffects declarations', () => {
         'dist/pragmatic-core.cjs': 'the root entry, published',
         'dist/pragmatic-core.iife.js': 'the CDN bundle: a script, nothing after it',
     };
+
+    /**
+     * Core's modules that do something at load and are NOT in `sideEffects`, on purpose, with the
+     * reason (#1246). Each does its work only in a development build, behind `DEV`, and is imported by
+     * what uses it, so it is loaded whenever it is needed; listed, it would be in every production
+     * bundle, which is what the second part of #1246 took out.
+     */
+    const CORE_UNDECLARED: Record<string, string> = {
+        'debug/inspector.ts': 'reads `?pdxdebug` and `pdx.telemetry` in development only; imported by the calls behind DEV and by `setTelemetryLevel`',
+        'debug/devtools-api.ts': 'the `__PDX_DEVTOOLS__` global and its error listeners, in development only; imported by the calls behind DEV',
+    };
+
+    it('core\'s undeclared load-time modules are the ones listed, each behind DEV', () => {
+        const found = sideEffectful(join(PACKAGES, 'core', 'src'));
+        for (const file of Object.keys(CORE_UNDECLARED)) {
+            expect(found, `${file} no longer does anything at load: take it off the list`).toContain(file);
+            const top = readFileSync(join(PACKAGES, 'core', 'src', file), 'utf8').split('\n').filter((l) => /^if \(/.test(l));
+            expect(top.every((l) => /^if \(DEV\b/.test(l)), `${file} does something at load that is not development-only: ${top.join(' | ')}`).toBe(true);
+        }
+    });
 
     it('core\'s sideEffects holds exactly the modules listed with a reason', () => {
         const pkg = JSON.parse(readFileSync(join(PACKAGES, 'core', 'package.json'), 'utf8')) as { sideEffects: string[] };
@@ -119,7 +138,9 @@ describe('sideEffects declarations', () => {
         const patterns = pkg.sideEffects as string[];
 
         it(`${name}: every module with a load-time effect is declared`, () => {
-            const missing = sideEffectful(join(dir, 'src')).filter(f => !covered(patterns, f));
+            const missing = sideEffectful(join(dir, 'src'))
+                .filter(f => !covered(patterns, f))
+                .filter(f => !(name === '@pdxui/core' && f in CORE_UNDECLARED));
             expect(missing, `${name} runs code at load in these, and declares itself pure for them`)
                 .toEqual([]);
         });

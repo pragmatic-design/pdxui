@@ -6,6 +6,7 @@
 
 import type { PdxElement } from '../component/element';
 import { DEV } from '../utils/env';
+import { setTelemetryHooks, type TelemetryHooks } from './telemetry-hooks';
 
 // ─── Telemetry Level ──────────────────────────────────────────────
 
@@ -39,8 +40,15 @@ if (DEV && typeof window !== 'undefined') {
     }
 }
 
-/** Set telemetry level. 0=off, 1=errors only (prod-safe), 2=full trace (dev). */
-export function setTelemetryLevel(level: TelemetryLevel): void { _level = level; }
+/**
+ * Set telemetry level. 0=off, 1=errors only (prod-safe), 2=full trace (dev). From level 1 the flushes,
+ * the effects that threw and the cycles broken are counted for `__pdx_debug.perf()`, in production too;
+ * level 2's registries and trace record in a development build only.
+ */
+export function setTelemetryLevel(level: TelemetryLevel): void {
+    _level = level;
+    setTelemetryHooks(level > 0 ? LEVEL_ONE : null);
+}
 /**
  * The current telemetry level: 0 off, 1 errors only (safe in production), 2 full trace (development).
  *
@@ -395,6 +403,9 @@ export function trackCycleDetection(): void {
     cycleDetections++;
 }
 
+/** What the flush reports to at level 1 and above: installed by `setTelemetryLevel`. */
+const LEVEL_ONE: TelemetryHooks = { flushStart, flushEnd, trackError, trackCycleDetection };
+
 // ─── Reconciliation metrics (called from list.ts) ─────────────────
 
 /** A cheap guard for the callers that BUILD the metrics object (list.ts):
@@ -587,3 +598,7 @@ export const __pdx_debug = {
 
 // `window.__PDX_DEVTOOLS__` — this namespace as `.debug`, and the agent API around it — is
 // installed by debug/devtools-api.ts, in development only.
+
+// A level asked for at load (`?pdxdebug`, `localStorage['pdx.telemetry']`, development only, read at
+// the top of this module): its hooks, installed now that they are defined.
+if (DEV && _level > 0) setTelemetryHooks(LEVEL_ONE);
