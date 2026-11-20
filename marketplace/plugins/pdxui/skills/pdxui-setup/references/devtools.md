@@ -22,6 +22,20 @@ So the devtools raise the level to 2 as the page loads, before your app runs, an
 the dev server puts their script first in the page for that reason. It only ships in `pdx dev`;
 `pdx build` strips it, so there's zero cost in production.
 
+One level is meant for production: **level 1** counts the flushes, the effects that threw and the
+cycles the runtime broke. An app that wants those numbers turns it on and reads them itself:
+
+```ts
+import { setTelemetryLevel, __pdx_debug } from '@pdxui/core';
+
+setTelemetryLevel(1);
+// later
+const { errorCount, cycleDetections, avgFlushTimeMs } = __pdx_debug.perf();
+```
+
+An app that never calls `setTelemetryLevel` carries none of the inspector in its production bundle.
+Level 2's registries and trace record in development only.
+
 ## The console namespace: `__PDX_DEVTOOLS__.debug`
 
 The overlay reads the object core installs in development, and you can use it in the console:
