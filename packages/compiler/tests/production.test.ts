@@ -541,7 +541,7 @@ let visible = $signal(true);
         expect(builds(code, 'div')).toBe(true);
     });
 
-    it('handles @for with the eachRow() helper', () => {
+    it('handles @for with a list helper, eachStatic for a row that reads its item as a value', () => {
         const source = `<template>
 @for (items as item; track item.id) {
   <div>{{ item.name }}</div>
@@ -551,7 +551,7 @@ let visible = $signal(true);
 let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'inline-for.pdx', [], undefined, { production: true });
-        expect(code).toContain('eachRow(');
+        expect(code).toContain('eachStatic(');
         expect(builds(code, 'div')).toBe(true);
     });
 

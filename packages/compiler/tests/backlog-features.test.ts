@@ -48,7 +48,8 @@ describe('@for with index variable', () => {
 @prop items: any[] = [];
 </script>`;
         const { code } = compile(source, 'for-no-idx.pdx');
-        expect(code).toContain('eachRow(');
+        // A value row (#1237): its item read as a value, the row updated in place on a new item.
+        expect(code).toContain('eachStatic(');
         // Callback should have only item (no trailing comma)
         expect(code).toMatch(/\(item\)\s*=>/);
     });

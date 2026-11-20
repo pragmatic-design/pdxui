@@ -1022,8 +1022,8 @@ any other key is a function, `(item, i) => …`. Rows are moved, not rebuilt, by
 reconciliation. `@empty` is given to the list (`eachRow(…, transitions, listEmpty(() => …))`), which
 renders it between its markers while it has no row, in its own scope, disposed when the first row
 comes (#1233). A source that is `null` or `undefined` shows `@empty`, like an empty array. A list
-without `@empty` does not carry its code into a bundle, nor does a list without static rows carry
-theirs.
+without `@empty` does not carry its code into a bundle, nor does a list without static or value rows
+carry theirs.
 
 **A static row** (#1233) is built once from its item, with nothing reactive in it, and compiles to
 `eachStatic(…)`: each binding is written once, there is no item signal, and no scope is kept unless
@@ -1037,13 +1037,26 @@ something in the row registers one. A row is static when every value it binds, i
 A static row is reconciled by key like any other. A row whose key stays with the same item keeps its
 node, and a moved row moves. A row whose key stays with a **different** item is built again in its
 place, since nothing in it could update. Event handlers do not change this: they run when the event
-fires. A row stays reactive, as `eachRow`, when any of these holds:
+fires, unless one reads the index (a static row's index is where it was built). A row is not static
+when any of these holds:
 - it reads the index, a prop, a `$signal`, a `$derived` or a store;
-- it reads a member of the item: `{{ item.name }}` stays reactive, because an item may be a `$store`
-  proxy changed in place;
+- it reads a member of the item: `{{ item.name }}` keeps its binding, because an item may be a
+  `$store` proxy changed in place;
 - it calls a function, which may read a signal;
 - it holds a block (`@if`, a nested `@for`…), a `::` two-way binding, a `:ref`, a `:show`, an
   `attach:` or a pipe;
+- the `@for` has a `@transition` or `@virtual`.
+
+**A value row** (#1237) is one of those that is not static but still reads its item as a value: it
+compiles to `eachStatic(…)` too, with no item signal, and every binding keeps its effect. A binding
+that reads a signal, a prop or a `$store` proxy's member stays subscribed. A row whose key stays with
+a **different** item — an immutable update, `rows[i] = { ...rows[i], label }` — keeps its nodes: the
+new item is written to the row and its bindings run again on it, as a reactive row's do when its item
+signal is set. Measured on js-framework-benchmark, against the item signal: script time −21% creating
+1,000 rows, −29% updating every tenth. A row stays reactive, as `eachRow`, when any of these holds:
+- it reads the index, in a binding or a handler: the index follows the row when it moves;
+- it holds a block (`@if`, a nested `@for`…), whose bindings running the row again could not reach;
+- it holds a `::` two-way binding, which writes through the item;
 - the `@for` has a `@transition` or `@virtual`.
 
 To make a row static, compute what it shows in a `$derived` and loop over that:

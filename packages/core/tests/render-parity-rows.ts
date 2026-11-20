@@ -179,6 +179,21 @@ export const ROWS: Row[] = [
         script: "let items = $signal(['a', 'b', 'c']);",
         act: async (h) => { click('button')(h); await settle(); },
     },
+    // Value rows (#1237): the item a value, the bindings of its members kept as effects. Over a $store
+    // proxy changed in place the member read subscribes and the row follows; over a $signal updated by
+    // a new object the row is built again with it.
+    {
+        name: '@for value rows over a $store, a member changed in place', expected: '<ul><li>b</li></ul><button>x</button>',
+        template: "<ul>@for (s.rows as r; track r.id) { <li>{{ r.label }}</li> }</ul><button @click=\"s.rows[0].label = 'b'\">x</button>",
+        script: "let s = $store({ rows: [{ id: 1, label: 'a' }] });",
+        act: async (h) => { click('button')(h); await settle(); },
+    },
+    {
+        name: '@for value rows over a $signal, an item replaced by a new object', expected: '<ul><li>b</li><li>c</li></ul><button>x</button>',
+        template: "<ul>@for (rows as r; track r.id) { <li>{{ r.label }}</li> }</ul><button @click=\"rows = rows.map(x => x.id === 1 ? { ...x, label: 'b' } : x)\">x</button>",
+        script: "let rows = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'c' }]);",
+        act: async (h) => { click('button')(h); await settle(); },
+    },
     // With rows, as the server renders it (#160): the rows' branch is what a build writes.
     { name: '@for with @empty, with rows', expected: '<ul><li>a</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: "let items = $signal(['a']);" },
     // #283: no template-path recording exists — it landed after #238. happy-dom lays nothing out, so

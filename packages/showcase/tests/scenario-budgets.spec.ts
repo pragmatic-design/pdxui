@@ -51,12 +51,18 @@ import { scenarioDist } from './scenarios-build';
  * `component()` imported the html`` engine for `ctx.slot()`'s default, so every app carried it; with
  * the alpha slots' runtime removed it is not imported, and a bundler drops it from an app that never
  * writes html``. Measured with the import put back: the two came back to 17.9 and 23.7.
+ *
+ * Raised for value rows (#1237, owner's OK): benchmark js 14.4 → 14.8, crud 52.1 → 52.2, dashboard
+ * 20.9 → 21.1. A row that reads its item as a value is an eachStatic row now, updated in place for
+ * a new item, so these apps carry list-static.ts and core's collectRowRuns. What it buys, on
+ * js-framework-benchmark's script time (median of 3 runs): create 1k 7.8 → 6.2 ms, replace 14.7 →
+ * 11.9, update every 10th 4.8 → 3.4, append 7.4 → 6.5.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 4.2, css: 0 },
-    benchmark: { js: 14.4, css: 0 },
-    crud: { js: 52.1, css: 1.6 },
-    dashboard: { js: 20.9, css: 21.9 },
+    benchmark: { js: 14.8, css: 0 },
+    crud: { js: 52.2, css: 1.6 },
+    dashboard: { js: 21.1, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the

@@ -32,20 +32,35 @@ describe('a @for row that follows only from its item', () => {
     });
 });
 
-describe('the rows that stay reactive', () => {
+// A value row (#1237): its item a value, as a static row's is, but its bindings keep their effect —
+// over a $store proxy its member reads subscribe, and a new item for its key runs them again in place.
+describe('a value row: the item a value, its other bindings reactive', () => {
+    for (const [why, template, binding] of [
+        ['a prop', '<ul>@for (keys as key; track key) { <li>{{ symbols ? key : "" }}</li> }</ul>', /bindInterpolation\(__t\d+,\(\)=>__li\d+_symbols\(\) \? key\(\) : ""\)/],
+        ['a call', '<ul>@for (keys as key; track key) { <li>{{ key.toUpperCase() }}</li> }</ul>', /bindInterpolation\(__t\d+,\(\)=>key\(\)\.toUpperCase\(\)\)/],
+        ['a member of the item, which a $store proxy keeps reactive', '<ul>@for (keys as key; track key) { <li>{{ key.length }}</li> }</ul>', /bindInterpolation\(__t\d+,\(\)=>key\(\)\.length\)/],
+        ['a pipe', '<ul>@for (keys as key; track key) { <li>{{ key | uppercase }}</li> }</ul>', /bindInterpolation\(__t\d+,\(\)=>templatePipe\(key\(\), __li\d+_uppercase\(\)\)\)/],
+    ] as const) {
+        it(`one that reads ${why}: eachStatic, the binding with its effect`, () => {
+            const out = render(template);
+            expect(out).toContain('eachStatic(');
+            expect(out).toMatch(binding);
+        });
+    }
+});
+
+describe('the rows that keep their item signal', () => {
     for (const [why, template] of [
-        ['a prop', '<ul>@for (keys as key; track key) { <li>{{ symbols ? key : "" }}</li> }</ul>'],
-        ['a call, which may read a signal', '<ul>@for (keys as key; track key) { <li>{{ key.toUpperCase() }}</li> }</ul>'],
-        ['a member of the item, which a $store proxy would make reactive', '<ul>@for (keys as key; track key) { <li>{{ key.length }}</li> }</ul>'],
-        ['the index', '<ul>@for (keys as key, i; track key) { <li>{{ i }}</li> }</ul>'],
-        ['a block inside', '<ul>@for (keys as key; track key) { @if (key) { <li>{{ key }}</li> } }</ul>'],
-        ['a two-way binding', '<ul>@for (keys as key; track key) { <input ::value="symbols" /> }</ul>'],
-        ['a pipe', '<ul>@for (keys as key; track key) { <li>{{ key | uppercase }}</li> }</ul>'],
+        ['the index, which follows the row when it moves', '<ul>@for (keys as key, i; track key) { <li>{{ i }}</li> }</ul>'],
+        ['the index in a handler, which must see where the row is now', '<ul>@for (keys as key, i; track key) { <li @click="symbols = i > 0">{{ key }}</li> }</ul>'],
+        ['a block inside, whose bindings running the row again cannot reach', '<ul>@for (keys as key; track key) { @if (key) { <li>{{ key }}</li> } }</ul>'],
+        ['a two-way binding, which writes through the item','<ul>@for (keys as key; track key) { <input ::value="symbols" /> }</ul>'],
+        ['the index of an outer loop an inner one names again', '<ul>@for (keys as key, i; track key) { @for (keys as k, i; track k) { <li>{{ k }}</li> } }</ul>'],
     ] as const) {
         it(`one that reads ${why}`, () => {
             const out = render(template);
-            expect(out).toContain('eachRow(');
-            expect(out).not.toContain('eachStatic(');
+            expect(out.indexOf('eachRow(')).toBeGreaterThan(-1);
+            expect(out.slice(0, out.indexOf('eachRow(')), 'the outer row became a value row').not.toContain('eachStatic(');
         });
     }
 });

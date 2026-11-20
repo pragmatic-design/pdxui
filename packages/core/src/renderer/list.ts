@@ -24,7 +24,12 @@ export interface MappedItem<T> {
     dispose: (() => void) | null;
     /** Row mode only: the signals behind the getters the row was rendered with. */
     row?: RowSignals<T>;
+    /** A static or value row (list-static.ts): the item its getter answers, and its effects. */
+    cell?: RowCell<T>;
 }
+
+/** A static or value row's item (list-static.ts), and the effects a new item runs again — null when none can. */
+export interface RowCell<T> { item: T; runs: (() => void)[] | null }
 
 export interface RowSignals<T> { item: Signal<T>; index: RowIndex }
 
@@ -69,9 +74,11 @@ export type RowRenderer<T> =
         static?: StaticRows<T>;
     };
 
-/** How a static row is built, and built again in its place for a new item (list-static.ts). */
+/** How a static or value row is built, updated for a new item, or built again in its place (list-static.ts). */
 export interface StaticRows<T> {
-    build(item: T, i: number): [Node, (() => void) | undefined];
+    build(item: T, i: number): [Node, (() => void) | undefined, RowCell<T>];
+    /** A value row given its new item in place; false when the row cannot be, and is built again. */
+    update(m: MappedItem<T>, item: T): boolean;
     rebuild(m: MappedItem<T>, item: T, i: number): MappedItem<T>;
 }
 
@@ -196,12 +203,12 @@ export function followList<T>(
             for (let i = 0; i < n; i++) { if (keys[i] !== prevKeys[i]) { same = false; break; } }
             if (same && renderer.mode === 'getters') {
                 // Same keys, same positions: only the objects may have been replaced. Move each
-                // reused row's getter to its new object; its bindings re-run, its DOM stays. A static
-                // row cannot update: it is built again in its place.
+                // reused row's getter to its new object; its bindings re-run, its DOM stays. A value
+                // row is updated in its cell; a static row cannot update: it is built again in its place.
                 for (let i = 0; i < n; i++) {
                     const m = mapped[i];
                     if (m.item === list[i]) continue;
-                    if (statics) mapped[i] = statics.rebuild(m, list[i], i);
+                    if (statics) { if (!statics.update(m, list[i])) mapped[i] = statics.rebuild(m, list[i], i); }
                     else { m.item = list[i]; m.row?.item.setRaw(list[i]); }
                 }
                 return;
@@ -263,9 +270,10 @@ export function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i:
     let row: RowSignals<T> | undefined;
     let node: Node;
     let dispose: (() => void) | undefined;
+    let cell: RowCell<T> | undefined;
     if (renderer.mode === 'getters' && renderer.static) {
-        // A static row (#1233, list-static.ts): no item signal, no scope unless it registers one.
-        [node, dispose] = renderer.static.build(item, i);
+        // A static or value row (#1233, #1237, list-static.ts): no item signal, no scope unless it registers one.
+        [node, dispose, cell] = renderer.static.build(item, i);
     } else if (renderer.mode === 'getters') {
         const r: RowSignals<T> = { item: signal(item), index: rowIndex(i) };
         row = r;
@@ -280,7 +288,7 @@ export function createRow<T>(renderer: RowRenderer<T>, key: unknown, item: T, i:
     // of a list, which the outline may summarise — controls that merely share a role are not.
     // Development only: a production row carries no marker.
     if (DEV) for (const n of nodes) if (n.nodeType === 1) (n as Element).setAttribute('data-pdx-item', '');
-    return { key, item, nodes, dispose: dispose ?? null, row };
+    return { key, item, nodes, dispose: dispose ?? null, row, cell };
 }
 
 /**
@@ -364,7 +372,7 @@ function reconcile<T>(
             for (let i = 0; i < oldLen; i++) {
                 const kept = result[i];
                 if (kept.item === newItems[i]) continue;
-                if (statics) result[i] = statics.rebuild(kept, newItems[i], i);
+                if (statics) { if (!statics.update(kept, newItems[i])) result[i] = statics.rebuild(kept, newItems[i], i); }
                 else { kept.item = newItems[i]; kept.row?.item.setRaw(newItems[i]); }
             }
             // More new rows than one task should make (#242): a first slice now, the rest in slices
@@ -424,9 +432,10 @@ function reconcile<T>(
         const key = newKeys[i];
         const existing = oldMap.get(key);
 
-        if (existing && statics && existing.item !== newItems[i]) {
+        if (existing && statics && existing.item !== newItems[i] && !statics.update(existing, newItems[i])) {
             // A static row whose item was replaced cannot update: it leaves as a removed row does
-            // (below, from oldMap), and a new row is built for the key.
+            // (below, from oldMap), and a new row is built for the key. A value row was updated in
+            // place, and is reused below.
             newMapped[i] = createRow(renderer, key, newItems[i], i);
             lisPositions[i] = -1;
         } else if (existing) {
