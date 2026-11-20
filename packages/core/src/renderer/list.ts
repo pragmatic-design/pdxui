@@ -324,8 +324,9 @@ function reconcile<T>(
     slice?: SliceRest<T>
 ): MappedItem<T>[] {
     // Telemetry only when tracking is on — it avoids 2× performance.now()
-    // + a filter and allocations for every reconciliation in production.
-    const trackingOn = isReconcileTrackingEnabled();
+    // + a filter and allocations for every reconciliation in production. Level 2, development only
+    // (#1246): behind DEV, a production bundle carries none of the inspector.
+    const trackingOn = DEV && isReconcileTrackingEnabled();
     const reconcileStart = trackingOn ? performance.now() : 0;
     // A static row whose kept key has a new item is built again (#1233, list-static.ts).
     const statics = renderer.mode === 'getters' ? renderer.static : undefined;
@@ -357,7 +358,7 @@ function reconcile<T>(
     if (newLen === 0 && oldLen > 0 && !transitions?.exit && startMarker.parentNode === parent) {
         for (const m of oldMapped) m.dispose?.();
         clearBetween(parent, startMarker, endMarker);
-        if (trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: 0, reused: 0, added: 0, removed: oldLen, moved: 0, lisLength: 0, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
+        if (DEV && trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: 0, reused: 0, added: 0, removed: oldLen, moved: 0, lisLength: 0, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
         return [];
     }
 
@@ -394,7 +395,7 @@ function reconcile<T>(
                     for (const n of result[i].nodes) void enterRow(n, transitions.enter, stagger * (i - oldLen));
                 }
             }
-            if (trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: newLen, reused: oldLen, added: newLen - oldLen, removed: 0, moved: 0, lisLength: oldLen, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
+            if (DEV && trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: newLen, reused: oldLen, added: newLen - oldLen, removed: 0, moved: 0, lisLength: oldLen, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
             return result;
         }
     }
@@ -527,7 +528,7 @@ function reconcile<T>(
     }
 
     // Telemetry: track reconciliation metrics (only with tracking on)
-    if (trackingOn) {
+    if (DEV && trackingOn) {
         let reusedCount = 0;
         for (let i = 0; i < newLen; i++) { if (lisPositions[i] >= 0) reusedCount++; }
         const movedCount = newMapped.length - lisSet.size - (newLen - reusedCount);

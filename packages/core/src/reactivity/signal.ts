@@ -9,7 +9,8 @@
 
 import { DEV } from '../utils/env';
 import type { Signal, ReadonlySignal, HistorySignal, SignalOptions, Subscriber, Dispose } from '../utils/types';
-import { registerSignal, registerEffect, noteEffectDeps, unregisterEffect, registerReactiveNode, nameSubscriber, notifyTrace, effectRunTrace, emitDevTools, flushStart, flushEnd, trackError, trackCycleDetection } from '../debug/inspector';
+import { registerSignal, registerEffect, noteEffectDeps, unregisterEffect, registerReactiveNode, nameSubscriber, notifyTrace, effectRunTrace, emitDevTools } from '../debug/inspector';
+import { telemetryHooks } from '../debug/telemetry-hooks';
 import { dispatchGlobalError, ownerContext } from '../component/global-error';
 import { devOwnedNode, devRecordError } from '../debug/devtools-api';
 
@@ -529,7 +530,8 @@ function createSignal<T>(
     const unchanged = (next: T): boolean => (equals ? equals(value, next) : Object.is(value, next));
     exposeSubscribers?.(subscribers);
 
-    if (name) registerSignal(name, () => value, () => subscribers.size);
+    // The inspector's registries are development's (#1246): behind DEV, a production bundle names none.
+    if (DEV && name) registerSignal(name, () => value, () => subscribers.size);
 
     const read = () => {
         const t = currentTracker;
@@ -561,7 +563,7 @@ function createSignal<T>(
         if (unchanged(resolved)) return;
         const oldValue = value;
         value = resolved;
-        if (name) {
+        if (DEV && name) {
             notifyTrace(name, oldValue, resolved);
             emitDevTools('signal:change', { name, oldValue, newValue: resolved });
         }
@@ -574,7 +576,7 @@ function createSignal<T>(
         if (unchanged(next)) return;
         const oldValue = value;
         value = next;
-        if (name) {
+        if (DEV && name) {
             notifyTrace(name, oldValue, next);
             emitDevTools('signal:change', { name, oldValue, newValue: next });
         }
@@ -585,7 +587,7 @@ function createSignal<T>(
 
     // The accessor and its subscriber Set, so `__pdx_debug.deps` can name this signal when a
     // computed lists it, and `__pdx_debug.subscribers` can say who is listening.
-    registerReactiveNode(read, name || '(unnamed)', subscribers);
+    if (DEV) registerReactiveNode(read, name || '(unnamed)', subscribers);
     // Created in a component's setup: part of that instance's state for `inspect()`.
     if (DEV && name) devOwnedNode('state', name, read);
 
@@ -723,7 +725,7 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
     // `markDirty`, which is what a source holds — who is listening to a source. `deps` is read
     // lazily, so the list is always the last run's rather than a snapshot of some earlier one.
     const debugName = options?.name ?? '';
-    nameSubscriber(markDirty, debugName || '(anonymous computed)');
+    if (DEV) nameSubscriber(markDirty, debugName || '(anonymous computed)');
 
     // Tag so notifySet propagates this synchronously instead of queuing it as an effect.
     (markDirty as { __pdx_mark?: boolean }).__pdx_mark = true;
@@ -771,7 +773,7 @@ export function computed<T>(fn: () => T, options?: ComputedOptions<T>): Readonly
 
     // The inspector, both ways: `deps` is a GETTER over the live list, so the answer
     // is always the last run's, and the subscriber Set makes this computed answerable too.
-    registerReactiveNode(read, debugName || '(anonymous computed)', subscribers, () => tracker.deps, () => dirty);
+    if (DEV) registerReactiveNode(read, debugName || '(anonymous computed)', subscribers, () => tracker.deps, () => dirty);
     if (DEV && debugName) devOwnedNode('derived', debugName, read);
 
     // An ownership scope: without a disposer, a computed created in a subtree that is
@@ -853,7 +855,7 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
             currentTracker = prevTracker;
             currentComputedReads = prevComputedReads;
             endTracking(tracker);
-            if (inspected) noteEffectDeps(inspected.record, tracker.deps);
+            if (DEV && inspected) noteEffectDeps(inspected.record, tracker.deps);
         }
     };
     const tracker = newTracker(run);
@@ -874,7 +876,7 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     // telemetry level 2, like signals.
     const name = options?.name;
     if (name) (run as { __pdx_name?: string }).__pdx_name = name;
-    const inspected = registerEffect(name ?? '(anonymous)', run);
+    const inspected = DEV ? registerEffect(name ?? '(anonymous)', run) : null;
     // A value row's own binding (#1237, collectRowRuns): kept, to run again for the row's next item.
     let rowRun = false;
     if (rowRuns !== null) {
@@ -886,7 +888,7 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     const dispose: Dispose = () => {
         if (disposed) return;
         disposed = true;
-        if (inspected) unregisterEffect(inspected.id);
+        if (DEV && inspected) unregisterEffect(inspected.id);
         for (let i = 0; i < cleanups.length; i++) cleanups[i]();
         cleanups = [];
         for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(run);
@@ -1036,10 +1038,12 @@ const flushPool: Subscriber[][] = [];
  */
 function flush(): void {
     let iterations = 0;
-    const startTime = flushStart();
+    // Level-1 telemetry, when an app turned it on: hooks the inspector installs (#1246), read once.
+    const telemetry = telemetryHooks;
+    const startTime = telemetry !== null ? telemetry.flushStart() : 0;
     while (pendingLen > 0) {
         if (++iterations > MAX_FLUSH_ITERATIONS) {
-            trackCycleDetection();
+            telemetry?.trackCycleDetection();
             console.error(
                 `[pdx] Infinite reactive loop detected (${MAX_FLUSH_ITERATIONS} flush cycles). ` +
                 'This usually means an effect writes to a signal it reads. Breaking cycle.'
@@ -1074,10 +1078,10 @@ function flush(): void {
                 if (!shouldRun(arr[i])) continue;
                 const effectName = (arr[i] as { __pdx_name?: string }).__pdx_name ?? 'anonymous';
                 try {
-                    effectRunTrace(effectName);
+                    if (DEV) effectRunTrace(effectName);
                     arr[i]();
                 } catch (err) {
-                    trackError(effectName, err);
+                    telemetry?.trackError(effectName, err);
                     // Prefer the route captured at THIS effect's creation (correct owner) — a
                     // boundary, or the boundary enclosing its component NOW; fall back to the
                     // current stack, then the global handler.
@@ -1104,7 +1108,7 @@ function flush(): void {
         arr.length = 0;
         if (flushPool.length < 4) flushPool.push(arr);
     }
-    flushEnd(startTime);
+    telemetry?.flushEnd(startTime);
 }
 
 // --- Ref ---

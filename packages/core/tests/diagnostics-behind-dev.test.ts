@@ -109,3 +109,59 @@ describe('a diagnostic costs nothing in production', () => {
         }
     });
 });
+
+// ─── The inspector and the devtools API are development's (#1246) ──────────────────────────────────
+//
+// A production bundle carries neither `debug/inspector.ts` nor `debug/devtools-api.ts`: every call
+// into them from the rest of core is behind `DEV`, so the branch folds away with the import. The one
+// telemetry production may turn on, level 1, reaches the flush through `debug/telemetry-hooks.ts`,
+// installed by `setTelemetryLevel` — the flush names nothing of the inspector.
+
+/** The names `debug/inspector.ts` and `debug/devtools-api.ts` export that a module imports from them. */
+function debugImports(text: string): string[] {
+    // Match: `import { a, b as c } from '…/debug/inspector'` (or devtools-api), not `import type`.
+    // Groups: [1]=the braces' content
+    const names: string[] = [];
+    for (const m of text.matchAll(/^import\s+\{([^}]*)\}\s+from\s+'[./]+(?:debug\/)?(?:inspector|devtools-api)';/gm)) {
+        for (const part of m[1].split(',')) {
+            const name = part.trim().replace(/^type\s+/, '').split(/\s+as\s+/).pop();
+            if (name && !part.trim().startsWith('type ')) names.push(name);
+        }
+    }
+    return names;
+}
+
+describe('a production bundle carries no debug code', () => {
+    // The debug modules themselves and the devtools overlay, which is development's by its entry.
+    const outside = sources('core').filter((f) => !/[\\/]src[\\/](debug|devtools)[\\/]/.test(f));
+
+    it('every call into the inspector or the devtools API is behind DEV', () => {
+        const unguardedCalls: string[] = [];
+        for (const file of outside) {
+            const text = readFileSync(file, 'utf-8');
+            const names = debugImports(text);
+            if (names.length === 0) continue;
+            const lines = text.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (/^import\b/.test(lines[i])) continue;
+                for (const name of names) {
+                    if (!new RegExp(`(?<![\\w$.])${name}\\(`).test(lines[i])) continue;
+                    if (!isGuarded(lines, i)) unguardedCalls.push(`${relative(PACKAGES, file).replace(/\\/g, '/')}:${i + 1} — ${lines[i].trim().slice(0, 90)}`);
+                }
+            }
+        }
+        expect(unguardedCalls, 'a call into the debug modules outside DEV keeps them in every production '
+            + 'bundle: put it behind `if (DEV)`, or, for level-1 telemetry, go through debug/telemetry-hooks.ts')
+            .toEqual([]);
+    });
+
+    it('reads modules that import the debug modules, and the flush goes through the hooks', () => {
+        const importers = outside.filter((f) => debugImports(readFileSync(f, 'utf-8')).length > 0);
+        // The zero this was written against: signal, element, component, list, global-store, global-error.
+        expect(importers.length, 'no module imports the debug modules: the check above read nothing').toBeGreaterThanOrEqual(5);
+        const signal = readFileSync(join(PACKAGES, 'core', 'src', 'reactivity', 'signal.ts'), 'utf-8');
+        expect(signal).toMatch(/telemetryHooks/);
+        expect(debugImports(signal), 'the flush calls the inspector\'s level-1 counters directly')
+            .not.toEqual(expect.arrayContaining(['flushStart']));
+    });
+});

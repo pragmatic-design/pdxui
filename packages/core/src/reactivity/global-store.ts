@@ -3,6 +3,7 @@
 
 import { effect } from './signal';
 import { registerStore, unregisterStores } from '../debug/inspector';
+import { DEV } from '../utils/env';
 
 const registry = new Map<string, unknown>();
 
@@ -99,7 +100,7 @@ export function createGlobalStore<T>(
     }
 
     // The inspector lists it at level 2: `__pdx_debug.stores()`.
-    registerStore(id, instance);
+    if (DEV) registerStore(id, instance);
 
     return instance;
 }
@@ -116,5 +117,5 @@ export function getStore<T = unknown>(id: string): T | undefined {
  */
 export function clearStores(): void {
     registry.clear();
-    unregisterStores();
+    if (DEV) unregisterStores();
 }

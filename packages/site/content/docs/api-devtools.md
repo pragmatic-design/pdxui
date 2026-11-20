@@ -108,7 +108,9 @@ import { setTelemetryLevel } from '@pdxui/core';
 function setTelemetryLevel(level: TelemetryLevel): void
 ```
 
-Set telemetry level. 0=off, 1=errors only (prod-safe), 2=full trace (dev).
+Set telemetry level. 0=off, 1=errors only (prod-safe), 2=full trace (dev). From level 1 the flushes,
+the effects that threw and the cycles broken are counted for `__pdx_debug.perf()`, in production too;
+level 2's registries and trace record in a development build only.
 
 ## `toggle`
 

@@ -93,8 +93,6 @@
   "sideEffects": [
       "src/boot/theme.ts",
       "src/boot/splash.ts",
-      "src/debug/inspector.ts",
-      "src/debug/devtools-api.ts",
       "dist/boot-theme.es.js",
       "dist/boot-theme.cjs",
       "dist/boot-splash.es.js",

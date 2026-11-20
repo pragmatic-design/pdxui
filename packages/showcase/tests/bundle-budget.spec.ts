@@ -370,7 +370,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // adaptive, online, rtl, the overlay stack, the context protocol — leave an entry that does not use
 // them, and the theme restore and the splash come as two boot modules the pdx() plugin imports. The
 // built dist: entry 43.4 KB, blocking 102.4 KB, js 477.4 KB locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.5, js: 477.6, css: 67, blocking: 102.5 };
+// entry 43.5 → 43.2, blocking 102.5 → 102.2, js 477.6 → 477.3 (#1246, second part): the inspector and
+// the devtools API out of the production bundle, every call into them behind DEV and the flush's
+// level-1 counters through hooks only `setTelemetryLevel` installs. The built dist: entry 43.1 KB,
+// blocking 102.1 KB, js 477.2 KB locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.2, js: 477.3, css: 67, blocking: 102.2 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

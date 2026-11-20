@@ -64,12 +64,15 @@ import { scenarioDist } from './scenarios-build';
  * `<template>`, which the compiler dropped with no word (#1249), so the app registered no component
  * and its 3.8 KB were those load-time modules alone; with them gone it weighed 0.6 KB and failed "not
  * empty" below. Written as the counter it says it is, it measures 8.0 KB — the floor every app pays.
+ *
+ * #1246's second part, core's inspector and devtools API out of production bundles: hello 8.0 → 7.8,
+ * benchmark 13.2 → 13.0, crud 51.9 → 51.4, dashboard 20.0 → 19.8, each budget the measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 8.3, css: 0 },
-    benchmark: { js: 13.5, css: 0 },
-    crud: { js: 52.2, css: 1.6 },
-    dashboard: { js: 20.3, css: 21.9 },
+    hello: { js: 8.1, css: 0 },
+    benchmark: { js: 13.3, css: 0 },
+    crud: { js: 51.7, css: 1.6 },
+    dashboard: { js: 20.1, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -145,6 +148,15 @@ const NOT_IN_A_SMALL_APP = [
     'packages/core/src/component/style.ts',
 ];
 
+/**
+ * What core's inspector and devtools API leave in a bundle that carries them (#1246, second part):
+ * the keys of their registries and summaries, the events their callers pass, their globals. Read in
+ * the minified file, not in `modules.json`: Rollup can keep a declaration of theirs whose every caller
+ * a folded `DEV` removed, which the minifier then drops, so the module list names them while the file
+ * carries none of their code. Every call into them is behind DEV, and these say so where it counts.
+ */
+const DEBUG_CODE = ['subscriberCount', 'cycleDetections', 'signal:change', 'component:mount', 'list:reconcile', '__PDX_DEVTOOLS__', 'pdx.telemetry'];
+
 for (const name of ['hello', 'benchmark']) {
     test(`the ${name} bundle carries none of core's modules that worked at load (#1246)`, () => {
         const modules = Object.values(chunksOf(name)).flat();
@@ -152,6 +164,14 @@ for (const name of ['hello', 'benchmark']) {
             .toBe(true);
         const found = modules.filter((m) => NOT_IN_A_SMALL_APP.some((p) => m.includes(p)));
         expect(found, `modules the ${name} app does not use`).toEqual([]);
+    });
+
+    test(`the ${name} bundle carries no debug code (#1246)`, () => {
+        const dir = join(scenarioDist(name), 'assets');
+        const js = readdirSync(dir).filter((f) => f.endsWith('.js')).map((f) => readFileSync(join(dir, f), 'utf8')).join('\n');
+        // The control: the file is the app, which registers its element with core's `component()`.
+        expect(js, `the ${name} bundle is not the app`).toMatch(/customElements/);
+        expect(DEBUG_CODE.filter((s) => js.includes(s)), `debug code in the ${name} production bundle`).toEqual([]);
     });
 }
 
