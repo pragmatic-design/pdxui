@@ -155,6 +155,22 @@ describe('a production bundle carries no debug code', () => {
             .toEqual([]);
     });
 
+    it('HMR\'s instance registry and saved state are filled only in development (#1246, part 3a)', () => {
+        // Match: a call that fills what only a hot update reads — the live instances by tag, the setup's
+        // signals. Groups: none
+        const hmr = /(?<![\w$.])(trackInstance|untrackInstance)\(|\._setupSignals\s*=/;
+        const unguardedHmr: string[] = [];
+        for (const file of outside) {
+            if (file.endsWith(`${'define'}.ts`)) continue;
+            const lines = readFileSync(file, 'utf-8').split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (/^import\b/.test(lines[i]) || !hmr.test(lines[i])) continue;
+                if (!isGuarded(lines, i)) unguardedHmr.push(`${relative(PACKAGES, file).replace(/\\/g, '/')}:${i + 1} — ${lines[i].trim().slice(0, 90)}`);
+            }
+        }
+        expect(unguardedHmr, 'HMR\'s bookkeeping runs on every mount of a production app: put it behind DEV').toEqual([]);
+    });
+
     it('reads modules that import the debug modules, and the flush goes through the hooks', () => {
         const importers = outside.filter((f) => debugImports(readFileSync(f, 'utf-8')).length > 0);
         // The zero this was written against: signal, element, component, list, global-store, global-error.

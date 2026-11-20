@@ -409,27 +409,6 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
 
         get _renderTarget(): Node { return useShadow ? this.shadowRoot! : this; }
 
-        /** Save all setup signal values for HMR state preservation. */
-        __pdx_saveState(): Map<string, unknown> | null {
-            const signals = this._setupSignals;
-            if (!signals) return null;
-            const state = new Map<string, unknown>();
-            for (const [name, sig] of signals) {
-                state.set(name, sig.peek());
-            }
-            return state;
-        }
-
-        /** Restore signal values from HMR-saved state. */
-        __pdx_restoreState(state: Map<string, unknown>): void {
-            const signals = this._setupSignals;
-            if (!signals || !state) return;
-            for (const [name, value] of state) {
-                const sig = signals.get(name);
-                if (sig) sig.set(value as never);
-            }
-        }
-
         body(): DocumentFragment | Node | null {
             const setState = (name: string, on: boolean): void => {
                 if (!declaredStates?.has(name)) {
@@ -623,14 +602,16 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 // The host's declared attributes, bindings and listeners (#133), and its variant axes,
                 // after setup: a binding reads what setup returned, as the render does.
                 bindHost(this, host, ctx, (fn) => this.track(fn));
-                // Register signals for HMR save/restore
-                const signalMap = new Map<string, Signal<unknown>>();
-                for (const [key, value] of Object.entries(ctx)) {
-                    if (value && typeof value === 'function' && typeof (value as { set?: unknown }).set === 'function' && typeof (value as { peek?: unknown }).peek === 'function') {
-                        signalMap.set(key, value as Signal<unknown>);
+                // Register signals for HMR save/restore: development only, as HMR is (#1246, part 3a).
+                if (DEV) {
+                    const signalMap = new Map<string, Signal<unknown>>();
+                    for (const [key, value] of Object.entries(ctx)) {
+                        if (value && typeof value === 'function' && typeof (value as { set?: unknown }).set === 'function' && typeof (value as { peek?: unknown }).peek === 'function') {
+                            signalMap.set(key, value as Signal<unknown>);
+                        }
                     }
+                    if (signalMap.size > 0) this._setupSignals = signalMap;
                 }
-                if (signalMap.size > 0) this._setupSignals = signalMap;
             } catch (err) {
                 popScope();
                 if (DEV) {
@@ -675,8 +656,36 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
         }
     }
 
+    // HMR's state save and restore (#1246, part 3a): on the prototype in development only, where a hot
+    // update reads them (`__pdx_hmr_save`, `__pdx_hmr_restore` call them only if they are there).
+    if (DEV) Object.assign(Comp.prototype, HMR_STATE);
+
     define(tag, Comp as unknown as new () => PdxElement);
 }
+
+/** What a hot update keeps of an instance: its setup's signals, saved and restored by name. */
+const HMR_STATE = {
+    /** Save all setup signal values for HMR state preservation. */
+    __pdx_saveState(this: { _setupSignals: Map<string, Signal<unknown>> | null }): Map<string, unknown> | null {
+        const signals = this._setupSignals;
+        if (!signals) return null;
+        const state = new Map<string, unknown>();
+        for (const [name, sig] of signals) {
+            state.set(name, sig.peek());
+        }
+        return state;
+    },
+
+    /** Restore signal values from HMR-saved state. */
+    __pdx_restoreState(this: { _setupSignals: Map<string, Signal<unknown>> | null }, state: Map<string, unknown>): void {
+        const signals = this._setupSignals;
+        if (!signals || !state) return;
+        for (const [name, value] of state) {
+            const sig = signals.get(name);
+            if (sig) sig.set(value as never);
+        }
+    },
+};
 
 // ─── Helpers ───────────────────────────────────────────────────────
 

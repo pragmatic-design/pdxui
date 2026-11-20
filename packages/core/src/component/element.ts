@@ -388,7 +388,8 @@ export abstract class PdxElement extends HTMLElementBase {
                 this._projectSlots();
                 this._watchLateSlots();
 
-                trackInstance(this.tagName.toLowerCase(), this);
+                // HMR's registry of live instances, which only a hot update reads (#1246, part 3a).
+                if (DEV) trackInstance(this.tagName.toLowerCase(), this);
                 if (DEV) registerComponent(this);
                 if (DEV) emitDevTools('component:mount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
                 this.connected();
@@ -450,7 +451,7 @@ export abstract class PdxElement extends HTMLElementBase {
         this._mountGeneration++;
         for (const fn of this._destroyCallbacks) fn();
         this.disconnected();
-        untrackInstance(this.tagName.toLowerCase(), this);
+        if (DEV) untrackInstance(this.tagName.toLowerCase(), this);
         if (DEV) unregisterComponent(this);
         if (DEV) emitDevTools('component:unmount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
         for (const d of this._disposers) d();

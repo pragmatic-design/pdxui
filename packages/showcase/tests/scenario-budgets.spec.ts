@@ -67,12 +67,16 @@ import { scenarioDist } from './scenarios-build';
  *
  * #1246's second part, core's inspector and devtools API out of production bundles: hello 8.0 → 7.8,
  * benchmark 13.2 → 13.0, crud 51.9 → 51.4, dashboard 20.0 → 19.8, each budget the measurement + 0.3.
+ *
+ * #1246's part 3a, HMR's bookkeeping behind DEV (the setup's signal map, the live-instance registry,
+ * the state save and restore): hello 7.8 → 7.6, benchmark 13.0 → 12.8, crud 51.4 → 51.2, dashboard
+ * 19.8 → 19.7, each budget the measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 8.1, css: 0 },
-    benchmark: { js: 13.3, css: 0 },
-    crud: { js: 51.7, css: 1.6 },
-    dashboard: { js: 20.1, css: 21.9 },
+    hello: { js: 7.9, css: 0 },
+    benchmark: { js: 13.1, css: 0 },
+    crud: { js: 51.5, css: 1.6 },
+    dashboard: { js: 20.0, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -155,7 +159,12 @@ const NOT_IN_A_SMALL_APP = [
  * a folded `DEV` removed, which the minifier then drops, so the module list names them while the file
  * carries none of their code. Every call into them is behind DEV, and these say so where it counts.
  */
-const DEBUG_CODE = ['subscriberCount', 'cycleDetections', 'signal:change', 'component:mount', 'list:reconcile', '__PDX_DEVTOOLS__', 'pdx.telemetry'];
+const DEBUG_CODE = [
+    'subscriberCount', 'cycleDetections', 'signal:change', 'component:mount', 'list:reconcile', '__PDX_DEVTOOLS__', 'pdx.telemetry',
+    // HMR's (#1246, part 3a): a component's state saved and restored across a hot update, and the
+    // registry of live instances it reaches them by — development only.
+    '__pdx_saveState', '__pdx_restoreState',
+];
 
 for (const name of ['hello', 'benchmark']) {
     test(`the ${name} bundle carries none of core's modules that worked at load (#1246)`, () => {
