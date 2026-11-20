@@ -56,7 +56,7 @@ describe('@for track', () => {
 
     it('control — track item.field stays a field name', () => {
         const code = tpl('@for (rows as r; track r.id) { <b>{{ r.name }}</b> }');
-        expect(code).toContain("eachRow(()=>ctx.rows(),'id',");
+        expect(code).toContain("eachStatic(()=>ctx.rows(),'id',");
     });
 
     it('control — a destructured pattern is never read as a regex for the field shortcut', () => {

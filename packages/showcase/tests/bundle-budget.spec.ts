@@ -361,7 +361,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // compiled render's helpers for the moved ones — and each move brings helpers no chunk had yet. The
 // built dist: 477.3 KB locally, 477.5 on the CI's line. The engine (~4–5 KB) leaves when the last
 // component does; the budget comes down then.
-const BUDGET_KB = { entry: 43.9, js: 477.6, css: 67, blocking: 103 };
+// entry 43.9 → 44.1 (owner's OK): value rows (#1237). A row that reads its item as a value is updated
+// in place for a new item — core's collectRowRuns, and list-static.ts's update beside its rebuild —
+// so the entry carries that code. What it buys, on js-framework-benchmark's script time (median of 3
+// runs): create 1k 7.8 → 6.2 ms, replace 14.7 → 11.9, update every 10th 4.8 → 3.4. The built dist:
+// 44.1 KB locally.
+const BUDGET_KB = { entry: 44.1, js: 477.6, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -28,7 +28,7 @@ import { arrowOf, jsQuote, jsString } from './js-literal';
 import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey, withRowValue } from './codegen-constant-bindings';
-import { isStaticRow } from './static-rows';
+import { isStaticRow, isValueRow } from './static-rows';
 import { specialisedClassBinding } from './inline-class-binding';
 import { delegableHandler } from './inline-event-delegation';
 import { rewriteKeyedSelectors, selectorName } from './inline-keyed-selector';
@@ -1005,7 +1005,10 @@ class InlineGen {
         // A row whose content follows only from its item is built once, with nothing reactive
         // (static-rows.ts, #1233): its item is a constant while it is generated, so each binding is
         // written once, and core's eachStatic builds the row again when its key keeps a new item.
-        const isStatic = rows && isStaticRow(node, this.ctx);
+        // A value row (#1237) is an eachStatic row too, its item a value, but its item is not a
+        // constant: every binding keeps its effect, which core runs again when its key keeps a new item.
+        const constantItem = rows && isStaticRow(node, this.ctx);
+        const isStatic = constantItem || (rows && isValueRow(node));
         // A destructured binding: value rows, sliced as eachRow's are (#398).
         const helper = isStatic ? 'eachStatic' : rows ? 'eachRow' : 'eachDestructured';
         this.imports.add(helper);
@@ -1013,7 +1016,7 @@ class InlineGen {
         const keyArg = trackKeyArg(node, this.ctx);
         const generate = () => this.sub(node.body);
         let body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx,
-            isStatic ? () => withRowValue(node.item.trim(), this.ctx, generate) : generate)));
+            constantItem ? () => withRowValue(node.item.trim(), this.ctx, generate) : generate)));
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const transition = generateTransition(node.transition);
         const cf = this.v('cf');

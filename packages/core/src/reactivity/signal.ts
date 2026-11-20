@@ -319,6 +319,36 @@ export function collectIfAny<T>(fn: () => T): [T, Dispose | undefined] {
     return [result, disposerOf(scope)];
 }
 
+/** The effects a value row's build creates at its top (#1237), or null outside one: see {@link collectRowRuns}. */
+let rowRuns: (() => void)[] | null = null;
+/** The scope those effects belong to: the row's. */
+let rowRunsScope: OwnerScope | null = null;
+/** Set when the build created an effect below its top — inside a block — which a new item cannot reach. */
+let rowRunsNested = false;
+
+/**
+ * Run a value row's build (#1237) and collect the effects it creates at its top — in the current scope,
+ * outside any other effect — so that a new item for the row's key runs them again on it, the row's
+ * nodes kept. They are kept registered even when their first run read no signal: a new item is what
+ * runs them next. The runs, or null when an effect was created below the top (a block's), whose
+ * reads of the item only the block's own effect could reach: such a row is built again instead.
+ */
+export function collectRowRuns<T>(fn: () => T): [T, (() => void)[] | null] {
+    const prev = rowRuns, prevScope = rowRunsScope, prevNested = rowRunsNested;
+    const runs: (() => void)[] = [];
+    rowRuns = runs;
+    rowRunsScope = currentOwner;
+    rowRunsNested = false;
+    try {
+        const result = fn();
+        return [result, rowRunsNested ? null : runs];
+    } finally {
+        rowRuns = prev;
+        rowRunsScope = prevScope;
+        rowRunsNested = prevNested;
+    }
+}
+
 /** {@link collectDisposers}, and the scope it collected into: what a container suspends. */
 export function collectScope<T>(fn: () => T): [T, Dispose, OwnerScope] {
     let scope!: OwnerScope;
@@ -832,6 +862,12 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
     const name = options?.name;
     if (name) (run as { __pdx_name?: string }).__pdx_name = name;
     const inspected = registerEffect(name ?? '(anonymous)', run);
+    // A value row's own binding (#1237, collectRowRuns): kept, to run again for the row's next item.
+    let rowRun = false;
+    if (rowRuns !== null) {
+        if (currentOwner === rowRunsScope && currentEffect === null) { rowRuns.push(run); rowRun = true; }
+        else rowRunsNested = true;
+    }
     run();
 
     const dispose: Dispose = () => {
@@ -843,6 +879,13 @@ export function effect(fn: () => void | (() => void), options?: EffectOptions): 
         for (let i = 0; i < tracker.deps.length; i++) tracker.deps[i].delete(run);
         tracker.deps.length = 0;
     };
+    // Inert (#1237): its first run read no source and left no cleanup, so nothing can run it again and
+    // nothing is left to dispose. It is not registered with its scope — a binding of a plain value,
+    // written once, holds no scope. An inspected effect keeps its entry, which the inspector lists.
+    if (!rowRun && tracker.deps.length === 0 && cleanups.length === 0 && !inspected) {
+        disposed = true;
+        return dispose;
+    }
     // Register with the enclosing ownership scope so removed subtrees dispose
     // their effects (idempotent — safe even if also disposed explicitly).
     if (currentOwner) currentOwner.disposers.push(dispose);

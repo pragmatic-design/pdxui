@@ -232,8 +232,11 @@ round; anything else is read as written.
 A row that shows only its item — the item itself, its `track` key, literals — is **static**: it is
 built once, with nothing reactive in it (core's `eachStatic`), the way a hand-written `map()` builds
 rows. When an item is replaced by a new one under the same key, its row is built again. A row that
-reads anything else — a member of the item (`{{ todo.text }}`), the index, a prop or a signal — keeps
-its reactive bindings. To make a row static, compute what it shows first and loop over that:
+reads anything else — a member of the item (`{{ todo.text }}`), a prop or a signal — keeps its
+reactive bindings, but still has no item signal: when its item is replaced under the same key
+(`rows[i] = { ...rows[i], done: true }`), the row keeps its elements and its bindings run again on the
+new item. Only a row that reads its index, holds a block (`@if`, a nested `@for`) or a `::` binding
+keeps an item signal. To make a row static, compute what it shows first and loop over that:
 
 ```pdx
 <script>

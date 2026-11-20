@@ -90,12 +90,16 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // every component registered uses both, so here they are counted whole.
     // 338.8 after #1210's second atoms (+0.3): pdx-divider, pdx-spinner and pdx-progress, each lighter
     // than its TypeScript module alone (0.93×, 0.78×, 0.86×), for the reason the first three added 0.2.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339 },
+    // 339.1 after #1237 (+0.3): value rows, a row that reads its item as a value updated in place on
+    // a new item — core's collectRowRuns and the in-place update in list-static.ts. What it buys, on
+    // js-framework-benchmark's script time: create 1k −21%, replace −19%, update every 10th −29%.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339.5 },
     { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
-    // 330.1 after #1233 (+1.1), for the same core code as the root's above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 330.5 },
+    // 330.1 after #1233 (+1.1), for the same core code as the root's above. 330.6 after #1237 (+0.2
+    // from 330.4), for the root's reason.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 4 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

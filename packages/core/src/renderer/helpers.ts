@@ -207,9 +207,11 @@ export function eachRow<T>(
 }
 
 /**
- * {@link eachRow} with static rows (#1233): what `@for` compiles to when the row's content follows only
- * from its item. Each row is built once, its getter answering the item it was built from, with no item
- * signal; a kept key whose item is replaced is a row built again.
+ * {@link eachRow} with static rows (#1233) and value rows (#1237): what `@for` compiles to when the row
+ * reads its item as a value — never its index, no two-way binding. Each row's getter answers the item
+ * it holds, with no item signal. A value row keeps its effects: a kept key whose item is replaced has
+ * the new item written to the row and those effects run again on it, its nodes kept. A static row, its
+ * bindings written once, or a row with a block inside, is built again in its place instead.
  */
 export function eachStatic<T>(
     items: () => T[],

@@ -8,7 +8,9 @@
 // The target is the TypeScript version's gzip, measured the same way: pdx-switch.ts 1120 B before #1008
 // removed it, src/select/pdx-select.ts, still in the tree, 7650 B on 2026-11-19. On 2026-11-19 the
 // compiled modules were 1411 B and 8981 B (1.26×, 1.17×); after #1207, 1204 B and 7741 B (1.07×,
-// 1.01×). What is left, per construct, is in the pull request of #1207 and in PILOT.md.
+// 1.01×). What is left, per construct, is in the pull request of #1207 and in PILOT.md. select 7741 →
+// 7746 B after #1237: one of its two lists is a value row (eachStatic, no item signal per row), the
+// other keeps eachRow, and the module imports both.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -26,7 +28,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1204,
-    'pilot/select.pdx': 7741,
+    'pilot/select.pdx': 7746,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

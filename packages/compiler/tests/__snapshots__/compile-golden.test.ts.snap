@@ -466,7 +466,7 @@ exports[`compile golden — demo corpus > infra/demo-datasource.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, component, createDataSource, eachRow, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindNativeProperty, component, createDataSource, eachStatic, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-oxc18m");
@@ -639,7 +639,7 @@ component('app-demo-datasource', {
     bindInterpolation(__t11,()=>ctx.sortIcon('id'));
     __el12.addEventListener('click', eventHandler(ctx.sortByName, ctx.el, 'click'));
     bindInterpolation(__t13,()=>ctx.sortIcon('name'));
-    const __cf22=eachRow(()=>ctx.rows(),'id',(row)=>{const __frag=__blk0();const [__t17,__t19,__t21]=__walk0(__frag);bindInterpolation(__t17,()=>row().id,true);bindInterpolation(__t19,()=>row().name);bindInterpolation(__t21,()=>row().email);return __frag;});
+    const __cf22=eachStatic(()=>ctx.rows(),'id',(row)=>{const __frag=__blk0();const [__t17,__t19,__t21]=__walk0(__frag);bindInterpolation(__t17,()=>row().id,true);bindInterpolation(__t19,()=>row().name);bindInterpolation(__t21,()=>row().email);return __frag;});
     __m23.replaceWith(__cf22);
     __el25.addEventListener('click', eventHandler(ctx.prevPage, ctx.el, 'click'));
     bindNativeProperty(__el25, "disabled", "disabled", ()=>ctx.currentPage() <= 1);
@@ -1157,7 +1157,7 @@ exports[`compile golden — demo corpus > infra/demo-icons.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, bindRef, clearBoundProperty, clearIconSets, component, eachRow, eventHandler, onMount, registerIconSet, resolveIcon, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttributeOrProperty, bindInterpolation, bindRef, clearBoundProperty, clearIconSets, component, eachStatic, eventHandler, onMount, registerIconSet, resolveIcon, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import '../../../ui/src/icon/pdx-icon';
 
 {
@@ -1267,11 +1267,11 @@ const ICONS = {
     __el7.addEventListener('click', eventHandler(ctx.doResolve, ctx.el, 'click'));
     __el8.addEventListener('click', eventHandler(ctx.doMissing, ctx.el, 'click'));
     bindInterpolation(__t10,()=>ctx.resultText());
-    const __cf21=eachRow(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);bindAttributeOrProperty(__el16, "style", "style", ()=>'width:' + s().px + 'px;height:' + s().px + 'px');bindInterpolation(__t19,()=>s().name,true);bindInterpolation(__t20,()=>s().px);return __frag;});
+    const __cf21=eachStatic(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);bindAttributeOrProperty(__el16, "style", "style", ()=>'width:' + s().px + 'px;height:' + s().px + 'px');bindInterpolation(__t19,()=>s().name,true);bindInterpolation(__t20,()=>s().px);return __frag;});
     __m22.replaceWith(__cf21);
-    const __cf29=eachRow(()=>ctx.iconEntries,'name',(entry)=>{const __frag=__blk1();const [__el26,__t28]=__walk1(__frag);bindRef(__el26,entry().ref);bindInterpolation(__t28,()=>entry().name,true);return __frag;});
+    const __cf29=eachStatic(()=>ctx.iconEntries,'name',(entry)=>{const __frag=__blk1();const [__el26,__t28]=__walk1(__frag);bindRef(__el26,entry().ref);bindInterpolation(__t28,()=>entry().name,true);return __frag;});
     __m30.replaceWith(__cf29);
-    const __cf69=eachRow(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);{ if ("style" in __el68) { const __v = 'color:' + c().color; if (__v == null) clearBoundProperty(__el68, "style", "style"); else __el68["style"] = __v; } else { const __v = 'color:' + c().color; if (__v == null || __v === false) __el68.removeAttribute("style"); else { __el68.setAttribute("style", __v === true ? '' : String(__v)); } } }bindRef(__el68,c().ref);return __frag;});
+    const __cf69=eachStatic(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);{ if ("style" in __el68) { const __v = 'color:' + c().color; if (__v == null) clearBoundProperty(__el68, "style", "style"); else __el68["style"] = __v; } else { const __v = 'color:' + c().color; if (__v == null || __v === false) __el68.removeAttribute("style"); else { __el68.setAttribute("style", __v === true ? '' : String(__v)); } } }bindRef(__el68,c().ref);return __frag;});
     __m70.replaceWith(__cf69);
     return __frag;
   })(),
@@ -1713,7 +1713,7 @@ exports[`compile golden — demo corpus > infra/demo-scrollbar.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, delegate, eachRow, effect, eventHandler, onDestroy, onMount, selector, signal, staticBlock, staticMarkup, useScrollbar } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, delegate, eachStatic, effect, eventHandler, onDestroy, onMount, selector, signal, staticBlock, staticMarkup, useScrollbar } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4mmvf3");
@@ -1793,7 +1793,7 @@ const options = [
     bindRef(__el56,ctx.box3Ref);
     bindRef(__el68,ctx.box4Ref);
     const __rh70=eventHandler((__e,opt)=>(() => ctx.selectOption(opt()))(__e), ctx.el, 'click');
-    const __cf72=eachRow(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t71]=__walk0(__frag);delegate(ctx.el,__el69,'click',__rh70,opt);effect(()=>{const __c=!!(__sel_selected.is(opt()));__el69.classList.toggle("active",__c);});bindInterpolation(__t71,()=>opt(),true);return __frag;});
+    const __cf72=eachStatic(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t71]=__walk0(__frag);delegate(ctx.el,__el69,'click',__rh70,opt);effect(()=>{const __c=!!(__sel_selected.is(opt()));__el69.classList.toggle("active",__c);});bindInterpolation(__t71,()=>opt(),true);return __frag;});
     __m73.replaceWith(__cf72);
     bindInterpolation(__t76,()=>ctx.selected());
     return __frag;
@@ -1806,7 +1806,7 @@ exports[`compile golden — demo corpus > infra/demo-selection.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, component, createSelection, delegate, eachRow, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindNativeProperty, component, createSelection, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-wzxjxl");
@@ -1923,18 +1923,18 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     const __frag=__blk3();
     const [__m12,__t14,__m25,__el27,__el28,__t30,__el37,__m55,__t57]=__walk3(__frag);
     const __rh9=eventHandler((__e,fruit)=>(() => ctx.singleSel.select(fruit()))(__e), ctx.el, 'click');
-    const __cf11=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t10]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el8,'click',__rh9,fruit);bindInterpolation(__t10,()=>fruit(),true);return __frag;});
+    const __cf11=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t10]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el8,'click',__rh9,fruit);bindInterpolation(__t10,()=>fruit(),true);return __frag;});
     __m12.replaceWith(__cf11);
     bindInterpolation(__t14,()=>ctx.singleInfo());
     const __rh22=eventHandler((__e,fruit)=>(ctx.handleMultiClick)(__e), ctx.el, 'click');
-    const __cf24=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el21,__t23]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el21.classList.remove(__t); for (const __t of __n) __el21.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el21,'click',__rh22,fruit);bindInterpolation(__t23,()=>fruit(),true);return __frag;});
+    const __cf24=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el21,__t23]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el21.classList.remove(__t); for (const __t of __n) __el21.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el21,'click',__rh22,fruit);bindInterpolation(__t23,()=>fruit(),true);return __frag;});
     __m25.replaceWith(__cf24);
     delegate(ctx.el,__el27,'click',eventHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits), ctx.el, 'click'));
     delegate(ctx.el,__el28,'click',eventHandler(() => ctx.multiSel.clear(), ctx.el, 'click'));
     bindInterpolation(__t30,()=>ctx.multiInfo());
     __el37.addEventListener('change', eventHandler(ctx.handleCheckAll, ctx.el, 'change'));
     const __rh45=eventHandler((__e,p)=>(ctx.handleGridClick)(__e), ctx.el, 'click');
-    const __cf54=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk2();const [__el44,__el47,__t49,__t51,__t53]=__walk2(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el44.classList.remove(__t); for (const __t of __n) __el44.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el44,'click',__rh45,p);bindNativeProperty(__el47, "checked", "checked", ()=>ctx.gridIsSelected(p().id));bindInterpolation(__t49,()=>p().name);bindInterpolation(__t51,()=>p().role);bindInterpolation(__t53,()=>p().status);return __frag;});
+    const __cf54=eachStatic(()=>ctx.people,'id',(p)=>{const __frag=__blk2();const [__el44,__el47,__t49,__t51,__t53]=__walk2(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el44.classList.remove(__t); for (const __t of __n) __el44.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el44,'click',__rh45,p);bindNativeProperty(__el47, "checked", "checked", ()=>ctx.gridIsSelected(p().id));bindInterpolation(__t49,()=>p().name);bindInterpolation(__t51,()=>p().role);bindInterpolation(__t53,()=>p().status);return __frag;});
     __m55.replaceWith(__cf54);
     bindInterpolation(__t57,()=>ctx.gridInfo());
     return __frag;
@@ -1947,7 +1947,7 @@ exports[`compile golden — demo corpus > infra/demo-sortable.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, eachRow, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useSortable } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, eachStatic, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useSortable } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qui0xl");
@@ -2020,11 +2020,11 @@ function reorderItems(from, to) {
     const __frag=__blk2();
     const [__el5,__m11,__t13,__el16,__m20]=__walk2(__frag);
     bindRef(__el5,ctx.listRef);
-    const __cf10=eachRow(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>item().label);return __frag;});
+    const __cf10=eachStatic(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t9]=__walk0(__frag);bindInterpolation(__t9,()=>item().label);return __frag;});
     __m11.replaceWith(__cf10);
     bindInterpolation(__t13,()=>ctx.orderLog());
     bindRef(__el16,ctx.tabsRef);
-    const __cf19=eachRow(()=>ctx.tabs(),'id',(tab)=>{const __frag=__blk1();const [__t18]=__walk1(__frag);bindInterpolation(__t18,()=>tab().label);return __frag;});
+    const __cf19=eachStatic(()=>ctx.tabs(),'id',(tab)=>{const __frag=__blk1();const [__t18]=__walk1(__frag);bindInterpolation(__t18,()=>tab().label);return __frag;});
     __m20.replaceWith(__cf19);
     return __frag;
   })(),
@@ -2210,7 +2210,7 @@ exports[`compile golden — demo corpus > infra/demo-utilities.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, component, createToastQueue, delegate, eachRow, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup, useClipboard, useResizeHandle } from '@pdxui/core';
+import { bindInterpolation, bindRef, component, createToastQueue, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup, useClipboard, useResizeHandle } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-drx6xh");
@@ -2325,7 +2325,7 @@ component('app-demo-utilities', {
     delegate(ctx.el,__el37,'click',eventHandler(ctx.addError, ctx.el, 'click'));
     delegate(ctx.el,__el38,'click',eventHandler(ctx.clearToasts, ctx.el, 'click'));
     const __rh45=eventHandler((__e,t)=>(() => ctx.dismissToast(t().id))(__e), ctx.el, 'click');
-    const __cf46=eachRow(()=>ctx.toasts(),'id',(t)=>{const __frag=__blk0();const [__el40,__t42,__t43,__el44]=__walk0(__frag);{ const __s = new Set(["toast-item"]); let __w = []; effect(() => { const __n = interpolationText('toast-' + t().type).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el40.classList.remove(__t); for (const __t of __n) __el40.classList.add(__t); __w = __n; }); }bindInterpolation(__t42,()=>t().type.toUpperCase());bindInterpolation(__t43,()=>t().message);delegate(ctx.el,__el44,'click',__rh45,t);return __frag;});
+    const __cf46=eachStatic(()=>ctx.toasts(),'id',(t)=>{const __frag=__blk0();const [__el40,__t42,__t43,__el44]=__walk0(__frag);{ const __s = new Set(["toast-item"]); let __w = []; effect(() => { const __n = interpolationText('toast-' + t().type).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el40.classList.remove(__t); for (const __t of __n) __el40.classList.add(__t); __w = __n; }); }bindInterpolation(__t42,()=>t().type.toUpperCase());bindInterpolation(__t43,()=>t().message);delegate(ctx.el,__el44,'click',__rh45,t);return __frag;});
     __m47.replaceWith(__cf46);
     bindInterpolation(__t50,()=>ctx.toastCount());
     return __frag;
@@ -4537,7 +4537,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-button.pdx 1`]
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, component, computed, eachRow, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
+import { bindAttributeOrProperty, bindInterpolation, component, computed, eachStatic, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
 import { useButtonConsole } from './sections/comp-button/state.pdx';
 
 {
@@ -4571,7 +4571,7 @@ component('app-comp-button', {
     const __frag=__blk2();
     const [__el13,__m25]=__walk2(__frag);
     __el13.addEventListener('click', eventHandler(ctx.clearLog, ctx.el, 'click'));
-    const __cf24=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf23=eachRow(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t18,__el19,__t20,__t22]=__walk1(__frag);bindInterpolation(__t18,()=>entry().time);bindAttributeOrProperty(__el19, "style", "style", ()=>'color:' + entry().color);bindInterpolation(__t20,()=>entry().variant);bindInterpolation(__t22,()=>entry().text);return __frag;});return __cf23;});
+    const __cf24=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf23=eachStatic(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t18,__el19,__t20,__t22]=__walk1(__frag);bindInterpolation(__t18,()=>entry().time);bindAttributeOrProperty(__el19, "style", "style", ()=>'color:' + entry().color);bindInterpolation(__t20,()=>entry().variant);bindInterpolation(__t22,()=>entry().text);return __frag;});return __cf23;});
     __m25.replaceWith(__cf24);
     return __frag;
   })(),
@@ -4885,7 +4885,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-chip.pdx 1`] =
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, computed, eachRow, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
+import { bindInterpolation, component, computed, eachStatic, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
 import { useChipConsole } from './sections/comp-chip/state.pdx';
 
 {
@@ -4917,7 +4917,7 @@ component('app-comp-chip', {
     const __frag=__blk2();
     const [__el7,__m17]=__walk2(__frag);
     __el7.addEventListener('click', eventHandler(ctx.clearLog, ctx.el, 'click'));
-    const __cf16=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf15=eachRow(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t12,__t14]=__walk1(__frag);bindInterpolation(__t12,()=>entry().time);bindInterpolation(__t14,()=>entry().text);return __frag;});return __cf15;});
+    const __cf16=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf15=eachStatic(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t12,__t14]=__walk1(__frag);bindInterpolation(__t12,()=>entry().time);bindInterpolation(__t14,()=>entry().text);return __frag;});return __cf15;});
     __m17.replaceWith(__cf16);
     return __frag;
   })(),
@@ -7917,7 +7917,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-tag-input.pdx 
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, computed, eachRow, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
+import { bindInterpolation, component, computed, eachStatic, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
 import '@pdxui/ui/tag-input';
 import { useTagInputLog } from './sections/comp-tag-input/state.pdx';
 
@@ -7949,7 +7949,7 @@ component('app-comp-tag-input', {
     const __frag=__blk2();
     const [__el7,__m17]=__walk2(__frag);
     __el7.addEventListener('click', eventHandler(ctx.clearLog, ctx.el, 'click'));
-    const __cf16=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf15=eachRow(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t12,__t14]=__walk1(__frag);bindInterpolation(__t12,()=>entry().time);bindInterpolation(__t14,()=>entry().text);return __frag;});return __cf15;});
+    const __cf16=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf15=eachStatic(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t12,__t14]=__walk1(__frag);bindInterpolation(__t12,()=>entry().time);bindInterpolation(__t14,()=>entry().text);return __frag;});return __cf15;});
     __m17.replaceWith(__cf16);
     return __frag;
   })(),
@@ -13834,7 +13834,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-check
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { allOn, someOn, setAll, setOne } from './state.pdx';
 
 {
@@ -13865,7 +13865,7 @@ component('app-demo-comp-checkbox-composition', {
     let __el14w_checked = {}; effect(() => { const __b = allOn(ctx.perms()); if (Object.is(__b, __el14w_checked)) return; __el14w_checked = __b; assignBoundProperty(__el14, "checked", __b); });
     let __el14w_indeterminate = {}; effect(() => { const __b = someOn(ctx.perms()); if (Object.is(__b, __el14w_indeterminate)) return; __el14w_indeterminate = __b; assignBoundProperty(__el14, "indeterminate", __b); });
     __el14.addEventListener('checked-change', eventHandler(e => ctx.perms.setRaw(setAll(ctx.perms(), e.detail.value)), ctx.el, 'checked-change'));
-    const __cf17=eachRow(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);{ assignBoundProperty(__el16, "label", perm().label); }let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });{ assignBoundProperty(__el16, "value", perm().label); }let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('checked-change', eventHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), perm().label, e.detail.value)), ctx.el, 'checked-change'));return __frag;});
+    const __cf17=eachStatic(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);{ assignBoundProperty(__el16, "label", perm().label); }let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });{ assignBoundProperty(__el16, "value", perm().label); }let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('checked-change', eventHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), perm().label, e.detail.value)), ctx.el, 'checked-change'));return __frag;});
     __m18.replaceWith(__cf17);
     return __frag;
   })(),
@@ -13917,7 +13917,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-check
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { allOn, someOn, setAll, setOne } from './state.pdx';
 
 const __blk0=staticBlock(staticMarkup('<div style="padding-left:var(--pdx-space-xl)"><pdx-checkbox></pdx-checkbox></div>'));
@@ -13941,7 +13941,7 @@ component('app-demo-comp-checkbox-indeterminate', {
     let __el5w_checked = {}; effect(() => { const __b = allOn(ctx.items()); if (Object.is(__b, __el5w_checked)) return; __el5w_checked = __b; assignBoundProperty(__el5, "checked", __b); });
     let __el5w_indeterminate = {}; effect(() => { const __b = someOn(ctx.items()); if (Object.is(__b, __el5w_indeterminate)) return; __el5w_indeterminate = __b; assignBoundProperty(__el5, "indeterminate", __b); });
     __el5.addEventListener('checked-change', eventHandler(e => ctx.items.setRaw(setAll(ctx.items(), e.detail.value)), ctx.el, 'checked-change'));
-    const __cf8=eachRow(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);{ assignBoundProperty(__el7, "label", item().label); }{ assignBoundProperty(__el7, "value", item().label); }let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('checked-change', eventHandler(e => ctx.items.setRaw(setOne(ctx.items(), item().label, e.detail.value)), ctx.el, 'checked-change'));return __frag;});
+    const __cf8=eachStatic(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);{ assignBoundProperty(__el7, "label", item().label); }{ assignBoundProperty(__el7, "value", item().label); }let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('checked-change', eventHandler(e => ctx.items.setRaw(setOne(ctx.items(), item().label, e.detail.value)), ctx.el, 'checked-change'));return __frag;});
     __m9.replaceWith(__cf8);
     return __frag;
   })(),
@@ -14105,7 +14105,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-chip/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 import { useChipConsole } from './state.pdx';
 
 {
@@ -14142,7 +14142,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__m8,__m12]=__walk2(__frag);
-    const __cf7=eachRow(()=>ctx.people(),'name',(person)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);let __el5w_avatar = {}; effect(() => { const __b = person().avatar; if (Object.is(__b, __el5w_avatar)) return; __el5w_avatar = __b; assignBoundProperty(__el5, "avatar", __b); });let __el5w_variant = {}; effect(() => { const __b = person().variant; if (Object.is(__b, __el5w_variant)) return; __el5w_variant = __b; assignBoundProperty(__el5, "variant", __b); });{ assignBoundProperty(__el5, "value", person().name); }__el5.addEventListener('pdx-remove', eventHandler(e => ctx.people.setRaw(ctx.dropPerson(ctx.people(), e)), ctx.el, 'pdx-remove'));bindInterpolation(__t6,()=>person().name,true);return __frag;});
+    const __cf7=eachStatic(()=>ctx.people(),'name',(person)=>{const __frag=__blk0();const [__el5,__t6]=__walk0(__frag);let __el5w_avatar = {}; effect(() => { const __b = person().avatar; if (Object.is(__b, __el5w_avatar)) return; __el5w_avatar = __b; assignBoundProperty(__el5, "avatar", __b); });let __el5w_variant = {}; effect(() => { const __b = person().variant; if (Object.is(__b, __el5w_variant)) return; __el5w_variant = __b; assignBoundProperty(__el5, "variant", __b); });{ assignBoundProperty(__el5, "value", person().name); }__el5.addEventListener('pdx-remove', eventHandler(e => ctx.people.setRaw(ctx.dropPerson(ctx.people(), e)), ctx.el, 'pdx-remove'));bindInterpolation(__t6,()=>person().name,true);return __frag;});
     __m8.replaceWith(__cf7);
     const __cf11=when(()=>ctx.people().length < 2,()=>{const __frag=__blk1();const [__el10]=__walk1(__frag);__el10.addEventListener('click', eventHandler(() => ctx.people.setRaw(ctx.startPeople()), ctx.el, 'click'));return __frag;},null);
     __m12.replaceWith(__cf11);
@@ -14156,7 +14156,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-chip/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 import { useChipConsole } from './state.pdx';
 
 {
@@ -14192,7 +14192,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__m25,__m28]=__walk2(__frag);
-    const __cf24=eachRow(()=>ctx.team(),'name',(member)=>{const __frag=__blk0();const [__el22,__t23]=__walk0(__frag);let __el22w_avatar = {}; effect(() => { const __b = member().avatar; if (Object.is(__b, __el22w_avatar)) return; __el22w_avatar = __b; assignBoundProperty(__el22, "avatar", __b); });{ assignBoundProperty(__el22, "value", member().name); }__el22.addEventListener('pdx-remove', eventHandler(e => ctx.team.setRaw(ctx.dropPerson(ctx.team(), e)), ctx.el, 'pdx-remove'));bindInterpolation(__t23,()=>member().name,true);return __frag;});
+    const __cf24=eachStatic(()=>ctx.team(),'name',(member)=>{const __frag=__blk0();const [__el22,__t23]=__walk0(__frag);let __el22w_avatar = {}; effect(() => { const __b = member().avatar; if (Object.is(__b, __el22w_avatar)) return; __el22w_avatar = __b; assignBoundProperty(__el22, "avatar", __b); });{ assignBoundProperty(__el22, "value", member().name); }__el22.addEventListener('pdx-remove', eventHandler(e => ctx.team.setRaw(ctx.dropPerson(ctx.team(), e)), ctx.el, 'pdx-remove'));bindInterpolation(__t23,()=>member().name,true);return __frag;});
     __m25.replaceWith(__cf24);
     const __cf27=when(()=>ctx.team().length === 0,()=>{const __frag=__blk1();const [__el26]=__walk1(__frag);__el26.addEventListener('click', eventHandler(() => ctx.team.setRaw(ctx.startTeam()), ctx.el, 'click'));return __frag;},null);
     __m28.replaceWith(__cf27);
@@ -14384,7 +14384,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-chip/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { useChipConsole } from './state.pdx';
 
 {
@@ -14433,7 +14433,7 @@ const chipConsole = useChipConsole();
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m10,__t12]=__walk1(__frag);
-    const __cf9=eachRow(()=>ctx.interests(),'label',(item)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);let __el7w_selected = {}; effect(() => { const __b = item().selected; if (Object.is(__b, __el7w_selected)) return; __el7w_selected = __b; assignBoundProperty(__el7, "selected", __b); });{ assignBoundProperty(__el7, "value", item().label); }__el7.addEventListener('selected-change', eventHandler(e => ctx.toggleInterest(e.currentTarget.value, e.detail.value), ctx.el, 'selected-change'));bindInterpolation(__t8,()=>item().label,true);return __frag;});
+    const __cf9=eachStatic(()=>ctx.interests(),'label',(item)=>{const __frag=__blk0();const [__el7,__t8]=__walk0(__frag);let __el7w_selected = {}; effect(() => { const __b = item().selected; if (Object.is(__b, __el7w_selected)) return; __el7w_selected = __b; assignBoundProperty(__el7, "selected", __b); });{ assignBoundProperty(__el7, "value", item().label); }__el7.addEventListener('selected-change', eventHandler(e => ctx.toggleInterest(e.currentTarget.value, e.detail.value), ctx.el, 'selected-change'));bindInterpolation(__t8,()=>item().label,true);return __frag;});
     __m10.replaceWith(__cf9);
     bindInterpolation(__t12,()=>ctx.selectedStr());
     return __frag;
@@ -18512,7 +18512,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-error
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, eachRow, eventHandler, onGlobalError, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { bindInterpolation, component, eachStatic, eventHandler, onGlobalError, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ag3fh1");
@@ -18560,7 +18560,7 @@ component('app-demo-comp-error-boundary-global-error', {
     const __frag=__blk2();
     const [__el5,__m19]=__walk2(__frag);
     __el5.addEventListener('click', eventHandler(ctx.triggerGlobalError, ctx.el, 'click'));
-    const __cf18=when(()=>ctx.globalErrors().length > 0,()=>{const __frag=__blk1();const [__t8,__m17]=__walk1(__frag);bindInterpolation(__t8,()=>ctx.globalErrors().length);const __cf16=eachRow(()=>ctx.globalErrors(),'id',(entry)=>{const __frag=__blk0();const [__t11,__t13,__t15]=__walk0(__frag);bindInterpolation(__t11,()=>entry().source);bindInterpolation(__t13,()=>entry().message);bindInterpolation(__t15,()=>entry().time);return __frag;});__m17.replaceWith(__cf16);return __frag;},null);
+    const __cf18=when(()=>ctx.globalErrors().length > 0,()=>{const __frag=__blk1();const [__t8,__m17]=__walk1(__frag);bindInterpolation(__t8,()=>ctx.globalErrors().length);const __cf16=eachStatic(()=>ctx.globalErrors(),'id',(entry)=>{const __frag=__blk0();const [__t11,__t13,__t15]=__walk0(__frag);bindInterpolation(__t11,()=>entry().source);bindInterpolation(__t13,()=>entry().message);bindInterpolation(__t15,()=>entry().time);return __frag;});__m17.replaceWith(__cf16);return __frag;},null);
     __m19.replaceWith(__cf18);
     return __frag;
   })(),
@@ -23569,7 +23569,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttribute, bindInterpolation, bindRef, bindTwoWay, component, eachRow, effect, eventHandler, signal, staticBlock, staticMarkup, store, when } from '@pdxui/core';
+import { assignBoundProperty, bindAttribute, bindInterpolation, bindRef, bindTwoWay, component, eachStatic, effect, eventHandler, signal, staticBlock, staticMarkup, store, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-1izf8x");
@@ -23691,7 +23691,7 @@ component('app-demo-comp-list-comment-thread', {
     const [__el0,__el14,__el52,__el53,__el56,__t58]=__walk6(__frag);
     bindRef(__el0,ctx.root);
     let __el14w_items = {}; effect(() => { const __b = ctx.thread.comments; if (Object.is(__b, __el14w_items)) return; __el14w_items = __b; assignBoundProperty(__el14, "items", __b); });
-    __el14['item']=(c)=>{const __frag=__blk4();const [__el15,__el16,__t20,__el21,__t23,__el25,__m28,__m43,__m50]=__walk4(__frag);bindAttribute(__el15, "aria-label", ()=>c.author + ', ' + c.text);let __el16w_alt = {}; effect(() => { const __b = c.author; if (Object.is(__b, __el16w_alt)) return; __el16w_alt = __b; assignBoundProperty(__el16, "alt", __b); });bindInterpolation(__t20,()=>c.author);let __el21w_datetime = {}; effect(() => { const __b = c.at; if (Object.is(__b, __el21w_datetime)) return; __el21w_datetime = __b; assignBoundProperty(__el21, "datetime", __b); });bindInterpolation(__t23,()=>c.text);__el25.addEventListener('click', eventHandler(($event) => ctx.openReply(c, $event), ctx.el, 'click'));const __cf27=when(()=>c.author === ctx.ME,()=>{const __frag=__blk0();const [__el26]=__walk0(__frag);__el26.addEventListener('click', eventHandler(() => ctx.remove(c.id), ctx.el, 'click'));return __frag;},null);__m28.replaceWith(__cf27);const __cf42=when(()=>c.replies.length > 0,()=>{const __frag=__blk2();const [__m41]=__walk2(__frag);const __cf40=eachRow(()=>c.replies,'id',(r)=>{const __frag=__blk1();const [__el31,__el32,__t36,__el37,__t39]=__walk1(__frag);bindAttribute(__el31, "aria-label", ()=>r().author + ', ' + r().text);let __el32w_alt = {}; effect(() => { const __b = r().author; if (Object.is(__b, __el32w_alt)) return; __el32w_alt = __b; assignBoundProperty(__el32, "alt", __b); });bindInterpolation(__t36,()=>r().author);let __el37w_datetime = {}; effect(() => { const __b = r().at; if (Object.is(__b, __el37w_datetime)) return; __el37w_datetime = __b; assignBoundProperty(__el37, "datetime", __b); });bindInterpolation(__t39,()=>r().text);return __frag;});__m41.replaceWith(__cf40);return __frag;},null);__m43.replaceWith(__cf42);const __cf49=when(()=>ctx.replyTo() === c.id,()=>{const __frag=__blk3();const [__el44,__el45,__el47,__el48]=__walk3(__frag);__el44.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.sendReply(c.id), ctx.el, 'submit'))(e);});bindTwoWay(__el45, 'value', ctx.replyDraft);let __el45w_ariaLabel = {}; effect(() => { const __b = 'Reply to ' + c.author; if (Object.is(__b, __el45w_ariaLabel)) return; __el45w_ariaLabel = __b; assignBoundProperty(__el45, "ariaLabel", __b); });__el45.addEventListener('keydown', eventHandler(($event) => ctx.onReplyKey($event, c.id), ctx.el, 'keydown'));__el47.addEventListener('click', eventHandler(() => ctx.closeReply(), ctx.el, 'click'));let __el48w_disabled = {}; effect(() => { const __b = !ctx.replyDraft().trim(); if (Object.is(__b, __el48w_disabled)) return; __el48w_disabled = __b; assignBoundProperty(__el48, "disabled", __b); });return __frag;},null);__m50.replaceWith(__cf49);return __frag;};
+    __el14['item']=(c)=>{const __frag=__blk4();const [__el15,__el16,__t20,__el21,__t23,__el25,__m28,__m43,__m50]=__walk4(__frag);bindAttribute(__el15, "aria-label", ()=>c.author + ', ' + c.text);let __el16w_alt = {}; effect(() => { const __b = c.author; if (Object.is(__b, __el16w_alt)) return; __el16w_alt = __b; assignBoundProperty(__el16, "alt", __b); });bindInterpolation(__t20,()=>c.author);let __el21w_datetime = {}; effect(() => { const __b = c.at; if (Object.is(__b, __el21w_datetime)) return; __el21w_datetime = __b; assignBoundProperty(__el21, "datetime", __b); });bindInterpolation(__t23,()=>c.text);__el25.addEventListener('click', eventHandler(($event) => ctx.openReply(c, $event), ctx.el, 'click'));const __cf27=when(()=>c.author === ctx.ME,()=>{const __frag=__blk0();const [__el26]=__walk0(__frag);__el26.addEventListener('click', eventHandler(() => ctx.remove(c.id), ctx.el, 'click'));return __frag;},null);__m28.replaceWith(__cf27);const __cf42=when(()=>c.replies.length > 0,()=>{const __frag=__blk2();const [__m41]=__walk2(__frag);const __cf40=eachStatic(()=>c.replies,'id',(r)=>{const __frag=__blk1();const [__el31,__el32,__t36,__el37,__t39]=__walk1(__frag);bindAttribute(__el31, "aria-label", ()=>r().author + ', ' + r().text);let __el32w_alt = {}; effect(() => { const __b = r().author; if (Object.is(__b, __el32w_alt)) return; __el32w_alt = __b; assignBoundProperty(__el32, "alt", __b); });bindInterpolation(__t36,()=>r().author);let __el37w_datetime = {}; effect(() => { const __b = r().at; if (Object.is(__b, __el37w_datetime)) return; __el37w_datetime = __b; assignBoundProperty(__el37, "datetime", __b); });bindInterpolation(__t39,()=>r().text);return __frag;});__m41.replaceWith(__cf40);return __frag;},null);__m43.replaceWith(__cf42);const __cf49=when(()=>ctx.replyTo() === c.id,()=>{const __frag=__blk3();const [__el44,__el45,__el47,__el48]=__walk3(__frag);__el44.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.sendReply(c.id), ctx.el, 'submit'))(e);});bindTwoWay(__el45, 'value', ctx.replyDraft);let __el45w_ariaLabel = {}; effect(() => { const __b = 'Reply to ' + c.author; if (Object.is(__b, __el45w_ariaLabel)) return; __el45w_ariaLabel = __b; assignBoundProperty(__el45, "ariaLabel", __b); });__el45.addEventListener('keydown', eventHandler(($event) => ctx.onReplyKey($event, c.id), ctx.el, 'keydown'));__el47.addEventListener('click', eventHandler(() => ctx.closeReply(), ctx.el, 'click'));let __el48w_disabled = {}; effect(() => { const __b = !ctx.replyDraft().trim(); if (Object.is(__b, __el48w_disabled)) return; __el48w_disabled = __b; assignBoundProperty(__el48, "disabled", __b); });return __frag;},null);__m50.replaceWith(__cf49);return __frag;};
     __el14['empty']=()=>{const __frag=__blk5();return __frag;};
     __el52.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.send(), ctx.el, 'submit'))(e);});
     bindRef(__el53,ctx.composer);
@@ -33605,7 +33605,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-trans
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, eachRow, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, component, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<div class="demo-stack"><pdx-input></pdx-input> <pdx-transfer searchable sourcetitle="Available" targettitle="Selected"></pdx-transfer></div>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild;const n2=n1.nextSibling.nextSibling;return [n1,n2];};
@@ -33626,7 +33626,7 @@ const sizes = ['sm', 'md', 'lg'];
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m10]=__walk1(__frag);
-    const __cf9=eachRow(()=>ctx.sizes,(s) => s,(s)=>{const __frag=__blk0();const [__el7,__el8]=__walk0(__frag);{ assignBoundProperty(__el7, "size", s()); }{ assignBoundProperty(__el7, "placeholder", s() + ' field'); }{ assignBoundProperty(__el8, "size", s()); }let __el8w_items = {}; effect(() => { const __b = ctx.items; if (Object.is(__b, __el8w_items)) return; __el8w_items = __b; assignBoundProperty(__el8, "items", __b); });let __el8w_value = {}; effect(() => { const __b = ['b']; if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });return __frag;});
+    const __cf9=eachStatic(()=>ctx.sizes,(s) => s,(s)=>{const __frag=__blk0();const [__el7,__el8]=__walk0(__frag);{ assignBoundProperty(__el7, "size", s()); }{ assignBoundProperty(__el7, "placeholder", s() + ' field'); }{ assignBoundProperty(__el8, "size", s()); }let __el8w_items = {}; effect(() => { const __b = ctx.items; if (Object.is(__b, __el8w_items)) return; __el8w_items = __b; assignBoundProperty(__el8, "items", __b); });let __el8w_value = {}; effect(() => { const __b = ['b']; if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });return __frag;});
     __m10.replaceWith(__cf9);
     return __frag;
   })(),
@@ -38204,7 +38204,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/design-the
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindAttributeOrProperty, bindInterpolation, component, computed, eachRow, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindAttributeOrProperty, bindInterpolation, component, computed, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
 import { useThemeMeasure } from './state.pdx';
 
 {
@@ -38229,7 +38229,7 @@ component('app-demo-design-themes-contrast', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m26]=__walk1(__frag);
-    const __cf25=eachRow(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken);bindAttribute(__el15, "data-ratio", ()=>row().ratio);bindAttributeOrProperty(__el16, "style", "style", ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')');bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
+    const __cf25=eachStatic(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken);bindAttribute(__el15, "data-ratio", ()=>row().ratio);bindAttributeOrProperty(__el16, "style", "style", ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')');bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
     __m26.replaceWith(__cf25);
     return __frag;
   })(),
@@ -40046,7 +40046,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, component, createSelection, delegate, eachRow, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindNativeProperty, component, createSelection, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-8i2p4t");
@@ -40123,7 +40123,7 @@ const people = [
     const [__el6,__m24,__t26]=__walk1(__frag);
     __el6.addEventListener('change', eventHandler(ctx.handleCheckAll, ctx.el, 'change'));
     const __rh14=eventHandler((__e,p)=>(ctx.handleGridClick)(__e), ctx.el, 'click');
-    const __cf23=eachRow(()=>ctx.people,'id',(p)=>{const __frag=__blk0();const [__el13,__el16,__t18,__t20,__t22]=__walk0(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el13.classList.remove(__t); for (const __t of __n) __el13.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el13,'click',__rh14,p);bindNativeProperty(__el16, "checked", "checked", ()=>ctx.gridIsSelected(p().id));bindInterpolation(__t18,()=>p().name);bindInterpolation(__t20,()=>p().role);bindInterpolation(__t22,()=>p().status);return __frag;});
+    const __cf23=eachStatic(()=>ctx.people,'id',(p)=>{const __frag=__blk0();const [__el13,__el16,__t18,__t20,__t22]=__walk0(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el13.classList.remove(__t); for (const __t of __n) __el13.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el13,'click',__rh14,p);bindNativeProperty(__el16, "checked", "checked", ()=>ctx.gridIsSelected(p().id));bindInterpolation(__t18,()=>p().name);bindInterpolation(__t20,()=>p().role);bindInterpolation(__t22,()=>p().status);return __frag;});
     __m24.replaceWith(__cf23);
     bindInterpolation(__t26,()=>ctx.gridInfo());
     return __frag;
@@ -40136,7 +40136,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, createSelection, delegate, eachRow, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, component, createSelection, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qyfzev");
@@ -40204,7 +40204,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     const __frag=__blk1();
     const [__m10,__el12,__el13,__t15]=__walk1(__frag);
     const __rh7=eventHandler((__e,fruit)=>(ctx.handleMultiClick)(__e), ctx.el, 'click');
-    const __cf9=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t8]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el6,'click',__rh7,fruit);bindInterpolation(__t8,()=>fruit(),true);return __frag;});
+    const __cf9=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el6,__t8]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el6,'click',__rh7,fruit);bindInterpolation(__t8,()=>fruit(),true);return __frag;});
     __m10.replaceWith(__cf9);
     delegate(ctx.el,__el12,'click',eventHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits), ctx.el, 'click'));
     delegate(ctx.el,__el13,'click',eventHandler(() => ctx.multiSel.clear(), ctx.el, 'click'));
@@ -40219,7 +40219,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-sele
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, createSelection, delegate, eachRow, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, component, createSelection, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-n3id1b");
@@ -40263,7 +40263,7 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
     const __frag=__blk1();
     const [__m9,__t11]=__walk1(__frag);
     const __rh6=eventHandler((__e,fruit)=>(() => ctx.singleSel.select(fruit()))(__e), ctx.el, 'click');
-    const __cf8=eachRow(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el5,'click',__rh6,fruit);bindInterpolation(__t7,()=>fruit(),true);return __frag;});
+    const __cf8=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el5,__t7]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el5.classList.remove(__t); for (const __t of __n) __el5.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el5,'click',__rh6,fruit);bindInterpolation(__t7,()=>fruit(),true);return __frag;});
     __m9.replaceWith(__cf8);
     bindInterpolation(__t11,()=>ctx.singleInfo());
     return __frag;
@@ -40423,7 +40423,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/showcase-settings.p
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, computed, delegate, eachRow, effect, eventHandler, selector, setTheme as applyThemeName, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, computed, delegate, eachStatic, effect, eventHandler, selector, setTheme as applyThemeName, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-mwg9c1");
@@ -40543,10 +40543,10 @@ component('app-showcase-settings', {
     __el7.classList.add("settings-panel");effect(()=>{const __c=!!(ctx.settingsOpen());__el7.classList.toggle("open",__c);});
     delegate(ctx.el,__el10,'click',eventHandler(ctx.toggleSettings, ctx.el, 'click'));
     const __rh16=eventHandler((__e,opt)=>(() => ctx.setTheme(opt().key))(__e), ctx.el, 'click');
-    const __cf18=eachRow(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t17]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_theme.is(opt().key));__el15.classList.toggle("active",__c);});delegate(ctx.el,__el15,'click',__rh16,opt);bindInterpolation(__t17,()=>opt().label);return __frag;});
+    const __cf18=eachStatic(()=>ctx.themeItems,'key',(opt)=>{const __frag=__blk0();const [__el15,__t17]=__walk0(__frag);__el15.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_theme.is(opt().key));__el15.classList.toggle("active",__c);});delegate(ctx.el,__el15,'click',__rh16,opt);bindInterpolation(__t17,()=>opt().label);return __frag;});
     __m19.replaceWith(__cf18);
     const __rh24=eventHandler((__e,opt)=>(() => ctx.setDensity(opt().key))(__e), ctx.el, 'click');
-    const __cf26=eachRow(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk0();const [__el23,__t25]=__walk0(__frag);__el23.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_density.is(opt().key));__el23.classList.toggle("active",__c);});delegate(ctx.el,__el23,'click',__rh24,opt);bindInterpolation(__t25,()=>opt().label);return __frag;});
+    const __cf26=eachStatic(()=>ctx.densityItems,'key',(opt)=>{const __frag=__blk0();const [__el23,__t25]=__walk0(__frag);__el23.classList.add("settings-chip");effect(()=>{const __c=!!(__sel_density.is(opt().key));__el23.classList.toggle("active",__c);});delegate(ctx.el,__el23,'click',__rh24,opt);bindInterpolation(__t25,()=>opt().label);return __frag;});
     __m27.replaceWith(__cf26);
     __el31.classList.add("settings-chip");effect(()=>{const __c=!!(ctx.dark());__el31.classList.toggle("active",!__c);});
     delegate(ctx.el,__el31,'click',eventHandler(() => ctx.setDark(false), ctx.el, 'click'));
@@ -40603,7 +40603,7 @@ exports[`compile golden — demo corpus > todo-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindTwoWay, component, computed, delegate, eachRow, eventHandler, prop, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { bindInterpolation, bindTwoWay, component, computed, delegate, eachStatic, eventHandler, prop, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-9864yt");
@@ -40654,7 +40654,7 @@ let nextId = 4;
     delegate(ctx.el,__el5,'click',eventHandler(ctx.addItem, ctx.el, 'click'));
     bindInterpolation(__t7,()=>ctx.remaining());
     const __rh12=eventHandler((__e,item)=>(() => ctx.remove(item().id))(__e), ctx.el, 'click');
-    const __cf13=eachRow(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t10,__el11]=__walk0(__frag);bindInterpolation(__t10,()=>item().text);delegate(ctx.el,__el11,'click',__rh12,item);return __frag;});
+    const __cf13=eachStatic(()=>ctx.items(),'id',(item)=>{const __frag=__blk0();const [__t10,__el11]=__walk0(__frag);bindInterpolation(__t10,()=>item().text);delegate(ctx.el,__el11,'click',__rh12,item);return __frag;});
     __m14.replaceWith(__cf13);
     const __cf16=when(()=>ctx.items().length === 0,()=>{const __frag=__blk1();return __frag;},null);
     __m17.replaceWith(__cf16);
@@ -40668,7 +40668,7 @@ exports[`compile golden — demo corpus > user-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, component, computed, eachRow, effect, eventHandler, interpolationText, prop, resource, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { bindInterpolation, component, computed, eachStatic, effect, eventHandler, interpolationText, prop, resource, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-q0t8c6");
@@ -40724,7 +40724,7 @@ let users = resource(() => {
     bindInterpolation(__t7,()=>ctx.userCount());
     const __cf9=when(()=>ctx.users.state() === 'pending',()=>{const __frag=__blk0();return __frag;},null);
     __m10.replaceWith(__cf9);
-    const __cf17=when(()=>ctx.users.state() === 'success',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachRow(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name,true);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
+    const __cf17=when(()=>ctx.users.state() === 'success',()=>{const __frag=__blk2();const [__m16]=__walk2(__frag);const __cf15=eachStatic(()=>ctx.userData(),'name',(user)=>{const __frag=__blk1();const [__t13,__t14]=__walk1(__frag);bindInterpolation(__t13,()=>user().name,true);bindInterpolation(__t14,()=>user().role);return __frag;});__m16.replaceWith(__cf15);return __frag;},null);
     __m18.replaceWith(__cf17);
     const __cf20=when(()=>ctx.users.state() === 'error',()=>{const __frag=__blk3();return __frag;},null);
     __m21.replaceWith(__cf20);
