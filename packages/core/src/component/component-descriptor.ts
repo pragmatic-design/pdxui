@@ -132,7 +132,17 @@ export interface ModelOptions extends PropOptions {
     form?: boolean;
 }
 
+/**
+ * A model declared `{ form: true }`: its spec holds the form wiring, and a component that declares one is
+ * form-associated, so its context's `el` is a FormPdxElement (#1246).
+ */
+export interface FormModelSpec<T> extends ModelSpec<T> {
+    readonly form: typeof wireFormModel;
+}
+
 /** Declare a model: `model<string>('')`, `model<Item[]>(() => [])`, `model<string>('', { form: true })`. */
+export function model<T>(defaultValue: T | (() => T) | undefined, options: ModelOptions & { form: true }): FormModelSpec<T>;
+export function model<T>(defaultValue?: T | (() => T), options?: ModelOptions): ModelSpec<T>;
 export function model<T>(defaultValue?: T | (() => T), options?: ModelOptions): ModelSpec<T> {
     const spec = { ...propBuilder(defaultValue, options), model: true as const };
     return options?.form ? { ...spec, form: wireFormModel } : spec;

@@ -5,7 +5,7 @@
 // added to PdxElement is reserved without anyone remembering to.
 
 import { describe, it, expect, vi } from 'vitest';
-import { component, prop } from '../src/index';
+import { component, prop, model } from '../src/index';
 import { RESERVED_ELEMENT_NAMES, ELEMENT_NAMES_KEPT } from '../../compiler/src/compiler/reserved-element-names';
 import { RESERVED_DOM_MEMBERS as COMPILER_DOM_MEMBERS, DOM_EVENT_HANDLERS } from '../../compiler/src/compiler/reserved-dom-names';
 import { RESERVED_DOM_MEMBERS } from '../src/component/reserved-dom-members';
@@ -21,11 +21,16 @@ function membersBelowHTMLElement(cls: CustomElementConstructor): Set<string> {
 
 describe("the compiler's reserved names", () => {
     it("are the element class's members, less the ones kept on purpose", () => {
-        component('x-reserved-probe', { render: () => document.createDocumentFragment() });
+        // A form-associated probe: its class extends FormPdxElement, which extends PdxElement (#1246), so
+        // its chain holds every member any component's class has. The compiler has one list for all.
+        component('x-reserved-probe', { models: { value: model('', { form: true }) }, render: () => document.createDocumentFragment() });
         const members = membersBelowHTMLElement(customElements.get('x-reserved-probe')!);
-        // The control: the walk reached PdxElement's members, not only the component's own class.
+        // The control: the walk reached PdxElement's members and FormPdxElement's, not only the
+        // component's own class.
         expect(members.has('track') && members.has('emit') && members.has('body')).toBe(true);
-        const expected = [...members].filter(n => !ELEMENT_NAMES_KEPT.has(n)).sort();
+        expect(members.has('checkValidity') && members.has('setFormValue')).toBe(true);
+        // Less the probe's own model, whose accessor is its class's (#1246, 3b): a declaration, not a member.
+        const expected = [...members].filter(n => !ELEMENT_NAMES_KEPT.has(n) && n !== 'value').sort();
         expect([...RESERVED_ELEMENT_NAMES].sort()).toEqual(expected);
     });
 });

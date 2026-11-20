@@ -261,10 +261,13 @@ export function assembleModule(
     if (slots.length > 0) imports.add('slot');
     // The features the definition is given (#1246), and imported: the ones its declarations use, so a
     // bundle carries no feature none of its components declares. `ctx.expose` is read from the emitted
-    // body, as `__adoptStyles` above; `host` is the descriptor's `host` and the variant axes it reflects.
+    // body, as `__adoptStyles` above; `host` is the descriptor's `host` and the variant axes it reflects;
+    // `form`, the base of a form-associated component, is a model declared `{ form }`, whose spec the
+    // caller has already given `wireFormModel` (codegen-new).
     const features: [string, string][] = [];
     if (setupBody.includes('ctx.expose(')) features.push(['expose', 'exposeOnElement']);
     if (hostCode || variantsCode) features.push(['host', 'bindHost']);
+    if (imports.has('wireFormModel')) features.push(['form', 'FormPdxElement']);
     for (const [, fn] of features) imports.add(fn);
     // None is no third argument: most components (every page) declare none, and pay nothing for it.
     const featuresCode = features.length > 0 ? `, { ${features.map(([name, fn]) => `${name}: ${fn}`).join(', ')} }` : '';

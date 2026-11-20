@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-492 value exports.
+493 value exports.
 
 ### `__adoptStyles`
 
@@ -2353,6 +2353,16 @@ function formFieldNames(form: Form<Record<string, unknown>>): string[]
 ```
 
 The names of a form's fields as they are now, rows a field list added included.
+
+### `FormPdxElement`
+
+```ts
+import { FormPdxElement } from '@pdxui/core';
+
+class FormPdxElement
+```
+
+Base class of a form-associated component: `defineComponent` gives it to one with a form model.
 
 ### `forwardSlots`
 

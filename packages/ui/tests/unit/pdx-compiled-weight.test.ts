@@ -14,7 +14,9 @@
 // a module names the features its declarations use, `defineComponent(…, { expose: exposeOnElement,
 // host: bindHost })`, so an app whose components use neither does not carry them (hello: 8064 → 7508 B).
 // Weighed here with every import external, the module pays the two imports' names; in an app's bundle
-// they are local identifiers, and the showcase's whole JavaScript grew 0.2 KB.
+// they are local identifiers, and the showcase's whole JavaScript grew 0.2 KB. 1243 → 1255 B and
+// 7787 → 7800 B with #1246's form base: both are form components, and name `{ form: FormPdxElement }`,
+// the class whose form API leaves every component that is not one (hello: 7505 → 7237 B).
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -31,8 +33,8 @@ const UI = join(__dirname, '..', '..');
 
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
-    'src/switch-toggle/pdx-switch.pdx': 1243,
-    'pilot/select.pdx': 7787,
+    'src/switch-toggle/pdx-switch.pdx': 1255,
+    'pilot/select.pdx': 7800,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

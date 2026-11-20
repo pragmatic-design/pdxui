@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 104 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 105 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -533,6 +533,16 @@ function flip(options?: FlipOptions): Middleware
 ```
 
 Flip to the opposite side if the floating element overflows the boundary (or viewport).
+
+## `FormPdxElement`
+
+```ts
+import { FormPdxElement } from '@pdxui/core';
+
+class FormPdxElement
+```
+
+Base class of a form-associated component: `defineComponent` gives it to one with a form model.
 
 ## `forwardSlots`
 

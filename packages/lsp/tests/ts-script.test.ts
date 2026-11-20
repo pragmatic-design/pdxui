@@ -146,9 +146,14 @@ describe('getScriptDiagnostics', () => {
         expect(diagnose('\n@host el;\nconst n: number = el.id;\n', APP_URI).some((m) => /string/i.test(m) && /number/i.test(m)), 'el is not typed').toBe(true);
     });
 
-    it('@host el is a PdxElement: its labels are the <label>s that name it (#987)', () => {
-        expect(diagnose('\n@host el;\nconst first: HTMLLabelElement | undefined = el.labels[0];\nconst n: number = el.labels.length;\n', APP_URI)).toEqual([]);
-        expect(diagnose('\n@host el;\nconst s: string = el.labels;\n', APP_URI).some((m) => /NodeListOf<HTMLLabelElement>/.test(m)), 'el.labels is not typed').toBe(true);
+    it('@host el of a form component is a FormPdxElement: its labels are the <label>s that name it (#987)', () => {
+        const form = "\n@model value: string = '' { form };\n@host el;\n";
+        expect(diagnose(`${form}const first: HTMLLabelElement | undefined = el.labels[0];\nconst n: number = el.labels.length;\n`, APP_URI)).toEqual([]);
+        expect(diagnose(`${form}const s: string = el.labels;\n`, APP_URI).some((m) => /NodeListOf<HTMLLabelElement>/.test(m)), 'el.labels is not typed').toBe(true);
+    });
+
+    it('@host el of any other component is a PdxElement, with no form API (#1246)', () => {
+        expect(diagnose('\n@host el;\nconst n = el.labels;\n', APP_URI).some((m) => /labels/.test(m)), 'el.labels is typed on a host that has none').toBe(true);
     });
 
     it('the @event payload is typed: a string where a number belongs is an error', () => {

@@ -44,7 +44,9 @@ describe('Form-Associated CE', () => {
 
         const el = document.createElement('pdx-test-plain-fa') as any;
         document.body.appendChild(el);
-        expect(el._internals).toBeNull();
+        // It extends PdxElement, not FormPdxElement: no internals, and no form API (#1246).
+        expect(el._internals).toBeUndefined();
+        expect(el.checkValidity).toBeUndefined();
         el.remove();
     });
 });

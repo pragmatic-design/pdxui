@@ -2,7 +2,7 @@
 // every feature. A descriptor that uses a feature the definition was not given is refused in development.
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { defineComponent, component, exposeOnElement, bindHost } from '../src/index';
+import { defineComponent, component, exposeOnElement, bindHost, FormPdxElement, PdxElement, model } from '../src/index';
 
 let n = 0;
 const tag = (): string => `x-features-${++n}`;
@@ -47,6 +47,22 @@ describe('defineComponent: the features given, and no other (#1246)', () => {
     it('refuses, in development, a host or variant axes it was not given the host feature for', () => {
         expect(() => defineComponent(tag(), { host: { role: 'note' }, render })).toThrow(/host feature/);
         expect(() => defineComponent(tag(), { variants: { tone: ['a', 'b'] }, render }, { expose: exposeOnElement })).toThrow(/host feature/);
+    });
+
+    it('given form, a form-associated component extends FormPdxElement; one that is not, PdxElement', () => {
+        const formTag = tag();
+        defineComponent(formTag, { models: { value: model('', { form: true }) }, render }, { form: FormPdxElement });
+        const plainTag = tag();
+        defineComponent(plainTag, { render }, { form: FormPdxElement });
+        expect(mount(formTag)).toBeInstanceOf(FormPdxElement);
+        const plain = mount(plainTag);
+        expect(plain).toBeInstanceOf(PdxElement);
+        expect(plain).not.toBeInstanceOf(FormPdxElement);
+    });
+
+    it('refuses, in development, a form-associated component it was not given the form feature for', () => {
+        expect(() => defineComponent(tag(), { models: { value: model('', { form: true }) }, render })).toThrow(/form feature/);
+        expect(() => defineComponent(tag(), { formAssociated: true, render })).toThrow(/form feature/);
     });
 
     it('component() is defineComponent with every feature', () => {

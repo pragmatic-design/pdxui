@@ -216,11 +216,13 @@ export function projectScriptMapped(
             if (ev && emitter) emitters.push(ev[4] ? `var ${emitter}: (detail: ${ev[4]}) => ${returns};` : `var ${emitter}: (detail?: unknown) => ${returns};`);
         }
         if (kw === 'host') {
-            // Match: @host el;  or  @host el { … } — the component's own element, named (#750), a
-            // PdxElement: what core makes every host, with its labels (#987).
+            // Match: @host el;  or  @host el { … } — the component's own element, named (#750): a
+            // FormPdxElement, with its labels (#987) and the form API, for a component with a model
+            // `{ form }`, which core makes form-associated; a PdxElement, which has none, for any other (#1246).
             // Groups: [1]=the name
             const named = /^\s+([A-Za-z_$][\w$]*)\s*(?=[{;\n]|$)/.exec(s.slice(m.index + 1 + kw.length));
-            if (named) emitters.push(`var ${named[1]}: import('@pdxui/core').PdxElement;`);
+            const formAssociated = analyzeScript(s, 'projection.pdx').props.some((p) => p.model && p.form);
+            if (named) emitters.push(`var ${named[1]}: import('@pdxui/core').${formAssociated ? 'FormPdxElement' : 'PdxElement'};`);
         }
         if (kw === 'part') {
             // Match: @part trigger, popup; — each name is its element, null while not rendered (#134),
