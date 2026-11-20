@@ -3,7 +3,7 @@
 // Use inside <pdx-radio-group> for managed selection + keyboard nav.
 
 import { component, html, untracked, model, prop } from '@pdxui/core';
-import type { PdxElement } from '@pdxui/core';
+import type { FormPdxElement } from '@pdxui/core';
 import { setOwnProp } from '../shared/own-prop';
 
 // One submitter per radio: the host. The inner <input type="radio"> stays, because the
@@ -18,7 +18,7 @@ function formScope(form: HTMLFormElement): number {
     if (id === undefined) { id = ++nextFormId; formIds.set(form, id); }
     return id;
 }
-type RadioHost = PdxElement & { name: string; checked: boolean };
+type RadioHost = FormPdxElement & { name: string; checked: boolean };
 
 /**
  * A radio button: one option of a single selection, grouped by `<pdx-radio-group>` and navigated

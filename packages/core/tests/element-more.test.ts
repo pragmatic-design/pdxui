@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { PdxElement } from '../src/component/element';
+import { FormPdxElement } from '../src/component/form-element';
 import { define } from '../src/component/define';
 
 let tagCounter = 0;
@@ -305,15 +306,31 @@ describe('emit', () => {
     });
 });
 
-describe('the form-associated surface without ElementInternals', () => {
-    it('answers safely rather than throwing when internals were never attached', () => {
+describe('the form-associated surface (#1246)', () => {
+    it('is not on an element that is not form-associated, as on a native one', () => {
         const tag = defineEl(() => html`<input />`);
-        const el = document.createElement(tag) as PdxElement;
+        const el = document.createElement(tag) as PdxElement & Record<string, unknown>;
         document.body.appendChild(el);
 
-        // No formAssociated → no _internals. Every accessor has to degrade, because a
-        // component that is not in a form still gets asked these by generic form code.
+        // The form API is FormPdxElement's: a PdxElement carries none of it, as a native element
+        // that is not a form control has no `form`, `labels` or validity.
+        for (const member of ['form', 'labels', 'validationMessage', 'validity', 'checkValidity', 'reportValidity', 'setFormValue', 'setValidity', 'formResetCallback', 'formStateRestoreCallback']) {
+            expect(el[member], member).toBeUndefined();
+        }
+    });
+
+    it('answers safely on a form element whose internals were never attached', () => {
+        const tag = uniqueTag();
+        class FormEl extends FormPdxElement { body() { return html`<input />`; } }
+        define(tag, FormEl as unknown as new () => PdxElement);
+        const el = document.createElement(tag) as FormEl;
+        // A DOM without form association (Node, an older browser): every accessor has to degrade,
+        // because generic form code still asks a form control these.
+        el._internals = null;
+        document.body.appendChild(el);
+
         expect(el.form).toBeNull();
+        expect(el.labels).toHaveLength(0);
         expect(el.validationMessage).toBe('');
         expect(el.validity).toEqual({});
         expect(el.checkValidity()).toBe(true);

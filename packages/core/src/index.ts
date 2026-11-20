@@ -219,8 +219,10 @@ export type { ComponentScope, PropChange } from './component/lifecycle';
 // Component Communication
 export { exposeOnElement } from './component/channel';
 
-// A feature `defineComponent` is given (#1246), beside `exposeOnElement`: what a compiled `.pdx` names for `@host`.
+// The features `defineComponent` is given (#1246), beside `exposeOnElement`: what a compiled `.pdx` names
+// for `@host`, and for a model declared `{ form }`.
 export { bindHost } from './component/host';
+export { FormPdxElement } from './component/form-element';
 
 // Permissions
 export { setPermissions, hasPermission, requirePermission } from './component/permissions';

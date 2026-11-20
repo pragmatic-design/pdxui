@@ -391,7 +391,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // both, through `@pdxui/ui`'s components, and pays the definition's indirection once and the features
 // object in each component that names one. The built dist: entry 43.2 KB, blocking 102.2 KB, js 477.2 KB
 // locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.3, js: 477.3, css: 67, blocking: 102.3 };
+// js 477.3 → 477.4 (#1246, part 3c): the form API in FormPdxElement, the base of a form-associated
+// component only (hello 7,505 → 7,237 B). This app still defines most of its library components with
+// component(), which carries every feature, so it carries FormPdxElement as a subclass: entry 44,180 →
+// 44,237 B. The built dist: entry 43.2 KB, blocking 102.2 KB, js 477.3 KB locally; a tenth kept.
+const BUDGET_KB = { entry: 43.3, js: 477.4, css: 67, blocking: 102.3 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

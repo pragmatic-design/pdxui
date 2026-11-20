@@ -41,6 +41,12 @@ describe('a compiled component names the features it uses (#1246)', () => {
         expect(d.features).toBe('{ host: bindHost }');
     });
 
+    it('a model declared { form } is given FormPdxElement, the base of a form-associated component', () => {
+        const d = definition(`<template><input /></template>\n<script>\n@model value: string = '' { form };\n</script>`);
+        expect(d.features).toBe('{ form: FormPdxElement }');
+        expect(d.imports).toEqual(expect.arrayContaining(['FormPdxElement', 'wireFormModel']));
+    });
+
     it('both, in one object', () => {
         const d = definition(`<template><p></p></template>\n<script>\n@host { role="button" }\n@expose open;\nfunction open() {}\n</script>`);
         expect(d.features).toBe('{ expose: exposeOnElement, host: bindHost }');

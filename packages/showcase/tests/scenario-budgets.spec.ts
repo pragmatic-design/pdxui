@@ -82,12 +82,18 @@ import { scenarioDist } from './scenarios-build';
  * (`expose`, `host`): an app whose components declare neither carries neither. hello 7.9 → 7.3,
  * dashboard 19.9 → 19.3, benchmark 13.1 as it was; crud 51.4 → 51.5, the cost of the definition's
  * indirection in an app whose components use both. Each budget the measurement + 0.3.
+ *
+ * #1246's part 3c, the form API (ElementInternals, `form`, `labels`, validity, the form callbacks) in
+ * FormPdxElement, the base of a form-associated component only: hello 7.3 → 7.1, benchmark 12.5 →
+ * 12.3 (12,824 → 12,571 B), dashboard 19.3 → 19.1, crud 51.5 as it was. The benchmark had read 13.1
+ * here: it is built with the compiler's dist, and a stale one emitted the definition every feature
+ * carries. Each budget the measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 7.6, css: 0 },
-    benchmark: { js: 13.1, css: 0 },
+    hello: { js: 7.4, css: 0 },
+    benchmark: { js: 12.6, css: 0 },
     crud: { js: 51.8, css: 1.6 },
-    dashboard: { js: 19.6, css: 21.9 },
+    dashboard: { js: 19.4, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the

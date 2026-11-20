@@ -70,15 +70,6 @@ const HTMLElementBase: typeof HTMLElement = (typeof HTMLElement !== 'undefined'
     ? HTMLElement
     : (class {} as unknown as typeof HTMLElement));
 
-/**
- * An empty NodeList of labels, the platform's own type: what `labels` is for an element with no
- * internals. Made from a detached fragment, once, when first asked for.
- */
-let noLabels: NodeListOf<HTMLLabelElement> | null = null;
-function emptyLabels(): NodeListOf<HTMLLabelElement> {
-    return noLabels ??= document.createDocumentFragment().querySelectorAll('label');
-}
-
 /** Every <slot> in a rendered template, the root included. */
 function slotsIn(content: Node | null): Element[] {
     if (!content) return [];
@@ -152,83 +143,6 @@ export abstract class PdxElement extends HTMLElementBase {
     static attrCanonical?: Map<string, string>;
     /** The `.pdx` this component was compiled from — development builds only. See component(). */
     static file?: string;
-
-    // --- Form-Associated Custom Elements (ElementInternals) ---
-
-    /** ElementInternals instance (only for form-associated components). */
-    protected _internals: ElementInternals | null = null;
-
-    /** Set the form value for this component (if form-associated). */
-    setFormValue(value: FormData | string | File | null, state?: string | File | FormData | null): void {
-        this._internals?.setFormValue(value, state ?? undefined);
-    }
-
-    /** Set the form validity for this component (if form-associated). */
-    setValidity(flags?: ValidityStateFlags, message?: string, anchor?: HTMLElement): void {
-        if (!this._internals) return;
-        if (!flags || Object.keys(flags).length === 0) {
-            this._internals.setValidity({});
-        } else {
-            this._internals.setValidity(flags, message, anchor);
-        }
-    }
-
-    /** Get the form this component belongs to. */
-    get form(): HTMLFormElement | null { return this._internals?.form ?? null; }
-
-    /**
-     * A component may declare a `form` PROP — pdx-form's whole API is one. Its accessor is installed
-     * when it connects; before that, this getter alone would make `el.form = x` throw ("only a
-     * getter"), which is what `<pdx-form :form>` does wherever the element is upgraded before it is
-     * bound. The value is kept as an own property, which the prop accessor picks up when installed.
-     */
-    set form(value: unknown) {
-        Object.defineProperty(this, 'form', { value, writable: true, configurable: true, enumerable: true });
-    }
-
-    /**
-     * The labels that name this element (#987): for a form-associated component, the `<label for>`
-     * pointing at its id and a `<label>` wrapping it, read from its ElementInternals, live as the
-     * platform keeps them. A component names its inner control after them — a `.pdx` writes
-     * `self.labels` with `@host self;` — with no query on the document. Empty for one that is not
-     * form-associated: the platform associates a label only with a labelable element. Empty too, and
-     * not live, for one no label can name, with no id and in no label: read it again after giving it one.
-     */
-    get labels(): NodeListOf<HTMLLabelElement> {
-        // A label names an element by its `for` matching the element's id, or by holding it (HTML,
-        // "labeled control"): with neither, none can, and the platform's list is not asked for.
-        // Asking costs a walk of the document after each change to it, which a hundred mounts in a
-        // row pay a hundred times (scenario-pilot-mount.spec.ts measured the select at 2× main).
-        if (!this._internals || (!this.id && !this.closest('label'))) return emptyLabels();
-        return this._internals.labels as NodeListOf<HTMLLabelElement>;
-    }
-
-    /** A component may declare a `labels` prop: the same as `form`, kept as an own property. */
-    set labels(value: unknown) {
-        Object.defineProperty(this, 'labels', { value, writable: true, configurable: true, enumerable: true });
-    }
-
-    /** Get the validation message. */
-    get validationMessage(): string { return this._internals?.validationMessage ?? ''; }
-
-    /** Get the validity state. */
-    get validity(): ValidityState { return this._internals?.validity ?? ({} as ValidityState); }
-
-    /** Check validity (triggers browser UI). */
-    checkValidity(): boolean { return this._internals?.checkValidity() ?? true; }
-
-    /** Report validity (shows browser validation bubble). */
-    reportValidity(): boolean { return this._internals?.reportValidity() ?? true; }
-
-    /** Called when the parent form resets. Override to handle reset. */
-    formResetCallback(): void {
-        // Subclass can override to reset internal state
-    }
-
-    /** Called when form state is restored (back/forward navigation). */
-    formStateRestoreCallback(_state: string | File | FormData | null, _mode: 'restore' | 'autocomplete'): void {
-        // Subclass can override to restore state
-    }
 
     /** Attribute-backed signals, keyed by attribute name. */
     private _attrSignals = new Map<string, Signal<string | null>>();

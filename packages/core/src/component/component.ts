@@ -5,6 +5,7 @@ import { signal, getTopErrorHandler } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
 import { PdxElement, attrValue, watchAttr } from './element';
+import { FormPdxElement } from './form-element';
 import type { EmitOptions } from './element';
 import { define } from './define';
 import { pushScope, popScope } from './lifecycle';
@@ -54,7 +55,6 @@ export function __pdx_hmr_restore(tag: string): void {
 import { PROP_SPEC } from './prop-spec';
 import type { PropType, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
 import { modelEvent } from '../utils/model-event';
-import type { FormModelCallbacks } from '../form/form-model';
 import type { HydrateOnOptions } from '../renderer/hydrate-on';
 import { isServerRender } from '../server/mode';
 export type { PropType } from './component-descriptor';
@@ -78,7 +78,10 @@ type PropSignals<P extends PropMap> = {
  * Use this when writing typed handwritten components with known props.
  */
 export interface ComponentContextBase {
-    /** The host element: a PdxElement, with its labels and its form association (#987). */
+    /**
+     * The host element. A form-associated component's is a FormPdxElement, with its labels and its form
+     * association (#987); a typed context says which (`TypedComponentContext`, #1246).
+     */
     el: PdxElement;
     /** Dispatch a custom event. It stays on the host unless `{ bubbles: true }` (#138). */
     /** False when the event was `cancelable` and a listener prevented it. */
@@ -134,7 +137,14 @@ export type ModelMap = Record<string, ModelSpec<unknown>>;
  * declared events (any name when it declares none).
  */
 export type TypedComponentContext<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>> =
-    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P> & PropSignals<M> & VariantSignals<V>;
+    Omit<ComponentContextBase, 'emit' | 'el'> & { emit: EmitOf<E>; el: HostElementOf<M> } & PropSignals<P> & PropSignals<M> & VariantSignals<V>;
+
+/**
+ * The host as a typed context has it (#1246): a FormPdxElement, with the platform's form API, for a
+ * component that declares a model `{ form: true }`; a PdxElement, which has none, for any other.
+ */
+type HostElementOf<M extends ModelMap> =
+    { [K in keyof M]: M[K] extends { readonly form: unknown } ? K : never }[keyof M] extends never ? PdxElement : FormPdxElement;
 
 /**
  * One variant axis (#512): its values in order, or a record from each value to the native selector
@@ -277,10 +287,15 @@ export interface ComponentFeatures {
     expose?: typeof exposeOnElement;
     /** The descriptor's `host` (`@host`), and the attributes that reflect its variant axes. */
     host?: typeof bindHost;
+    /**
+     * The base of a form-associated component (a model declared `{ form }`, or `formAssociated`): its
+     * ElementInternals and the platform's form API. A component that is not one extends PdxElement.
+     */
+    form?: typeof FormPdxElement;
 }
 
 /** What `component()` defines with: every feature, for a descriptor written by hand. */
-const EVERY_FEATURE: ComponentFeatures = { expose: exposeOnElement, host: bindHost };
+const EVERY_FEATURE: ComponentFeatures = { expose: exposeOnElement, host: bindHost, form: FormPdxElement };
 
 /**
  * Define a component with the features given and no other (#1246): the definition a compiled `.pdx`
@@ -293,7 +308,7 @@ export function defineComponent<P extends PropMap, S extends Record<string, unkn
 export function defineComponent<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
     tag: string, options: ComponentOptions<P, E, M, V>, features?: ComponentFeatures): void;
 export function defineComponent<P extends PropMap, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>, features: ComponentFeatures = {}): void {
-    const { expose, host: hostFeature } = features;
+    const { expose, host: hostFeature, form: formBase } = features;
     // A descriptor whose `host` or variant axes nothing would bind: the definition was not given the
     // host feature. The compiler gives it to every component that declares either.
     if (DEV && !hostFeature && (Object.keys(options.host ?? {}).length > 0 || Object.keys(options.variants ?? {}).length > 0)) {
@@ -360,6 +375,15 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
 
     const useShadow = options.shadow ?? false;
     const useFormAssociated = (options.formAssociated ?? false) || formModel !== null;
+    if (DEV && useFormAssociated && !formBase) {
+        throw new Error(`[pdx] <${tag}> is form-associated (a model declared { form }, or formAssociated), and defineComponent was not given the form feature. Pass it ({ form: FormPdxElement }), or define the component with component(), which carries every feature.`);
+    }
+    // The class a form-associated component extends: the form feature's, with the platform's form API on
+    // its ElementInternals. The others extend PdxElement and carry none of it (#1246).
+    const Base: typeof PdxElement = useFormAssociated && formBase ? formBase : PdxElement;
+    // This element as the form base it extends, for the form wiring below: the class's base is the
+    // form feature's exactly when the component is form-associated.
+    const asForm = (el: PdxElement): FormPdxElement | null => (Base === PdxElement ? null : el as FormPdxElement);
     // _skipAttrSync removed — attribute→prop sync must be identical in dev and prod
 
     // Object/Array/Function props are property-only (not attributes).
@@ -396,7 +420,7 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
 
     const hydrateLater = options.hydrate ?? null;
 
-    class Comp extends PdxElement {
+    class Comp extends Base {
         static attrs = attrNames;
         static attrCanonical = attrCanonical;
         static formAssociated = useFormAssociated;
@@ -408,13 +432,6 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
         _customStates: CustomStateSet | null = null;
 
         override get _hydrateLater(): HydrateOnOptions | null { return hydrateLater; }
-
-        /** The form lifecycle of a model declared `{ form }` (#135), once the body has wired it. */
-        _formModel: FormModelCallbacks | null = null;
-
-        formResetCallback(): void { this._formModel?.reset(); }
-        formDisabledCallback(disabled: boolean): void { this._formModel?.disabled(disabled); }
-        formStateRestoreCallback(state: string | File | FormData | null): void { this._formModel?.restore(state); }
 
         /**
          * The signals setup returned, by name, for HMR state save/restore. A field, not a WeakMap keyed
@@ -434,13 +451,12 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
 
         constructor() {
             super();
-            // Internals are attached once, for a form-associated component and for declared states.
-            // Only a form-associated one keeps them as `_internals`: the form getters read that, and
-            // `internals.form` throws on an element that is not form-associated.
-            if ((useFormAssociated || declaredStates) && typeof this.attachInternals === 'function') {
-                const internals = this.attachInternals();
-                if (useFormAssociated) this._internals = internals;
-                if (declaredStates) this._customStates = internals.states ?? null;
+            // Internals are attached once: by the form base for a form-associated component, here for
+            // one that only declares states.
+            if (declaredStates) {
+                const internals = asForm(this)?._internals
+                    ?? (typeof this.attachInternals === 'function' ? this.attachInternals() : null);
+                this._customStates = internals?.states ?? null;
             }
         }
 
@@ -487,9 +503,10 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
                 },
             };
             // Form-associated: expose form methods on context
-            if (useFormAssociated && this._internals) {
-                ctx.setFormValue = (v: FormData | string | File | null) => this.setFormValue(v);
-                ctx.setValidity = (flags: ValidityStateFlags, msg?: string) => this.setValidity(flags, msg);
+            const formEl = asForm(this);
+            if (formEl?._internals) {
+                ctx.setFormValue = (v: FormData | string | File | null) => formEl.setFormValue(v);
+                ctx.setValidity = (flags: ValidityStateFlags, msg?: string) => formEl.setValidity(flags, msg);
             }
 
             // Create typed prop signals with dual sync:
@@ -598,7 +615,7 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
             }
 
             // The model declared `{ form }` is the form's value, and the form's lifecycle writes it (#135).
-            if (wireForm && this._internals) this._formModel = wireForm(this, (fn) => this.track(fn), ctx, formModel!, propNames, tag);
+            if (wireForm && formEl?._internals) formEl._formModel = wireForm(formEl, (fn) => this.track(fn), ctx, formModel!, propNames, tag);
 
             // Activate composable lifecycle scope during setup
             const scope: ComponentScope = {
