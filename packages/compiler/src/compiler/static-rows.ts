@@ -18,6 +18,7 @@ import type { CompileContext } from './compile-context';
 import { isRowBinding } from './codegen-prefix';
 import { isLiteralExpression } from './codegen-constant-bindings';
 import { openingTagTexts } from '../text-scan';
+import { escapeForRegExp } from './regexp-escape';
 
 // Match: a bound attribute in an opening tag — `:x="…"`, `:class.on="…"`, `::x="…"`, `attach:x="…"`.
 // Groups: [1]=the name with its sigil [2]/[3]=the value
@@ -61,7 +62,7 @@ function hasTwoWay(nodes: readonly TemplateNode[]): boolean {
  */
 function mayRead(nodes: readonly TemplateNode[], name: string): boolean {
     // Match: `name` as a whole identifier, not after a `.` — groups: none
-    const word = new RegExp(`(?<![\\w$.])${name.replace(/\$/g, '\\$')}(?![\\w$])`);
+    const word = new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`);
     for (const node of nodes) {
         if (node.type === 'interpolation') {
             if (word.test(node.expr)) return true;
