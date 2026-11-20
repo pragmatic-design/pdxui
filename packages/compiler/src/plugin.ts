@@ -694,7 +694,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
             }
         },
     };
-    // The boot modules (#1246): the theme for an app that uses the design system, the splash for a page
+    // The boot modules (#1246): the theme for an app that imports the design system's themes, the splash for a page
     // that has one — the same condition `transformIndexHtml` above writes it by.
     const boot = bootImportsPlugin(() => splash !== null && scannedRoutes.length > 0);
     return hydrate

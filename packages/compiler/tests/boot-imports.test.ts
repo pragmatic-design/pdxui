@@ -8,10 +8,10 @@ describe('the theme boot module', () => {
     for (const code of [
         "import '@pdxui/design';",
         "import '@pdxui/design/base';\nimport '@pdxui/design/themes/neutral';",
-        'import "@pdxui/design/components/button.css";',
+        "import '@pdxui/design/themes';",
         "const x = 1; import '@pdxui/design/base';",
     ]) {
-        it(`is imported first by a module that imports the design system: ${JSON.stringify(code)}`, () => {
+        it(`is imported first by a module that imports the design system's themes: ${JSON.stringify(code)}`, () => {
             const out = withThemeBoot(code);
             expect(out).not.toBeNull();
             expect(out!.startsWith(`import '${BOOT_THEME}';\n`)).toBe(true);
@@ -24,6 +24,8 @@ describe('the theme boot module', () => {
         "const doc = 'import \"@pdxui/designer\"';",
         "import '@pdxui/designish';",
         '// see @pdxui/design for the tokens',
+        // A library component's own stylesheet: the theme is the app's, not every component's.
+        "import '@pdxui/design/components/select';",
     ]) {
         it(`is not imported by a module that does not: ${JSON.stringify(code)}`, () => {
             expect(importsDesign(code)).toBe(false);

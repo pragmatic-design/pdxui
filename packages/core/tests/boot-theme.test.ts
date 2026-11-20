@@ -2,7 +2,7 @@
 //
 // Restoring the theme is what an app with the design system relies on without calling anything. It
 // ran when `component/style.ts` loaded, in every app; it runs now when `boot/theme.ts` loads, which
-// the pdx() plugin imports into an app that imports `@pdxui/design`, with the same precedence: the
+// the pdx() plugin imports into an app that imports the design system's themes, with the same precedence: the
 // user's saved choice, then the author's `<html pdx-scheme>`, then the OS preference.
 import { describe, it, expect, vi, afterEach } from 'vitest';
 

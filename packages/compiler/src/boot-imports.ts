@@ -5,10 +5,10 @@
 // down. Core does nothing at load now; each lives in a boot module (`@pdxui/core/boot/theme`,
 // `@pdxui/core/boot/splash`) that this plugin imports into an app that has the behaviour:
 //
-//   - the theme, into every module that imports `@pdxui/design` — the app's own stylesheet imports in
-//     `index.html` or its entry, and the library components that bring their stylesheet. An app that
-//     uses the design system restores its theme; one that does not reads no storage. The boot module
-//     is evaluated once, however many modules import it;
+//   - the theme, into a module that imports the design system's themes — `@pdxui/design`, its `base`,
+//     or a theme: what an app writes in `index.html` or its entry. A stored theme means something only
+//     where the themes are loaded. A library component brings only its own stylesheet
+//     (`@pdxui/design/components/x`), and its module stays as it is: the theme is the app's;
 //   - the splash, into the page, when the page has it: written by the author, or injected by this
 //     plugin (`splash.ts`). An inline module script added before Vite processes the page, so that
 //     Vite resolves its import as it resolves the author's own scripts, in dev and in a build.
@@ -20,16 +20,17 @@ export const BOOT_THEME = '@pdxui/core/boot/theme';
 /** The module that takes the start-up splash down. */
 export const BOOT_SPLASH = '@pdxui/core/boot/splash';
 
-// Match: a static import of `@pdxui/design` or one of its sub-paths, with or without bindings:
-// `import '@pdxui/design/base';`, `import x from "@pdxui/design/x.css"`. Groups: none
-const DESIGN_IMPORT = /(?:^|[\s;])import\s*(?:[^'"`;]*?\sfrom\s*)?['"]@pdxui\/design(?:\/[^'"]*)?['"]/m;
+// Match: a static import of the design system's themes, with or without bindings — `@pdxui/design`
+// itself, `@pdxui/design/base`, `@pdxui/design/themes` or one theme (`/themes/neutral`); not a
+// component's own stylesheet (`@pdxui/design/components/select`). Groups: none
+const DESIGN_IMPORT = /(?:^|[\s;])import\s*(?:[^'"`;]*?\sfrom\s*)?['"]@pdxui\/design(?:\/base|\/themes(?:\/[^'"]*)?)?['"]/m;
 
-/** Does `code` import the design system? */
+/** Does `code` import the design system's themes, as an app does? */
 export function importsDesign(code: string): boolean {
     return DESIGN_IMPORT.test(code);
 }
 
-/** `code` with the theme's boot module imported first, or null when it imports no design stylesheet. */
+/** `code` with the theme's boot module imported first, or null when it imports none of the themes. */
 export function withThemeBoot(code: string): string | null {
     if (!importsDesign(code) || code.includes(BOOT_THEME)) return null;
     return `import '${BOOT_THEME}';\n${code}`;

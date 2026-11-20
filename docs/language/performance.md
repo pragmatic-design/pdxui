@@ -179,8 +179,8 @@ stack, the context protocol, the theme, the splash — and `scenario-startup.spe
 benchmark installs no listener, observer or media query and reads no storage as it starts (#1246).
 Each of those modules starts on its first use; the two behaviours an app relies on without calling
 anything are boot modules, `@pdxui/core/boot/theme` and `@pdxui/core/boot/splash`, which the `pdx()`
-plugin imports into an app that has them — the theme where `@pdxui/design` is imported, the splash
-into a page that shows one — and which the CDN bundle and `@pdxui/framework` import for an app built
+plugin imports into an app that has them — the theme where the app imports the design system's
+themes (`@pdxui/design`, its `base`, a theme), the splash into a page that shows one — and which the CDN bundle and `@pdxui/framework` import for an app built
 without the plugin.
 
 ## Out of scope for the beta
