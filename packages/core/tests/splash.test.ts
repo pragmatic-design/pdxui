@@ -3,11 +3,19 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 type SplashModule = typeof import('../src/browser/splash');
 
-/** A fresh module each time: its state is the page's, once per load. */
+/**
+ * A fresh module each time: its state is the page's, once per load. With its boot module (#1246),
+ * which the pdx() plugin imports into an app whose page has the splash: the module alone does
+ * nothing at load.
+ */
 async function freshSplash(): Promise<SplashModule> {
     vi.resetModules();
+    await import('../src/boot/splash');
     return import('../src/browser/splash');
 }
+
+/** The module without its boot module: what an app whose page has no splash loads. */
+const splashAlone = (): Promise<SplashModule> => import('../src/browser/splash');
 
 const frame = () => new Promise(r => requestAnimationFrame(() => r(undefined)));
 const tick = () => new Promise(r => setTimeout(r, 0));
@@ -103,5 +111,21 @@ describe('pdx-splash', () => {
         splash.splashReady(Promise.resolve());
         await tick(); await frame();
         expect(splash.isSplashUp()).toBe(false);
+    });
+
+    it('the module alone does nothing at load: an app without the boot module adds no listener (#1246)', async () => {
+        const el = mountSplash();
+        const add = vi.spyOn(document, 'addEventListener');
+        const timer = vi.spyOn(globalThis, 'setTimeout');
+        vi.resetModules();
+        const splash = await splashAlone();
+        expect(add.mock.calls.map((c) => c[0]), 'a listener added at load').not.toContain('DOMContentLoaded');
+        expect(timer, 'a start scheduled at load').not.toHaveBeenCalled();
+        add.mockRestore();
+        timer.mockRestore();
+        // Without the start, a settled condition does not take it down: the boot module is what does.
+        splash.splashReady(Promise.resolve());
+        await tick(); await frame(); await frame();
+        expect(el.isConnected).toBe(true);
     });
 });

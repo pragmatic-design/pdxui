@@ -62,6 +62,10 @@ export function provide<T>(token: Context<T>, value: T, host?: HTMLElement): voi
         _ensureContextListener(host);
     } else {
         globalRegistry.set(token, value);
+        // The global listener answers from this registry, so it is installed with its first value
+        // (#1246): before one there is nothing to answer, and an app that provides nothing globally
+        // installs no listener.
+        installContextProtocol();
     }
 }
 
@@ -188,7 +192,8 @@ interface ContextRequestEvent extends Event {
 
 /**
  * Install global Context Protocol listener (for global providers).
- * Responds to context-request events with values from the global registry.
+ * Responds to context-request events with values from the global registry. The first global
+ * {@link provide} installs it; calling it again does nothing.
  */
 export function installContextProtocol(): void {
     if (_globalListenerInstalled || typeof document === 'undefined') return;
@@ -203,8 +208,3 @@ export function installContextProtocol(): void {
 }
 
 let _globalListenerInstalled = false;
-
-// Auto-install global listener in browser
-if (typeof document !== 'undefined') {
-    queueMicrotask(installContextProtocol);
-}

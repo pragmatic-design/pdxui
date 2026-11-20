@@ -3131,7 +3131,8 @@ function installContextProtocol(): void
 ```
 
 Install global Context Protocol listener (for global providers).
-Responds to context-request events with values from the global registry.
+Responds to context-request events with values from the global registry. The first global
+{@link provide} installs it; calling it again does nothing.
 
 ### `installHydration`
 
@@ -4934,7 +4935,7 @@ import { screen } from '@pdxui/core';
 const screen
 ```
 
-Centralized screen/device signals. One matchMedia listener per query.
+Centralized screen/device signals. One matchMedia listener per query, set up on its first read.
 
 ### `scrollTo`
 
@@ -5052,7 +5053,7 @@ The router says where to read the current route from. One router at a time: the 
 ```ts
 import { setDirection } from '@pdxui/core';
 
-function setDirection(dir: 'ltr' | 'rtl'): void
+function setDirection(value: 'ltr' | 'rtl'): void
 ```
 
 Force set direction (e.g. for testing or user override).
@@ -6442,10 +6443,10 @@ Use this in custom validators for i18n support.
 ```ts
 import { viewport } from '@pdxui/core';
 
-const viewport
+const viewport: Readonly<ViewportSignals>
 ```
 
-Centralized viewport signals. One resize listener, many readers.
+Centralized viewport signals. One resize listener, many readers; set up on the first read.
 
 ### `waitFor`
 

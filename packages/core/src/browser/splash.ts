@@ -77,11 +77,22 @@ function fadeOut(el: HTMLElement): void {
     el.addEventListener('transitionend', () => el.remove(), { once: true });
 }
 
-// «Loaded» is DOMContentLoaded, not `load`: what it stands for is that the entry's modules have run
-// and handed their conditions over, and module scripts run before DOMContentLoaded. `load` also
-// waits for every image, font and preload — measured on the showcase, it held the splash ~300 ms
-// past the page.
-if (typeof document !== 'undefined') {
+let started = false;
+
+/**
+ * Wait for the document, then take the splash down once every condition has settled. Run by the boot
+ * module `boot/splash.ts`, which the `pdx()` plugin imports into the entry of an app whose `index.html`
+ * has the splash, and which the IIFE build and `@pdxui/framework` import (#1246). Nothing in this
+ * module runs it at load: an app without a splash adds no listener.
+ *
+ * «Loaded» is DOMContentLoaded, not `load`: what it stands for is that the entry's modules have run
+ * and handed their conditions over, and module scripts run before DOMContentLoaded. `load` also
+ * waits for every image, font and preload — measured on the showcase, it held the splash ~300 ms
+ * past the page.
+ */
+export function startSplash(): void {
+    if (started || typeof document === 'undefined') return;
+    started = true;
     const onLoad = () => { loaded = true; maybeLeave(); };
     // Already parsed — a module evaluated late: a task, not a microtask, so the code that imported
     // this module has handed its conditions over before the splash decides it has none.

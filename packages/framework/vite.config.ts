@@ -27,7 +27,9 @@ export default defineConfig({
         sourcemap: true,
         target: 'es2022',
         rollupOptions: {
-            external: ['@pdxui/core', '@pdxui/ui', '@pdxui/router', '@pdxui/design'],
+            // Their sub-paths too: `@pdxui/core/boot/theme` (#1246) bundled would be a second core.
+            // Groups: [1]=the package
+            external: [/^@pdxui\/(core|ui|router|design)(\/.*)?$/],
         },
     },
     // What each public entry costs an app (#1212): Node, building consumers against the packages' dist.

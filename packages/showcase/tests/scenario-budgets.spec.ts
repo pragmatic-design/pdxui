@@ -57,12 +57,19 @@ import { scenarioDist } from './scenarios-build';
  * a new item, so these apps carry list-static.ts and core's collectRowRuns. What it buys, on
  * js-framework-benchmark's script time (median of 3 runs): create 1k 7.8 → 6.2 ms, replace 14.7 →
  * 11.9, update every 10th 4.8 → 3.4, append 7.4 → 6.5.
+ *
+ * #1246, core's modules that did work at load out of every bundle that does not use them: benchmark
+ * js 14.8 → 13.2 KB measured (budget 13.5), dashboard 21.1 → 20.0 (budget 20.3); crud 51.9, its
+ * budget kept. And hello 4.2 → 8.3: it never weighed a counter. Its `hello.pdx` had its markup outside
+ * `<template>`, which the compiler dropped with no word (#1249), so the app registered no component
+ * and its 3.8 KB were those load-time modules alone; with them gone it weighed 0.6 KB and failed "not
+ * empty" below. Written as the counter it says it is, it measures 8.0 KB — the floor every app pays.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 4.2, css: 0 },
-    benchmark: { js: 14.8, css: 0 },
+    hello: { js: 8.3, css: 0 },
+    benchmark: { js: 13.5, css: 0 },
     crud: { js: 52.2, css: 1.6 },
-    dashboard: { js: 21.1, css: 21.9 },
+    dashboard: { js: 20.3, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -121,6 +128,32 @@ test('the hello bundle carries no router, no forms and no resource code', () => 
     const found = modules.filter((m) => NOT_IN_HELLO.some((p) => m.includes(p)));
     expect(found, 'modules a one-signal counter should not carry').toEqual([]);
 });
+
+/**
+ * Core's modules that did work when they loaded, whatever the app used (#1246): listeners on the window
+ * and the document, signals, a localStorage read. Each now starts on its first use, and an app that
+ * uses none of them carries none: they left core's `sideEffects`, which kept them in every bundle.
+ */
+const NOT_IN_A_SMALL_APP = [
+    'packages/core/src/component/viewport.ts',
+    'packages/core/src/component/adaptive.ts',
+    'packages/core/src/browser/online.ts',
+    'packages/core/src/i18n/rtl.ts',
+    'packages/core/src/component/overlay-stack.ts',
+    'packages/core/src/component/context.ts',
+    'packages/core/src/browser/splash.ts',
+    'packages/core/src/component/style.ts',
+];
+
+for (const name of ['hello', 'benchmark']) {
+    test(`the ${name} bundle carries none of core's modules that worked at load (#1246)`, () => {
+        const modules = Object.values(chunksOf(name)).flat();
+        expect(modules.some((m) => m.includes('packages/core/src/')), 'modules.json names no module of core\'s sources')
+            .toBe(true);
+        const found = modules.filter((m) => NOT_IN_A_SMALL_APP.some((p) => m.includes(p)));
+        expect(found, `modules the ${name} app does not use`).toEqual([]);
+    });
+}
 
 /** A scenario's chunks, by file name, each with the modules in it, separators normalised. */
 function chunksOf(name: string): Record<string, string[]> {

@@ -32,6 +32,7 @@ import { copyFileSync, rmSync, writeFileSync } from 'node:fs';
 // With its extension: `tools/perf/lib.mjs` imports this file under Node's own type stripping, which
 // does not guess one, as Playwright's loader does.
 import { mainWorktree } from './pilot-main.ts';
+import { moduleList } from '../scenarios/module-list.ts';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -84,11 +85,14 @@ const FROM_MAIN = [
 ];
 
 export default async function buildScenarios(): Promise<void> {
+    // Each build writes its `modules.json` (`moduleList`), added here rather than in each config: the
+    // benchmark's config is the one js-framework-benchmark builds, and its modules are weighed too (#1246).
     for (const { name, root, config } of SCENARIOS) {
         await build({
             root,
             configFile: join(root, config),
             logLevel: 'warn',
+            plugins: [moduleList()],
             build: { outDir: scenarioDist(name), emptyOutDir: true },
         });
     }

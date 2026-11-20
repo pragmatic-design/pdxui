@@ -157,7 +157,7 @@ when crossed and a slack that fails when it is stale (the showcase's pattern):
 
 | Scenario | What it contains |
 |---|---|
-| hello | one component, one `$signal` (**landed**: JS 3.8 KB, no CSS; budget 4.2 KB) |
+| hello | one component, one `$signal` (**landed**: JS 8.0 KB, no CSS; budget 8.3 KB — measured 3.8 KB until #1246, when it turned out its component had never compiled: its markup was outside `<template>`, #1249) |
 | benchmark | the js-framework-benchmark app (**landed**: JS 16.5 KB, no CSS; budget 18.2 KB — built here with its own config against the workspace's sources; 13 KB was measured on 2026-10-10 inside the benchmark's clone) |
 | crud | one routed page with `@loader`, `@form`, `@action`, a `@for` of 100 rows (**landed**: JS 47.3 KB, CSS 1.4 KB; budgets 52.1 and 1.6 KB) |
 | dashboard | four `@defer` panels, a virtual list, a theme (**landed**: JS 23.4 KB, CSS 19.9 KB — the design system's base and one theme; budgets 25.8 and 21.9 KB) |
@@ -172,6 +172,16 @@ bundle until it was made pure (#244). For dashboard it holds L5 — each `@defer
 a chunk of its own, not in the entry — and found it false too: a trigger with parentheses of its own
 (`when (…)`, `idle(ms)`, `timer(ms)`) was not recognised, and the panel was imported statically as
 well (#245).
+
+The same spec holds that hello and the benchmark carry none of core's modules that did work when
+they loaded — the viewport and screen signals, `useAdaptive`, `useOnline`, the direction, the overlay
+stack, the context protocol, the theme, the splash — and `scenario-startup.spec.ts` that the
+benchmark installs no listener, observer or media query and reads no storage as it starts (#1246).
+Each of those modules starts on its first use; the two behaviours an app relies on without calling
+anything are boot modules, `@pdxui/core/boot/theme` and `@pdxui/core/boot/splash`, which the `pdx()`
+plugin imports into an app that has them — the theme where `@pdxui/design` is imported, the splash
+into a page that shows one — and which the CDN bundle and `@pdxui/framework` import for an app built
+without the plugin.
 
 ## Out of scope for the beta
 

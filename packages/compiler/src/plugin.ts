@@ -57,6 +57,7 @@ import type { RequiredSlotsLookup } from './compiler/validate-required-slots';
 import { jsQuote } from './compiler/js-literal';
 import { designTargetPlugin } from './design-target';
 import { hydrateEntryPlugin, type RoutePreloads } from './hydrate-entry';
+import { bootImportsPlugin } from './boot-imports';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
 /**
@@ -693,9 +694,12 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
             }
         },
     };
+    // The boot modules (#1246): the theme for an app that uses the design system, the splash for a page
+    // that has one — the same condition `transformIndexHtml` above writes it by.
+    const boot = bootImportsPlugin(() => splash !== null && scannedRoutes.length > 0);
     return hydrate
-        ? [main, designTargetPlugin(target), hydrateEntryPlugin(() => scannedRoutes.length > 0, () => routePreloads)]
-        : [main, designTargetPlugin(target)];
+        ? [main, designTargetPlugin(target), boot, hydrateEntryPlugin(() => scannedRoutes.length > 0, () => routePreloads)]
+        : [main, designTargetPlugin(target), boot];
 }
 
 /** Result of compiling a .pdx file. */

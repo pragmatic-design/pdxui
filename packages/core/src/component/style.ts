@@ -216,8 +216,24 @@ function cssVarToCamel(cssName: string, prefix: string): string {
 const THEME_KEY = 'pdx-theme';
 const SCHEME_KEY = 'pdx-scheme';
 
-const _currentTheme = signal<string>(isBrowser ? (localStorage.getItem(THEME_KEY) ?? 'neutral') : 'neutral');
-const _currentScheme = signal<string>(isBrowser ? (localStorage.getItem(SCHEME_KEY) ?? detectSystemScheme()) : 'light');
+// The current theme and scheme, created on their first read (#1246): an app that never reads them, nor
+// sets one, reads no localStorage and runs no media query at load. Read then, they are what a setup at
+// load gave, by the same precedence as `restoreTheme`: the user's saved choice, then what the author
+// declared on <html>, then the OS preference.
+let _themeState: { theme: Signal<string>; scheme: Signal<string> } | null = null;
+
+function themeState(): { theme: Signal<string>; scheme: Signal<string> } {
+    if (_themeState) return _themeState;
+    let theme = 'neutral';
+    let scheme = 'light';
+    if (isBrowser) {
+        theme = localStorage.getItem(THEME_KEY) ?? 'neutral';
+        const authored = document.documentElement.getAttribute('pdx-scheme');
+        scheme = localStorage.getItem(SCHEME_KEY)
+            ?? (authored === 'light' || authored === 'dark' ? authored : detectSystemScheme());
+    }
+    return (_themeState = { theme: signal(theme), scheme: signal(scheme) });
+}
 
 function detectSystemScheme(): string {
     if (!isBrowser) return 'light';
@@ -225,10 +241,10 @@ function detectSystemScheme(): string {
 }
 
 /** Current brand theme name (e.g. 'neutral', 'material', 'fluent'). */
-export const currentTheme: ReadonlySignal<string> = computed(() => _currentTheme());
+export const currentTheme: ReadonlySignal<string> = computed(() => themeState().theme());
 
 /** Current color scheme ('light' or 'dark'). */
-export const currentScheme: ReadonlySignal<string> = computed(() => _currentScheme());
+export const currentScheme: ReadonlySignal<string> = computed(() => themeState().scheme());
 
 // The app's browser target, defined by the pdx() plugin (#156). Read with `typeof`: an app without the
 // plugin — the CDN bundle, a hand-written page — defines nothing and gets the baseline-2024 behaviour.
@@ -251,7 +267,7 @@ function behaviourAttrsNeeded(): boolean {
  * from the theme's CSS custom properties.
  */
 export function setTheme(name: string): void {
-    _currentTheme.set(name);
+    themeState().theme.set(name);
     if (isBrowser) {
         document.documentElement.setAttribute('pdx-theme', name);
         localStorage.setItem(THEME_KEY, name);
@@ -296,7 +312,7 @@ function syncBehaviorAttrs(): void {
  * Sets `pdx-scheme` attribute on <html> and persists to localStorage.
  */
 export function setScheme(scheme: 'light' | 'dark'): void {
-    _currentScheme.set(scheme);
+    themeState().scheme.set(scheme);
     if (isBrowser) {
         document.documentElement.setAttribute('pdx-scheme', scheme);
         localStorage.setItem(SCHEME_KEY, scheme);
@@ -305,28 +321,35 @@ export function setScheme(scheme: 'light' | 'dark'): void {
 
 /** Get the current theme name. */
 export function getTheme(): string {
-    return _currentTheme.peek();
+    return themeState().theme.peek();
 }
 
 /** Get the current color scheme. */
 export function getScheme(): string {
-    return _currentScheme.peek();
+    return themeState().scheme.peek();
 }
 
 /** Toggle between 'light' and 'dark' color schemes. */
 export function toggleDarkMode(): void {
-    setScheme(_currentScheme.peek() === 'dark' ? 'light' : 'dark');
+    setScheme(themeState().scheme.peek() === 'dark' ? 'light' : 'dark');
 }
 
-// Apply stored theme + scheme on load.
-//
-// ⚠️ Precedence: **the user's saved choice, then what the AUTHOR declared in the document, then the
-// OS preference.** Without the middle one, a `<html pdx-scheme="light">` written in index.html
-// would be overwritten before anything rendered, on any machine whose OS is set to dark, with no
-// warning.
-//
-// A system preference is a DEFAULT, not an instruction: it applies when nobody has said otherwise.
-if (isBrowser) {
+/**
+ * Apply the stored theme and scheme to <html>: what an app with the design system does as it starts.
+ * Run by the boot module `boot/theme.ts`, which the `pdx()` plugin imports into such an app's entry,
+ * and which the IIFE build and `@pdxui/framework` import (#1246). Nothing in this module runs it at
+ * load: an app without the design system reads no storage.
+ *
+ * ⚠️ Precedence: **the user's saved choice, then what the AUTHOR declared in the document, then the
+ * OS preference.** Without the middle one, a `<html pdx-scheme="light">` written in index.html
+ * would be overwritten before anything rendered, on any machine whose OS is set to dark, with no
+ * warning. The author's scheme is left as it is, and read as the current one (`themeState`), so
+ * `getScheme()` and `toggleDarkMode()` start from what is actually on screen.
+ *
+ * A system preference is a DEFAULT, not an instruction: it applies when nobody has said otherwise.
+ */
+export function restoreTheme(): void {
+    if (!isBrowser) return;
     const storedTheme = localStorage.getItem(THEME_KEY);
     const storedScheme = localStorage.getItem(SCHEME_KEY);
     const authored = document.documentElement.getAttribute('pdx-scheme');
@@ -336,11 +359,7 @@ if (isBrowser) {
     }
     if (storedScheme) {
         document.documentElement.setAttribute('pdx-scheme', storedScheme);
-    } else if (authored === 'light' || authored === 'dark') {
-        // The author already said. Adopt it as the current scheme instead of replacing it, so
-        // `getScheme()` and `toggleDarkMode()` start from what is actually on screen.
-        _currentScheme.set(authored);
-    } else if (detectSystemScheme() === 'dark') {
+    } else if (authored !== 'light' && authored !== 'dark' && detectSystemScheme() === 'dark') {
         document.documentElement.setAttribute('pdx-scheme', 'dark');
     }
     // Sync behavior attrs from theme tokens on initial load

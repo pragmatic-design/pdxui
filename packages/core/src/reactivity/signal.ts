@@ -459,6 +459,19 @@ export function untracked<T>(fn: () => T): T {
     finally { currentEffect = prev; currentTracker = prevTracker; }
 }
 
+/**
+ * Run `fn` untracked and outside every owner scope: an effect it creates belongs to no component, is
+ * disposed with none and suspended with none. For a module's own state started on first use (#1246) —
+ * the overlay stack's scroll lock lives as long as the stack, not as long as the first component that
+ * pushed. Internal.
+ */
+export function unowned<T>(fn: () => T): T {
+    const prevOwner = currentOwner;
+    currentOwner = null;
+    try { return untracked(fn); }
+    finally { currentOwner = prevOwner; }
+}
+
 // --- Signal ---
 
 /**

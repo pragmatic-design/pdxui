@@ -634,7 +634,8 @@ function installContextProtocol(): void
 ```
 
 Install global Context Protocol listener (for global providers).
-Responds to context-request events with values from the global registry.
+Responds to context-request events with values from the global registry. The first global
+{@link provide} installs it; calling it again does nothing.
 
 ## `measure`
 
@@ -1056,7 +1057,7 @@ import { screen } from '@pdxui/core';
 const screen
 ```
 
-Centralized screen/device signals. One matchMedia listener per query.
+Centralized screen/device signals. One matchMedia listener per query, set up on its first read.
 
 ## `setDefaultIconSet`
 
@@ -1335,7 +1336,7 @@ receiver `onReceive`.
 ```ts
 import { viewport } from '@pdxui/core';
 
-const viewport
+const viewport: Readonly<ViewportSignals>
 ```
 
-Centralized viewport signals. One resize listener, many readers.
+Centralized viewport signals. One resize listener, many readers; set up on the first read.

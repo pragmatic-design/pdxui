@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 // Relative, as in the showcase's own config: esbuild bundles this file and resolves the compiler's
 // extensionless internal imports.
 import { pdx } from '../../../compiler/src/index';
-import { moduleList } from '../module-list';
 
 /**
  * A dashboard — four `@defer` panels, one prefetched, a virtual list of 10,000 rows, one theme of
@@ -10,6 +9,6 @@ import { moduleList } from '../module-list';
  * says each panel's component is in a chunk of its own, not in the entry (L5). A production build.
  */
 export default defineConfig({
-    plugins: [pdx({ devtools: false }), moduleList()],
+    plugins: [pdx({ devtools: false })],
     build: { target: 'es2022' },
 });

@@ -72,6 +72,18 @@
       "types": "./dist/i18n/index.d.ts",
       "import": "./dist/i18n.es.js",
       "require": "./dist/i18n.cjs"
+    },
+    "./boot/theme": {
+"development": "./src/boot/theme.ts",
+      "types": "./dist/boot/theme.d.ts",
+      "import": "./dist/boot-theme.es.js",
+      "require": "./dist/boot-theme.cjs"
+    },
+    "./boot/splash": {
+"development": "./src/boot/splash.ts",
+      "types": "./dist/boot/splash.d.ts",
+      "import": "./dist/boot-splash.es.js",
+      "require": "./dist/boot-splash.cjs"
     }
   },
   "files": [
@@ -79,16 +91,14 @@
     "src"
   ],
   "sideEffects": [
-      "src/browser/online.ts",
-      "src/browser/splash.ts",
-      "src/component/adaptive.ts",
-      "src/component/context.ts",
-      "src/component/overlay-stack.ts",
-      "src/component/style.ts",
-      "src/component/viewport.ts",
+      "src/boot/theme.ts",
+      "src/boot/splash.ts",
       "src/debug/inspector.ts",
       "src/debug/devtools-api.ts",
-      "src/i18n/rtl.ts",
+      "dist/boot-theme.es.js",
+      "dist/boot-theme.cjs",
+      "dist/boot-splash.es.js",
+      "dist/boot-splash.cjs",
       "dist/pragmatic-core.es.js",
       "dist/pragmatic-core.cjs",
       "dist/pragmatic-core.iife.js"
