@@ -19,7 +19,8 @@ export default defineConfig({
     build: {
         emptyOutDir: false,
         lib: {
-            entry: 'src/index.ts',
+            // The barrel with the boot modules a page without the pdx() plugin needs (#1246).
+            entry: 'src/iife.ts',
             name: 'Pragmatic',
             formats: ['iife'],
             fileName: () => 'pragmatic-core.iife.js',

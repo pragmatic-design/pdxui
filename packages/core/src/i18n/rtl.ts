@@ -10,11 +10,30 @@ const isBrowser = typeof document !== 'undefined';
 
 const _dir = signal<'ltr' | 'rtl'>('ltr');
 
+// The direction is read from the DOM, and `<html dir>` observed, on the first read (#1246): an app that
+// never asks runs no getComputedStyle and installs no MutationObserver at load. Read then, it is what a
+// detection at load would have found at that moment.
+let _started = false;
+
+/** The direction signal, detected and observed from its first read on. */
+function dir(): typeof _dir {
+    if (_started) return _dir;
+    _started = true;
+    if (isBrowser) {
+        _dir.set(detectDirection());
+        new MutationObserver(() => _dir.set(detectDirection())).observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['dir'],
+        });
+    }
+    return _dir;
+}
+
 /** Current document direction (reactive). */
-export const direction: ReadonlySignal<'ltr' | 'rtl'> = _dir;
+export const direction: ReadonlySignal<'ltr' | 'rtl'> = Object.assign(() => dir()(), { peek: () => dir().peek() });
 
 /** Whether the document is RTL (reactive). */
-export const isRTL: ReadonlySignal<boolean> = computed(() => _dir() === 'rtl');
+export const isRTL: ReadonlySignal<boolean> = computed(() => dir()() === 'rtl');
 
 /** Read current direction from the DOM. */
 function detectDirection(): 'ltr' | 'rtl' {
@@ -26,35 +45,21 @@ function detectDirection(): 'ltr' | 'rtl' {
 }
 
 /** Force set direction (e.g. for testing or user override). */
-export function setDirection(dir: 'ltr' | 'rtl'): void {
-    _dir.set(dir);
-    if (isBrowser) document.documentElement.setAttribute('dir', dir);
-}
-
-// Auto-detect on load and observe changes
-if (isBrowser) {
-    _dir.set(detectDirection());
-
-    // Watch for dir attribute changes on <html>
-    const observer = new MutationObserver(() => {
-        _dir.set(detectDirection());
-    });
-    observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['dir'],
-    });
+export function setDirection(value: 'ltr' | 'rtl'): void {
+    dir().set(value);
+    if (isBrowser) document.documentElement.setAttribute('dir', value);
 }
 
 // ─── Logical property helpers ─────────────────────────────────
 
 /** Returns 'left' or 'right' based on current direction. For inline-start. */
 export function inlineStart(): 'left' | 'right' {
-    return _dir.peek() === 'rtl' ? 'right' : 'left';
+    return dir().peek() === 'rtl' ? 'right' : 'left';
 }
 
 /** Returns 'right' or 'left' based on current direction. For inline-end. */
 export function inlineEnd(): 'left' | 'right' {
-    return _dir.peek() === 'rtl' ? 'left' : 'right';
+    return dir().peek() === 'rtl' ? 'left' : 'right';
 }
 
 /**
@@ -63,7 +68,7 @@ export function inlineEnd(): 'left' | 'right' {
  * Used by positioning engine for direction-aware placement.
  */
 export function flipPlacement(placement: string): string {
-    if (_dir.peek() === 'ltr') return placement;
+    if (dir().peek() === 'ltr') return placement;
     return placement
         .replace(/\bstart\b/, '__end__')
         .replace(/\bend\b/, 'start')
@@ -75,5 +80,5 @@ export function flipPlacement(placement: string): string {
  * Useful for: margin-left → margin-right, translateX(10) → translateX(-10).
  */
 export function rtlTransformX(value: number): number {
-    return _dir.peek() === 'rtl' ? -value : value;
+    return dir().peek() === 'rtl' ? -value : value;
 }

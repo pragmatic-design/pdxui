@@ -2,7 +2,6 @@ import { defineConfig } from 'vite';
 // Relative, as in the showcase's own config: esbuild bundles this file and resolves the compiler's
 // extensionless internal imports.
 import { pdx } from '../../../compiler/src/index';
-import { moduleList } from '../module-list';
 
 /**
  * One routed CRUD page — a named `@loader`, a `@form` of three fields, an `@action` that saves and
@@ -10,6 +9,6 @@ import { moduleList } from '../module-list';
  * and `scenario-budgets.spec.ts` holds it. A production build, as an app ships.
  */
 export default defineConfig({
-    plugins: [pdx({ devtools: false }), moduleList()],
+    plugins: [pdx({ devtools: false })],
     build: { target: 'es2022' },
 });

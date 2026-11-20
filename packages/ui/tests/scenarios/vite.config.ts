@@ -78,6 +78,26 @@ function uiSubpathAliases(): { find: string | RegExp; replacement: string }[] {
     return [...patterns, ...aliases.sort((a, b) => b.find.length - a.find.length)];
 }
 
+/**
+ * One alias per `@pdxui/core` sub-path export, to its `development` target, as `uiSubpathAliases` does
+ * for the library. Without them the `@pdxui/core` prefix alias below answered for every sub-path:
+ * `@pdxui/core/boot/theme`, which the pdx() plugin imports where a page imports the design themes
+ * (#1246), became `<src>/index.ts/boot/theme`, and every scenario page answered 500.
+ */
+function coreSubpathAliases(): { find: string; replacement: string }[] {
+    const pkg = JSON.parse(readFileSync(resolve(here, '../../../core/package.json'), 'utf-8')) as {
+        exports: Record<string, { development?: string } | string>;
+    };
+    return Object.entries(pkg.exports)
+        .filter(([key]) => key !== '.' && key.startsWith('./'))
+        .flatMap(([key, target]) => {
+            const dev = typeof target === 'string' ? target : target.development;
+            return dev ? [{ find: `@pdxui/core${key.slice(1)}`, replacement: resolve(here, '../../../core', dev) }] : [];
+        })
+        // Longest first, for the same prefix reason as the library's.
+        .sort((a, b) => b.find.length - a.find.length);
+}
+
 // The browser target the pages are certified for (#156): the design CSS in the form pdx() gives an
 // app on that target, and core told the same. The default target unless PDX_TARGET says
 // `baseline-2024`, the form with the behaviour attributes on <html>. Read where Dim 1 reads it (#509).
@@ -116,6 +136,7 @@ export default defineConfig({
             // Generated from the export map, so a component added tomorrow is resolvable here by
             // being exported — which the component workflow already requires.
             ...uiSubpathAliases(),
+            ...coreSubpathAliases(),
             { find: /^@pdxui\/router\/outlet$/, replacement: resolve(router, 'outlet.ts') },
             { find: /^@pdxui\/router$/, replacement: resolve(router, 'index.ts') },
             ...Object.entries({

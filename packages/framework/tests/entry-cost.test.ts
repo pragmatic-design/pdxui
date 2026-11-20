@@ -94,15 +94,19 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // a new item — core's collectRowRuns and the in-place update in list-static.ts. What it buys, on
     // js-framework-benchmark's script time: create 1k −21%, replace −19%, update every 10th −29%.
     { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339.5 },
-    { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 4 },
+    // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
+    // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
+    // signal no longer brings them. The same for `@pdxui/core` below.
+    { name: '@pdxui/framework/core', code: "import { signal } from '@pdxui/framework/core'; globalThis.out = signal(0);", ceiling: 2 },
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
     // 330.1 after #1233 (+1.1), for the same core code as the root's above. 330.6 after #1237 (+0.2
     // from 330.4), for the root's reason.
     { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331 },
-    { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 4 },
+    { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
+    // The root is 1.6 since #1246, above.
     { name: '@pdxui/core/reactivity', code: "import { signal } from '@pdxui/core/reactivity'; globalThis.out = signal(0);", ceiling: 2 },
     { name: '@pdxui/ui/button', code: "import '@pdxui/ui/button';", ceiling: 16 },
 ];

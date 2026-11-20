@@ -1,9 +1,10 @@
 // A module that does something when it loads must say so, or a bundler is allowed to delete it.
 //
-// `component/context.ts` installs the W3C Context Protocol listener on `document` at load. With
-// `sideEffects` given as an array, anything absent from it is declared pure — so a bundler that sees
-// no used export from the module may drop it, and the protocol silently stops answering. `style.ts`
-// and `online.ts` have exactly the same shape; every one of them has to be listed.
+// With `sideEffects` given as an array, anything absent from it is declared pure — so a bundler that
+// sees no used export from a module may drop it, and whatever it did at load silently stops
+// happening. Every module that does something at load has to be listed; and since a listed module is
+// in every bundle that reaches it, core keeps that list short (#1246): its state starts on first use,
+// and what an app relies on without calling anything is a boot module (`src/boot/`).
 //
 // The second half is the one that reaches a real consumer: an `import` of the published package
 // resolves to `dist/`, so entries naming only `src/**` paths leave the whole published bundle read
@@ -73,26 +74,44 @@ describe('sideEffects declarations', () => {
 
     // Calibration: the scanner is a heuristic, so pin what it finds in a package whose modules are
     // known. If this number moves, read the list before trusting anything else in this file.
-    it('the scanner finds exactly the eight side-effectful modules of core', () => {
-        // Each was opened and confirmed to run something at load: two resize listeners, an effect
-        // on document.body, a window global, an RTL watcher, the online listener, the style
-        // injector, the Context Protocol listener, the start-up splash's DOMContentLoaded listener,
-        // and the `__PDX_DEVTOOLS__` global with its error listeners, installed in development by
-        // debug/devtools-api.ts. `form/form-registry.ts` left the list in #244: its built-in
-        // controls are the registry's initial value now, not registrations run at load.
+    it('the scanner finds exactly the four side-effectful modules of core', () => {
+        // Each was opened and confirmed to run something at load: the two boot modules, and the
+        // `__PDX_DEVTOOLS__` global with its error listeners and the inspector's window global.
+        // `form/form-registry.ts` left the list in #244: its built-in controls are the registry's
+        // initial value now, not registrations run at load. Seven more left it in #1246 —
+        // viewport, adaptive, online, rtl, overlay-stack, context, style — each now starting on its
+        // first use, and the splash's start moved to its boot module.
         const found = sideEffectful(join(PACKAGES, 'core', 'src'));
         expect(found).toEqual([
-            'browser/online.ts',
-            'browser/splash.ts',
-            'component/adaptive.ts',
-            'component/context.ts',
-            'component/overlay-stack.ts',
-            'component/style.ts',
-            'component/viewport.ts',
+            'boot/splash.ts',
+            'boot/theme.ts',
             'debug/devtools-api.ts',
             'debug/inspector.ts',
-            'i18n/rtl.ts',
         ]);
+    });
+
+    /**
+     * What core keeps in `sideEffects`, each with its reason (#1246). A module listed there is in every
+     * bundle that reaches it whether or not its exports are used, so each entry is argued for here, and
+     * the field may not hold one this list does not.
+     */
+    const CORE_SIDE_EFFECTS: Record<string, string> = {
+        'src/boot/theme.ts': 'restores the stored theme on <html>: what it is for, imported by the pdx() plugin into an app with the design system',
+        'src/boot/splash.ts': 'takes the start-up splash down once the app is ready: imported into an app whose page has the splash',
+        'src/debug/inspector.ts': 'the inspector\'s window global; out of production builds in #1246\'s second part',
+        'src/debug/devtools-api.ts': 'the `__PDX_DEVTOOLS__` global and its error listeners; out of production builds in #1246\'s second part',
+        'dist/boot-theme.es.js': 'the theme boot module, published',
+        'dist/boot-theme.cjs': 'the theme boot module, published',
+        'dist/boot-splash.es.js': 'the splash boot module, published',
+        'dist/boot-splash.cjs': 'the splash boot module, published',
+        'dist/pragmatic-core.es.js': 'the root entry, published: an `import \'@pdxui/core\'` keeps what it reaches',
+        'dist/pragmatic-core.cjs': 'the root entry, published',
+        'dist/pragmatic-core.iife.js': 'the CDN bundle: a script, nothing after it',
+    };
+
+    it('core\'s sideEffects holds exactly the modules listed with a reason', () => {
+        const pkg = JSON.parse(readFileSync(join(PACKAGES, 'core', 'package.json'), 'utf8')) as { sideEffects: string[] };
+        expect([...pkg.sideEffects].sort()).toEqual(Object.keys(CORE_SIDE_EFFECTS).sort());
     });
 
     for (const { dir, pkg } of packages) {

@@ -366,7 +366,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // so the entry carries that code. What it buys, on js-framework-benchmark's script time (median of 3
 // runs): create 1k 7.8 → 6.2 ms, replace 14.7 → 11.9, update every 10th 4.8 → 3.4. The built dist:
 // 44.1 KB locally.
-const BUDGET_KB = { entry: 44.1, js: 477.6, css: 67, blocking: 103 };
+// entry 44.1 → 43.5, blocking 103 → 102.5 (#1246): core's modules that did work at load — viewport,
+// adaptive, online, rtl, the overlay stack, the context protocol — leave an entry that does not use
+// them, and the theme restore and the splash come as two boot modules the pdx() plugin imports. The
+// built dist: entry 43.4 KB, blocking 102.4 KB, js 477.4 KB locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.5, js: 477.6, css: 67, blocking: 102.5 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

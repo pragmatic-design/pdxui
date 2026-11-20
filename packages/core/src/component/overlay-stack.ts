@@ -1,7 +1,7 @@
 // Overlay stack — z-index management, portal, backdrop, dismiss coordination.
 // Used by: Dialog, Drawer, Toast, Popover, Tooltip, ContextMenu, BottomSheet.
 
-import { signal, computed, effect } from '../reactivity/signal';
+import { signal, computed, effect, unowned } from '../reactivity/signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 
 const isBrowser = typeof document !== 'undefined';
@@ -62,9 +62,17 @@ let _zCounter = 0;
 const _count = computed(() => _stack().length);
 const _modalCount = computed(() => _stack().filter(e => e.modal).length);
 
-// Body scroll lock — effect reacts to modalCount changes
-if (isBrowser) {
-    effect(() => {
+// The body scroll lock and the global Escape handler start with the first overlay pushed (#1246):
+// before one, the stack is empty and neither has anything to do, and an app that never opens an
+// overlay installs neither.
+let _started = false;
+
+function start(): void {
+    if (_started || !isBrowser) return;
+    _started = true;
+    // Body scroll lock — effect reacts to modalCount changes. Created outside any owner: it lives as
+    // long as the stack does, not as long as the component that pushed first.
+    unowned(() => effect(() => {
         const body = document.body;
         if (!body) return; // guard for test teardown (happy-dom)
         if (_modalCount() > 0) {
@@ -72,11 +80,8 @@ if (isBrowser) {
         } else {
             body.style.overflow = '';
         }
-    });
-}
-
-// Global Escape handler — notifies only the topmost overlay
-if (isBrowser) {
+    }));
+    // Global Escape handler — notifies only the topmost overlay
     document.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key !== 'Escape') return;
         const stack = _stack.peek();
@@ -93,6 +98,7 @@ if (isBrowser) {
 }
 
 function push(id: string, options?: OverlayOptions): number {
+    start();
     const current = _stack.peek();
     // Prevent duplicate
     if (current.some(e => e.id === id)) {

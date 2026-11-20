@@ -361,7 +361,7 @@ setComponentStrings('select', {
 ```ts
 import { setDirection } from '@pdxui/core';
 
-function setDirection(dir: 'ltr' | 'rtl'): void
+function setDirection(value: 'ltr' | 'rtl'): void
 ```
 
 Force set direction (e.g. for testing or user override).

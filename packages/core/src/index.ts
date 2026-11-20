@@ -420,6 +420,7 @@ export type { TokenBridge } from './component/style';
 
 // Viewport & Screen Signals (centralized)
 export { viewport, screen, adaptive } from './component/viewport';
+export type { ViewportSignals } from './component/viewport';
 
 // Browser Composables
 export { useStorage } from './browser/storage';

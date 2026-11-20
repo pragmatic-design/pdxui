@@ -3,7 +3,7 @@
 // Signal-based: components react to viewport changes.
 
 import { signal, computed } from '../reactivity/signal';
-import type { ReadonlySignal } from '../utils/types';
+import type { ReadonlySignal, Signal } from '../utils/types';
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -33,12 +33,19 @@ export interface AdaptiveReturn {
 
 // ─── Global viewport signal (singleton) ───────────────────────
 
-const _viewportWidth = signal(isBrowser ? window.innerWidth : 1024);
+// Created on the first viewport-based `useAdaptive()`, with its `resize` listener (#1246): an app that
+// never asks adds none. The width is read then, as a setup at load would have read it at that moment.
+let _viewportWidth: Signal<number> | null = null;
 
-if (isBrowser) {
-    window.addEventListener('resize', () => {
-        _viewportWidth.set(window.innerWidth);
-    }, { passive: true });
+function viewportWidth(): Signal<number> {
+    if (_viewportWidth) return _viewportWidth;
+    const width = signal(isBrowser ? window.innerWidth : 1024);
+    if (isBrowser) {
+        window.addEventListener('resize', () => {
+            width.set(window.innerWidth);
+        }, { passive: true });
+    }
+    return (_viewportWidth = width);
 }
 
 // ─── useAdaptive ──────────────────────────────────────────────
@@ -104,11 +111,12 @@ export function useAdaptive(options?: AdaptiveOptions): AdaptiveReturn {
     }
 
     // Viewport-based (default)
+    const width = viewportWidth();
     return {
-        mode: computed(() => _viewportWidth() < breakpoint ? 'mobile' : 'desktop'),
-        isMobile: computed(() => _viewportWidth() < breakpoint),
-        isDesktop: computed(() => _viewportWidth() >= breakpoint),
-        width: _viewportWidth as ReadonlySignal<number>,
+        mode: computed(() => width() < breakpoint ? 'mobile' : 'desktop'),
+        isMobile: computed(() => width() < breakpoint),
+        isDesktop: computed(() => width() >= breakpoint),
+        width: width as ReadonlySignal<number>,
     };
 }
 

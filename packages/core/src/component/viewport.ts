@@ -8,59 +8,87 @@ const isBrowser = typeof window !== 'undefined';
 
 // ─── Viewport Signals (resize + scroll) ───────────────────────────
 
-const _width = signal(isBrowser ? window.innerWidth : 1024);
-const _height = signal(isBrowser ? window.innerHeight : 768);
-const _scrollY = signal(isBrowser ? window.scrollY : 0);
-const _scrollX = signal(isBrowser ? window.scrollX : 0);
-
-/** Centralized viewport signals. One resize listener, many readers. */
-export const viewport = {
-    width: computed(() => _width()) as ReadonlySignal<number>,
-    height: computed(() => _height()) as ReadonlySignal<number>,
-    scrollY: computed(() => _scrollY()) as ReadonlySignal<number>,
-    scrollX: computed(() => _scrollX()) as ReadonlySignal<number>,
-} as const;
-
-// Install global listeners. Module-level code runs once per module instance, so no extra guard flag
-// is needed (an ESM re-import returns the cached module without re-executing this).
-if (isBrowser) {
-    window.addEventListener('resize', () => {
-        _width.set(window.innerWidth);
-        _height.set(window.innerHeight);
-    }, { passive: true });
-
-    window.addEventListener('scroll', () => {
-        _scrollY.set(window.scrollY);
-        _scrollX.set(window.scrollX);
-    }, { passive: true });
+/** The viewport's size and scroll, each a signal: what {@link viewport} holds. */
+export interface ViewportSignals {
+    width: ReadonlySignal<number>;
+    height: ReadonlySignal<number>;
+    scrollY: ReadonlySignal<number>;
+    scrollX: ReadonlySignal<number>;
 }
+
+// Created on the first read of a `viewport` member, with the two listeners (#1246): an app that
+// never reads the viewport adds no `resize` or `scroll` listener. The values are read then, as a setup
+// at load would have read them at that moment.
+let _viewport: ViewportSignals | null = null;
+
+function viewportSignals(): ViewportSignals {
+    if (_viewport) return _viewport;
+    const width = signal(isBrowser ? window.innerWidth : 1024);
+    const height = signal(isBrowser ? window.innerHeight : 768);
+    const scrollY = signal(isBrowser ? window.scrollY : 0);
+    const scrollX = signal(isBrowser ? window.scrollX : 0);
+    if (isBrowser) {
+        window.addEventListener('resize', () => {
+            width.set(window.innerWidth);
+            height.set(window.innerHeight);
+        }, { passive: true });
+        window.addEventListener('scroll', () => {
+            scrollY.set(window.scrollY);
+            scrollX.set(window.scrollX);
+        }, { passive: true });
+    }
+    return (_viewport = {
+        width: computed(() => width()),
+        height: computed(() => height()),
+        scrollY: computed(() => scrollY()),
+        scrollX: computed(() => scrollX()),
+    });
+}
+
+/** Centralized viewport signals. One resize listener, many readers; set up on the first read. */
+export const viewport: Readonly<ViewportSignals> = {
+    get width() { return viewportSignals().width; },
+    get height() { return viewportSignals().height; },
+    get scrollY() { return viewportSignals().scrollY; },
+    get scrollX() { return viewportSignals().scrollX; },
+};
 
 // ─── Screen Signals (media queries) ──────────────────────────────
 
+/** One signal per query, created on its first read with its `change` listener (#1246). */
+const _media = new Map<string, ReadonlySignal<boolean>>();
+
 function mediaSignal(query: string): ReadonlySignal<boolean> {
-    if (!isBrowser) return computed(() => false);
-    const mql = window.matchMedia(query);
-    const sig = signal(mql.matches);
-    mql.addEventListener('change', (e) => sig.set(e.matches));
-    return computed(() => sig());
+    let read = _media.get(query);
+    if (read) return read;
+    if (!isBrowser) {
+        read = computed(() => false);
+    } else {
+        const mql = window.matchMedia(query);
+        const sig = signal(mql.matches);
+        mql.addEventListener('change', (e) => sig.set(e.matches));
+        read = computed(() => sig());
+    }
+    _media.set(query, read);
+    return read;
 }
 
-/** Centralized screen/device signals. One matchMedia listener per query. */
+/** Centralized screen/device signals. One matchMedia listener per query, set up on its first read. */
 export const screen = {
     /** Portrait orientation. */
-    isPortrait: mediaSignal('(orientation: portrait)'),
+    get isPortrait() { return mediaSignal('(orientation: portrait)'); },
     /** Landscape orientation. */
-    isLandscape: mediaSignal('(orientation: landscape)'),
+    get isLandscape() { return mediaSignal('(orientation: landscape)'); },
     /** User prefers reduced motion. */
-    prefersReducedMotion: mediaSignal('(prefers-reduced-motion: reduce)'),
+    get prefersReducedMotion() { return mediaSignal('(prefers-reduced-motion: reduce)'); },
     /** User prefers dark color scheme. */
-    prefersDark: mediaSignal('(prefers-color-scheme: dark)'),
+    get prefersDark() { return mediaSignal('(prefers-color-scheme: dark)'); },
     /** Touch-primary input device. */
-    isTouch: mediaSignal('(pointer: coarse)'),
+    get isTouch() { return mediaSignal('(pointer: coarse)'); },
     /** High contrast mode. */
-    prefersContrast: mediaSignal('(prefers-contrast: more)'),
+    get prefersContrast() { return mediaSignal('(prefers-contrast: more)'); },
     /** Device pixel ratio ≥ 2 (retina). */
-    isHighDpi: mediaSignal('(min-resolution: 2dppx)'),
+    get isHighDpi() { return mediaSignal('(min-resolution: 2dppx)'); },
 } as const;
 
 // ─── Adaptive Feature Flags ──────────────────────────────────────

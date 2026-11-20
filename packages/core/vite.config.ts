@@ -32,6 +32,11 @@ export default defineConfig({
                 reactivity: 'src/reactivity/index.ts',
                 renderer: 'src/renderer/index.ts',
                 component: 'src/component/index.ts',
+                // The boot modules (#1246): what an app relies on without calling anything, imported
+                // into its entry by the pdx() plugin, each its own file so that it can be listed in
+                // `sideEffects` and nothing else needs to be.
+                'boot-theme': 'src/boot/theme.ts',
+                'boot-splash': 'src/boot/splash.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one
             // artefact with no bundler after it: it needs `process.env.NODE_ENV` replaced, and
