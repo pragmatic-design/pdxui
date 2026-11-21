@@ -1018,7 +1018,10 @@ class InlineGen {
         let body = this.rowBody(() => withLoopScope(node, rows, this.ctx, () => withRowKey(node, this.ctx,
             constantItem ? () => withRowValue(node.item.trim(), this.ctx, generate) : generate)));
         const params = node.index ? `${node.item},${node.index}` : node.item;
-        const transition = generateTransition(node.transition);
+        // A list's transitions run with core's listAnimation, named here (#1246): a list with none
+        // brings no animation code into the bundle.
+        const transition = generateTransition(node.transition, true);
+        if (transition) this.imports.add('listAnimation');
         const cf = this.v('cf');
 
         // A read that does not depend on the row is lifted into ONE computed, outside the loop —

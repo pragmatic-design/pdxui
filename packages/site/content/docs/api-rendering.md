@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 84 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 85 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -670,6 +670,16 @@ Usage:
     { offset: 0.5, transform: 'translateY(-20px)' },
     { offset: 1, transform: 'translateY(0)' },
   ], { duration: 500, easing: 'ease-out' });
+
+## `listAnimation`
+
+```ts
+import { listAnimation } from '@pdxui/core';
+
+const listAnimation: ListAnimation
+```
+
+The animation a list with transitions is given.
 
 ## `listEmpty`
 

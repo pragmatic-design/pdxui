@@ -400,7 +400,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // defines most components with component(), which carries every feature: entry 44,237 → 44,303 B, a
 // module's boundary and its import. The built dist: entry 43.3 KB, blocking 102.3 KB, js 477.1 KB
 // locally; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.4, js: 477.4, css: 67, blocking: 102.4 };
+// entry 43.4 → 43.5, js 477.4 → 477.6, blocking 102.4 → 102.5 (#1246, last part): a keyed list runs its
+// transitions with the animation its options name, so a list with none does not carry transitions.ts
+// (the benchmark 11.8 → 10.9 KB). This app carries it anyway, through when(), dynamic() and its library,
+// and pays the indirection: entry 44,303 → 44,425 B, the whole JavaScript +349 B — of which board.pdx,
+// its one @for with a transition, 17, and the rest the minifier's names for the entry's exports moving
+// in 77 route chunks. The built dist: entry 43.4 KB, blocking 102.4 KB, js 477.5 KB; a tenth kept.
+const BUDGET_KB = { entry: 43.5, js: 477.6, css: 67, blocking: 102.5 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

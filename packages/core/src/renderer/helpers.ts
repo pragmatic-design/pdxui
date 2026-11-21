@@ -3,10 +3,11 @@
 
 import { DEV } from '../utils/env';
 import { effect, signal, collectDisposers, onDispose } from '../reactivity/signal';
-import { repeat, repeatRows, mountList, type RepeatOptions } from './list';
+import { repeat, mountList, type RepeatOptions } from './list';
 import { staticRowRenderer } from './list-static';
 import type { ListEmpty } from './list-empty';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
+import type { ListAnimation } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
@@ -32,6 +33,12 @@ export interface TransitionOptions {
     stagger?: number;
     /** Transition sequencing: 'simultaneous' (default), 'out-in' (exit before enter), 'in-out'. */
     mode?: 'simultaneous' | 'out-in' | 'in-out';
+    /**
+     * What a keyed list runs these with (#1246): `listAnimation`. The compiler names it for a `@for`
+     * that declares a transition, and the hand-written `repeat()`, `repeatRows()` and `each()` give it
+     * themselves, so a list with no transition carries none of transitions.ts. `when()` does not read it.
+     */
+    animate?: ListAnimation;
 }
 
 /**
@@ -176,7 +183,8 @@ export function eachDestructured<T>(
     const keyFn = typeof key === 'string'
         ? (item: T) => (item as Record<string, unknown>)[key]
         : key;
-    return repeat(items, keyFn, renderFn, { transitions: options, slices: true, empty });
+    // mountList, not repeat(): what the compiler emits names its list animation itself (#1246).
+    return mountList(items, keyFn, { mode: 'value', render: renderFn }, { transitions: options, slices: true, empty });
 }
 
 /** The list options of a compiled `@for`: its transitions and its `@empty` (#1233), when it has them. */
@@ -203,7 +211,8 @@ export function eachRow<T>(
     const keyFn = typeof key === 'string'
         ? (item: T) => (item as Record<string, unknown>)[key]
         : key;
-    return repeatRows(items, keyFn, renderFn, forOptions(options, empty));
+    // mountList, not repeatRows(): what the compiler emits names its list animation itself (#1246).
+    return mountList(items, keyFn, { mode: 'getters', render: renderFn }, forOptions(options, empty));
 }
 
 /**

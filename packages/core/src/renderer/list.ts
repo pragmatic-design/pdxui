@@ -4,7 +4,8 @@
 
 import { effect, collectDisposers, onDispose, signal, untracked } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
-import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
+import { listAnimation } from './transitions';
+import type { ListAnimation } from './transitions';
 import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
@@ -82,6 +83,19 @@ export interface StaticRows<T> {
     rebuild(m: MappedItem<T>, item: T, i: number): MappedItem<T>;
 }
 
+/** Transitions a list runs, with the animation that runs them (#1246): what the reconciler is given. */
+type Animated = TransitionOptions & { animate: ListAnimation };
+
+/**
+ * The options of a hand-written `repeat()` / `repeatRows()`: its transitions run with
+ * `listAnimation`, given here. What the compiler emits names the animation itself, and goes through
+ * `mountList`, so a list with no transition brings no animation code into a bundle.
+ */
+function withAnimation(options: RepeatOptions | undefined): RepeatOptions | undefined {
+    const t = options?.transitions;
+    return t && !t.animate ? { ...options, transitions: { ...t, animate: listAnimation } } : options;
+}
+
 /** Options for repeat rendering. */
 export interface RepeatOptions {
     transitions?: TransitionOptions;
@@ -112,7 +126,7 @@ export function repeat<T>(
     renderFn: (item: T, index: number) => Node,
     options?: RepeatOptions
 ): DocumentFragment {
-    return mountList(items, keyFn, { mode: 'value', render: renderFn }, options);
+    return mountList(items, keyFn, { mode: 'value', render: renderFn }, withAnimation(options));
 }
 
 /**
@@ -127,7 +141,7 @@ export function repeatRows<T>(
     renderFn: (item: () => T, index: () => number) => Node,
     options?: RepeatOptions
 ): DocumentFragment {
-    return mountList(items, keyFn, { mode: 'getters', render: renderFn }, options);
+    return mountList(items, keyFn, { mode: 'getters', render: renderFn }, withAnimation(options));
 }
 
 export function mountList<T>(
@@ -163,6 +177,12 @@ export function followList<T>(
     let mapped: MappedItem<T>[] = adopted?.mapped ?? [];
     let prevKeys: unknown[] = adopted?.keys ?? [];
     const empty = options?.empty;
+    // Transitions run with the animation the options give (#1246): given none, the list renders
+    // without them, and development says so.
+    const transitions: Animated | undefined = options?.transitions?.animate ? options.transitions as Animated : undefined;
+    if (DEV && options?.transitions && !transitions) {
+        console.warn('[pdx] A keyed list was given transitions and no animation to run them with, so it renders without them: pass animate: listAnimation, or render it with repeat() or each(), which give it.');
+    }
     // A static row with a new item is built again (#1233): only a static list's renderer says how.
     const statics = renderer.mode === 'getters' ? renderer.static : undefined;
     // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
@@ -190,7 +210,7 @@ export function followList<T>(
             if (mapped.length > 0 || pending) {
                 pending?.abort();
                 pending = null;
-                mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys, slice);
+                mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, transitions, keys, slice);
             }
             prevKeys = keys;
             empty.show(endMarker);
@@ -240,7 +260,7 @@ export function followList<T>(
         pending?.abort();
         pending = null;
         prevKeys = keys;
-        mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, options?.transitions, keys, slice);
+        mapped = reconcile(list, keyFn, renderer, mapped, startMarker, endMarker, transitions, keys, slice);
     });
 
     // Teardown: dispose every surviving item's effects when the enclosing scope
@@ -319,7 +339,7 @@ function reconcile<T>(
     oldMapped: MappedItem<T>[],
     startMarker: Comment,
     endMarker: Comment,
-    transitions?: TransitionOptions,
+    transitions?: Animated,
     precomputedKeys?: unknown[],
     slice?: SliceRest<T>
 ): MappedItem<T>[] {
@@ -392,7 +412,7 @@ function reconcile<T>(
             if (transitions?.enter) {
                 const stagger = transitions.stagger ?? 0;
                 for (let i = oldLen; i < newLen; i++) {
-                    for (const n of result[i].nodes) void enterRow(n, transitions.enter, stagger * (i - oldLen));
+                    for (const n of result[i].nodes) void transitions.animate.enterRow(n, transitions.enter, stagger * (i - oldLen));
                 }
             }
             if (DEV && trackingOn) trackReconcile({ listId: `list-${reconcileCounter++}`, oldCount: oldLen, newCount: newLen, reused: oldLen, added: newLen - oldLen, removed: 0, moved: 0, lisLength: oldLen, durationMs: Math.round((performance.now() - reconcileStart) * 100) / 100 });
@@ -416,7 +436,7 @@ function reconcile<T>(
     }
 
     // FLIP: record old positions before mutation — only when a move transition will use them.
-    const oldPositions = transitions?.move ? recordPositions(oldMapped.flatMap(m => m.nodes)) : null;
+    const oldPositions = transitions?.move ? transitions.animate.recordPositions(oldMapped.flatMap(m => m.nodes)) : null;
 
     const oldMap = new Map<unknown, MappedItem<T>>();
     const oldKeyToIndex = new Map<unknown, number>();
@@ -469,7 +489,7 @@ function reconcile<T>(
         else for (const n of old.nodes) n.parentNode?.removeChild(n);
         old.dispose?.();
     }
-    const runExits = (): Promise<unknown> => Promise.all(leavingNodes.map((n) => exit(n, transitions!.exit)));
+    const runExits = (): Promise<unknown> => Promise.all(leavingNodes.map((n) => transitions!.animate.exit(n, transitions!.exit)));
     const exitsAfterEnters = mode === 'in-out' && arriving && leavingNodes.length > 0;
     const exitsDone = leavingNodes.length > 0 && !exitsAfterEnters ? runExits() : null;
 
@@ -515,7 +535,7 @@ function reconcile<T>(
         for (let i = 0; i < newMapped.length; i++) {
             if (lisPositions[i] !== -1) continue; // reused, not arriving
             const delay = stagger * arrived++;
-            for (const n of newMapped[i].nodes) enters.push(enterRow(n, transitions.enter, delay, after));
+            for (const n of newMapped[i].nodes) enters.push(transitions.animate.enterRow(n, transitions.enter, delay, after));
         }
         if (exitsAfterEnters) void Promise.all(enters).then(runExits);
     }
@@ -524,7 +544,7 @@ function reconcile<T>(
     if (oldPositions && transitions?.move) {
         const duration = parseInt(transitions.move.replace(/\D/g, '')) || 300;
         const allNewNodes = newMapped.flatMap(m => m.nodes);
-        flipAnimate(oldPositions, allNewNodes, duration);
+        transitions.animate.flipAnimate(oldPositions, allNewNodes, duration);
     }
 
     // Telemetry: track reconciliation metrics (only with tracking on)

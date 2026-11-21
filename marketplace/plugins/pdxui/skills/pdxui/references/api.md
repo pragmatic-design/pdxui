@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-494 value exports.
+495 value exports.
 
 ### `__adoptStyles`
 
@@ -3445,6 +3445,16 @@ function linkedSignal(optionsOrFn: LinkedSignalOptions<S, T> | (() => T)): Signa
 
 Create a writable derived signal.
  Shorthand: computation IS the source. Value recomputes on any dependency change.
+
+### `listAnimation`
+
+```ts
+import { listAnimation } from '@pdxui/core';
+
+const listAnimation: ListAnimation
+```
+
+The animation a list with transitions is given.
 
 ### `listEmpty`
 

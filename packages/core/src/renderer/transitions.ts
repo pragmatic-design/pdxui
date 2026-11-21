@@ -306,3 +306,19 @@ export function injectTransitionCSS(): void {
 `;
     document.head.appendChild(style);
 }
+
+/**
+ * What a keyed list runs its `@transition`, `@stagger`, `@mode` and `@move` with (#1246): given as its
+ * transition options' `animate`, by the compiler for a `@for` that declares one and by the hand-written
+ * `repeat()`, `repeatRows()` and `each()` themselves, so the reconciler in list.ts imports none of this
+ * module and a list with no transition does not carry it.
+ */
+export interface ListAnimation {
+    enterRow: typeof enterRow;
+    exit: typeof exit;
+    recordPositions: typeof recordPositions;
+    flipAnimate: typeof flipAnimate;
+}
+
+/** The animation a list with transitions is given. */
+export const listAnimation: ListAnimation = { enterRow, exit, recordPositions, flipAnimate };
