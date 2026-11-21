@@ -33,12 +33,23 @@ export interface UsedKeys {
  * the key exists in one of them, so a `$t` key under one of these namespaces is reported by name
  * instead of being counted as an ordinary missing translation.
  *
- * Kept in lockstep with the sources by `tests/i18n-component-namespaces.test.ts`.
+ * Kept in lockstep with the sources by `tests/i18n-component-namespaces.test.ts`: the components'
+ * own `registerComponentStrings()` calls, and the keys of `DEFAULTS` in ui's `src/shared/i18n.ts`,
+ * which `registerUiDefaults()` registers in a loop (#1272).
  */
 export const COMPONENT_STRING_NAMESPACES: readonly string[] = [
-    'calendar', 'cascader', 'data-grid', 'date-picker', 'field-list', 'form', 'form-actions',
-    'form-template', 'inline-edit', 'mention', 'router', 'select', 'time-picker', 'transfer',
-    'tree-select', 'wizard',
+    'alert-dialog', 'app-layout', 'app-shell', 'auto-form', 'autocomplete', 'avatar-group', 'badge',
+    'banner', 'bottom-nav', 'bottom-sheet', 'breadcrumb', 'bulk-actions', 'calendar', 'carousel',
+    'cascader', 'chart', 'chip', 'color-picker', 'command', 'context-menu', 'data-grid',
+    'date-picker', 'dialog', 'drawer', 'dropdown-menu', 'edit-drawer', 'empty-state', 'entity-grid',
+    'error-boundary', 'fab', 'field-group', 'field-list', 'fieldset', 'file-upload',
+    'filter-builder', 'form', 'form-actions', 'form-template', 'image', 'infinite-scroll',
+    'inline-edit', 'input', 'json-editor', 'kanban', 'list', 'localized-input', 'mention',
+    'menubar', 'nav-menu', 'navbar', 'number-input', 'otp-input', 'overlay', 'page-header',
+    'pagination', 'password-input', 'popover', 'progress', 'rating', 'relation-picker', 'rich-text',
+    'router', 'scheduler', 'search-input', 'select', 'shared', 'sidebar', 'signature-pad', 'slider',
+    'sortable-list', 'sparkline', 'spinner', 'split-button', 'splitter', 'switch', 'tag-input',
+    'time-picker', 'timeline', 'toast', 'toolbar', 'transfer', 'tree-select', 'wizard',
 ];
 
 /** Scan .pdx/.ts/.tsx under root for $t() arguments. */

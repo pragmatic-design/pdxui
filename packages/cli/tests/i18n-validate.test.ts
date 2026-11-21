@@ -75,6 +75,15 @@ describe('the one real diagnostic is kept', () => {
         expect(r.missing, 'it must not be counted twice').toEqual([]);
     });
 
+    it("a key of a namespace ui registers from its DEFAULTS is reported as such too (#1272)", async () => {
+        // fieldset's strings are registered by registerUiDefaults(), in a loop, not by a call of its own.
+        writeFileSync(join(root, 'group.pdx'), `<template>{{ $t('fieldset.toggle') }}</template>`);
+        const r = await report();
+        rmSync(join(root, 'group.pdx'));
+        expect(r.componentStrings).toEqual(['fieldset.toggle']);
+        expect(r.missing).toEqual([]);
+    });
+
     it('the namespaces are the ones the library registers', () => {
         // The list is data, and it is kept honest by i18n-component-namespaces.test.ts, which reads
         // the registerComponentStrings() calls in the workspace.
