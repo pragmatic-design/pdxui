@@ -19,7 +19,7 @@ import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippe
 import { dynamic, followDynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { hydrateOn } from '../renderer/hydrate-on';
-import { eachVirtual, followVirtual, type VirtualCall, type VirtualRow } from '../renderer/virtual-list';
+import { eachVirtual, followVirtual, type VirtualAdopted, type VirtualCall, type VirtualRow } from '../renderer/virtual-list';
 import { listOf, isPaged, type PagedSource } from '../renderer/virtual-set';
 import { withoutHydration, type Adopter } from './mode';
 import { takeOverLater } from './later';
@@ -248,17 +248,24 @@ function adoptVirtual<T>(a: Adopter, parent: Node, at: Node | null, call: Virtua
     }
     if (!isSpacer(next)) a.fail('a virtual list without the spacer after its rows');
     const after = next;
-    // `@empty`, as the server wrote it with nothing to show: adopted as one node, which the list removes
-    // when rows come, as it removes the one it builds.
-    let empty: Node | null = null;
+    // `@empty`, as the server wrote it with nothing to show: every node between the spacer and the end
+    // marker, adopted in a scope of its own (#1236), as a plain list's is — the list removes those nodes
+    // and disposes that scope when rows come.
+    let empty: VirtualAdopted<T>['empty'] = null;
     if (after.nextSibling !== end) {
         const loading = isPaged<T>(source) && ((source as PagedSource<T>).isLoading?.() ?? false);
         if (data.length > 0 || loading || !call.options.empty) a.fail('a virtual list has markup after its rows that is not its @empty');
-        empty = after.nextSibling;
+        const first = after.nextSibling!;
         // A compiled `@empty` takes its run over itself, as a compiled row does (hydrate/compiled.ts).
         const emptyFn = call.options.empty;
-        const content = offerRange({ parent, at: empty, next: null }, () => emptyFn());
-        if (a.value(content, parent, empty, end) !== end) a.fail('a virtual list has markup after its @empty');
+        const [reached, dispose] = collectDisposers(() => {
+            const content = offerRange({ parent, at: first, next: null }, () => emptyFn());
+            return a.value(content, parent, first, end);
+        });
+        if (reached !== end) a.fail('a virtual list has markup after its @empty');
+        const nodes: Node[] = [];
+        for (let n = after.nextSibling; n && n !== end; n = n.nextSibling) nodes.push(n);
+        empty = { nodes, dispose };
     }
     // Out of the hydration: the list's first run builds the rows its window holds that the server did not
     // write, as a mount builds them.

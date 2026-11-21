@@ -265,6 +265,28 @@ describe('hydrating a virtual list', () => {
         expect(p.querySelector('.none')).toBeNull();
         expect(p.querySelector('[data-virtual-index="0"]')?.textContent).toBe('a');
     });
+
+    it('@empty with two roots adopted: both go when rows come (#1236)', async () => {
+        const items = signal<string[]>([]);
+        const { page: p } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => items(), (r) => r, (r: string) => html`<li>${r}</li>`, { tag: 'li', empty: () => html`<li class="none">none</li><li class="hint">add one</li>` })}</ul>`);
+        expect(p.querySelectorAll('.none, .hint'), 'the server\'s two roots').toHaveLength(2);
+        items.set(['a']);
+        await settle();
+        expect(p.querySelectorAll('.none, .hint'), 'an adopted root left beside the rows').toHaveLength(0);
+    });
+
+    it('@empty adopted with a binding: the binding stops when rows come (#1236)', async () => {
+        const items = signal<string[]>([]);
+        const count = signal(0);
+        let reads = 0;
+        await hydratedVirtual(() => html`<ul>${eachVirtual(() => items(), (r) => r, (r: string) => html`<li>${r}</li>`, { tag: 'li', empty: () => html`<li class="none">${() => { reads++; return count(); }}</li>` })}</ul>`);
+        items.set(['a']);
+        await settle();
+        const before = reads;
+        count.set(1);
+        await settle();
+        expect(reads, 'the adopted @empty\'s binding ran after it left').toBe(before);
+    });
 });
 
 describe('hydrating an error boundary', () => {
