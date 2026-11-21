@@ -187,6 +187,15 @@ On the inline path the same rule is generated inline, in one `effect` per bindin
 `:name.once="expr"` (#126) reads the value once, untracked, when the element is rendered, assigns it
 the same way, and has no `effect`: a later change of what it read does not reach the element.
 
+A value that cannot change is written the same way without being asked (#110, #1270): an expression of
+literals, a `@for` row's `track` key, and the names of the script's top-level `const`s whose value is
+literals only (`const MAX = 10`) or certainly a primitive, whatever it reads — a template literal, a `+`
+with a string on either side, `!x`, `typeof x`, a comparison (`` const contentId = `${uid}-content` ``).
+A `const` holding a call's result, a name or a function may hold anything, a signal's getter among
+them, and keeps its binding. On a plain element each is core's binding call given the value and its
+`once` flag (`bindAttribute(el, name, value, 1)`): written by the same write as the binding's, with no
+effect; a `.once` value is read through `untracked`.
+
 #### Rules
 
 - `${…}` inside a bound value — `:title="${n}"` — is `PDX_RAW_INTERPOLATION_IN_BINDING` (error, the

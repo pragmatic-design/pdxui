@@ -21,8 +21,11 @@ describe(':style="expr" on a plain element (#1240)', () => {
     it('a value written once, a literal, is written to style.cssText too, on HTML and on SVG', () => {
         for (const template of [`<div :style="'color: red'"></div>`, `<svg><circle :style="'fill: red'"></circle></svg>`]) {
             const code = render(template);
-            expect(code, template).toMatch(/\.style\.cssText = /);
+            // Core's bindStyleText with its once flag, which writes style.cssText (#1270; core's
+            // bound-attribute-write test holds the write to the binding's).
+            expect(code, template).toMatch(/bindStyleText\(__el\d+, '(color|fill): red', 1\)/);
             expect(code, template).not.toMatch(/\["style"\] = /);
+            expect(code, template).not.toMatch(/bind\w+\(__el\d+, "style"/);
         }
     });
 

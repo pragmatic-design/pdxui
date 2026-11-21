@@ -88,7 +88,10 @@ core. A bound attribute on an element compiles to `bindAttribute(el, 'aria-label
 property the element certainly has, `:disabled` on an `<input>`, to `bindNativeProperty`; a name the
 element may or may not have to `bindAttributeOrProperty`, which asks it; and `:style="…"`, a string, to
 `bindStyleText`, which writes `style.cssText`. The compiler picks which from the element and the name; core holds the effect, the value written last, and what `null`
-does. A handler is `eventHandler(fn, ctx.el, 'click')`, which runs it in one batch and routes what it
+does. A value that cannot change — a literal, a `@for` row's key, a `const` whose value is certainly a
+string or a boolean (`` const contentId = `${uid}-content` ``), or `:id.once` — has no effect: it is the
+same call given the value and a last argument, `bindAttribute(el, 'id', ctx.contentId, 1)`, which core
+writes once by the same rule; a `.once` passes its value read through `untracked`. A handler is `eventHandler(fn, ctx.el, 'click')`, which runs it in one batch and routes what it
 throws; the `@state` runes are one `ctx.states({ … })`. Written out in every component, each of these
 weighed more than the component's own markup.
 

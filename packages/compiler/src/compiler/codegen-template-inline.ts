@@ -568,17 +568,22 @@ class InlineGen {
             this.serverBind(el, `:${this.boundName(name, kind)}`, preRewritten ? expr : arrowOf(this.read(expr)));
             return;
         }
-        // `:x.once` (#126): the value is read now, untracked, and assigned once.
+        // `:x.once` (#126): the value is read now, untracked, and assigned once. On a plain element it
+        // is core's binding with its once flag (#1270), the write a binding makes, given the value.
         if (prop.endsWith('.once')) {
             this.imports.add('untracked');
-            const name = prop.slice(0, -'.once'.length);
-            const value = preRewritten ? `(${expr})()` : this.read(expr);
-            this.out(`{ const __b = untracked(() => ${value}); ${this.assign(el, this.boundName(name, kind), '__b', kind)} }`);
+            const name = this.boundName(prop.slice(0, -'.once'.length), kind);
+            const value = `untracked(${arrowOf(preRewritten ? `(${expr})()` : this.read(expr))})`;
+            const call = this.onceCall(el, name, value, kind);
+            this.out(call ?? `{ const __b = ${value}; ${this.assign(el, name, '__b', kind)} }`);
             return;
         }
-        // A value that cannot change — a literal, a @for row's track key — is written once (#110).
+        // A value that cannot change — a literal, an instance constant, a @for row's track key — is
+        // written once (#110, #1270), with no effect.
         if (!preRewritten && isConstantBinding(expr, this.ctx)) {
-            this.out(`{ ${this.assign(el, this.boundName(prop, kind), this.read(expr), kind)} }`);
+            const name = this.boundName(prop, kind);
+            const call = this.onceCall(el, name, this.read(expr), kind);
+            this.out(call ?? `{ ${this.assign(el, name, this.read(expr), kind)} }`);
             return;
         }
         // Pre-rewritten values are already final JS (often a `() => …` getter from form-binding).
@@ -599,32 +604,50 @@ class InlineGen {
     }
 
     /**
+     * How a value written once is written (#1270): core's binding given the value and its once flag, or
+     * null for the assignment spelled out. The call is lighter — the module names nothing it does not
+     * name already, where the assignment repeats the null rule at every binding — and the assignment
+     * is faster: measured on a stub element, the call cost 5 ns a write more, V8 inlining the assignment
+     * and not the binder. So a `@for` row, where the write runs once a row and the module carries it once,
+     * keeps the assignment; elsewhere it runs once an instance, and the call is the weight saved.
+     */
+    private onceCall(el: string, prop: string, value: string, kind: ElementKind): string | null {
+        if (this.ctx.rowKeys.length > 0) return null;
+        return this.boundAttributeCall(el, prop, value, kind, true);
+    }
+
+    /**
      * The call to core's binding of a plain element's attribute or property (`bound-attribute.ts`), the
      * same three writes `assign` spells out: the attribute, a property the element certainly has, or
      * the property asked for with `in`. Null for what `assign` keeps inline: a component's prop, which
      * goes through `assignBoundProperty`, and a URL name, which goes through `sanitizeBoundUrl`.
+     * `once` (#1270): a value that cannot change, or a `:name.once`, is written with no effect — the
+     * same call with its flag, and then `value` is passed as the value, not as a getter: a getter cost
+     * an allocation per row for nothing.
      */
-    private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind): string | null {
+    private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind, once = false): string | null {
         if (kind.custom || URL_BINDINGS.has(prop.toLowerCase())) return null;
         // Parenthesised when the value starts with `{`: `() => { a: 'x' }['a']` is a block (render-parity).
-        const getter = arrowOf(value);
+        // As a plain argument, `{ a: 'x' }['a']` is an expression already.
+        const getter = once ? value : arrowOf(value);
+        const flag = once ? ', 1' : '';
         // `:style="expr"` writes `style.cssText`, HTML and SVG alike (#1240): not the property, which
         // only a browser forwards to cssText.
         if (prop === 'style') {
             this.imports.add('bindStyleText');
-            return `bindStyleText(${el}, ${getter});`;
+            return `bindStyleText(${el}, ${getter}${flag});`;
         }
         if (isAttributeBinding(prop, kind)) {
             this.imports.add('bindAttribute');
-            return `bindAttribute(${el}, ${jsString(prop)}, ${getter});`;
+            return `bindAttribute(${el}, ${jsString(prop)}, ${getter}${flag});`;
         }
         const p = jsString(propName(prop, kind));
         if (hasNativeProperty(kind.tag, propName(prop, kind))) {
             this.imports.add('bindNativeProperty');
-            return `bindNativeProperty(${el}, ${jsString(prop)}, ${p}, ${getter});`;
+            return `bindNativeProperty(${el}, ${jsString(prop)}, ${p}, ${getter}${flag});`;
         }
         this.imports.add('bindAttributeOrProperty');
-        return `bindAttributeOrProperty(${el}, ${jsString(prop)}, ${p}, ${getter});`;
+        return `bindAttributeOrProperty(${el}, ${jsString(prop)}, ${p}, ${getter}${flag});`;
     }
 
     /**

@@ -25,6 +25,10 @@
 // `bindAttributeOrProperty`): the six bytes are that name, which an app's bundle makes a local identifier.
 // With #1268 a @part nothing reads has no ref, no signal and no bindRef: the switch 1273 → 1258 B (its
 // root, label and description), the select 7806 → 7699 B (five of its eight parts are unread).
+// With #1270 a value that cannot change is core's binding given the value and its once flag, with no
+// effect: the select's four bindings of its `listboxId`, a `const` template literal, went from
+// `()=>t.listboxId` to `t.listboxId,1` — fewer bytes raw, four more gzip (7699 → 7703 B) because the
+// getter's shape repeats through the module and compresses better — for four effects fewer at each mount.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -42,7 +46,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1258,
-    'pilot/select.pdx': 7699,
+    'pilot/select.pdx': 7703,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */
