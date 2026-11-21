@@ -11,9 +11,11 @@
  * `main` has in TypeScript and this tree in `.pdx` is a tag the change moves, and `main`'s side IS its
  * TypeScript version. `PDX_PORT_BASE` names another base for `main`'s side (a commit from before a move).
  *
- * The procedure, for each moved tag: PAIRS fresh pairs of pages, each with WARM_UP mounts and SAMPLES
- * alternated samples of INSTANCES tags; a pair's ratio is the median of its samples, the tag's the median
- * of its pairs. The bound is the runner's own spread: a CONTROL row measures one tag with this tree's
+ * The procedure, for each moved tag: COUPLES couples of fresh pairs of pages, one pair opened ours first
+ * and one theirs first, each with WARM_UP mounts and SAMPLES alternated samples of INSTANCES tags; a
+ * pair's ratio is the median of its samples, a couple's the geometric mean of its two pairs', which cancels
+ * a page that is slower for being opened first (#1277, `port-ratio.ts`), and the tag's the median of its
+ * couples. The bound is the runner's own spread: a CONTROL row measures one tag with this tree's
  * build on both sides, by the same procedure, and its ratio is held to the same band. The band comes
  * from that control over CI runs, written at BAND with the runs it was set from.
  */
@@ -24,6 +26,7 @@ import { extname, join, normalize, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { scenarioDist, COMPONENT_MOUNT_MAIN } from './scenarios-build';
+import { portRatio, coupleRatios, type PairResult } from './port-ratio';
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 
@@ -40,7 +43,8 @@ function serve(dir: string): Promise<{ url: string; server: Server }> {
     }));
 }
 
-const PAIRS = 7;
+/** Couples of pairs, one opened in each order (#1277): eight fresh pairs, one more than the seven before. */
+const COUPLES = 4;
 const WARM_UP = 3;
 const SAMPLES = 21;
 /** 1,000 and not the 100 of the budget spec: at 100 the 0.1 ms timer is several per cent of a mount. */
@@ -86,9 +90,15 @@ async function open(browser: Browser, url: string): Promise<Page> {
     return page;
 }
 
-/** One pair of fresh pages: the median of each side's alternated samples. */
-async function pair(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ a: number; b: number }> {
-    const [pa, pb] = [await open(browser, ours), await open(browser, theirs)];
+/**
+ * One pair of fresh pages: the median of each side's alternated samples. `oursFirst` is the order the
+ * two are opened in, which `portRatio` balances (#1277).
+ */
+async function pair(browser: Browser, ours: string, theirs: string, tag: string, oursFirst: boolean): Promise<PairResult> {
+    let pa: Page;
+    let pb: Page;
+    if (oursFirst) { pa = await open(browser, ours); pb = await open(browser, theirs); }
+    else { pb = await open(browser, theirs); pa = await open(browser, ours); }
     for (let i = 0; i < WARM_UP; i++) { await mount(pa, tag); await mount(pb, tag); }
     const a: number[] = [];
     const b: number[] = [];
@@ -98,15 +108,18 @@ async function pair(browser: Browser, ours: string, theirs: string, tag: string)
         else { b.push(await mount(pb, tag)); a.push(await mount(pa, tag)); }
     }
     await Promise.all([pa.close(), pb.close()]);
-    return { a: median(a), b: median(b) };
+    return { a: median(a), b: median(b), oursFirst };
 }
 
-/** The tag's ratio, ours over theirs: the median of PAIRS fresh pairs, each pair's the median of its samples. */
+/**
+ * The tag's ratio, ours over theirs: COUPLES couples of fresh pairs, one opened ours first and one theirs
+ * first (`portRatio`, #1277). `pairs` are the couples' ratios, each pair's the median of its samples.
+ */
 async function ratioOf(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ ratio: number; a: number; b: number; pairs: number[] }> {
-    const results: { a: number; b: number }[] = [];
-    for (let p = 0; p < PAIRS; p++) results.push(await pair(browser, ours, theirs, tag));
-    const pairs = results.map((r) => Math.round((r.a / r.b) * 100) / 100);
-    return { ratio: median(pairs), a: median(results.map((r) => r.a)), b: median(results.map((r) => r.b)), pairs };
+    const results: PairResult[] = [];
+    for (let p = 0; p < COUPLES * 2; p++) results.push(await pair(browser, ours, theirs, tag, p % 2 === 0));
+    const pairs = coupleRatios(results).map((r) => Math.round(r * 100) / 100);
+    return { ratio: portRatio(results), a: median(results.map((r) => r.a)), b: median(results.map((r) => r.b)), pairs };
 }
 
 let site: { url: string; server: Server };
