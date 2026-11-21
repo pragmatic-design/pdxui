@@ -93,7 +93,11 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 339.1 after #1237 (+0.3): value rows, a row that reads its item as a value updated in place on
     // a new item — core's collectRowRuns and the in-place update in list-static.ts. What it buys, on
     // js-framework-benchmark's script time: create 1k −21%, replace −19%, update every 10th −29%.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339.5 },
+    // 339.6 after #1210's third atoms: pdx-chip, pdx-button-group and pdx-radio, each lighter than its
+    // TypeScript module alone (0.96×, 0.74×, 1.04× with its form scope), for the reason the first
+    // batches added: html``'s runtime stays for the other components, and hostClass comes in with the
+    // group's `@host :class`. Measured on the rebuilt dists, as CI measures it; a tenth kept above.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339.7 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.

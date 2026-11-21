@@ -659,6 +659,9 @@ function hostClass(read: (ctx: C) => unknown): HostBinder
 it named last time and names no more is removed; one it never named — the author's `class="toolbar"`
 — stays. Writing the attribute replaced them all, and wrote an object as `[object Object]`.
 
+It runs at every mount of every host that binds it: one toggle per key, and a split only for a key
+that holds several classes (#1210, pdx-button-group).
+
 ## `hostStyle`
 
 ```ts
