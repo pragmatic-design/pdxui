@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/textarea/pdx-textarea';
 import '../../src/password-input/pdx-password-input';
 import '../../src/search-input/pdx-search-input';

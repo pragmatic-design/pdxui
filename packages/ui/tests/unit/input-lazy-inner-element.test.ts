@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/textarea/pdx-textarea';
 
 async function mountHtml(html: string): Promise<HTMLElement> {

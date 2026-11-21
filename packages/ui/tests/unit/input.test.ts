@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 
 describe('pdx-input', () => {
     beforeEach(cleanup);

@@ -20,7 +20,7 @@ import '../form-field/pdx-form-field';
 import '../form-actions/pdx-form-actions';
 import '../field-group/pdx-field-group';
 import '../field-list/pdx-field-list';
-import '../input/pdx-input';
+import '../input/pdx-input.pdx';
 import '../textarea/pdx-textarea';
 import '../password-input/pdx-password-input';
 import '../search-input/pdx-search-input';

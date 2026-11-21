@@ -2,7 +2,7 @@
 // CSS's `@variant` rules key on it, and no longer assembled into a class on their own elements.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/password-input/pdx-password-input';
 import '../../src/search-input/pdx-search-input';
 import '../../src/textarea/pdx-textarea';

@@ -9,7 +9,7 @@
 // for the upgrade — the focus — waits for `loadTag()`.
 
 const LOADERS = {
-    'pdx-input': () => import('../input/pdx-input'),
+    'pdx-input': () => import('../input/pdx-input.pdx'),
     'pdx-number-input': () => import('../number-input/pdx-number-input'),
     'pdx-select': () => import('../select/pdx-select'),
     'pdx-date-picker': () => import('../date-picker/pdx-date-picker'),

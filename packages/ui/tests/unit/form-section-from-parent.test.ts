@@ -11,7 +11,7 @@ import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
 import '../../src/form/pdx-form';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 
 function compiled(filename: string, source: string): string {
     const { code, warnings } = compile(source, filename);

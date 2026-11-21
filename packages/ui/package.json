@@ -59,11 +59,6 @@
       "types": "./dist/label/pdx-label.d.ts",
       "import": "./dist/label/pdx-label.js"
     },
-    "./input": {
-      "development": "./src/input/pdx-input.ts",
-      "types": "./dist/input/pdx-input.d.ts",
-      "import": "./dist/input/pdx-input.js"
-    },
     "./textarea": {
       "development": "./src/textarea/pdx-textarea.ts",
       "types": "./dist/textarea/pdx-textarea.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/checkbox/pdx-checkbox.pdx",
       "types": "./dist/checkbox/pdx-checkbox.d.ts",
       "import": "./dist/checkbox/pdx-checkbox.js"
+    },
+    "./input": {
+      "development": "./src/input/pdx-input.pdx",
+      "types": "./dist/input/pdx-input.d.ts",
+      "import": "./dist/input/pdx-input.js"
     },
     "./package.json": "./package.json"
   },

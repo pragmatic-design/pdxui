@@ -1,0 +1,188 @@
+<template>
+  <!-- The border is on the frame, not on the input: the `.pdx-input-wrap` pattern. A click on the frame
+       (outside the input and its buttons) focuses the input. -->
+  <div class="pdx-input-wrap" data-part="root" @click="onWrapClick($event)">
+    @if (prefix) {
+      <span class="pdx-input-prefix" data-part="prefix">{{ prefix }}</span>
+    }
+    <slot name="prefix"></slot>
+    <input
+      class="pdx-input"
+      data-part="input"
+      :ref="inputEl"
+      :type="type"
+      ::value="value"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :readonly="readonly"
+      :required="required"
+      :name="name"
+      :maxlength="maxlength > 0 ? maxlength : null"
+      :autofocus="autofocus"
+      :autocomplete="autocomplete || (managed ? undefined : 'off')"
+      :data-lpignore="managedFor ? null : 'true'"
+      :data-1p-ignore="managedFor ? null : ''"
+      :data-form-type="managedFor ? null : 'other'"
+      :inputmode="inputmode || undefined"
+      :aria-label="ariaLabel || undefined"
+      :aria-invalid="error ? 'true' : null"
+      :aria-required="required ? 'true' : null"
+      :aria-busy="loading ? 'true' : null"
+      @focus="pdxFocus()"
+      @blur="pdxBlur()"
+    />
+    @if (clearable && !disabled && !readonly) {
+      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="clearLabel" tabindex="-1" @click="onClear()">×</button>
+    }
+    @if (loading) {
+      <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="loadingLabel"></span>
+    }
+    <slot name="suffix"></slot>
+    @if (suffix) {
+      <span class="pdx-input-suffix" data-part="suffix">{{ suffix }}</span>
+    }
+  </div>
+  @if (showCount) {
+    <div class="pdx-input-count" data-part="count">{{ countText }}</div>
+  }
+</template>
+
+<script>
+/**
+ * A text input with prefix and suffix content, a clear button and loading and validation states,
+ * and the base of the specialized inputs.
+ *
+ * @slot prefix - Content inside the input's frame, before the text (an icon, a unit, a currency sign).
+ * @slot suffix - Content inside the input's frame, after the text.
+ *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input>`, the textbox a form submits.
+ * @csspart prefix - The `prefix` text, when set.
+ * @csspart suffix - The `suffix` text, when set.
+ * @csspart clear - The clear button, while `clearable` and neither `disabled` nor `readonly`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while `loading`.
+ * @csspart count - The character count, with `show-count`.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set.
+ * @cssstate over-limit - The text is longer than `maxlength`; the count shows it.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
+ */
+// The foundation of the specialized inputs (number, password, search, masked, date).
+import { onNextFrame } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import { dispatchCommit } from '../shared/commit-change';
+import { allowsPasswordManager } from './password-manager';
+
+// Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
+// Enter, is the inner input's native `change`, which bubbles to the host. The inner field is what a
+// form submits: it carries `name`, holds the value verbatim, and keeps its form ownership for
+// autofill and password managers. The host submits nothing of its own, or the same text would go
+// twice (#135): its form value is null; the model is still the form's, for a reset.
+@model value: string = '' { form: () => null };
+/** The textbox received focus. */
+@event 'pdx-focus': void;
+/** The textbox lost focus. */
+@event 'pdx-blur': void;
+/** The clear button emptied the field, after its `value-change`. */
+@event 'pdx-clear': void;
+// The visual states, on the host as custom states (#132): a theme styles `pdx-input:state(invalid)`,
+// and the design CSS draws the frame from them. The frame carries no state class of its own.
+@state invalid = !!error;
+@state success = !!success;
+@state warning = !!warning;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state loading = !!loading;
+@state over-limit = overCount;
+@part root, input, prefix, suffix, clear, spinner, count;
+// The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws the
+// same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-button. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+// `date` and `time` are the native input's, and a date field in a form is ordinary: the enum lists them
+// so the validator does not warn about `<pdx-input type="date">` on a page where it works.
+// `<pdx-date-picker>` remains the component for a calendar, a format and a locale; this is the plain field.
+@prop type: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' = 'text';
+@prop placeholder: string = '';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop required: boolean = false;
+@prop error: boolean = false;
+@prop success: boolean = false;
+@prop warning: boolean = false;
+@prop clearable: boolean = false;
+@prop loading: boolean = false;
+@prop name: string = '';
+@prop maxlength: number = 0;
+@prop showCount: boolean = false;
+@prop autofocus: boolean = false;
+@prop autocomplete: string = '';
+@prop inputmode: string = '';
+@prop ariaLabel: string = '';
+/** Prefix text (e.g. "$", "https://"). For icons use slot. */
+@prop prefix: string = '';
+/** Suffix text (e.g. "kg", ".com"). For icons use slot. */
+@prop suffix: string = '';
+
+@expose focus, blur, clear, selectText;
+
+let inputEl = $signal(null);
+
+// A password manager's overlay is welcome only where the field says it is a credential: a password,
+// or the autocomplete token of one. With no explicit token, the field asks for no autocomplete.
+const managed = $derived(allowsPasswordManager(type, ''));
+const managedFor = $derived(allowsPasswordManager(type, autocomplete));
+const clearLabel = $derived(uiString('input', 'clear'));
+const loadingLabel = $derived(uiString('input', 'loading'));
+const countText = $derived(maxlength > 0 ? String(value ?? '').length + '/' + maxlength : '' + String(value ?? '').length);
+const overCount = $derived(maxlength > 0 && String(value ?? '').length > maxlength);
+
+// A native reset puts a field back to its default value, which a property binding never sets: the
+// default is the value the component mounted with, so the field's own reset and the host's model agree.
+const mounted = value;
+onNextFrame(() => {
+  if (inputEl) inputEl.defaultValue = mounted === null || mounted === undefined ? '' : String(mounted);
+});
+
+// Signal first, DOM in the frame: the input does not exist yet when setup runs.
+$effect(() => {
+  if (!autofocus) return;
+  requestAnimationFrame(() => inputEl?.focus());
+});
+
+// A commit no typing produced: the model's write, then the native change a commit makes.
+function onClear() {
+  if (disabled || readonly) return;
+  const input = inputEl;
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  value = '';
+  dispatchCommit(input);
+  pdxClear();
+}
+
+function onWrapClick(e) {
+  const tag = e.target.tagName;
+  if (tag === 'INPUT' || tag === 'BUTTON') return;
+  inputEl?.focus();
+}
+
+function focus() { inputEl?.focus(); }
+function blur() { inputEl?.blur(); }
+function clear() { onClear(); }
+/** Select the whole text, so the next keystroke replaces it. Does not focus first. */
+function selectText() { inputEl?.select(); }
+</script>

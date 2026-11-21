@@ -17124,7 +17124,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/input/pdx-input.ts",
+      "path": "src/input/pdx-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -17733,7 +17733,7 @@
           "name": "pdx-input",
           "declaration": {
             "name": "PdxInput",
-            "module": "src/input/pdx-input.ts"
+            "module": "src/input/pdx-input.pdx"
           }
         }
       ]
