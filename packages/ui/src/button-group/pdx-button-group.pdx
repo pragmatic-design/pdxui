@@ -10,7 +10,6 @@
  */
 // Selecting among buttons is pdx-toggle-group: the selection modes (mode="single"|"multiple") left this
 // component in #286 (decision 51), and `pdx migrate` rewrites a group that used them.
-import { onNextFrame } from '@pdxui/core';
 
 @prop orientation: string = 'horizontal';
 @prop variant: string = '';
@@ -28,21 +27,20 @@ import { onNextFrame } from '@pdxui/core';
   :class="{ 'pdx-btn-group-vertical': orientation === 'vertical', 'pdx-btn-group': orientation !== 'vertical' }"
 }
 
-// The name goes where the role is, on the host. Without `label`, an author's aria-label stays, which a
-// host binding would remove: the binding is written here, removing only the name it wrote.
 let labelled = false;
 $effect(() => {
+  // The name goes where the role is, on the host. Without `label`, an author's aria-label stays, which
+  // a host binding would remove: the binding is written here, removing only the name it wrote.
   if (label) { el.setAttribute('aria-label', label); labelled = true; }
   else if (labelled) { el.removeAttribute('aria-label'); labelled = false; }
-});
 
-// The group's variant, size and disabled passed on to its buttons, once they are projected. Read
-// first, so the effect follows them; written a frame later, when the buttons are in place.
-$effect(() => {
+  // The group's variant, size and disabled passed on to its buttons, once they are projected. Read
+  // first, so the effect follows them; written a frame later, when the buttons are in place. A plain
+  // frame, not onNextFrame: that one needs the setup's scope, which a re-run of the effect has not.
   const v = variant;
   const s = size;
   const d = disabled;
-  onNextFrame(() => {
+  requestAnimationFrame(() => {
     for (const btn of el.querySelectorAll('pdx-button')) {
       if (v) btn.setAttribute('variant', v);
       if (s) btn.setAttribute('size', s);

@@ -51,7 +51,6 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/chip';
-import { onNextFrame } from '@pdxui/core';
 
 // A click writes it (#291): `selected-change` `{ value }`, in place of `pdx-toggle`.
 @model selected: boolean = false;
@@ -118,9 +117,10 @@ const toggleOnBody = $derived(!!selectable && !!removable);
 // read after the slot content has been projected.
 let bodyEl = $signal(null);
 let text = $signal('');
+// A plain frame, not onNextFrame: that one needs the setup's scope, which a re-run of the effect has not.
 $effect(() => {
   void label;
-  onNextFrame(() => { text = (bodyEl?.textContent ?? '').trim(); });
+  requestAnimationFrame(() => { text = (bodyEl?.textContent ?? '').trim(); });
 });
 const removeName = $derived(format(uiString('chip', 'remove'), { label: label || text || value || '' }).trim());
 </script>
