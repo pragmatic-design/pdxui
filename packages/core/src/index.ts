@@ -163,7 +163,8 @@ export { whenChain } from './renderer/when-chain';
 export { pages } from './renderer/pages';
 
 // Transitions + FLIP
-export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions } from './renderer/transitions';
+export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions, listAnimation } from './renderer/transitions';
+export type { ListAnimation } from './renderer/transitions';
 
 // Keyframe Animations
 export { keyframes, playKeyframes } from './renderer/keyframes';

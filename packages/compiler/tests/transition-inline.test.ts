@@ -1,7 +1,8 @@
 // `@transition`, `@stagger`, `@mode` and `@move` on an `@if` or a `@for` reach the runtime: every .pdx's
 // render since #107, and a snippet's body. The inline path dropped them once, so an animation that
 // played in dev did not play in the shipped app (#85). The options object must be passed to `when` /
-// `each` / `eachRow`, at the top level and in a snippet.
+// `each` / `eachRow`, at the top level and in a snippet. A list's also names the animation that runs
+// them, core's listAnimation (#1246), which a list with no transition does not carry.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -25,10 +26,10 @@ function options(code: string): string | undefined {
 const FORMS: Array<[string, string, string]> = [
     ['@if with enter and exit', `@if (on) @transition('fade', 'out') { <p>x</p> }`, "{ enter: 'fade', exit: 'out' }"],
     ['@if with @mode', `@if (on) @transition('fade') @mode('out-in') { <p>x</p> } @else { <p>y</p> }`, "{ enter: 'fade', exit: 'fade', mode: 'out-in' }"],
-    ['@for with @stagger', `@for (list as x; track x) @transition('fade') @stagger(50) { <p>{{ x }}</p> }`, "{ enter: 'fade', exit: 'fade', stagger: 50 }"],
-    ['@for with @move alone', `@for (list as x; track x) @move(200) { <p>{{ x }}</p> }`, "{ move: '200' }"],
-    ['@for with @empty', `@for (list as x; track x) @transition('fade') { <p>{{ x }}</p> } @empty { <p>none</p> }`, "{ enter: 'fade', exit: 'fade' }"],
-    ['@for over a destructured row', `@for (list as { id }; track id) @transition('fade') { <p>{{ id }}</p> }`, "{ enter: 'fade', exit: 'fade' }"],
+    ['@for with @stagger', `@for (list as x; track x) @transition('fade') @stagger(50) { <p>{{ x }}</p> }`, "{ enter: 'fade', exit: 'fade', stagger: 50, animate: listAnimation }"],
+    ['@for with @move alone', `@for (list as x; track x) @move(200) { <p>{{ x }}</p> }`, "{ move: '200', animate: listAnimation }"],
+    ['@for with @empty', `@for (list as x; track x) @transition('fade') { <p>{{ x }}</p> } @empty { <p>none</p> }`, "{ enter: 'fade', exit: 'fade', animate: listAnimation }"],
+    ['@for over a destructured row', `@for (list as { id }; track id) @transition('fade') { <p>{{ id }}</p> }`, "{ enter: 'fade', exit: 'fade', animate: listAnimation }"],
 ];
 
 describe('transitions reach the runtime', () => {
@@ -39,6 +40,15 @@ describe('transitions reach the runtime', () => {
             expect(options(slot), 'a snippet body dropped the transition').toBe(expected);
         });
     }
+
+    it('a @for with a transition imports listAnimation, and one without does not (#1246)', () => {
+        const animated = compiled(`@for (list as x; track x) @transition('fade') { <p>{{ x }}</p> }`).inline;
+        expect(/import \{[^}]*\blistAnimation\b[^}]*\} from '@pdxui\/core'/.test(animated)).toBe(true);
+        const plain = compiled(`@for (list as x; track x) { <p>{{ x }}</p> }`).inline;
+        expect(plain).not.toContain('listAnimation');
+        // An @if's transition is when()'s, which does not read an animation.
+        expect(compiled(`@if (on) @transition('fade') { <p>x</p> }`).inline).not.toContain('listAnimation');
+    });
 
     it('a block with no transition passes no options', () => {
         const { inline, slot } = compiled('@if (on) { <p>x</p> }');

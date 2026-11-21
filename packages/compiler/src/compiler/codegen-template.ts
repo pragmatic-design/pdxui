@@ -118,9 +118,11 @@ export function awaitTimingArg(node: AwaitNode): string {
 
 /**
  * The options a `when` / `each` / `eachRow` call takes for `@transition`, `@stagger`, `@mode` and
- * `@move`, as `, { … }` to append after its last argument, or '' for a block without them (#85).
+ * `@move`, as `, { … }` to append after its last argument, or '' for a block without them (#85). A
+ * list's (`list`) also names the animation that runs them, core's `listAnimation` (#1246), which the
+ * caller imports.
  */
-export function generateTransition(config?: TransitionConfig): string {
+export function generateTransition(config?: TransitionConfig, list = false): string {
     if (!config) return '';
     const parts: string[] = [];
     if (config.enter) parts.push(`enter: ${jsQuote(config.enter)}`);
@@ -130,5 +132,6 @@ export function generateTransition(config?: TransitionConfig): string {
     // The reconciler reads this to record positions before the mutation and play the FLIP after
     // (renderer/list.ts:172 and :299).
     if (config.move) parts.push(`move: ${jsQuote(config.move)}`);
+    if (list) parts.push('animate: listAnimation');
     return `, { ${parts.join(', ')} }`;
 }

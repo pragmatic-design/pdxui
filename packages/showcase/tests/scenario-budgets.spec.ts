@@ -93,12 +93,17 @@ import { scenarioDist } from './scenarios-build';
  * a <slot>: hello 7.1 → 6.6, benchmark 12.3 → 11.8, dashboard 19.1 → 18.6; crud 51.5 → 51.6, an app
  * whose library components are defined with component(), which carries every feature. Each budget the
  * measurement + 0.3.
+ *
+ * #1246's last part, a keyed list's transitions run with the animation its options name instead of a
+ * static import in list.ts, and the benchmark's own build with no modulepreload polyfill: benchmark
+ * 11.8 → 10.9 (11,212 B), crud 51.6 → 51.2, dashboard 18.6 → 18.2, hello 6.6 as it was. Each budget
+ * the measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 6.9, css: 0 },
-    benchmark: { js: 12.1, css: 0 },
-    crud: { js: 51.9, css: 1.6 },
-    dashboard: { js: 18.9, css: 21.9 },
+    benchmark: { js: 11.2, css: 0 },
+    crud: { js: 51.5, css: 1.6 },
+    dashboard: { js: 18.5, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -190,14 +195,16 @@ const DEBUG_CODE = [
 
 /**
  * The features of a component's definition (#1246, part 3c), each a module a compiled component names
- * when it declares it: `@expose`, `@host` and `@variants`, a form model, a `<slot>`. The hello and
- * benchmark apps declare none.
+ * when it declares it: `@expose`, `@host` and `@variants`, a form model, a `<slot>`; and a list's
+ * transitions, which a `@for` with `@transition` names as its `animate`. The hello and benchmark apps
+ * declare none.
  */
 const FEATURE_MODULES = [
     'packages/core/src/component/channel.ts',
     'packages/core/src/component/host.ts',
     'packages/core/src/component/form-element.ts',
     'packages/core/src/component/slots.ts',
+    'packages/core/src/renderer/transitions.ts',
 ];
 
 for (const name of ['hello', 'benchmark']) {
