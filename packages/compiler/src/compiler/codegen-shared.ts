@@ -268,6 +268,11 @@ export function assembleModule(
     if (setupBody.includes('ctx.expose(')) features.push(['expose', 'exposeOnElement']);
     if (hostCode || variantsCode) features.push(['host', 'bindHost']);
     if (imports.has('wireFormModel')) features.push(['form', 'FormPdxElement']);
+    // `projection`, slot projection, for a template that renders a <slot>: read from the template's
+    // markup, an external `<template src>` already resolved into it. One written as text in `@raw` is
+    // read as a slot too, and costs only the projection; none is ever missed.
+    // Match: an opening <slot tag. Groups: none
+    if (/<slot[\s>/]/i.test(descriptor.template?.content ?? '')) features.push(['projection', 'slotProjection']);
     for (const [, fn] of features) imports.add(fn);
     // None is no third argument: most components (every page) declare none, and pay nothing for it.
     const featuresCode = features.length > 0 ? `, { ${features.map(([name, fn]) => `${name}: ${fn}`).join(', ')} }` : '';

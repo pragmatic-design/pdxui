@@ -223,6 +223,8 @@ export { exposeOnElement } from './component/channel';
 // for `@host`, and for a model declared `{ form }`.
 export { bindHost } from './component/host';
 export { FormPdxElement } from './component/form-element';
+export { slotProjection } from './component/slots';
+export type { SlotProjection } from './component/slots';
 
 // Permissions
 export { setPermissions, hasPermission, requirePermission } from './component/permissions';

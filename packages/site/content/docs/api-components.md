@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 105 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 106 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -1190,6 +1190,16 @@ function slot(): SlotSpec<F>
 ```
 
 Declare a slot: `slot<(o: Option) => Node>()`.
+
+## `slotProjection`
+
+```ts
+import { slotProjection } from '@pdxui/core';
+
+const slotProjection: SlotProjection
+```
+
+The projection a component whose template renders a <slot> is defined with.
 
 ## `swipeDownDismiss`
 

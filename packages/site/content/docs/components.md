@@ -680,19 +680,25 @@ is written from a theme or the page.
 
 ## A component carries the features it declares
 
-`@expose`, `@host` and a form model are features of the definition, and the code that implements
-them ships only with a component that declares them. A compiled `.pdx` is defined with core's
+`@expose`, `@host`, a form model and a `<slot>` are features of the definition, and the code that
+implements them ships only with a component that declares them. A compiled `.pdx` is defined with core's
 `defineComponent(tag, descriptor, features)`, naming the features its declarations use: a component
 with an `@expose` passes `{ expose: exposeOnElement }`, one with `@host` or `@variants` (whose axes
 are reflected on the host) passes `{ host: bindHost }`, and one with a `@model` `{ form }` passes
 `{ form: FormPdxElement }`, the class a form-associated component extends, with its ElementInternals
-and the platform's form API; one with none passes nothing. An app none of whose components exposes
-anything does not carry `exposeOnElement`, one with no host bindings does not carry `bindHost`, and
-one with no form component does not carry the form API.
+and the platform's form API; one whose template renders a `<slot>` passes
+`{ projection: slotProjection }`, which places the host's children there; one with none passes
+nothing. An app none of whose components exposes anything does not carry `exposeOnElement`, one with
+no host bindings does not carry `bindHost`, one with no form component does not carry the form API,
+and one with no `<slot>` does not carry slot projection. A component with no `<slot>` still takes its
+children out of the host when it mounts, as one always has.
 
 A component written in TypeScript is defined with `component(tag, descriptor)`, which is
 `defineComponent` with every feature, so a hand-written descriptor never names one. `defineComponent`
-given a `host` or variant axes without `{ host: bindHost }` throws in development.
+given a `host` or variant axes without `{ host: bindHost }` throws in development, as it does for a
+form-associated descriptor without `{ form: FormPdxElement }`; a render with a `<slot>` and no
+projection is reported when it mounts. A class that extends `PdxElement` by hand declares
+`static slotProjection = slotProjection` to project its children.
 
 ## Icons: a page ships the ones it draws
 

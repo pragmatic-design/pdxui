@@ -17,13 +17,15 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { html } from '../src/renderer/template';
 import { PdxElement } from '../src/component/element';
 import { define } from '../src/component/define';
+import { slotProjection } from '../src/component/slots';
 
 let tagCounter = 0;
 const uniqueTag = () => `late-slot-${tagCounter++}`;
 
 function defineEl(body: () => DocumentFragment | Node | null): string {
     const tag = uniqueTag();
-    class El extends PdxElement { body() { return body(); } }
+    // A class written by hand carries slot projection by declaring it, as component() does (#1246).
+    class El extends PdxElement { static slotProjection = slotProjection; body() { return body(); } }
     define(tag, El as unknown as new () => PdxElement);
     return tag;
 }
