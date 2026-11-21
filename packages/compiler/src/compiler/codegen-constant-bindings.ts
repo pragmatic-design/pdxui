@@ -115,10 +115,54 @@ export function withRowValue<T>(item: string, ctx: CompileContext, generate: () 
     }
 }
 
+/** The binary operators whose result is a boolean whatever their operands: comparisons, `in`, `instanceof`. */
+const BOOLEAN_OPERATORS = new Set([
+    ts.SyntaxKind.EqualsEqualsToken, ts.SyntaxKind.EqualsEqualsEqualsToken, ts.SyntaxKind.ExclamationEqualsToken,
+    ts.SyntaxKind.ExclamationEqualsEqualsToken, ts.SyntaxKind.LessThanToken, ts.SyntaxKind.LessThanEqualsToken,
+    ts.SyntaxKind.GreaterThanToken, ts.SyntaxKind.GreaterThanEqualsToken, ts.SyntaxKind.InKeyword,
+    ts.SyntaxKind.InstanceOfKeyword,
+]);
+
+/** Is `node` a string literal or a template literal, whose value is a string whatever it holds? */
+const isStringSyntax = (node: ts.Node): boolean =>
+    ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateExpression(node);
+
 /**
- * The names the script declares at its top level with `const` and a value of literals only —
- * `const MAX = 10;` — which the template reads as values that cannot change. A destructuring, a `let`
- * and anything initialised by a call or a name are left out.
+ * Is the value of `node` certainly a primitive, whatever its names hold (#1270)? A template literal is
+ * a string; `+` with a string on either side is one; `!x`, `typeof x` and a comparison are a boolean or
+ * a string. A primitive in a top-level `const` is fixed for the instance: the template reads it as a
+ * plain property of the setup's object, and nothing it holds can be read reactively. A call, a name or
+ * a member may hold anything — a function, a signal's getter, an object read through a store — and
+ * makes no such promise.
+ */
+function certainlyPrimitive(node: ts.Expression): boolean {
+    if (isStringSyntax(node)) return true;
+    if (ts.isParenthesizedExpression(node)) return certainlyPrimitive(node.expression);
+    if (ts.isTypeOfExpression(node)) return true;
+    if (ts.isPrefixUnaryExpression(node)) return node.operator === ts.SyntaxKind.ExclamationToken;
+    if (ts.isBinaryExpression(node)) {
+        const op = node.operatorToken.kind;
+        if (BOOLEAN_OPERATORS.has(op)) return true;
+        if (op === ts.SyntaxKind.PlusToken) return certainlyString(node.left) || certainlyString(node.right);
+    }
+    return false;
+}
+
+/** Is the value of `node` certainly a string: string syntax, or a `+` with a string on either side? */
+function certainlyString(node: ts.Expression): boolean {
+    if (isStringSyntax(node)) return true;
+    if (ts.isParenthesizedExpression(node)) return certainlyString(node.expression);
+    if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.PlusToken) {
+        return certainlyString(node.left) || certainlyString(node.right);
+    }
+    return false;
+}
+
+/**
+ * The names the script declares at its top level with `const`, which the template reads as values that
+ * cannot change: a value of literals only — `const MAX = 10;` — or certainly a primitive, whatever it
+ * reads — `` const contentId = `${uid}-content`; `` (#1270). A destructuring, a `let` and anything
+ * initialised by a call or a bare name are left out.
  */
 export function literalConstNames(script: string): Set<string> {
     const names = new Set<string>();
@@ -127,7 +171,8 @@ export function literalConstNames(script: string): Set<string> {
         if (!ts.isVariableStatement(statement)) continue;
         if (!(statement.declarationList.flags & ts.NodeFlags.Const)) continue;
         for (const d of statement.declarationList.declarations) {
-            if (ts.isIdentifier(d.name) && d.initializer && literalOnly(d.initializer, sf, [])) names.add(d.name.text);
+            if (!ts.isIdentifier(d.name) || !d.initializer) continue;
+            if (literalOnly(d.initializer, sf, []) || certainlyPrimitive(d.initializer)) names.add(d.name.text);
         }
     }
     return names;

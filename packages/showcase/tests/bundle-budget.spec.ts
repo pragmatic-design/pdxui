@@ -415,7 +415,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // lighter alone (0.83×, 0.96×, 1.04×). The entry and the blocking bytes do not move; the route chunks
 // carry +0.8 KB each through the chunk they share, where the compiled two-way bindings these three are
 // the first to use (::value, ::checked) come in while html`` stays for the others. js 478.9 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 479.0, css: 67, blocking: 102.5 };
+// blocking 102.5 → 102.6 (owner's OK, 2026-11-21): a value that cannot change is written with no effect
+// (#1270) — core's four binders take the value and a `once` flag, a branch each, in the code every app
+// loads before it paints. In exchange each constant binding outside a row (a literal, a `const`
+// template literal such as an id, a `:x.once`) makes no effect at mount. The built dist: blocking
+// 102.6 KB, entry 43.5 KB, js 478.6 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 479.0, css: 67, blocking: 102.6 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

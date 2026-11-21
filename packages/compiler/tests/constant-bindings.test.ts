@@ -27,6 +27,8 @@ describe('the track key of a @for row is written once', () => {
     it('a property bound to the key is assigned once, with no effect', () => {
         const out = render('@for (rows as row; track row.id) {<p :data-id="row.id" :title="row.label"></p>}');
         expect(out).not.toMatch(/bind\w+\(__el\d+, "data-id"/);
+        // In a row the assignment is spelled out, not core's call with its once flag: a write once a
+        // row, where the call costs a few ns more and the module carries it once (#1270, onceCall).
         expect(out).toMatch(/__el\d+\.setAttribute\("data-id"/);
         // The control: the label is not the key, and keeps its binding.
         expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>row\(\)\.label\)/);
@@ -58,9 +60,8 @@ describe('an expression of literals is written once', () => {
     it(':title="\'x\'" is an assignment, not an effect', () => {
         const out = render('<p :title="\'x\'"></p>');
         expect(out).not.toContain('effect(');
-        // A binding is core's call now (#1207): it is no effect in the module, and no binding either.
-        expect(out).not.toMatch(/bind(?:Attribute|NativeProperty|AttributeOrProperty)\(/);
-        expect(out).toMatch(/__el\d+\.setAttribute\("title"|__el\d+\["title"\]/);
+        // Core's binding with its `once` flag (#1270): written once, no effect, by the same write.
+        expect(out).toMatch(/bindAttributeOrProperty\(__el\d+, "title", "title", 'x', 1\)/);
     });
 
     it('{{ 1 + 2 }} and {{ \'a\' }} are constant interpolations', () => {
@@ -83,7 +84,7 @@ describe('an expression of literals is written once', () => {
 
     it('a word inside a string is not a name; a name inside a template literal\'s ${} is', () => {
         const out = render('<p :title="\'label\'" :lang="`${label}`"></p>');
-        expect(out).not.toMatch(/bind\w+\(__el\d+, "title"/);
+        expect(out, 'written once: the binding carries the once flag (#1270)').toMatch(/bind\w+\(__el\d+, "title"[^;]*, 1\);/);
         expect(out).toMatch(/bind\w+\(__el\d+, "lang", "lang", \(\)=>`\$\{ctx\.label\(\)\}`\)/);
     });
 
@@ -95,5 +96,55 @@ describe('an expression of literals is written once', () => {
     it('a pipe is never constant: the pipe may read a signal', () => {
         const out = render('<p>{{ \'a\' | upper }}</p>', "let rows = $signal([]);\nconst upper = (v) => v.toUpperCase();");
         expect(out).not.toMatch(/,true\)/);
+    });
+});
+
+// #1270: a value written once is core's binding with its `once` flag — no effect, the same write, and
+// no import the binding does not already have; an instance constant whose value is certainly a
+// primitive is one such value.
+describe('a value written once is core\'s binding with its once flag (#1270)', () => {
+    it(':id.once is one write, untracked, not the assignment spelled out inline', () => {
+        const out = render('<div :id.once="label"></div><p :aria-label.once="label"></p>');
+        expect(out).toMatch(/bindAttributeOrProperty\(__el\d+, "id", "id", untracked\(\(\)=>ctx\.label\(\)\), 1\)/);
+        expect(out).toMatch(/bindAttribute\(__el\d+, "aria-label", untracked\(\(\)=>ctx\.label\(\)\), 1\)/);
+        expect(out).not.toContain('const __b = untracked');
+        expect(out).not.toContain('effect(');
+    });
+
+    it('a literal binding is one write too', () => {
+        const out = render('<p :title="\'x\'" :style="\'color: red\'"></p>');
+        expect(out).toMatch(/bindAttributeOrProperty\(__el\d+, "title", "title", 'x', 1\)/);
+        expect(out).toMatch(/bindStyleText\(__el\d+, 'color: red', 1\)/);
+    });
+
+    it('an instance const that is certainly a primitive is written once: a template literal, a string concatenation', () => {
+        const script = "let rows = $signal([]);\nconst uid = make();\nconst contentId = `${uid}-content`;\nconst errId = uid + '-error';";
+        const out = render('<div :id="contentId" :aria-describedby="errId"></div><b>{{ contentId }}</b>', script);
+        expect(out).toMatch(/bindAttributeOrProperty\(__el\d+, "id", "id", ctx\.contentId, 1\)/);
+        expect(out).toMatch(/bindAttribute\(__el\d+, "aria-describedby", ctx\.errId, 1\)/);
+        expect(out).toMatch(/bindInterpolation\(__t\d+,\(\)=>ctx\.contentId,true\)/);
+        // Every binding of the two is the written-once form: none without the flag.
+        expect(out.match(/bind(?:Attribute|AttributeOrProperty)\(__el\d+, [^;]*;/g)?.every((c) => c.endsWith(', 1);'))).toBe(true);
+    });
+
+    it('a const whose value may be anything keeps its binding: a call, a name, a function, a $derived', () => {
+        const script = "let rows = $signal([]);\nconst made = make();\nconst alias = made;\nconst f = () => rows;\nconst d = $derived(rows.length + 'x');";
+        const out = render('<p :title="made" :lang="alias" :dir="f" :data-n="d"></p>', script);
+        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>ctx\.made\)/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "lang", "lang", \(\)=>ctx\.alias\)/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "dir", "dir", \(\)=>ctx\.f\)/);
+        expect(out).toMatch(/bindAttribute\(__el\d+, "data-n", \(\)=>ctx\.d\(\)\)/);
+    });
+
+    it('a primitive const shadowed by a loop name is the loop name inside the loop', () => {
+        const script = "let rows = $signal([]);\nconst id = `${make()}-x`;";
+        const out = render('@for (rows as id; track id.key) {<p :title="id.label"></p>}', script);
+        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>id\(\)\.label\)/);
+    });
+
+    it('a component prop written once still goes through assignBoundProperty', () => {
+        const out = render('<pdx-x :title.once="label" :open="true"></pdx-x>');
+        expect(out).toMatch(/assignBoundProperty\(__el\d+, "title"/);
+        expect(out).not.toMatch(/bind\w+\(__el\d+, "(title|open)"/);
     });
 });
