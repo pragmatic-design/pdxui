@@ -14,7 +14,7 @@ import { alphaChangeEvent, type AlphaLookup } from '../../../compiler/src/langua
 import { tick, cleanup } from './helpers';
 import '../../src/checkbox/pdx-checkbox';
 import '../../src/switch-toggle/pdx-switch.pdx';
-import '../../src/radio/pdx-radio';
+import '../../src/radio/pdx-radio.pdx';
 import '../../src/toggle/pdx-toggle';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/checkbox-group/pdx-checkbox-group';

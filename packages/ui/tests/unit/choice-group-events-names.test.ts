@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/checkbox/pdx-checkbox';
 import '../../src/checkbox-group/pdx-checkbox-group';
-import '../../src/radio/pdx-radio';
+import '../../src/radio/pdx-radio.pdx';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/segmented/pdx-segmented';
 import '../../src/label/pdx-label';

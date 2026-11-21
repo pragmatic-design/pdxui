@@ -19,7 +19,7 @@ import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';
 import './input/pdx-input';
 import './checkbox/pdx-checkbox';
-import './radio/pdx-radio';
+import './radio/pdx-radio.pdx';
 import './switch-toggle/pdx-switch.pdx';
 import './flag/pdx-flag.pdx';
 

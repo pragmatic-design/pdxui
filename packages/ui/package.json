@@ -84,11 +84,6 @@
       "types": "./dist/checkbox/pdx-checkbox.d.ts",
       "import": "./dist/checkbox/pdx-checkbox.js"
     },
-    "./radio": {
-      "development": "./src/radio/pdx-radio.ts",
-      "types": "./dist/radio/pdx-radio.d.ts",
-      "import": "./dist/radio/pdx-radio.js"
-    },
     "./radio-group": {
       "development": "./src/radio-group/pdx-radio-group.ts",
       "types": "./dist/radio-group/pdx-radio-group.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/button-group/pdx-button-group.pdx",
       "types": "./dist/button-group/pdx-button-group.d.ts",
       "import": "./dist/button-group/pdx-button-group.js"
+    },
+    "./radio": {
+      "development": "./src/radio/pdx-radio.pdx",
+      "types": "./dist/radio/pdx-radio.d.ts",
+      "import": "./dist/radio/pdx-radio.js"
     },
     "./package.json": "./package.json"
   },

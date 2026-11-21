@@ -23425,7 +23425,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/radio/pdx-radio.ts",
+      "path": "src/radio/pdx-radio.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23688,7 +23688,7 @@
           "name": "pdx-radio",
           "declaration": {
             "name": "PdxRadio",
-            "module": "src/radio/pdx-radio.ts"
+            "module": "src/radio/pdx-radio.pdx"
           }
         }
       ]

@@ -26,6 +26,7 @@ const PORTED: Record<string, string> = {
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',
+    'pdx-radio': 'src/radio/pdx-radio.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
 };
 

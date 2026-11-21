@@ -2,7 +2,7 @@
  * MANIFEST — pdx-radio (+ pdx-radio-group)
  *
  * Contracts derived by inspecting:
- *  - source: packages/ui/src/radio/pdx-radio.ts
+ *  - source: packages/ui/src/radio/pdx-radio.pdx
  *      render → <label class="pdx-radio-wrap ..."> holding:
  *        - <input type="radio" class="pdx-radio ..."> (:checked, :disabled, :name, :value, :aria-invalid)
  *        - size → the host's [size]; error and disabled → the host's :state(invalid) and :state(disabled) (#286)
