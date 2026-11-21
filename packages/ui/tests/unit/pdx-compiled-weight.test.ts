@@ -23,6 +23,8 @@
 // `:style="…"` write `style.cssText` through `bindStyleText`, shorter calls than the property binding
 // they were, and the module names one more import (its other bindings still use
 // `bindAttributeOrProperty`): the six bytes are that name, which an app's bundle makes a local identifier.
+// With #1268 a @part nothing reads has no ref, no signal and no bindRef: the switch 1273 → 1258 B (its
+// root, label and description), the select 7806 → 7699 B (five of its eight parts are unread).
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -39,8 +41,8 @@ const UI = join(__dirname, '..', '..');
 
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
-    'src/switch-toggle/pdx-switch.pdx': 1273,
-    'pilot/select.pdx': 7806,
+    'src/switch-toggle/pdx-switch.pdx': 1258,
+    'pilot/select.pdx': 7699,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

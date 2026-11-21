@@ -586,7 +586,9 @@ function close() { open = false; trigger?.focus(); }
 
 The page or a theme styles a part by its name, `my-menu [data-part="popup"] { … }`, instead of an
 internal class that may be renamed; parts, `:state()` and the component's tokens are what is public.
-In the script the name is the element (`null` while it is not rendered), so it needs no `:ref`.
+In the script the name is the element (`null` while it is not rendered), so it needs no `:ref`. A
+part nothing reads costs nothing at mount: the compiler gives a ref only to the parts the script or a
+template expression names.
 
 A part is every element that carries it, as the platform's `part` attribute is. When the template can
 render more than one at once — every row of an `@for`, two siblings, an element beside the rows — the
