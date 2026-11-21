@@ -11,7 +11,8 @@ import '../../src/button/pdx-button';
 import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/chip/pdx-chip.pdx';
 
-const unhandled = (spy: ReturnType<typeof vi.spyOn>) => spy.mock.calls.map((c) => String(c[0])).filter((m) => m.includes('Unhandled effect error'));
+const unhandled = (spy: { mock: { calls: unknown[][] } }): string[] =>
+    spy.mock.calls.map((c: unknown[]) => String(c[0])).filter((m: string) => m.includes('Unhandled effect error'));
 
 describe('an effect that waits a frame, run again after the mount (#1210)', () => {
     let error: ReturnType<typeof vi.spyOn>;
