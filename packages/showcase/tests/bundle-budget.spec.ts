@@ -420,7 +420,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // loads before it paints. In exchange each constant binding outside a row (a literal, a `const`
 // template literal such as an id, a `:x.once`) makes no effect at mount. The built dist: blocking
 // 102.6 KB, entry 43.5 KB, js 478.6 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 479.0, css: 67, blocking: 102.6 };
+// js 479.0 → 480.0 (the same standing OK for #1210's batches, at its +1 KB): pdx-form-field moves to .pdx,
+// 1.02× alone with its wiring module (3,513 against 3,461 B). The whole JavaScript grows while html``
+// stays for the components not yet moved: CI's line read 479.7 KB before the field's $derived, which
+// adds a few bytes more, so the whole kilobyte is kept.
+const BUDGET_KB = { entry: 43.5, js: 480.0, css: 67, blocking: 102.6 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

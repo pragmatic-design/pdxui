@@ -3,9 +3,9 @@
     @if (label) {<label class="pdx-field-label" data-part="label" :id="labelId" :for="inputId">{{ label }}</label>}
     @if (description) {<span class="pdx-field-description" data-part="description" :id="descId">{{ description }}</span>}
     <div class="pdx-form-field-input" data-part="control"><slot></slot></div>
-    @if (shouldShowError()) {<span class="pdx-field-error" data-part="error" :id="errorId" role="alert">{{ resolveError() }}</span>}
-    @else if (resolveWarning()) {<span class="pdx-field-warning" data-part="warning">{{ resolveWarning() }}</span>}
-    @else if (success) {<span class="pdx-field-success" data-part="success">{{ success }}</span>}
+    @if (shown === 'error') {<span class="pdx-field-error" data-part="error" :id="errorId" role="alert">{{ resolveError() }}</span>}
+    @else if (shown === 'warning') {<span class="pdx-field-warning" data-part="warning">{{ resolveWarning() }}</span>}
+    @else if (shown === 'success') {<span class="pdx-field-success" data-part="success">{{ success }}</span>}
     @else if (hint) {<span class="pdx-field-hint" data-part="hint" :id="hintId">{{ hint }}</span>}
   </div>
 </template>
@@ -48,9 +48,9 @@ import '@pdxui/design/components/form';
 @state optional = !!optional;
 @state disabled = !!disabled;
 // One message at a time, as the render shows it: the error, else the warning, else the success.
-@state invalid = shouldShowError();
-@state warning = !shouldShowError() && !!resolveWarning();
-@state success = !shouldShowError() && !resolveWarning() && !!success;
+@state invalid = shown === 'error';
+@state warning = shown === 'warning';
+@state success = shown === 'success';
 @state horizontal = !!horizontal;
 // pdx-ignore PDX_PART_NAME_TAKEN: label, description and the messages are the theme's parts; the script reads the props of those names
 @part root, label, description, control, error, warning, success, hint;
@@ -199,13 +199,22 @@ function shouldShowError() {
   return false;
 }
 
+/**
+ * The message the field shows, one at a time: the error, else the warning, else the success. Decided
+ * once, here, for the states, the template and the wiring that all read it: each answer looks the form
+ * up, and a field with no form around it looks again at every call (`currentForm`). With the three states
+ * asking it on their own, a mount read 1.06× the TypeScript version on CI and 1.13× on a CPU throttled
+ * 4×; decided once, as the TypeScript version did in its one effect, 0.99× there.
+ */
+const shown = $derived(shouldShowError() ? 'error' : resolveWarning() ? 'warning' : success ? 'success' : '');
+
 /** The wiring for the props as last read; run again when the slot's content grows. */
 let lastWire = null;
 
 // Auto-wire the ARIA attributes to the first control found in the slot.
 $effect(() => {
   const w = {
-    err: shouldShowError(),
+    err: shown === 'error',
     hasHint: !!hint,
     hasDesc: !!description,
     disabled,
