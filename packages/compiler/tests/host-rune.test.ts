@@ -38,6 +38,24 @@ describe('@host compiles into the descriptor', () => {
         expect(code).toContain(`host: { 'role': "combobox", ':aria-expanded': (ctx) => ctx.open() },`);
     });
 
+    it(':class and :style in the object form compile to an arrow that returns the object (#1242)', () => {
+        const { code } = compile(pdx([
+            'let x = $signal(false);',
+            "let w = $signal('1px');",
+            '@host { :class="{ a: x, \'b-c\': !x }" :style="{ width: w }" }',
+        ].join('\n')), 'test.pdx');
+        expect(code).toContain(`':class': (ctx) => ({ a: ctx.x(), 'b-c': !ctx.x() })`);
+        expect(code).toContain(`':style': (ctx) => ({ width: ctx.w() })`);
+    });
+
+    it('a signal only @host reads is kept in a production build, as in dev (#1242)', () => {
+        for (const production of [false, true]) {
+            const { code } = compile(pdx('let open = $signal(false);\n@host { :aria-expanded="open" }'), 'test.pdx', [], undefined, { production });
+            expect(code, `production: ${production}`).toMatch(/const __open = signal\(false[,)]/);
+            expect(code, `production: ${production}`).toMatch(/return \{[^}]*\bopen: __open/);
+        }
+    });
+
     it('the control: a component with no @host declares no host', () => {
         expect(compile(pdx('let open = $signal(false);'), 'test.pdx').code).not.toContain('host:');
     });

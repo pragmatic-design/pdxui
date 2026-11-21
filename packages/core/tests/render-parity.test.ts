@@ -22,7 +22,7 @@ import { describe, it, expect, beforeAll } from 'vitest';
 import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
 import { renderToStringWithReport } from '../src/server/render-string';
-import { ROWS, DEFERRED_MODULE, lazyImport, settle, content, definePlainElements, type Row } from './render-parity-rows';
+import { ROWS, DEFERRED_MODULE, lazyImport, settle, measured, definePlainElements, type Row } from './render-parity-rows';
 
 
 let seq = 0;
@@ -56,7 +56,7 @@ async function render(row: Row): Promise<{ html: string; read: unknown }> {
         host = mount(row);
         await settle();
         if (row.act) { await row.act(host); await settle(); }
-        return { html: content(host), read: row.read?.(host) };
+        return { html: measured(row, host), read: row.read?.(host) };
     } catch (err) {
         return { html: `threw: ${(err as Error).message}`, read: undefined };
     } finally {
@@ -82,7 +82,7 @@ function serverRender(row: Row): string {
     const box = document.createElement('div');
     box.innerHTML = html;
     const host = box.firstElementChild as HTMLElement | null;
-    return host ? content(host) : `no host: ${html}`;
+    return host ? measured(row, host) : `no host: ${html}`;
 }
 
 /**

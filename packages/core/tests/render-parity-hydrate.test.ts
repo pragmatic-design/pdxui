@@ -12,7 +12,7 @@ import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
 import { renderToString } from '../src/server/render-string';
 import { installHydration } from '../src/hydrate/host';
-import { ROWS, DEFERRED_MODULE, lazyImport, settle, content, definePlainElements, type Row } from './render-parity-rows';
+import { ROWS, DEFERRED_MODULE, lazyImport, settle, measured, definePlainElements, type Row } from './render-parity-rows';
 
 beforeAll(() => {
     definePlainElements();
@@ -66,7 +66,7 @@ describe('the render-parity table, hydrated (#160)', () => {
             const afresh = warn.mock.calls.map((c) => String(c[0])).filter((m) => m.includes('renders afresh'));
             const replaced = written.filter((el) => !host.contains(el)).map((el) => el.localName);
             if (row.act) { await row.act(host); await settle(); }
-            const html = content(host);
+            const html = measured(row, host);
             const same = html === row.expected && afresh.length === 0 && replaced.length === 0;
             const detail = `\n  expected: ${row.expected}\n  hydrated: ${html}\n  afresh: ${afresh.join(' | ') || 'none'}`
                 + `\n  replaced: ${replaced.join(', ') || 'none'}`;

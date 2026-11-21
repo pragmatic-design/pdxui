@@ -9,7 +9,7 @@ import { prefixCtx, callSignals } from './codegen-prefix';
 import { templateEventHandler } from './codegen-template-rewrite';
 import { decodeEntities } from './codegen-template-inline';
 import { invalidHostAttribute } from './host-block';
-import { jsQuote, jsString } from './js-literal';
+import { arrowBody, jsQuote, jsString } from './js-literal';
 
 /**
  * The `host: { … }` entries for these attributes, or '' when there are none. The forms a host has no
@@ -22,7 +22,8 @@ export function hostDescriptor(attrs: readonly HostAttr[], ctx: CompileContext, 
         if (name.startsWith(':')) {
             // `:hidden` with no value reads the identifier of the same name, as in the template.
             const expr = value ?? name.slice(1);
-            entries.push(`${jsQuote(name)}: (ctx) => ${callSignals(prefixCtx(expr, ctx), ctx)}`);
+            // An object literal (`:class="{ a: x }"`) is returned, not read as a block (#1242).
+            entries.push(`${jsQuote(name)}: (ctx) => ${arrowBody(callSignals(prefixCtx(expr, ctx), ctx))}`);
         } else if (name.startsWith('@')) {
             if (value === undefined) continue;
             const event = name.slice(1).split('.')[0];

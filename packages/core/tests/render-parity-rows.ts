@@ -45,6 +45,11 @@ export interface Row {
      * The rule is `owner's`: a row that comes to match fails, and its reason is removed.
      */
     hydrateDiffers?: string;
+    /**
+     * Attributes of the host compared too (#1242): what `@host` binds is on the component's own element,
+     * which the content does not show. Measured as `[name="value"]` before the content.
+     */
+    hostAttributes?: readonly string[];
 }
 
 /** The mount a host belongs to: its tag less the `pdx-` prefix, which names the deferred load it asked for. */
@@ -81,6 +86,19 @@ export function normal(node: Node): string {
 }
 
 export const content = (host: HTMLElement) => [...host.childNodes].map(normal).join('').trim();
+
+/**
+ * What a row is compared on: the host's content, and before it the host attributes the row names
+ * (`hostAttributes`), a class's words sorted as `normal` sorts them. An absent one is `[name]`.
+ */
+export function measured(row: Row, host: HTMLElement): string {
+    const attrs = (row.hostAttributes ?? []).map((name) => {
+        const v = host.getAttribute(name);
+        if (v === null) return `[${name}]`;
+        return `[${name}="${name === 'class' ? v.split(/\s+/).filter(Boolean).sort().join(' ') : v}"]`;
+    });
+    return attrs.join('') + content(host);
+}
 
 export const click = (sel: string) => (host: HTMLElement) => { (host.querySelector(sel) as HTMLElement).click(); };
 
@@ -126,6 +144,9 @@ export const ROWS: Row[] = [
     { name: ':class beside a static class, after a change', expected: '<p class="b base">x</p><button>t</button>', template: "<p class=\"base\" :class=\"name\">x</p><button @click=\"name = 'b'\">t</button>", script: "let name = $signal('a');", act: click('button') },
     // The inline path assigned the object to el.style, which keeps no colour (#96).
     { name: ':style with an object', expected: '<p style="color: red;">x</p>', template: "<p :style=\"{ color: 'red' }\">x</p>" },
+    // @host's :class and :style in the object form (#1242): each class toggled and each property set, the host's own class and style kept.
+    { name: '@host :class and :style objects', expected: '[class="author off"][style="color: red; width: 4px;"]<span>x</span>', hostAttributes: ['class', 'style'], template: '<span>x</span>', script: "let on = $signal(false); let w = $signal('4px');\n@host { class=\"author\" style=\"color: red\" :class=\"{ on: on, off: !on }\" :style=\"{ width: w }\" }" },
+    { name: '@host :class and :style objects, after a change', expected: '[class="author on"][style="color: red;"]<button>t</button>', hostAttributes: ['class', 'style'], template: '<button @click="on = true; w = null">t</button>', script: "let on = $signal(false); let w = $signal('4px');\n@host { class=\"author\" style=\"color: red\" :class=\"{ on: on, off: !on }\" :style=\"{ width: w }\" }", act: click('button') },
     // `:style="expr"` writes style.cssText (#1240), on HTML and on SVG, whose style has only a getter in happy-dom.
     { name: ':style with a string', expected: '<p style="color: red;">x</p>', template: '<p :style="s">x</p>', script: "let s = $signal('color: red');" },
     { name: ':style with a string on SVG', expected: '<svg><circle style="fill: red;"></circle></svg>', template: '<svg><circle :style="s"></circle></svg>', script: "let s = $signal('fill: red');" },

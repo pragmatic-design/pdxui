@@ -634,7 +634,10 @@ let open = $signal(false);
 
 A static attribute (`role="combobox"`) is set when the element connects, **unless the page already
 set it**: `<my-combo role="listbox">` keeps its `listbox`. A bound one (`:aria-expanded`) follows what
-it reads; `null`, `undefined` and `false` remove it. A listener (`@keydown.enter`) takes the same forms
+it reads; `null`, `undefined` and `false` remove it. `:class` and `:style` work as in the template and
+keep the page's own: `:class="{ 'is-vertical': vertical }"` toggles that class and leaves
+`<my-group class="toolbar">`'s `toolbar`, and `:style="{ width: w }"` sets `width` and leaves the
+rest of the inline style. A listener (`@keydown.enter`) takes the same forms
 and modifiers as in the template, and is removed when the element leaves the page. `::x`, `data-part`
 and a generic argument mean nothing on a host and are `PDX_HOST_INVALID_ATTRIBUTE`. A TypeScript
 component declares the same thing in its descriptor:

@@ -154,10 +154,14 @@ export function compileNewMode(
     ctx.declaredNames = null;
     ctx.importedNames = null;
 
+    // The descriptor's `host` (#133), compiled before the elimination below: it reads signals too.
+    const hostCode = analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '';
+
     // Production: dead signal elimination — remove signals with zero references
     if (production) {
-        // A signal only a script snippet reads is read by the render all the same.
-        const deadSignals = detectDeadSignals(analysis, [renderCode, ...snippetFunctions].join('\n'));
+        // A signal only a script snippet reads is read by the render all the same, and one only `@host`
+        // reads is read by the host's bindings (#1242): a build dropped it, and `ctx.open` was undefined.
+        const deadSignals = detectDeadSignals(analysis, [renderCode, hostCode, ...snippetFunctions].join('\n'));
         if (deadSignals.size > 0) {
             analysis.signals = analysis.signals.filter(s => !deadSignals.has(s.name));
             analysis.exports = analysis.exports.filter(e =>
@@ -251,7 +255,7 @@ export function compileNewMode(
     return assembleModule(imports, allUserImports, descriptor, filename, tag, propsCode, setupParts, finalRenderCode, analysis.route, production, ctx.warnings, ctx.importPathOf ?? undefined, ctx.mapOrigins, ctx.sourceFile, templateHoists.lines.length > 0,
         analysis.events,
         analysis.states.map(s => s.name),
-        analysis.host ? hostDescriptor(analysis.host, ctx, imports) : '',
+        hostCode,
         analysis.parts,
         modelsCode,
         ctx.tagPrefix,
