@@ -125,7 +125,10 @@ test.describe('a component moved to .pdx against its TypeScript version, on this
     test(`control: ${CONTROL_TAG} against itself reads within ${BAND} of 1.0`, async ({ browser }) => {
         const r = await ratioOf(browser, site.url, site.url, CONTROL_TAG);
         console.log(`[port] control ${CONTROL_TAG} against itself: ${r.a.toFixed(2)} ms / ${r.b.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
-        expect(Math.abs(r.ratio - 1), `the runner reads one build ${r.ratio}× itself: the band ${BAND} is narrower than its spread`).toBeLessThanOrEqual(BAND);
+        // The ratio is to a hundredth, and so is its distance from 1: in floating point 1.05 - 1 is
+        // 0.050000000000000044, which read a control exactly at the band as outside it.
+        const off = Math.round(Math.abs(r.ratio - 1) * 100) / 100;
+        expect(off, `the runner reads one build ${r.ratio}× itself: the band ${BAND} is narrower than its spread`).toBeLessThanOrEqual(BAND);
     });
 
     test('every tag moved to .pdx mounts within the band of its TypeScript version', async ({ browser }) => {
