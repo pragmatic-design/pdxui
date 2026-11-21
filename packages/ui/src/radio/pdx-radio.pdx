@@ -1,0 +1,106 @@
+<template>
+  <label class="pdx-radio-wrap" :class="{ 'pdx-radio-label-left': labelPosition === 'left' }">
+    <!-- The browser's radio group is what gives one tab stop and arrow keys that move and check, so the
+         native radio stays; it must not submit: its `form` attribute names no form. Choosing it writes
+         `checked` (::checked); a disabled radio fires no change. -->
+    <input
+      type="radio"
+      class="pdx-radio"
+      data-part="root"
+      ::checked="checked"
+      :disabled="disabled"
+      form="pdx-radio-no-submit"
+      :name="innerName(name)"
+      :value="value"
+      :aria-invalid="error ? 'true' : null"
+    />
+    @if (label || description) {
+      <span class="pdx-radio-content">
+        @if (label) {
+          <span class="pdx-radio-label" data-part="label">{{ label }}</span>
+        } @else {
+          <slot></slot>
+        }
+        @if (description) {
+          <span class="pdx-radio-desc" data-part="description">{{ description }}</span>
+        }
+      </span>
+    } @else {
+      <slot></slot>
+    }
+  </label>
+</template>
+
+<script>
+/**
+ * A radio button: one option of a single selection, grouped by `<pdx-radio-group>` and navigated
+ * with the arrow keys.
+ *
+ * @csspart root - The native radio, the circle drawn; the size variants key by it.
+ * @csspart label - The `label` text, when set.
+ * @csspart description - The `description` text, when set.
+ *
+ * @cssstate checked - It is the one selected.
+ * @cssstate invalid - `error` is set; the radio is aria-invalid.
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ */
+// Use inside <pdx-radio-group> for managed selection and keyboard navigation.
+import { untracked } from '@pdxui/core';
+import { setOwnProp } from '../shared/own-prop';
+import { formScope } from './form-scope';
+
+// Selecting it writes it (#480), and the write dispatches `checked-change`. A sibling the browser
+// unchecks is set from outside, and announces nothing, as it never did. A form resets it (#135).
+// Inside a pdx-radio-group the group is the field and submits the value; the radio submits nothing,
+// or the choice went out twice.
+@model checked: boolean = false { form: () => checked && !el.closest('pdx-radio-group') ? (value || 'on') : null };
+// On the host as custom states (#132); the circle and its label carry no state class.
+@state checked = !!checked;
+@state invalid = !!error;
+@state disabled = !!disabled;
+@part root, label, description;
+// The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that draws
+// the same look on native markup. `md` is the base size, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the circle's size. */
+  size: { md: '.pdx-radio-md', sm: '.pdx-radio-sm', lg: '.pdx-radio-lg' } = md;
+}
+@prop disabled: boolean = false;
+@prop label: string = '';
+@prop description: string = '';
+@prop value: string = '';
+@prop name: string = '';
+@prop error: boolean = false;
+@prop labelPosition: string = 'right';
+
+// The host is the one submitter, under its name (#133).
+@host el { :name="name || null" }
+
+/**
+ * The inner radio's name. Radios whose form owner is null group by name across the whole document, so
+ * the name is scoped to the host's form: two forms with a field `x` do not uncheck each other.
+ */
+function innerName(n) {
+  if (!n) return null;
+  return el.form ? n + '~' + formScope(el.form) : n;
+}
+
+// The browser unchecks a radio when a sibling is chosen and fires no event for it, so the host would
+// keep `checked`, and keep submitting. The exclusivity is kept here, on the hosts: when this one is
+// checked (by the user, the keyboard or a parent) the others with its name in its form are not. Read
+// untracked: subscribing to a sibling's `checked` would run this again whenever the sibling is chosen.
+// A sibling not yet upgraded reads undefined.
+$effect(() => {
+  if (!checked || !name) return;
+  const own = name;
+  untracked(() => {
+    const root = el.getRootNode();
+    for (const r of Array.from(root.querySelectorAll('pdx-radio'))) {
+      if (r !== el && r.checked === true && r.name === own && r.form === el.form) setOwnProp(r, 'checked', false);
+    }
+  });
+});
+</script>

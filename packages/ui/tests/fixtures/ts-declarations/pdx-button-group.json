@@ -1,0 +1,114 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxButtonGroup",
+  "tagName": "pdx-button-group",
+  "category": "Atoms",
+  "order": 2,
+  "description": "Groups action buttons visually, and passes variant, size and disabled on to its buttons. To select\namong buttons, use `pdx-toggle-group`.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "Layout orientation — horizontal or vertical.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The group's accessible name (\"Text alignment\"), set as `aria-label` on the group.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "Layout orientation — horizontal or vertical.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The group's accessible name (\"Text alignment\"), set as `aria-label` on the group.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ]
+}

@@ -54,16 +54,6 @@
       "types": "./dist/button/pdx-button.d.ts",
       "import": "./dist/button/pdx-button.js"
     },
-    "./button-group": {
-      "development": "./src/button-group/pdx-button-group.ts",
-      "types": "./dist/button-group/pdx-button-group.d.ts",
-      "import": "./dist/button-group/pdx-button-group.js"
-    },
-    "./chip": {
-      "development": "./src/chip/pdx-chip.ts",
-      "types": "./dist/chip/pdx-chip.d.ts",
-      "import": "./dist/chip/pdx-chip.js"
-    },
     "./avatar-group": {
       "development": "./src/avatar-group/pdx-avatar-group.ts",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
@@ -93,11 +83,6 @@
       "development": "./src/checkbox/pdx-checkbox.ts",
       "types": "./dist/checkbox/pdx-checkbox.d.ts",
       "import": "./dist/checkbox/pdx-checkbox.js"
-    },
-    "./radio": {
-      "development": "./src/radio/pdx-radio.ts",
-      "types": "./dist/radio/pdx-radio.d.ts",
-      "import": "./dist/radio/pdx-radio.js"
     },
     "./radio-group": {
       "development": "./src/radio-group/pdx-radio-group.ts",
@@ -658,6 +643,21 @@
       "development": "./src/progress/pdx-progress.pdx",
       "types": "./dist/progress/pdx-progress.d.ts",
       "import": "./dist/progress/pdx-progress.js"
+    },
+    "./chip": {
+      "development": "./src/chip/pdx-chip.pdx",
+      "types": "./dist/chip/pdx-chip.d.ts",
+      "import": "./dist/chip/pdx-chip.js"
+    },
+    "./button-group": {
+      "development": "./src/button-group/pdx-button-group.pdx",
+      "types": "./dist/button-group/pdx-button-group.d.ts",
+      "import": "./dist/button-group/pdx-button-group.js"
+    },
+    "./radio": {
+      "development": "./src/radio/pdx-radio.pdx",
+      "types": "./dist/radio/pdx-radio.d.ts",
+      "import": "./dist/radio/pdx-radio.js"
     },
     "./package.json": "./package.json"
   },

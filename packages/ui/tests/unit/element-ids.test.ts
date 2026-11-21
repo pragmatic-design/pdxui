@@ -11,7 +11,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/command/pdx-command';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/radio-group/pdx-radio-group';
-import '../../src/radio/pdx-radio';
+import '../../src/radio/pdx-radio.pdx';
 
 beforeEach(() => {
     cleanup();

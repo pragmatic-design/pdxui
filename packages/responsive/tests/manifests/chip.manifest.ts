@@ -2,7 +2,7 @@
  * MANIFEST — pdx-chip
  *
  * Contracts derived by inspecting:
- *  - source: packages/ui/src/chip/pdx-chip.ts
+ *  - source: packages/ui/src/chip/pdx-chip.pdx
  *      render → <span class="pdx-chip ..."><span class="pdx-chip-body">…</span>[<button class="pdx-chip-remove">]</span>
  *        only the interactive parts are tab stops:
  *        - a plain chip → no role, no tabindex, no ARIA

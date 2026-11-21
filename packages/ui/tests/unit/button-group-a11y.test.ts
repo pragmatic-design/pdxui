@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { tick } from './helpers';
 import '../../src/button/pdx-button';
-import '../../src/button-group/pdx-button-group';
+import '../../src/button-group/pdx-button-group.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

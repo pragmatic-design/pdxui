@@ -1,0 +1,51 @@
+<template>
+  <!-- The host IS the group: the buttons the author wrote are projected straight into it. -->
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * Groups action buttons visually, and passes variant, size and disabled on to its buttons. To select
+ * among buttons, use `pdx-toggle-group`.
+ */
+// Selecting among buttons is pdx-toggle-group: the selection modes (mode="single"|"multiple") left this
+// component in #286 (decision 51), and `pdx migrate` rewrites a group that used them.
+
+@prop orientation: string = 'horizontal';
+@prop variant: string = '';
+@prop size: string = '';
+@prop disabled: boolean = false;
+/** The group's accessible name ("Text alignment"), set as `aria-label` on the group. */
+@prop label: string = '';
+
+// Its role and ARIA (#133, #291). No aria-orientation: a `group` may not carry it (axe's
+// aria-allowed-attr). Its classes are the design system's CSS-only `pdx-btn-group` and
+// `pdx-btn-group-vertical`, toggled by the object form of `:class`, which keeps the author's (#1242).
+@host el {
+  role="group"
+  :aria-disabled="disabled ? 'true' : null"
+  :class="{ 'pdx-btn-group-vertical': orientation === 'vertical', 'pdx-btn-group': orientation !== 'vertical' }"
+}
+
+let labelled = false;
+$effect(() => {
+  // The name goes where the role is, on the host. Without `label`, an author's aria-label stays, which
+  // a host binding would remove: the binding is written here, removing only the name it wrote.
+  if (label) { el.setAttribute('aria-label', label); labelled = true; }
+  else if (labelled) { el.removeAttribute('aria-label'); labelled = false; }
+
+  // The group's variant, size and disabled passed on to its buttons, once they are projected. Read
+  // first, so the effect follows them; written a frame later, when the buttons are in place. A plain
+  // frame, not onNextFrame: that one needs the setup's scope, which a re-run of the effect has not.
+  const v = variant;
+  const s = size;
+  const d = disabled;
+  requestAnimationFrame(() => {
+    for (const btn of el.querySelectorAll('pdx-button')) {
+      if (v) btn.setAttribute('variant', v);
+      if (s) btn.setAttribute('size', s);
+      if (d) btn.setAttribute('disabled', '');
+    }
+  });
+});
+</script>

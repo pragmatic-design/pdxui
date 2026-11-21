@@ -9,7 +9,7 @@ import { cleanup, tick } from './helpers';
 
 import '../../src/checkbox/pdx-checkbox';
 import '../../src/switch-toggle/pdx-switch.pdx';
-import '../../src/radio/pdx-radio';
+import '../../src/radio/pdx-radio.pdx';
 import '../../src/number-input/pdx-number-input';
 import '../../src/slider/pdx-slider';
 import '../../src/color-picker/pdx-color-picker';

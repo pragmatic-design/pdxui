@@ -8,7 +8,7 @@
 // role="button" (axe nested-interactive).
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/chip/pdx-chip';
+import '../../src/chip/pdx-chip.pdx';
 
 type Chip = HTMLElement & { selected: boolean };
 

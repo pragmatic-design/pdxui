@@ -2,9 +2,9 @@
  * MANIFEST — pdx-button-group
  *
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
- *   - Source: packages/ui/src/button-group/pdx-button-group.ts
- *       · the styled class is on the HOST <pdx-button-group>, set in ctx.track:
- *         `el.classList.toggle('pdx-btn-group', …)` (or 'pdx-btn-group-vertical' when orientation=vertical).
+ *   - Source: packages/ui/src/button-group/pdx-button-group.pdx
+ *       · the styled class is on the HOST <pdx-button-group>, toggled by `@host :class="{ … }"`:
+ *         'pdx-btn-group' (or 'pdx-btn-group-vertical' when orientation=vertical), the author's kept (#1242).
  *       · render() = <slot></slot>: the <pdx-button> elements are projected as direct children of the host.
  *       · An action group: visual grouping only, role="group". Its selection modes left it in #286
  *         (decision 51): selecting among buttons is pdx-toggle-group, whose radio group the

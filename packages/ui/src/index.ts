@@ -7,10 +7,10 @@
 import './icon/pragmatic-all';
 import './icon/pdx-icon';
 import './button/pdx-button';
-import './button-group/pdx-button-group';
+import './button-group/pdx-button-group.pdx';
 import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';
-import './chip/pdx-chip';
+import './chip/pdx-chip.pdx';
 import './avatar/pdx-avatar.pdx';
 import './avatar-group/pdx-avatar-group';
 import './spinner/pdx-spinner.pdx';
@@ -19,7 +19,7 @@ import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';
 import './input/pdx-input';
 import './checkbox/pdx-checkbox';
-import './radio/pdx-radio';
+import './radio/pdx-radio.pdx';
 import './switch-toggle/pdx-switch.pdx';
 import './flag/pdx-flag.pdx';
 

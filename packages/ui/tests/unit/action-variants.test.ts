@@ -4,7 +4,7 @@
 // pdx-dropdown-menu — keep it as a plain prop (owner's decision on #630).
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/chip/pdx-chip';
+import '../../src/chip/pdx-chip.pdx';
 import '../../src/fab/pdx-fab';
 
 describe('pdx-chip\'s axes', () => {

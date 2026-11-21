@@ -11,7 +11,7 @@
  *      No focusGroup: the radios share one `name`, and the browser's native radio group
  *      gives the tab stop and the arrows. It passes name/size/disabled/error/
  *      checked to the children in an rAF. It announces each choice once, with its model's value-change (#480). formAssociated.
- *  - source: packages/ui/src/radio/pdx-radio.ts
+ *  - source: packages/ui/src/radio/pdx-radio.pdx
  *      render → <label class="pdx-radio-wrap [.disabled]"> holding:
  *        - <input type="radio" class="pdx-radio [.pdx-radio-{size}] [.pdx-radio-error]">
  *        - <span class="pdx-radio-content"> with .pdx-radio-label / .pdx-radio-desc

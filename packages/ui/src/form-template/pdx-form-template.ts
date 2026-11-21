@@ -31,7 +31,7 @@ import '../select/pdx-select';
 import '../autocomplete/pdx-autocomplete';
 import '../checkbox/pdx-checkbox';
 import '../checkbox-group/pdx-checkbox-group';
-import '../radio/pdx-radio';
+import '../radio/pdx-radio.pdx';
 import '../radio-group/pdx-radio-group';
 import '../switch-toggle/pdx-switch.pdx';
 import '../toggle/pdx-toggle';

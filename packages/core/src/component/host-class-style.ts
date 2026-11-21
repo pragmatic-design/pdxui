@@ -11,22 +11,16 @@
 
 import type { HostBinder } from './host';
 
-/** The classes a `:class` value names: `{ name: on }` by key (a key may hold several), a string by word. */
-function classesOf(value: unknown): { on: string[]; off: string[] } {
-    const on: string[] = [];
-    const off: string[] = [];
-    if (value !== null && typeof value === 'object') {
-        for (const [key, cond] of Object.entries(value)) for (const t of key.split(/\s+/)) if (t) (cond ? on : off).push(t);
-    } else if (value != null && value !== false) {
-        for (const t of String(value).split(/\s+/)) if (t) on.push(t);
-    }
-    return { on, off };
-}
+/** Match: a run of whitespace — a key or a string that names several classes. */
+const SPACES = /\s+/;
 
 /**
  * `:class` on the host: the object form toggles each class it names, a string adds its classes. A class
  * it named last time and names no more is removed; one it never named — the author's `class="toolbar"`
  * — stays. Writing the attribute replaced them all, and wrote an object as `[object Object]`.
+ *
+ * It runs at every mount of every host that binds it: one toggle per key, and a split only for a key
+ * that holds several classes (#1210, pdx-button-group).
  */
 export function hostClass<C>(read: (ctx: C) => unknown): HostBinder {
     return {
@@ -34,11 +28,19 @@ export function hostClass<C>(read: (ctx: C) => unknown): HostBinder {
         bind(el, value, track) {
             let named: string[] = [];
             track(() => {
-                const { on, off } = classesOf(value());
-                for (const t of named) if (!on.includes(t) && !off.includes(t)) el.classList.remove(t);
-                for (const t of off) el.classList.remove(t);
-                for (const t of on) el.classList.add(t);
-                named = on.concat(off);
+                const v = value();
+                const now: string[] = [];
+                if (v !== null && typeof v === 'object') {
+                    for (const key in v) {
+                        const on = !!(v as Record<string, unknown>)[key];
+                        if (!SPACES.test(key)) { el.classList.toggle(key, on); now.push(key); continue; }
+                        for (const t of key.split(SPACES)) if (t) { el.classList.toggle(t, on); now.push(t); }
+                    }
+                } else if (v != null && v !== false) {
+                    for (const t of String(v).split(SPACES)) if (t) { el.classList.add(t); now.push(t); }
+                }
+                for (const t of named) if (!now.includes(t)) el.classList.remove(t);
+                named = now;
             });
         },
     };
