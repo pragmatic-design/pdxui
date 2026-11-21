@@ -35,7 +35,7 @@ const TEACHING: [string, string][] = [
     ['options is not an array', '@pdxui/ui — segmented/pdx-segmented.ts'],
     ['is announced "button" alone', '@pdxui/ui — button/pdx-button.pdx and toolbar/pdx-toolbar.ts'],
     ['is not a region', '@pdxui/ui — app-layout/pdx-app-layout.ts'],
-    ['requires a "form" prop', '@pdxui/ui — form/pdx-form.ts'],
+    ['requires a "form" prop', '@pdxui/ui — form/pdx-form.pdx'],
     ['Duplicate key', '@pdxui/core — renderer/list.ts'],
     ['portal: target', '@pdxui/core — renderer/helpers.ts'],
     ['refused to set inline event attribute', '@pdxui/core — renderer/dom.ts'],

@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createForm, required, minLength } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
 import { cleanup, tick } from './helpers';
 

@@ -55,7 +55,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-file-upload',
     'pdx-filter-builder',
     'pdx-flag',
-    'pdx-form',
     'pdx-form-actions',
     'pdx-form-field',
     'pdx-form-section',

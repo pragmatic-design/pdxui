@@ -12,10 +12,14 @@ import { AREAS, componentPages } from './skill-pages';
 const REPO = join(__dirname, '..', '..', '..');
 const UI_SRC = join(REPO, 'packages', 'ui', 'src');
 
+/** A component's sources: its .ts files and, moved to .pdx (#1210), its .pdx. */
+const isSource = (f: string) => f.endsWith('.ts') || f.endsWith('.pdx');
+
 /** Every component whose own sources name the DataSource type, the source component itself aside. */
 function consumers(): string[] {
-    return readdirSync(UI_SRC).filter(d => existsSync(join(UI_SRC, d, `pdx-${d}.ts`)) && d !== 'data-source')
-        .filter(d => readdirSync(join(UI_SRC, d)).filter(f => f.endsWith('.ts'))
+    return readdirSync(UI_SRC)
+        .filter(d => (existsSync(join(UI_SRC, d, `pdx-${d}.ts`)) || existsSync(join(UI_SRC, d, `pdx-${d}.pdx`))) && d !== 'data-source')
+        .filter(d => readdirSync(join(UI_SRC, d)).filter(isSource)
             .some(f => /\bDataSource\b/.test(readFileSync(join(UI_SRC, d, f), 'utf-8'))))
         .map(d => `pdx-${d}`).sort();
 }
@@ -46,7 +50,7 @@ describe('the DataSource and the components that read one', () => {
         // (#495), the same reading the generator does.
         const injectors = found.filter(t => {
             const dir = join(UI_SRC, t.slice(4));
-            return readdirSync(dir).filter(f => f.endsWith('.ts'))
+            return readdirSync(dir).filter(isSource)
                 .some(f => /\binject\s*\(\s*DataSourceContext\b/.test(readFileSync(join(dir, f), 'utf-8')));
         });
         expect(injectors).toContain('pdx-select');

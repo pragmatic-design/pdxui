@@ -12,7 +12,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { component, html, createForm, minLength } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/form-actions/pdx-form-actions.pdx';
 import { cleanup, tick } from './helpers';

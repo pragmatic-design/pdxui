@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createForm } from '@pdxui/core';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 
 describe('pdx-form tracks the form prop', () => {
     beforeEach(cleanup);

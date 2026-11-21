@@ -79,11 +79,6 @@
       "types": "./dist/checkbox-group/pdx-checkbox-group.d.ts",
       "import": "./dist/checkbox-group/pdx-checkbox-group.js"
     },
-    "./form": {
-      "development": "./src/form/pdx-form.ts",
-      "types": "./dist/form/pdx-form.d.ts",
-      "import": "./dist/form/pdx-form.js"
-    },
     "./form-section": {
       "development": "./src/form-section/pdx-form-section.ts",
       "types": "./dist/form-section/pdx-form-section.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/form-field/pdx-form-field.pdx",
       "types": "./dist/form-field/pdx-form-field.d.ts",
       "import": "./dist/form-field/pdx-form-field.js"
+    },
+    "./form": {
+      "development": "./src/form/pdx-form.pdx",
+      "types": "./dist/form/pdx-form.d.ts",
+      "import": "./dist/form/pdx-form.js"
     },
     "./package.json": "./package.json"
   },

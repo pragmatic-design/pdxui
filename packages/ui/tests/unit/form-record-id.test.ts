@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource, createForm } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 
 async function formOver(data: Record<string, unknown>[], recordId: string) {
     const ds = createDataSource({ data, pageSize: 0 });

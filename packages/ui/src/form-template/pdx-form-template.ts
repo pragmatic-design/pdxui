@@ -15,7 +15,7 @@ import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternal
 // Self-contained: a schema can render ANY field control, so register the full form graph here (the
 // structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
 // — and everything composing it (edit-drawer, entity-grid, auto-form) — work outside the barrel.
-import '../form/pdx-form';
+import '../form/pdx-form.pdx';
 import '../form-field/pdx-form-field.pdx';
 import '../form-actions/pdx-form-actions.pdx';
 import '../field-group/pdx-field-group';

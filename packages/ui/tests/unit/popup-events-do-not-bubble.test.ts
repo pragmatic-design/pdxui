@@ -14,7 +14,7 @@ import '../../src/dialog/pdx-dialog';
 import '../../src/drawer/pdx-drawer';
 import '../../src/select/pdx-select';
 import '../../src/date-picker/pdx-date-picker';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 import '../../src/input/pdx-input.pdx';
 import { createForm } from '@pdxui/core';
 
