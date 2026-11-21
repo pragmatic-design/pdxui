@@ -1,0 +1,295 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxChip",
+  "tagName": "pdx-chip",
+  "category": "Atoms",
+  "order": 5,
+  "description": "A small tag that can be selectable or removable, with variants, an avatar and group support.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "removable",
+      "description": "Shows a × button — the chip's tab stop — named \"Remove {label}\", which emits pdx-remove. The\nchip does not remove itself: the app removes it and owns focus afterwards (move it to the\nnext chip's ×, or the previous one), or a keyboard user is left on <body>.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "removable"
+    },
+    {
+      "kind": "field",
+      "name": "selectable",
+      "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips the `selected` model.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "selectable"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Value passed in the remove event's detail for identification.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "avatar",
+      "description": "Avatar URL — renders a small circle image before the label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "avatar"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour.",
+      "type": {
+        "text": "'outline' | 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'tonal' | 'tonal-primary' | 'tonal-success' | 'tonal-danger' | 'tonal-warning'"
+      },
+      "default": "'outline'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "selected",
+      "description": "The currently selected item(s).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "selected"
+    }
+  ],
+  "models": [
+    "selected"
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "outline",
+        "primary",
+        "success",
+        "danger",
+        "warning",
+        "info",
+        "tonal",
+        "tonal-primary",
+        "tonal-success",
+        "tonal-danger",
+        "tonal-warning"
+      ],
+      "default": "outline",
+      "native": {
+        "outline": ".pdx-chip-outline",
+        "primary": ".pdx-chip-primary",
+        "success": ".pdx-chip-success",
+        "danger": ".pdx-chip-danger",
+        "warning": ".pdx-chip-warning",
+        "info": ".pdx-chip-info",
+        "tonal": ".pdx-chip-tonal",
+        "tonal-primary": ".pdx-chip-tonal-primary",
+        "tonal-success": ".pdx-chip-tonal-success",
+        "tonal-danger": ".pdx-chip-tonal-danger",
+        "tonal-warning": ".pdx-chip-tonal-warning"
+      }
+    },
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-chip-md",
+        "sm": ".pdx-chip-sm",
+        "lg": ".pdx-chip-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-toggle"
+  ],
+  "alphaDetail": {
+    "selected": "$event.detail.value",
+    "value": "$event.currentTarget.value"
+  },
+  "events": [
+    {
+      "name": "pdx-remove",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The × was pressed: the chip's value (its label when it has none) and its label.",
+      "detail": "{ value: string; label: string }"
+    },
+    {
+      "name": "selected-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `selected`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "button"
+  ],
+  "attributes": [
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "removable",
+      "fieldName": "removable",
+      "description": "Shows a × button — the chip's tab stop — named \"Remove {label}\", which emits pdx-remove. The\nchip does not remove itself: the app removes it and owns focus afterwards (move it to the\nnext chip's ×, or the previous one), or a keyboard user is left on <body>.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "selectable",
+      "fieldName": "selectable",
+      "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips the `selected` model.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "Value passed in the remove event's detail for identification.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "avatar",
+      "fieldName": "avatar",
+      "description": "Avatar URL — renders a small circle image before the label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour.",
+      "type": {
+        "text": "'outline' | 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'tonal' | 'tonal-primary' | 'tonal-success' | 'tonal-danger' | 'tonal-warning'"
+      },
+      "default": "'outline'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "selected",
+      "fieldName": "selected",
+      "description": "The currently selected item(s).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "icon",
+      "description": "An icon shown before the chip's label."
+    },
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The chip, the pill drawn; the variants key by it."
+    },
+    {
+      "name": "body",
+      "description": "Its label, avatar and icon; the toggle when the chip is also removable."
+    },
+    {
+      "name": "remove",
+      "description": "The × button, with `removable`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "selected",
+      "description": "It is selected."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import './button/pdx-button';
 import './button-group/pdx-button-group';
 import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';
-import './chip/pdx-chip';
+import './chip/pdx-chip.pdx';
 import './avatar/pdx-avatar.pdx';
 import './avatar-group/pdx-avatar-group';
 import './spinner/pdx-spinner.pdx';

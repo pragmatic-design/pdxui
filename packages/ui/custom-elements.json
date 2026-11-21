@@ -7376,7 +7376,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/chip/pdx-chip.ts",
+      "path": "src/chip/pdx-chip.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -7680,7 +7680,7 @@
           "name": "pdx-chip",
           "declaration": {
             "name": "PdxChip",
-            "module": "src/chip/pdx-chip.ts"
+            "module": "src/chip/pdx-chip.pdx"
           }
         }
       ]
