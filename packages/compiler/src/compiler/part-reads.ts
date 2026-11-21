@@ -13,23 +13,32 @@ import { collectTemplateIdentifiers } from './validate';
 
 /**
  * The names among `names` that the script source mentions as code. TypeScript's scanner skips comments
- * and reads a plain string as one token, so `'root'` and `// the root` are no read; a property name
- * or an object key is counted, and so is any name inside a template literal's text. The `@part`
- * declarations themselves are left out.
+ * and reads a string as one token, so `'root'` and `// the root` are no read; a property name or an
+ * object key is counted. A template literal's text is a string too, and what its `${…}` holds is
+ * code: at the `}` that closes an expression the scanner is asked to read on as the literal, or it
+ * would take the next backtick for the start of another and the rest of the script for its text.
+ * The `@part` declarations themselves are left out.
  */
 function scriptMentions(script: string, names: ReadonlySet<string>): Set<string> {
     // Match: a `@part a, b;` line, the declaration, which names every part.
     const src = script.split('\n').map((line) => (/^\s*@part\b/.test(line) ? '' : line)).join('\n');
     const found = new Set<string>();
     const scanner = ts.createScanner(ts.ScriptTarget.Latest, true, ts.LanguageVariant.Standard, src);
+    // For each template literal being read, the depth of the braces opened inside its current `${`.
+    const templates: number[] = [];
     for (let t = scanner.scan(); t !== ts.SyntaxKind.EndOfFileToken; t = scanner.scan()) {
-        const text = scanner.getTokenText();
         if (t === ts.SyntaxKind.Identifier) {
+            const text = scanner.getTokenText();
             if (names.has(text)) found.add(text);
-        } else if (t === ts.SyntaxKind.NoSubstitutionTemplateLiteral || t === ts.SyntaxKind.TemplateHead
-            || t === ts.SyntaxKind.TemplateMiddle || t === ts.SyntaxKind.TemplateTail) {
-            // A template literal's text: what its `${…}` reads is counted too, as words.
-            for (const n of names) if (new RegExp(`(?<![\\w$])${n}(?![\\w$])`).test(text)) found.add(n);
+        } else if (t === ts.SyntaxKind.TemplateHead) {
+            templates.push(0);
+        } else if (t === ts.SyntaxKind.OpenBraceToken && templates.length > 0) {
+            templates[templates.length - 1]++;
+        } else if (t === ts.SyntaxKind.CloseBraceToken && templates.length > 0) {
+            const depth = templates.length - 1;
+            if (templates[depth] > 0) { templates[depth]--; continue; }
+            // The `}` of `${…}`: the literal goes on, as its middle or its tail.
+            if (scanner.reScanTemplateToken(false) === ts.SyntaxKind.TemplateTail) templates.pop();
         }
     }
     return found;
