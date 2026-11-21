@@ -94,11 +94,6 @@
       "types": "./dist/form-template/pdx-form-template.d.ts",
       "import": "./dist/form-template/pdx-form-template.js"
     },
-    "./form-actions": {
-      "development": "./src/form-actions/pdx-form-actions.ts",
-      "types": "./dist/form-actions/pdx-form-actions.d.ts",
-      "import": "./dist/form-actions/pdx-form-actions.js"
-    },
     "./form-field": {
       "development": "./src/form-field/pdx-form-field.ts",
       "types": "./dist/form-field/pdx-form-field.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/input/pdx-input.pdx",
       "types": "./dist/input/pdx-input.d.ts",
       "import": "./dist/input/pdx-input.js"
+    },
+    "./form-actions": {
+      "development": "./src/form-actions/pdx-form-actions.pdx",
+      "types": "./dist/form-actions/pdx-form-actions.d.ts",
+      "import": "./dist/form-actions/pdx-form-actions.js"
     },
     "./package.json": "./package.json"
   },

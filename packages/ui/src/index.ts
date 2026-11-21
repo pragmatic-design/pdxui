@@ -56,7 +56,7 @@ import './inline-edit/pdx-inline-edit';
 import './form/pdx-form';
 import './form-template/pdx-form-template';
 import './form-section/pdx-form-section';
-import './form-actions/pdx-form-actions';
+import './form-actions/pdx-form-actions.pdx';
 import './form-field/pdx-form-field';
 import './fieldset/pdx-fieldset';
 import './field-group/pdx-field-group';

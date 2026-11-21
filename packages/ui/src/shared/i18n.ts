@@ -35,6 +35,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     'infinite-scroll': { end: 'No more data', loading: 'Loading...' },
     // `toggle` names a panel's toggle when the group has no label to name it.
     'field-group': { edit: 'Edit', toggle: 'Show or hide section' },
+    // The bar's two buttons, when `submit-label` / `reset-label` are not set (`reset-label="none"` hides
+    // the reset button). Registered by pdx-form-actions itself before it moved to .pdx (#1210).
+    'form-actions': { submit: 'Submit', reset: 'Reset' },
     list: { empty: 'No items' },
     // `field` names one culture's field, `{label}` the field's and `{language}` the culture's own name;
     // `missing` follows a culture's name, in its tab, while it has no text.

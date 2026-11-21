@@ -3,9 +3,9 @@
  *
  * The component: an action bar for a form (submit/reset). The tag is `pdx-form-actions`.
  * Export OK in packages/ui/package.json (`"./form-actions"`) + import in
- * packages/ui/src/index.ts (`import './form-actions/pdx-form-actions';`). Registrazione COMPLETA.
+ * packages/ui/src/index.ts (`import './form-actions/pdx-form-actions.pdx';`). Registrazione COMPLETA.
  *
- * ── Source: packages/ui/src/form-actions/pdx-form-actions.ts ──
+ * ── Source: packages/ui/src/form-actions/pdx-form-actions.pdx ──
  *   render() = an INNER <div class="pdx-form-actions" data-part="root"> holding a <slot>:
  *     - `align` is a variant axis reflected on the host (#293); the bar carries no class for it
  *     - the <slot> (lines 59-73) has a FALLBACK: reset (<button type="reset" class="pdx-ghost">) plus
