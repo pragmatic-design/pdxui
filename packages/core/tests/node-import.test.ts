@@ -13,7 +13,12 @@ describe('in Node, without a DOM', () => {
     // Imported here, not in the test: the first import of a source module pays for its whole graph.
     let libraryImport: Promise<unknown>;
     beforeAll(async () => {
-        libraryImport = import('../../ui/src/button/pdx-button');
+        // A library component written in TypeScript whose graph holds no .pdx: core's suite does not
+        // compile .pdx, and the library moves to .pdx one component at a time (#1210) — pdx-button,
+        // the component this imported, is one now, and every component that renders a button reaches
+        // it. pdx-relative-time imports core, its stylesheet and a locale helper only. When it moves
+        // too, this import has to be of a compiled module, which core's suite then has to compile.
+        libraryImport = import('../../ui/src/relative-time/pdx-relative-time');
         // Settled here; a rejection is asserted by the test below, which names it, not by the hook.
         await libraryImport.catch(() => undefined);
     });
