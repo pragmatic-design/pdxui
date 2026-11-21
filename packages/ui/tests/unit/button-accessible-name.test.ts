@@ -6,7 +6,7 @@
 // with nothing to be called by is reported, because it renders fine and nothing else would say so.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { tick } from './helpers';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

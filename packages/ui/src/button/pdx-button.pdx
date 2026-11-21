@@ -1,0 +1,136 @@
+<template>
+  <!-- The name goes on the element with the role: `aria-label` left on the host names nothing, and an
+       icon-only button would be read "button". `pdx-button`, the root's class for every variant, keeps
+       it under the design system's reset of a host's bare element rules; the variant is the host's
+       attribute. -->
+  <button data-part="root" class="pdx-button" :type="type" :disabled="isDisabled()" :aria-busy="isBusy() ? 'true' : null" :aria-label="ariaLabel || null" :aria-labelledby="ariaLabelledby || null" @click="onClick($event)"><slot></slot>@if (label) {<span data-part="label">{{ label }}</span>}</button>
+</template>
+
+<script>
+/**
+ * A button over the Pragmatic CSS button styles, with variants, sizes and a loading state.
+ *
+ * @csspart root - The native `<button>`.
+ * @csspart label - The text of `label`, after any slotted content.
+ * @cssstate loading - `loading` is set, or the `action` is pending: the button shows a spinner and is
+ * `aria-busy`.
+ */
+// Adds to the CSS button: variant and size axes reflected on the host, loading state (aria-busy),
+// disabled guard, icon slot. The design system's `@variant pdx-button` rules key on the host's
+// attributes (#512); the inner <button> carries its base class, `pdx-button`, and its state classes.
+import { DEV, onNextFrame } from '@pdxui/core';
+import { guardDisabledClicks } from '../shared/disabled-click';
+import { hasAccessibleName } from '../shared/accessible-name';
+
+/**
+ * When the `action`'s `execute` rejects. The error is the one
+ * the action keeps on its `error()`; the button is idle again.
+ */
+@event 'pdx-action-error': { error: unknown };
+// Loading is a state of the host (#291): buttons.css draws the spinner from `:state(loading)`.
+@state loading = isBusy();
+@part root, label;
+// The axes its stylesheet keys by (#512), reflected on the host; each value maps the selector that
+// draws the same look on a native <button>. Five sizes, the same scale as pdx-input and pdx-select.
+@variants {
+  /** Visual variant. */
+  variant: {
+    primary: '.pdx-primary', solid: '.pdx-primary', secondary: '.pdx-secondary', outline: '.pdx-outline',
+    ghost: '.pdx-ghost', link: '.pdx-link', danger: '.pdx-danger', success: '.pdx-success',
+    warning: '.pdx-warning', info: '.pdx-info'
+  } = primary;
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. */
+  size: { md: '[size="md"]', xs: '[size="xs"]', sm: '[size="sm"]', lg: '[size="lg"]', xl: '[size="xl"]' } = md;
+}
+@prop disabled: boolean = false;
+@prop loading: boolean = false;
+@prop type: 'button' | 'submit' | 'reset' = 'button';
+@prop full: boolean = false;
+/** The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. */
+@prop label: string = '';
+/** The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
+@prop ariaLabel: string = '';
+/** The id of an element whose text names the button, forwarded to the inner `<button>`. */
+@prop ariaLabelledby: string = '';
+/** A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. */
+@prop action: Record<string, unknown> | null = null;
+/** The value a click passes to `action.execute`. */
+@prop actionArg: Record<string, unknown> | null = null;
+
+@host el;
+
+/** The `action`, if it has the shape: an `execute` to call and a `pending` to read. */
+function asAction(a) {
+  return a && typeof a.execute === 'function' && typeof a.pending === 'function' ? a : null;
+}
+
+// Read as functions where they are bound, as the TypeScript version read them: a $derived each would be
+// a computed made at every mount, for values two bindings read.
+/** Busy: `loading` set, or the action's write in flight. */
+function isBusy() {
+  return !!(loading || asAction(action)?.pending());
+}
+/**
+ * Whether the pending action refuses another click (#500): under `'queue'` and `'drop'` a click while
+ * it is pending would wait or be dropped, so the button refuses it; under `'coalesce'` and `'parallel'`
+ * the action takes it, and the button stays clickable while it shows loading.
+ */
+function refusesWhilePending() {
+  const a = asAction(action);
+  if (!a?.pending()) return false;
+  return a.concurrency !== 'coalesce' && a.concurrency !== 'parallel';
+}
+/** Disabled, loading, or refusing a click while its action is pending. */
+function isDisabled() {
+  return !!(disabled || loading || refusesWhilePending());
+}
+
+/**
+ * Runs the action. A refusal stays where `mutation()` puts it, on `error()`, for the form to show, and
+ * is announced as `pdx-action-error`, so the button holds the promise it started instead of leaving an
+ * unhandled rejection behind every failed save.
+ */
+function runAction() {
+  const a = asAction(action);
+  if (!a) return;
+  Promise.resolve(a.execute(actionArg)).then(undefined, (error) => { pdxActionError({ error }); });
+}
+
+// Disabled or loading: the click stops at the host, before the app's @click.
+$effect(() => guardDisabledClicks(el, isDisabled));
+
+function onClick(e) {
+  if (isDisabled()) {
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  runAction();
+}
+
+// A size other than md and `full` are the inner button's attributes too, which the native button styles
+// key by: written a frame after they change, as the TypeScript version wrote them, so a mount does not
+// pay for two bindings no first paint needs.
+$effect(() => {
+  const s = size;
+  const f = full;
+  requestAnimationFrame(() => {
+    const btn = el.querySelector('button');
+    if (!btn) return;
+    if (s !== 'md') btn.setAttribute('size', s);
+    else btn.removeAttribute('size');
+    if (f) btn.setAttribute('full', '');
+    else btn.removeAttribute('full');
+  });
+});
+
+// An icon-only button with no name renders fine and is announced "button": nothing else would say so.
+// Once, after the first frame, when the slot is projected. In development only: a production bundle
+// carries neither the frame nor the message.
+if (DEV) onNextFrame(() => {
+  const btn = el.querySelector('button');
+  if (!btn || hasAccessibleName(btn)) return;
+  console.warn('[pdx-button] a button with no text and no name is announced "button" alone: '
+    + `give it aria-label (or aria-labelledby, or a label). ${el.outerHTML.slice(0, 120)}`);
+});
+</script>

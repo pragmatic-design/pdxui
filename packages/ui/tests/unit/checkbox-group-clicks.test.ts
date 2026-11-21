@@ -5,7 +5,7 @@
 // `el.className = …`, which would wipe every class the author put on the element.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/checkbox/pdx-checkbox';
+import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/checkbox-group/pdx-checkbox-group';
 
 type Group = HTMLElement & { value: string };

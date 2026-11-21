@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { readCellEditorValue } from '../../src/data-grid/grid-edit';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 
 function td(html: string): HTMLElement {
     const cell = document.createElement('div');

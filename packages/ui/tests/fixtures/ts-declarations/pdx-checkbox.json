@@ -1,0 +1,325 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCheckbox",
+  "tagName": "pdx-checkbox",
+  "category": "Atoms",
+  "order": 13,
+  "description": "A checkbox with a label and a description, which can be indeterminate or, as a tristate, cycle\nthrough unchecked, checked and indeterminate.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "tristate",
+      "description": "Enable 3-state cycle: unchecked → checked → indeterminate → unchecked",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "tristate"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "required"
+    },
+    {
+      "kind": "field",
+      "name": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'right'",
+      "attribute": "labelposition"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the box's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "checked",
+      "description": "Whether it is checked / on.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "checked"
+    },
+    {
+      "kind": "field",
+      "name": "indeterminate",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "indeterminate"
+    }
+  ],
+  "models": [
+    "checked",
+    "indeterminate"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-checkbox-md",
+        "sm": ".pdx-checkbox-sm",
+        "lg": ".pdx-checkbox-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "checked": "$event.detail.value",
+    "value": "$event.currentTarget.value",
+    "indeterminate": "$event.currentTarget.indeterminate",
+    "state": "($event.currentTarget.indeterminate ? null : $event.detail.value)"
+  },
+  "events": [
+    {
+      "name": "checked-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `checked`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "indeterminate-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `indeterminate`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "tristate",
+      "fieldName": "tristate",
+      "description": "Enable 3-state cycle: unchecked → checked → indeterminate → unchecked",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "required",
+      "fieldName": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "labelposition",
+      "fieldName": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'right'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the box's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "checked",
+      "fieldName": "checked",
+      "description": "Whether it is checked / on.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "indeterminate",
+      "fieldName": "indeterminate",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The native checkbox, the box drawn; the size variants key by it."
+    },
+    {
+      "name": "label",
+      "description": "The `label` text, when set."
+    },
+    {
+      "name": "description",
+      "description": "The `description` text, when set."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "checked",
+      "description": "It is checked."
+    },
+    {
+      "name": "indeterminate",
+      "description": "It is indeterminate; the box is aria-checked=\"mixed\"."
+    },
+    {
+      "name": "invalid",
+      "description": "`error` is set; the box is aria-invalid."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ]
+}

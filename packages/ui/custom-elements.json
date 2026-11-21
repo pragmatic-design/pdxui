@@ -4178,7 +4178,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/button/pdx-button.ts",
+      "path": "src/button/pdx-button.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -4353,7 +4353,7 @@
                 "text": "CustomEvent"
               },
               "description": "When the `action`'s `execute` rejects. The error is the one\nthe action keeps on its `error()`; the button is idle again.",
-              "detail": "{ error }"
+              "detail": "{ error: unknown }"
             }
           ],
           "attributes": [
@@ -4493,7 +4493,7 @@
           "name": "pdx-button",
           "declaration": {
             "name": "PdxButton",
-            "module": "src/button/pdx-button.ts"
+            "module": "src/button/pdx-button.pdx"
           }
         }
       ]
@@ -7035,7 +7035,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/checkbox/pdx-checkbox.ts",
+      "path": "src/checkbox/pdx-checkbox.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -7369,7 +7369,7 @@
           "name": "pdx-checkbox",
           "declaration": {
             "name": "PdxCheckbox",
-            "module": "src/checkbox/pdx-checkbox.ts"
+            "module": "src/checkbox/pdx-checkbox.pdx"
           }
         }
       ]
@@ -17124,7 +17124,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/input/pdx-input.ts",
+      "path": "src/input/pdx-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -17733,7 +17733,7 @@
           "name": "pdx-input",
           "declaration": {
             "name": "PdxInput",
-            "module": "src/input/pdx-input.ts"
+            "module": "src/input/pdx-input.pdx"
           }
         }
       ]

@@ -411,7 +411,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // bundle the html`` engine stays for the other components and the compiled helpers they first use come
 // in (@host :class's binder, ::checked). The built dist: entry 43.5 KB, blocking 102.5 KB (unchanged),
 // js 477.9 KB locally; a tenth kept for CI's line. The budgets come down in #1210's last batch.
-const BUDGET_KB = { entry: 43.5, js: 478.0, css: 67, blocking: 102.5 };
+// js 478.0 → 479.0 (the same standing OK, at its +1 KB): pdx-button, pdx-checkbox and pdx-input, each
+// lighter alone (0.83×, 0.96×, 1.04×). The entry and the blocking bytes do not move; the route chunks
+// carry +0.8 KB each through the chunk they share, where the compiled two-way bindings these three are
+// the first to use (::value, ::checked) come in while html`` stays for the others. js 478.9 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 479.0, css: 67, blocking: 102.5 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -9,11 +9,11 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
 import '../../src/json-editor/pdx-json-editor';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/select/pdx-select';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 
 type Editor = HTMLElement & { schema: unknown; value: unknown };
 

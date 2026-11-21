@@ -11,7 +11,7 @@
 import { component, html, createSelection, untracked, DEV, model, prop } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
-import '../checkbox/pdx-checkbox'; // rendered by this component, and registered by nobody else
+import '../checkbox/pdx-checkbox.pdx'; // rendered by this component, and registered by nobody else
 
 /**
  * A multi-selection across child `pdx-checkbox` elements, with one value for the form.

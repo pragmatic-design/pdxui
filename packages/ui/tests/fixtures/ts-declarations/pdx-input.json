@@ -1,0 +1,600 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxInput",
+  "tagName": "pdx-input",
+  "category": "Atoms",
+  "order": 12,
+  "description": "A text input with prefix and suffix content, a clear button and loading and validation states,\nand the base of the specialized inputs.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Native input type (text, email, password, …).",
+      "type": {
+        "text": "'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time'"
+      },
+      "default": "'text'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "required"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "maxlength",
+      "description": "Maximum number of characters allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxlength"
+    },
+    {
+      "kind": "field",
+      "name": "showCount",
+      "description": "Shows a live character counter.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showcount"
+    },
+    {
+      "kind": "field",
+      "name": "autofocus",
+      "description": "Focuses the input on mount.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "autofocus"
+    },
+    {
+      "kind": "field",
+      "name": "autocomplete",
+      "description": "Native autocomplete hint for the browser.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "autocomplete"
+    },
+    {
+      "kind": "field",
+      "name": "inputmode",
+      "description": "Virtual-keyboard hint (numeric, email, …).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "inputmode"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "prefix",
+      "description": "Prefix text (e.g. \"$\", \"https://\"). For icons use slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "prefix"
+    },
+    {
+      "kind": "field",
+      "name": "suffix",
+      "description": "Suffix text (e.g. \"kg\", \".com\"). For icons use slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "suffix"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "selectText",
+      "parameters": [],
+      "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox lost focus."
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The clear button emptied the field, after its `value-change`."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Native input type (text, email, password, …).",
+      "type": {
+        "text": "'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time'"
+      },
+      "default": "'text'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "required",
+      "fieldName": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "maxlength",
+      "fieldName": "maxlength",
+      "description": "Maximum number of characters allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "showcount",
+      "fieldName": "showCount",
+      "description": "Shows a live character counter.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "autofocus",
+      "fieldName": "autofocus",
+      "description": "Focuses the input on mount.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "autocomplete",
+      "fieldName": "autocomplete",
+      "description": "Native autocomplete hint for the browser.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "inputmode",
+      "fieldName": "inputmode",
+      "description": "Virtual-keyboard hint (numeric, email, …).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "prefix",
+      "fieldName": "prefix",
+      "description": "Prefix text (e.g. \"$\", \"https://\"). For icons use slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "suffix",
+      "fieldName": "suffix",
+      "description": "Suffix text (e.g. \"kg\", \".com\"). For icons use slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "prefix",
+      "description": "Content inside the input's frame, before the text (an icon, a unit, a currency sign)."
+    },
+    {
+      "name": "suffix",
+      "description": "Content inside the input's frame, after the text."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<input>`, the textbox a form submits."
+    },
+    {
+      "name": "prefix",
+      "description": "The `prefix` text, when set."
+    },
+    {
+      "name": "suffix",
+      "description": "The `suffix` text, when set."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable` and neither `disabled` nor `readonly`."
+    },
+    {
+      "name": "spinner",
+      "description": "The loading spinner, a `role=\"status\"`, while `loading`."
+    },
+    {
+      "name": "count",
+      "description": "The character count, with `show-count`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set."
+    },
+    {
+      "name": "success",
+      "description": "`success` is set."
+    },
+    {
+      "name": "warning",
+      "description": "`warning` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set."
+    },
+    {
+      "name": "over-limit",
+      "description": "The text is longer than `maxlength`; the count shows it."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-input-border-color"
+    },
+    {
+      "name": "--pdx-input-border-color-focus"
+    },
+    {
+      "name": "--pdx-input-border-color-invalid"
+    },
+    {
+      "name": "--pdx-input-border-color-success"
+    },
+    {
+      "name": "--pdx-input-border-color-warning"
+    },
+    {
+      "name": "--pdx-input-border-width",
+      "default": "var(--pdx-border-width)"
+    },
+    {
+      "name": "--pdx-input-focus-ring"
+    },
+    {
+      "name": "--pdx-input-min-height",
+      "default": "2.5rem"
+    }
+  ]
+}

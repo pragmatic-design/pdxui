@@ -31,7 +31,7 @@ no `@click` to write.
 | `variant` | `variant` | 'primary' \| 'solid' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. |
 
-**Events:** `pdx-action-error` → `detail: { error }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.
+**Events:** `pdx-action-error` → `detail: { error: unknown }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.
 
 **States:** `:state(loading)` — `loading` is set, or the `action` is pending: the button shows a spinner and is `aria-busy`.
 

@@ -16,7 +16,7 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
         const p = join(dir, entry);
         if (statSync(p).isDirectory()) componentFiles(p, acc);
-        else if (/^pdx-.*\.ts$/.test(entry)) acc.push(p);
+        else if (/^pdx-.*\.(ts|pdx)$/.test(entry)) acc.push(p);
     }
     return acc;
 }
@@ -76,9 +76,12 @@ describe('the scan can fail', () => {
 
 describe('the library', () => {
     it('declares every prop with the descriptor', () => {
+        // Every component of the library, as the floor counts it; the TypeScript ones are read. A
+        // component written in .pdx (#1210) declares its props with `@prop`, which has no constructor
+        // form: the library's move to .pdx must not take the count under the floor.
         const files = componentFiles(SRC);
         expect(files.length).toBeGreaterThan(100);
-        const offenders = files.flatMap(f => constructorProps(readFileSync(f, 'utf8'))
+        const offenders = files.filter(f => f.endsWith('.ts')).flatMap(f => constructorProps(readFileSync(f, 'utf8'))
             .map(p => `${relative(SRC, f).replace(/\\/g, '/')}: ${p}`));
         expect(offenders).toEqual([]);
     });

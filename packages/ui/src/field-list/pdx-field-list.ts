@@ -19,11 +19,11 @@ import { onControlValue } from '../shared/model-event';
 import '../form-field/pdx-form-field';
 // The controls of TYPE_TAG, rendered by this component and registered by nobody else: an app's compiler
 // imports the tags its templates name, and these are built from script (#293).
-import '../input/pdx-input';
+import '../input/pdx-input.pdx';
 import '../number-input/pdx-number-input';
 import '../textarea/pdx-textarea';
 import '../select/pdx-select';
-import '../checkbox/pdx-checkbox';
+import '../checkbox/pdx-checkbox.pdx';
 import '../switch-toggle/pdx-switch.pdx';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.

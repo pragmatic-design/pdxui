@@ -97,7 +97,10 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // TypeScript module alone (0.96×, 0.74×, 1.04× with its form scope), for the reason the first
     // batches added: html``'s runtime stays for the other components, and hostClass comes in with the
     // group's `@host :class`. Measured on the rebuilt dists, as CI measures it; a tenth kept above.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 339.7 },
+    // 340.2 after #1210's fourth atoms (+0.5): pdx-button, pdx-checkbox and pdx-input, each lighter
+    // alone (0.83×, 0.96×, 1.04× with its password-manager module), for the same reason; the compiled
+    // two-way bindings they are the first to use (::value, ::checked) come in with them.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 340.3 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -105,14 +108,16 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     { name: '@pdxui/framework/router', code: "import { navigate } from '@pdxui/framework/router'; navigate('/');", ceiling: 13.5 },
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
     // 330.1 after #1233 (+1.1), for the same core code as the root's above. 330.6 after #1237 (+0.2
-    // from 330.4), for the root's reason.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331 },
+    // from 330.4), for the root's reason. 331.1 after #1210's fourth atoms, for the root's reason.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331.2 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
     // The root is 1.6 since #1246, above.
     { name: '@pdxui/core/reactivity', code: "import { signal } from '@pdxui/core/reactivity'; globalThis.out = signal(0);", ceiling: 2 },
-    { name: '@pdxui/ui/button', code: "import '@pdxui/ui/button';", ceiling: 16 },
+    // 10.1, from 16 (#1210): pdx-button is a compiled .pdx, and a page that registers it alone no
+    // longer brings html``'s template engine with it.
+    { name: '@pdxui/ui/button', code: "import '@pdxui/ui/button';", ceiling: 10.2 },
 ];
 /** How far under its ceiling a measurement may sit before the ceiling must come down. */
 const SLACK_KB = 2;

@@ -85,16 +85,28 @@ describe('component definition', () => {
     });
 
     it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
+        // A library component still in TypeScript (#1210 moves the library to .pdx; this one is late).
         const root = join(__dirname, '..', '..', '..');
-        const real = new Map([['pdx-button', {
-            ...button, filePath: join(root, 'packages', 'ui', 'src', 'button', 'pdx-button.ts'),
+        const real = new Map([['pdx-relative-time', {
+            ...button, tag: 'pdx-relative-time',
+            filePath: join(root, 'packages', 'ui', 'src', 'relative-time', 'pdx-relative-time.ts'),
         }]]);
-        // tag → component('pdx-button' (line 20 → 0-based 19)
-        const tagLoc = resolveComponentDefinition('pdx-button', real, []);
+        // tag → its component('pdx-relative-time' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-relative-time', real, []);
         expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `variant:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-button', real, [], 'variant');
+        // member → the `datetime:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-relative-time', real, [], 'datetime');
         expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
+    });
+
+    it('in a library component written in .pdx, a member jumps to its declaration line (#1210)', () => {
+        // The file is the component: the tag has no call to land on. A member has its line, here the
+        // `variant:` axis inside pdx-button's @variants block.
+        const root = join(__dirname, '..', '..', '..');
+        const file = join(root, 'packages', 'ui', 'src', 'button', 'pdx-button.pdx');
+        const real = new Map([['pdx-button', { ...button, filePath: file }]]);
+        const memberLoc = resolveComponentDefinition('pdx-button', real, [], 'variant');
+        expect(memberLoc!.range.start.line).toBeGreaterThan(0);
     });
 });
 

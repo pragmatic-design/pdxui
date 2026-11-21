@@ -6,7 +6,7 @@
 // the page first, so no icon loads on demand. pdx-icon alone registers only the set's resolver (#47).
 import './icon/pragmatic-all';
 import './icon/pdx-icon';
-import './button/pdx-button';
+import './button/pdx-button.pdx';
 import './button-group/pdx-button-group.pdx';
 import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';
@@ -17,8 +17,8 @@ import './spinner/pdx-spinner.pdx';
 import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';
-import './input/pdx-input';
-import './checkbox/pdx-checkbox';
+import './input/pdx-input.pdx';
+import './checkbox/pdx-checkbox.pdx';
 import './radio/pdx-radio.pdx';
 import './switch-toggle/pdx-switch.pdx';
 import './flag/pdx-flag.pdx';

@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/toolbar/pdx-toolbar';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 import '../../src/select/pdx-select';
 import '../../src/toggle/pdx-toggle';
 

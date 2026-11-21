@@ -49,11 +49,6 @@
       "types": "./dist/icon/lucide-icons.d.ts",
       "import": "./dist/icon/lucide-icons.js"
     },
-    "./button": {
-      "development": "./src/button/pdx-button.ts",
-      "types": "./dist/button/pdx-button.d.ts",
-      "import": "./dist/button/pdx-button.js"
-    },
     "./avatar-group": {
       "development": "./src/avatar-group/pdx-avatar-group.ts",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
@@ -64,11 +59,6 @@
       "types": "./dist/label/pdx-label.d.ts",
       "import": "./dist/label/pdx-label.js"
     },
-    "./input": {
-      "development": "./src/input/pdx-input.ts",
-      "types": "./dist/input/pdx-input.d.ts",
-      "import": "./dist/input/pdx-input.js"
-    },
     "./textarea": {
       "development": "./src/textarea/pdx-textarea.ts",
       "types": "./dist/textarea/pdx-textarea.d.ts",
@@ -78,11 +68,6 @@
       "development": "./src/input-group/pdx-input-group.ts",
       "types": "./dist/input-group/pdx-input-group.d.ts",
       "import": "./dist/input-group/pdx-input-group.js"
-    },
-    "./checkbox": {
-      "development": "./src/checkbox/pdx-checkbox.ts",
-      "types": "./dist/checkbox/pdx-checkbox.d.ts",
-      "import": "./dist/checkbox/pdx-checkbox.js"
     },
     "./radio-group": {
       "development": "./src/radio-group/pdx-radio-group.ts",
@@ -658,6 +643,21 @@
       "development": "./src/radio/pdx-radio.pdx",
       "types": "./dist/radio/pdx-radio.d.ts",
       "import": "./dist/radio/pdx-radio.js"
+    },
+    "./button": {
+      "development": "./src/button/pdx-button.pdx",
+      "types": "./dist/button/pdx-button.d.ts",
+      "import": "./dist/button/pdx-button.js"
+    },
+    "./checkbox": {
+      "development": "./src/checkbox/pdx-checkbox.pdx",
+      "types": "./dist/checkbox/pdx-checkbox.d.ts",
+      "import": "./dist/checkbox/pdx-checkbox.js"
+    },
+    "./input": {
+      "development": "./src/input/pdx-input.pdx",
+      "types": "./dist/input/pdx-input.d.ts",
+      "import": "./dist/input/pdx-input.js"
     },
     "./package.json": "./package.json"
   },

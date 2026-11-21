@@ -39,7 +39,7 @@ import iconInbox from '../icon/pragmatic/inbox';
 // Runtime sub-components created via document.createElement (toolbar/filter/edit/footer).
 // Imported here so the data-grid self-registers its dependencies in any consumer,
 // regardless of whether the host template references these tags statically.
-import '../button/pdx-button';
+import '../button/pdx-button.pdx';
 /** `pdx-icon` the first time the empty state shows: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
     if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');

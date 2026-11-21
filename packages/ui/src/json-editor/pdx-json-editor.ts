@@ -15,8 +15,8 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/json-editor';
-import '../button/pdx-button'; // rendered by this component, and registered by nobody else
-import '../input/pdx-input'; // rendered by this component, and registered by nobody else
+import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
+import '../input/pdx-input.pdx'; // rendered by this component, and registered by nobody else
 import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else
 import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else

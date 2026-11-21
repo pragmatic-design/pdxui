@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource } from '@pdxui/core';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 import '../../src/relation-picker/pdx-relation-picker';
 import '../../src/auto-form/pdx-auto-form';
 

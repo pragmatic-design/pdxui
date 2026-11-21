@@ -13,7 +13,7 @@ import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
 import '../../src/form/pdx-form';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 
 /** Compile a .pdx and run the module: the core import becomes the injected namespace. */
 function load(filename: string, source: string): void {

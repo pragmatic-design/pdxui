@@ -9,7 +9,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { tick } from './helpers';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 import '../../src/button-group/pdx-button-group.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {

@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/form-field/pdx-form-field';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/form-template/pdx-form-template';
 

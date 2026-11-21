@@ -15,7 +15,7 @@ import '../../src/drawer/pdx-drawer';
 import '../../src/select/pdx-select';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/form/pdx-form';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import { createForm } from '@pdxui/core';
 
 /** `outer` open, `inner` inside it, both in the document. */

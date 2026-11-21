@@ -11,7 +11,7 @@
  *      State (selection) through createSelection({mode:'multiple'}); it passes size/disabled/error
  *      to the <pdx-checkbox> children in rAF. NO focusGroup → every checkbox is tabbable
  *      independently (NOT roving). It announces the selection with its model's value-change (#480). formAssociated.
- *  - source: packages/ui/src/checkbox/pdx-checkbox.ts
+ *  - source: packages/ui/src/checkbox/pdx-checkbox.pdx
  *      render → <label class="pdx-checkbox-wrap [.disabled]"> holding:
  *        - <input type="checkbox" class="pdx-checkbox [.pdx-checkbox-{size}] [.pdx-checkbox-error]">
  *        - <span class="pdx-checkbox-content"> with .pdx-checkbox-label / .pdx-checkbox-desc

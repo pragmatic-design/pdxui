@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/label/pdx-label';
-import '../../src/input/pdx-input';
+import '../../src/input/pdx-input.pdx';
 import '../../src/empty-state/pdx-empty-state';
 
 async function mount(html: string): Promise<HTMLElement> {
