@@ -25,7 +25,7 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
         const p = join(dir, entry);
         if (statSync(p).isDirectory()) componentFiles(p, acc);
-        else if (/^pdx-.*\.ts$/.test(entry)) acc.push(p);
+        else if (/^pdx-.*\.(ts|pdx)$/.test(entry)) acc.push(p);
     }
     return acc;
 }
@@ -90,6 +90,57 @@ function deadProps(text: string): { checked: number; dead: string[] } {
     return { checked, dead };
 }
 
+/**
+ * The same for a component written in .pdx (#1210): its props are its `@prop` lines, and a read is the
+ * name anywhere in the template or the script outside its declaration, comments (`<!-- -->` too) and
+ * `@part`, which names parts, not props. A `{ form }` model reads what core's form wiring reads.
+ */
+function pdxDeadProps(text: string, tag: string): { checked: number; dead: string[] } {
+    // Match: `@prop name: …` at the start of a line. Groups: [1]=name
+    const declared = [...text.matchAll(/^@prop\s+([\w$]+)\s*[?]?:/gm)].map((m) => m[1]);
+    const rest = stripComments(text.replace(/<!--[\s\S]*?-->/g, ''))
+        .replace(/^@prop\s[^\n]*$/gm, '')
+        .replace(/^@part\s[^\n]*$/gm, '');
+    const viaHelpers = new Set<string>();
+    // Match: `@model name: T = d { form …`, the form model (#135, #751).
+    if (/^@model\s[^\n]*\{\s*form\b/m.test(rest)) for (const p of FORM_MODEL_READS) viaHelpers.add(p);
+    const dead = declared.filter((name) => !viaHelpers.has(name) && !new RegExp(`\\b${name}\\b`).test(rest)).map((name) => `${tag}.${name}`);
+    return { checked: declared.length, dead };
+}
+
+/** The props of a component file, by its kind. */
+function propsOf(file: string): { checked: number; dead: string[] } {
+    const text = readFileSync(file, 'utf-8');
+    if (!file.endsWith('.pdx')) return deadProps(text);
+    return pdxDeadProps(text, file.replace(/^.*[\\/]/, '').replace(/\.pdx$/, ''));
+}
+
+describe('the scan can fail, in .pdx too (#1210)', () => {
+    const PDX = [
+        '<template>',
+        '  <!-- names forgotten, and must not count for it -->',
+        '  <span data-part="label">{{ used }}</span>',
+        '</template>',
+        '<script>',
+        '/** forgotten, in a doc comment */',
+        '@part label;',
+        "@prop used: string = '';",
+        '@prop label: string = \'\';',
+        "const shown = $derived(label || 'x');",
+        '</script>',
+    ].join('\n');
+
+    it('sees a prop named only in a comment and in @part', () => {
+        const planted = PDX.replace("@prop used: string = '';", "@prop used: string = '';\n@prop forgotten: boolean = false;\n@prop badge: string = '';")
+            .replace('@part label;', '@part label, badge;');
+        expect(pdxDeadProps(planted, 'pdx-probe').dead).toEqual(['pdx-probe.forgotten', 'pdx-probe.badge']);
+    });
+
+    it('does not accuse a prop the template or the script reads, and counts them', () => {
+        expect(pdxDeadProps(PDX, 'pdx-probe')).toEqual({ checked: 2, dead: [] });
+    });
+});
+
 describe('the scan can fail', () => {
     // Three shapes, because a scan that only ever returns [] passes the real assertion below.
     const LIVE = [
@@ -153,7 +204,7 @@ describe('every prop @pdxui/ui declares is read by the component that declares i
     let checked = 0;
     const dead: string[] = [];
     for (const file of files) {
-        const result = deadProps(readFileSync(file, 'utf-8'));
+        const result = propsOf(file);
         checked += result.checked;
         dead.push(...result.dead);
     }
