@@ -18,6 +18,7 @@ import { signal, effect, collectDisposers, onDispose, untracked } from '../react
 import type { Signal } from '../utils/types';
 import { createVirtualizer } from './virtualizer';
 import { rowIndex, type RowIndex } from './list';
+import { ListEmpty } from './list-empty';
 import { DEV } from '../utils/env';
 import { isDeferring, deferredBlock } from './deferred-block';
 import { isPaged, listOf, setSize, implicitRole, rowAttributes, DEFAULT_ESTIMATE, ROW_ROLES, KEY_ROLES, type PagedSource } from './virtual-set';
@@ -67,10 +68,13 @@ export interface VirtualNodes {
     readonly after: HTMLElement;
 }
 
-/** What a hydration hands the list: the rows it adopted, by key, and `@empty` if it adopted that. */
+/**
+ * What a hydration hands the list: the rows it adopted, by key, and `@empty` if it adopted that — its
+ * nodes, and the Dispose of the scope they were adopted in (#1236).
+ */
 export interface VirtualAdopted<T> {
     readonly rows: ReadonlyArray<VirtualRow<T>>;
-    readonly empty: Node | null;
+    readonly empty: { readonly nodes: Node[]; readonly dispose: () => void } | null;
 }
 
 /** What Tab can reach in a row. */
@@ -130,7 +134,7 @@ function spacerFor(options: VirtualListOptions): HTMLElement {
  */
 export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adopted: VirtualAdopted<T> | null): void {
     const { items, keyFn, render, options } = call;
-    const { start, before, after } = nodes;
+    const { start, end, before, after } = nodes;
     // The third spacer: between a focused row kept outside the window and the window (#284).
     const middle = spacerFor(options);
 
@@ -174,7 +178,10 @@ export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adop
     for (const row of adopted?.rows ?? []) rows.set(row.key, row);
     /** The row that holds focus while it is outside the window, kept where it was. */
     let pinned: Row<T> | null = null;
-    let emptyNode: Node | null = adopted?.empty ?? null;
+    // `@empty` (#1236): its nodes and the scope they were built in, as a plain list holds it (#1233) —
+    // removed node by node and disposed when the first row comes, and disposed with the list.
+    const empty = options.empty ? new ListEmpty(options.empty) : null;
+    if (empty && adopted?.empty) empty.adopt(adopted.empty.nodes, adopted.empty.dispose);
     let loadRequestedAt = -1;
     let warnedUnbounded = false;
     /** The item the roving tabindex rests on, under a composite role. */
@@ -243,14 +250,9 @@ export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adop
         // @empty: nothing to show, and nothing on its way.
         const showEmpty = data.length === 0 && !loading && !!options.empty;
         untracked(() => {
-            if (showEmpty && !emptyNode) {
-                const [node] = collectDisposers(() => options.empty!());
-                emptyNode = node;
-                after.after(node);
-            } else if (!showEmpty && emptyNode) {
-                (emptyNode as ChildNode).remove?.();
-                emptyNode = null;
-            }
+            // Shown before the end marker, after the spacer that follows the rows.
+            if (showEmpty) empty!.show(end);
+            else empty?.hide();
 
             // The window: the rows it holds, by key. A row leaving it is disposed — unless it holds
             // focus, and then it stays where it is until focus leaves it.
@@ -406,6 +408,7 @@ export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adop
         rows.clear();
         pinned?.dispose();
         pinned = null;
+        empty?.dispose();
         virt.dispose();
     });
 }
