@@ -406,7 +406,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // and pays the indirection: entry 44,303 → 44,425 B, the whole JavaScript +349 B — of which board.pdx,
 // its one @for with a transition, 17, and the rest the minifier's names for the entry's exports moving
 // in 77 route chunks. The built dist: entry 43.4 KB, blocking 102.4 KB, js 477.5 KB; a tenth kept.
-const BUDGET_KB = { entry: 43.5, js: 477.6, css: 67, blocking: 102.5 };
+// js 477.6 → 478.0 (owner's OK, standing for #1210's batches, ≤ +1 KB each): pdx-chip,
+// pdx-button-group and pdx-radio move to .pdx. Each is lighter alone, but while both forms are in the
+// bundle the html`` engine stays for the other components and the compiled helpers they first use come
+// in (@host :class's binder, ::checked). The built dist: entry 43.5 KB, blocking 102.5 KB (unchanged),
+// js 477.9 KB locally; a tenth kept for CI's line. The budgets come down in #1210's last batch.
+const BUDGET_KB = { entry: 43.5, js: 478.0, css: 67, blocking: 102.5 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
