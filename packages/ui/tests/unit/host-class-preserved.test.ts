@@ -7,7 +7,7 @@ import '../../src/checkbox/pdx-checkbox';
 import '../../src/checkbox-group/pdx-checkbox-group';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/input-group/pdx-input-group';
-import '../../src/button-group/pdx-button-group';
+import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/statistic/pdx-statistic';
 
 async function frames(n = 3): Promise<void> {

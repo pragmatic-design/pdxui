@@ -21,6 +21,7 @@ interface Module { path: string; declarations: Declaration[]; exports: { declara
 const PORTED: Record<string, string> = {
     'pdx-avatar': 'src/avatar/pdx-avatar.pdx',
     'pdx-badge': 'src/badge/pdx-badge.pdx',
+    'pdx-button-group': 'src/button-group/pdx-button-group.pdx',
     'pdx-chip': 'src/chip/pdx-chip.pdx',
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',

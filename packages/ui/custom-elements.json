@@ -4048,7 +4048,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/button-group/pdx-button-group.ts",
+      "path": "src/button-group/pdx-button-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -4171,7 +4171,7 @@
           "name": "pdx-button-group",
           "declaration": {
             "name": "PdxButtonGroup",
-            "module": "src/button-group/pdx-button-group.ts"
+            "module": "src/button-group/pdx-button-group.pdx"
           }
         }
       ]

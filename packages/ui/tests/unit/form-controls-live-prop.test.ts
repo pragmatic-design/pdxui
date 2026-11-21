@@ -31,7 +31,7 @@ import '../../src/rating/pdx-rating';
 import '../../src/segmented/pdx-segmented';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/toggle/pdx-toggle';
-import '../../src/button-group/pdx-button-group';
+import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/inline-edit/pdx-inline-edit';
 import '../../src/json-editor/pdx-json-editor';
 import '../../src/calendar/pdx-calendar';

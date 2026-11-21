@@ -54,11 +54,6 @@
       "types": "./dist/button/pdx-button.d.ts",
       "import": "./dist/button/pdx-button.js"
     },
-    "./button-group": {
-      "development": "./src/button-group/pdx-button-group.ts",
-      "types": "./dist/button-group/pdx-button-group.d.ts",
-      "import": "./dist/button-group/pdx-button-group.js"
-    },
     "./avatar-group": {
       "development": "./src/avatar-group/pdx-avatar-group.ts",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/chip/pdx-chip.pdx",
       "types": "./dist/chip/pdx-chip.d.ts",
       "import": "./dist/chip/pdx-chip.js"
+    },
+    "./button-group": {
+      "development": "./src/button-group/pdx-button-group.pdx",
+      "types": "./dist/button-group/pdx-button-group.d.ts",
+      "import": "./dist/button-group/pdx-button-group.js"
     },
     "./package.json": "./package.json"
   },
