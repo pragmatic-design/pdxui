@@ -95,10 +95,24 @@ function deadProps(text: string): { checked: number; dead: string[] } {
  * name anywhere in the template or the script outside its declaration, comments (`<!-- -->` too) and
  * `@part`, which names parts, not props. A `{ form }` model reads what core's form wiring reads.
  */
+/** `text` without its HTML comments, cut at each `<!--` up to the `-->` that closes it. */
+function withoutHtmlComments(text: string): string {
+    let out = '';
+    let at = 0;
+    for (;;) {
+        const open = text.indexOf('<!--', at);
+        if (open < 0) return out + text.slice(at);
+        out += text.slice(at, open);
+        const close = text.indexOf('-->', open + 4);
+        if (close < 0) return out;
+        at = close + 3;
+    }
+}
+
 function pdxDeadProps(text: string, tag: string): { checked: number; dead: string[] } {
     // Match: `@prop name: …` at the start of a line. Groups: [1]=name
     const declared = [...text.matchAll(/^@prop\s+([\w$]+)\s*[?]?:/gm)].map((m) => m[1]);
-    const rest = stripComments(text.replace(/<!--[\s\S]*?-->/g, ''))
+    const rest = stripComments(withoutHtmlComments(text))
         .replace(/^@prop\s[^\n]*$/gm, '')
         .replace(/^@part\s[^\n]*$/gm, '');
     const viaHelpers = new Set<string>();
