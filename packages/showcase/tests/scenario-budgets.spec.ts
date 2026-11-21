@@ -98,11 +98,17 @@ import { scenarioDist } from './scenarios-build';
  * static import in list.ts, and the benchmark's own build with no modulepreload polyfill: benchmark
  * 11.8 → 10.9 (11,212 B), crud 51.6 → 51.2, dashboard 18.6 → 18.2, hello 6.6 as it was. Each budget
  * the measurement + 0.3.
+ *
+ * #1210's fourth atoms (owner's OK, standing for #1210's batches: ≤ +1 KB each, measured, the reason
+ * here): crud 51.2 → 51.9 KB, budget 51.5 → 52.2. Its form holds three pdx-input and its page
+ * pdx-buttons, compiled from .pdx now, beside library components still in TypeScript that keep html``'s
+ * engine in the bundle; while both renderers ship, an app pays for both. hello, benchmark and dashboard
+ * use none of the three and do not move. The budgets come down in #1210's last batch.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 6.9, css: 0 },
     benchmark: { js: 11.2, css: 0 },
-    crud: { js: 51.5, css: 1.6 },
+    crud: { js: 52.2, css: 1.6 },
     dashboard: { js: 18.5, css: 21.9 },
 };
 /**
