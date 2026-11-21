@@ -17,17 +17,24 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
     for (const e of readdirSync(dir)) {
         const p = join(dir, e);
         if (statSync(p).isDirectory()) componentFiles(p, acc);
-        else if (/^pdx-.*\.ts$/.test(e)) acc.push(p);
+        else if (/^pdx-.*\.(ts|pdx)$/.test(e)) acc.push(p);
     }
     return acc;
 }
 
 /**
- * Named slots the component in `text` renders: literal `<slot name="x">`, and the snippets it reads,
+ * A component's source: its text, or a .pdx's text with the tag its file name gives (#1210), since a
+ * .pdx has no `component('…')` call to read the tag from.
+ */
+type Source = string | { text: string; tag: string };
+
+/**
+ * Named slots the component in `src` renders: literal `<slot name="x">`, and the snippets it reads,
  * `declaredSnippet(ctx, 'x', …)` (#492) and pdx-data-grid's `snippetOf('x')`.
  */
-function renderedSlots(text: string): { tag: string | null; names: string[] } {
-    const tag = (text.match(/component\('([\w-]+)'/) ?? [])[1] ?? null;
+function renderedSlots(src: Source): { tag: string | null; names: string[] } {
+    const text = typeof src === 'string' ? src : src.text;
+    const tag = (text.match(/component\('([\w-]+)'/) ?? [])[1] ?? (typeof src === 'string' ? null : src.tag);
     const names = new Set<string>();
     for (const m of text.matchAll(/<slot\s+name="([\w-]+)"/g)) names.add(m[1]);
     // Match: `declaredSnippet(ctx, 'x'`. Groups: [1]=the snippet's name
@@ -47,7 +54,7 @@ function documentedSlots(manifest: { modules?: { declarations?: { tagName?: stri
     return out;
 }
 
-function undocumented(sources: string[], documented: Map<string, Set<string>>): string[] {
+function undocumented(sources: Source[], documented: Map<string, Set<string>>): string[] {
     const gaps: string[] = [];
     for (const text of sources) {
         const { tag, names } = renderedSlots(text);
@@ -72,6 +79,10 @@ describe('the scan can fail', () => {
         const grid = "component('pdx-probe', { setup(ctx) { const c = snippetOf('cell')?.(row); } })";
         expect(undocumented([grid], docs)).toEqual(['pdx-probe: cell']);
     });
+    it('sees an undocumented slot of a .pdx, its tag from the file name (#1210)', () => {
+        const pdx = { text: '<template><slot name="header"></slot><slot name="footer"></slot></template>', tag: 'pdx-probe' };
+        expect(undocumented([pdx], docs)).toEqual(['pdx-probe: header']);
+    });
     it('does not accuse a documented slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"footer\"></slot>` })";
         expect(undocumented([src], docs)).toEqual([]);
@@ -80,7 +91,10 @@ describe('the scan can fail', () => {
 
 describe('every named slot @pdxui/ui renders is documented', () => {
     const files = componentFiles(join(UI, 'src'));
-    const sources = files.map((f) => readFileSync(f, 'utf-8'));
+    const sources: Source[] = files.map((f) => {
+        const text = readFileSync(f, 'utf-8');
+        return f.endsWith('.pdx') ? { text, tag: f.replace(/^.*[\\/]/, '').replace(/\.pdx$/, '') } : text;
+    });
     const documented = documentedSlots(JSON.parse(readFileSync(join(UI, 'custom-elements.json'), 'utf-8')));
 
     it('reached the components and found slots to check', () => {
