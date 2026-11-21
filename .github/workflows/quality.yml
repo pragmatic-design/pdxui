@@ -150,13 +150,6 @@ jobs:
           # 12m11s–14m50s on 2026-11-14; alone on a runner, nothing else runs while they measure.
           - { suite: showcase-timing, dir: showcase, run: 'pnpm --filter @pdxui/showcase run test:timing' }
           - { suite: showcase-scenarios, dir: showcase, run: 'pnpm --filter @pdxui/showcase run test:scenarios' }
-          # HACK(#1277): five runners that measure only port-mount's control, to land on an Azure one and
-          # read its raw times. Diagnostic only: removed from this branch before it merges.
-          - { suite: port-probe-1, dir: showcase, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.scenarios.config.ts tests/scenario-port-mount.spec.ts --grep control' }
-          - { suite: port-probe-2, dir: showcase, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.scenarios.config.ts tests/scenario-port-mount.spec.ts --grep control' }
-          - { suite: port-probe-3, dir: showcase, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.scenarios.config.ts tests/scenario-port-mount.spec.ts --grep control' }
-          - { suite: port-probe-4, dir: showcase, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.scenarios.config.ts tests/scenario-port-mount.spec.ts --grep control' }
-          - { suite: port-probe-5, dir: showcase, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.scenarios.config.ts tests/scenario-port-mount.spec.ts --grep control' }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
