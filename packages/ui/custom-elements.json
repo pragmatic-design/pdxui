@@ -14856,7 +14856,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/form-field/pdx-form-field.ts",
+      "path": "src/form-field/pdx-form-field.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -15264,7 +15264,7 @@
           "name": "pdx-form-field",
           "declaration": {
             "name": "PdxFormField",
-            "module": "src/form-field/pdx-form-field.ts"
+            "module": "src/form-field/pdx-form-field.pdx"
           }
         }
       ]

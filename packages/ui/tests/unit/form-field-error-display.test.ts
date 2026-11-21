@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, mount } from './helpers';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 
 const UI = join(__dirname, '..', '..');
 // The component's page in the pdxui-forms skill.

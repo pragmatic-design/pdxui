@@ -1,0 +1,245 @@
+// pdx-form-field's wiring: the ARIA a field writes on the control slotted into it — its id for the
+// label's `for`, aria-labelledby, aria-describedby, aria-invalid, aria-required, a fallback aria-label —
+// and the disabled/error/size it passes on to the library's controls. pdx-form-field.pdx reads its props
+// and calls wireControl; the marks it leaves are kept here, per element, across every field.
+
+/** The controls a field marked aria-required: only those are unmarked when `required` goes, so a
+ *  control that says `required` itself (pdx-input's own prop) keeps it. */
+const _markedRequired = new WeakSet<Element>();
+/** The comboboxes a field named by aria-labelledby, unnamed again when its label goes. */
+const _labelledByField = new WeakSet<Element>();
+/** The controls a field named with its a11yLabel, unnamed again when it goes or a label shows. */
+const _namedByField = new WeakSet<Element>();
+/** The elements of a group a field marked aria-invalid: only those are unmarked when the error goes,
+ *  so a cell its own component marked keeps it. */
+const _markedInvalid = new WeakSet<Element>();
+/** The groups a field described by its hint and error, undescribed again when there is neither. */
+const _describedByField = new WeakSet<Element>();
+/**
+ * The controls whose id a field gave, given again by the field that wires them. A field moved to
+ * another parent sets up again with a new id, which its label's `for` names: the control must take it,
+ * or it keeps the old one and is named by nothing (#293). An id the author wrote is never replaced.
+ */
+const _idByField = new WeakSet<Element>();
+
+/**
+ * The library controls that are a button holding their own value: an inline edit's display at rest —
+ * or, with `edit-on="icon"`, where the display is no button, its pencil button (#710) — a toggle's
+ * button (#286). A field takes one as its control when nothing else is there; a button may carry
+ * neither aria-required nor aria-invalid, so it is named and described only.
+ */
+const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"][role="button"], pdx-inline-edit [data-part="edit"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
+/**
+ * A button control found before any text box: pdx-color-picker's swatch, whose panel holds a hex field
+ * that is there, hidden, while the panel is closed; pdx-file-upload's drop zone, beside the hidden file
+ * input it opens. Either input would be taken for the control (#287).
+ */
+const FIRST_BUTTON_CONTROLS = 'pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
+
+/** Set `name` on `el` while `on`, and take it back only if this field set it. */
+function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Element>, value = 'true'): void {
+    if (on) {
+        el.setAttribute(name, value);
+        marked.add(el);
+    } else if (marked.has(el)) {
+        el.removeAttribute(name);
+        marked.delete(el);
+    }
+}
+
+/** The ids a field gives its label, hint, error, description and control. */
+export interface FieldIds { fieldId: string; inputId: string; labelId: string; hintId: string; errorId: string; descId: string }
+
+/** What the wiring reads of the field's props, read where they are tracked. */
+export interface FieldWiring {
+    err: boolean;
+    hasHint: boolean;
+    hasDesc: boolean;
+    disabled: boolean;
+    size: string;
+    required: boolean;
+    hasLabel: boolean;
+    a11yLabel: string;
+}
+
+/**
+ * A pdx-slider's thumbs are <div>s with the slider role: `for` cannot reach them, and every slider would
+ * be "Value" under its field's visible label. One thumb is named by
+ * the label; the two of a range by the label AND their own name ("Price range Minimum").
+ * Each is described by the hint and the error, and is aria-invalid with it (A2, #286). A `slider`
+ * may not carry aria-required: the label's marker says it.
+ */
+function wireSliders(root: HTMLElement, ids: FieldIds, hasLabel: boolean, describedBy: string[], err: boolean): void {
+    const thumbs = Array.from(root.querySelectorAll<HTMLElement>('[role="slider"]'));
+    thumbs.forEach((thumb, i) => {
+        if (hasLabel) {
+            if (!thumb.id) thumb.id = `${ids.fieldId}-thumb-${i}`;
+            thumb.setAttribute('aria-labelledby', thumbs.length > 1 ? `${ids.labelId} ${thumb.id}` : ids.labelId);
+            _labelledByField.add(thumb);
+        } else if (_labelledByField.has(thumb)) {
+            thumb.removeAttribute('aria-labelledby');
+            _labelledByField.delete(thumb);
+        }
+        markAttr(thumb, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
+        markAttr(thumb, 'aria-invalid', err, _markedInvalid);
+    });
+}
+
+/** Wire the first control found in the field `el` with what the field's props say (`w`). */
+export function wireControl(el: HTMLElement, ids: FieldIds, w: FieldWiring): void {
+    const { err, hasHint, hasDesc, disabled, size, required, hasLabel, a11yLabel } = w;
+    const { inputId, labelId, hintId, errorId, descId } = ids;
+    // Find the first focusable input element. Never a hidden input: it is what a
+    // component submits, not what a person reaches — the time picker's is the only
+    // input in its group, and the label's `for` would name it.
+    // Last, a button control (BUTTON_CONTROLS): pdx-inline-edit at rest — its display is the
+    // control until the editor opens, and the editor's text box, found first, takes over
+    // while it is open — and pdx-toggle (#286).
+    // A contenteditable `role="textbox"` — pdx-rich-text's editing area — is a control too.
+    // First of all, a colour picker's swatch (FIRST_BUTTON_CONTROLS).
+    const input = (el.querySelector(FIRST_BUTTON_CONTROLS) ?? el.querySelector(
+        'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"], [role="textbox"]'
+    ) ?? el.querySelector(BUTTON_CONTROLS)) as HTMLElement | null;
+    if (!input) {
+        const sliderDescribedBy = [hasDesc && descId, hasHint && hintId, err && errorId].filter((id): id is string => !!id);
+        wireSliders(el, ids, hasLabel, sliderDescribedBy, err);
+        return;
+    }
+
+    // A GROUP is named as a group. Its first input is one radio, or nothing a person
+    // reaches: taken as the control, the label's `for` would name the first radio «Gender
+    // Female» and leave the group unnamed.
+    const group = input.matches('[role="radiogroup"], [role="group"]') ? input : null;
+    // A textbox is the control itself: an <input> inside it is content — a rich text's
+    // task-list checkbox — not the field.
+    const textbox = input.matches('[role="textbox"]') ? input : null;
+
+    // Set input ID for label htmlFor
+    const nativeInput = group || textbox ? null : input.matches('input, textarea, select')
+        ? input
+        : input.querySelector<HTMLElement>('input:not([type="hidden"]), textarea, select');
+    if (nativeInput && (!nativeInput.id || _idByField.has(nativeInput))) {
+        nativeInput.id = inputId;
+        _idByField.add(nativeInput);
+    }
+
+    // A control that is no labelable element — pdx-select's trigger, a role="combobox"
+    // <div>, a contenteditable textbox — cannot be reached by the label's `for`: it is named
+    // by the label's id, and takes the rest of the wiring where an input would.
+    const combobox = nativeInput ? null : textbox ?? (input.matches('[role="combobox"]') ? input : null);
+    const control = nativeInput ?? combobox;
+
+    // Named by the label's id — `aria-labelledby` outranks both an aria-label and a
+    // <label for> — wherever `for` cannot do it: a role="combobox" <div>, a group, and a
+    // control that names itself with a fallback aria-label (the date picker's «Choose
+    // date», the switch's «Toggle», the tag input's «Add tag»), which outranks the label's
+    // `for` and would be the name every one of them is heard by. A plain input
+    // keeps the `for` alone.
+    const selfNamed = nativeInput && nativeInput.hasAttribute('aria-label') && !_namedByField.has(nativeInput)
+        ? nativeInput : null;
+    // A group whose ONE text box is where a person types — the tag input's «Add tag» —
+    // names that box too: the field is what is typed into. A time picker's segments and a
+    // group's radios are several, and keep their own names («Hour», «Female»).
+    // pdx-json-editor's group is a form of its own: each sub-field has its own name, and the
+    // field's requirement and error are the document's, not each sub-field's (#286). Its
+    // text boxes are neither renamed nor marked. pdx-transfer's text boxes are its two
+    // search filters, which are not the value (#287): neither is marked either. Its group
+    // is an element inside the host, so the test is `closest`, not `matches`.
+    const boxes = group && !group.closest('pdx-json-editor, pdx-transfer')
+        ? Array.from(group.querySelectorAll<HTMLElement>('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]), textarea'))
+        : [];
+    const soleBox = boxes.length === 1 && boxes[0].hasAttribute('aria-label') ? boxes[0] : null;
+    const labelled = new Set([combobox ?? group ?? selfNamed, soleBox].filter(Boolean));
+    for (const target of [combobox, group, nativeInput, soleBox]) {
+        if (!target) continue;
+        if (hasLabel && labelled.has(target)) {
+            target.setAttribute('aria-labelledby', labelId);
+            _labelledByField.add(target);
+        } else if (_labelledByField.has(target)) {
+            target.removeAttribute('aria-labelledby');
+            _labelledByField.delete(target);
+        }
+    }
+
+    // A field with no visible label names its control with a11yLabel — a list row's cell,
+    // whose column header names it only by sight. Not over a name the control
+    // gave itself, and taken back when a label shows or the a11yLabel goes.
+    const nameTarget = control ?? (input.matches('[role="radiogroup"], [role="group"]') ? input : null);
+    if (nameTarget) {
+        const ours = _namedByField.has(nameTarget);
+        if (!hasLabel && a11yLabel && (ours || !nameTarget.hasAttribute('aria-label'))) {
+            nameTarget.setAttribute('aria-label', a11yLabel);
+            _namedByField.add(nameTarget);
+        } else if (ours && (hasLabel || !a11yLabel)) {
+            nameTarget.removeAttribute('aria-label');
+            _namedByField.delete(nameTarget);
+        }
+    }
+
+    // aria-describedby: chain hint + error IDs
+    const describedBy: string[] = [];
+    if (hasDesc) describedBy.push(descId);
+    if (hasHint) describedBy.push(hintId);
+    if (err) describedBy.push(errorId);
+
+    if (control) {
+        if (describedBy.length > 0) {
+            control.setAttribute('aria-describedby', describedBy.join(' '));
+        } else {
+            control.removeAttribute('aria-describedby');
+        }
+        // Propagate error → aria-invalid
+        if (err) control.setAttribute('aria-invalid', 'true');
+        else control.removeAttribute('aria-invalid');
+    }
+
+    // Propagate required → aria-required. An asterisk alone tells no control:
+    // "Full Name, edit text", no "required", until an error shows. Not
+    // the native `required`: the browser's validation bubble would come up beside the
+    // form's own messages. A radio group takes it on the group — a radio cannot carry it.
+    const requiredTarget = input.matches('[role="radiogroup"]') ? input : control;
+    if (requiredTarget) {
+        if (required) {
+            requiredTarget.setAttribute('aria-required', 'true');
+            _markedRequired.add(requiredTarget);
+        } else if (_markedRequired.has(requiredTarget)) {
+            requiredTarget.removeAttribute('aria-required');
+            _markedRequired.delete(requiredTarget);
+        }
+    }
+
+    // A group is described by the message too: aria-describedby is global. Its error
+    // (A2) goes where the role allows it (#286): a radiogroup takes aria-invalid itself; a
+    // `group` may carry neither aria-invalid nor aria-required (axe's aria-allowed-attr),
+    // so its text boxes take both — the otp input's cells, the time picker's segments.
+    if (group) {
+        markAttr(group, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
+        const radiogroup = group.matches('[role="radiogroup"]');
+        for (const target of radiogroup ? [group] : boxes) markAttr(target, 'aria-invalid', err, _markedInvalid);
+        if (!radiogroup) for (const box of boxes) markAttr(box, 'aria-required', required, _markedRequired);
+    }
+
+    // A button control — an inline edit's display, a toggle's button — holds its own value.
+    // It may carry neither aria-invalid nor aria-required, so it is named by the label and
+    // its own text — "Name, Ada", the label's marker read with it — and described by the hint
+    // and the error (#286).
+    if (input.matches(BUTTON_CONTROLS)) {
+        if (!input.id) input.id = inputId + '-display';
+        markAttr(input, 'aria-labelledby', hasLabel, _labelledByField, `${labelId} ${input.id}`);
+        markAttr(input, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
+    }
+
+    // Propagate disabled/error/size to WC children
+    const wcInputs = el.querySelectorAll('pdx-input, pdx-textarea, pdx-otp-input, pdx-checkbox, pdx-radio, pdx-switch, pdx-radio-group, pdx-checkbox-group');
+    for (const wc of wcInputs) {
+        if (disabled) wc.setAttribute('disabled', '');
+        // A json editor's sub-fields are not in error: its document is (#286).
+        if (!wc.closest('pdx-json-editor')) {
+            if (err) wc.setAttribute('error', '');
+            else wc.removeAttribute('error');
+        }
+        // `md` is the axis's default, which every field reflects: only a size the author
+        // gave the field is passed on, as before the axis (#627), when it was empty.
+        if (size && size !== 'md') wc.setAttribute('size', size);
+    }
+}

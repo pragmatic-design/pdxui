@@ -11,7 +11,7 @@ import '../../src/tag-input/pdx-tag-input';
 import '../../src/number-input/pdx-number-input';
 import '../../src/otp-input/pdx-otp-input';
 import '../../src/label/pdx-label';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 
 /** Each component, the size it is mounted with, and the class it used to put on its own elements. */
 const FIELDS: [tag: string, size: string, oldClass: string][] = [

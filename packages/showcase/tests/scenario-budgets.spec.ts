@@ -104,11 +104,15 @@ import { scenarioDist } from './scenarios-build';
  * pdx-buttons, compiled from .pdx now, beside library components still in TypeScript that keep html``'s
  * engine in the bundle; while both renderers ship, an app pays for both. hello, benchmark and dashboard
  * use none of the three and do not move. The budgets come down in #1210's last batch.
+ *
+ * pdx-form-field moves to .pdx (#1210, the same standing OK): crud reads 52.3 KB on CI, budget 52.2 →
+ * 52.6. Its form's fields are pdx-form-field, compiled now (1.02× alone with its wiring module), while
+ * html`` stays for the TypeScript components beside them. hello, benchmark and dashboard use no field.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 6.9, css: 0 },
     benchmark: { js: 11.2, css: 0 },
-    crud: { js: 52.2, css: 1.6 },
+    crud: { js: 52.6, css: 1.6 },
     dashboard: { js: 18.5, css: 21.9 },
 };
 /**

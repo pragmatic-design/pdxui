@@ -7,7 +7,7 @@
 // by `aria-labelledby`, which outranks both.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/input/pdx-input.pdx';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/switch-toggle/pdx-switch.pdx';

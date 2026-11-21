@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { setValidationLocale, clearValidationLocale, validationMessage } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 
 type FieldEl = HTMLElement & { error: unknown };
 
