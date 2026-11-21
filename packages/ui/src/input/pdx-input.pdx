@@ -19,10 +19,10 @@
       :name="name"
       :maxlength="maxlength > 0 ? maxlength : null"
       :autofocus="autofocus"
-      :autocomplete="autocomplete || (managed ? undefined : 'off')"
-      :data-lpignore="managedFor ? null : 'true'"
-      :data-1p-ignore="managedFor ? null : ''"
-      :data-form-type="managedFor ? null : 'other'"
+      :autocomplete="autocomplete || (allowsPasswordManager(type, '') ? undefined : 'off')"
+      :data-lpignore="allowsPasswordManager(type, autocomplete) ? null : 'true'"
+      :data-1p-ignore="allowsPasswordManager(type, autocomplete) ? null : ''"
+      :data-form-type="allowsPasswordManager(type, autocomplete) ? null : 'other'"
       :inputmode="inputmode || undefined"
       :aria-label="ariaLabel || undefined"
       :aria-invalid="error ? 'true' : null"
@@ -32,10 +32,10 @@
       @blur="pdxBlur()"
     />
     @if (clearable && !disabled && !readonly) {
-      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="clearLabel" tabindex="-1" @click="onClear()">×</button>
+      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="uiString('input', 'clear')" tabindex="-1" @click="onClear()">×</button>
     }
     @if (loading) {
-      <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="loadingLabel"></span>
+      <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="uiString('input', 'loading')"></span>
     }
     <slot name="suffix"></slot>
     @if (suffix) {
@@ -43,7 +43,7 @@
     }
   </div>
   @if (showCount) {
-    <div class="pdx-input-count" data-part="count">{{ countText }}</div>
+    <div class="pdx-input-count" data-part="count">{{ countText() }}</div>
   }
 </template>
 
@@ -102,7 +102,7 @@ import { allowsPasswordManager } from './password-manager';
 @state disabled = !!disabled;
 @state readonly = !!readonly;
 @state loading = !!loading;
-@state over-limit = overCount;
+@state over-limit = isOverCount();
 @part root, input, prefix, suffix, clear, spinner, count;
 // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws the
 // same size on a native field. `md` is the base look, which no class adds to.
@@ -139,14 +139,17 @@ import { allowsPasswordManager } from './password-manager';
 
 let inputEl = $signal(null);
 
-// A password manager's overlay is welcome only where the field says it is a credential: a password,
-// or the autocomplete token of one. With no explicit token, the field asks for no autocomplete.
-const managed = $derived(allowsPasswordManager(type, ''));
-const managedFor = $derived(allowsPasswordManager(type, autocomplete));
-const clearLabel = $derived(uiString('input', 'clear'));
-const loadingLabel = $derived(uiString('input', 'loading'));
-const countText = $derived(maxlength > 0 ? String(value ?? '').length + '/' + maxlength : '' + String(value ?? '').length);
-const overCount = $derived(maxlength > 0 && String(value ?? '').length > maxlength);
+// A password manager's overlay is welcome only where the field says it is a credential: a password, or
+// the autocomplete token of one (allowsPasswordManager, bound above). With no explicit token, the field
+// asks for no autocomplete. The values below are read as functions where they are bound, as the
+// TypeScript version read them: a $derived each would be a computed made at every mount.
+function countText() {
+  const len = String(value ?? '').length;
+  return maxlength > 0 ? len + '/' + maxlength : '' + len;
+}
+function isOverCount() {
+  return maxlength > 0 && String(value ?? '').length > maxlength;
+}
 
 // A native reset puts a field back to its default value, which a property binding never sets: the
 // default is the value the component mounted with, so the field's own reset and the host's model agree.

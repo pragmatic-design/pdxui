@@ -22,9 +22,9 @@ import { goToScenario, openPage } from './contracts/measure';
 const UI_ENTRY = '**/ui/src/icon/pdx-icon.ts*';
 /**
  * What `touch-targets.html?c=input` loads for its case. The hand-written pages import no barrel
- * either.
+ * either. pdx-input is a .pdx since #1210, served under its own name.
  */
-const TOUCH_INPUT = '**/ui/src/input/pdx-input.ts*';
+const TOUCH_INPUT = '**/ui/src/input/pdx-input.pdx*';
 
 test('a module that throws is named in the timeout', async ({ page }) => {
     await page.route(UI_ENTRY, (route) => route.fulfill({
@@ -62,7 +62,7 @@ test('openPage names the error status a module was answered with', async ({ page
     await page.route(TOUCH_INPUT, (route) => route.fulfill({ status: 504, body: 'Outdated Optimize Dep' }));
     const err = await openPage(page, '/touch-targets.html?c=input', { timeout: 3000 }).then(() => null, (e: Error) => e);
     expect(err).not.toBeNull();
-    expect(err!.message).toMatch(/HTTP 504 .*pdx-input\.ts/);
+    expect(err!.message).toMatch(/HTTP 504 .*pdx-input\.pdx/);
 });
 
 test('the control: openPage on the same page, untouched, resolves ready', async ({ page }) => {
