@@ -1,6 +1,7 @@
 // @pdxui/core/component — Web Component API, services, device detection
 export { PdxElement } from './element';
 export { FormPdxElement } from './form-element';
+export { slotProjection } from './slots';
 export { define } from './define';
 export { component, defineComponent } from './component';
 export type { ComponentFeatures } from './component';

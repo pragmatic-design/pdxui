@@ -20,10 +20,10 @@ export const RESERVED_ELEMENT_NAMES: ReadonlySet<string> = new Set<string>([
     // PdxElement's lifecycle and rendering
     'attr', 'attributeChangedCallback', 'body', 'connected', 'connectedCallback', 'disconnected',
     'disconnectedCallback', 'emit', 'frame', 'track',
-    // its form-associated API
+    // the form API a form-associated component's base, FormPdxElement, adds (#1246)
     'checkValidity', 'formDisabledCallback', 'formResetCallback', 'formStateRestoreCallback', 'reportValidity', 'setFormValue',
     'setValidity', 'validationMessage', 'validity',
-    // its internals, and the ones component() adds
-    '__pdx_restoreState', '__pdx_saveState', '_captureChildren', '_disposeUnprojected', '_ownsNode',
-    '_hydrateLater', '_projectSlots', '_renderTarget', '_restoreLightChildren', '_watchLateSlots',
+    // its internals, and the ones component() adds; slot projection is a module of its own (#1246)
+    '__pdx_restoreState', '__pdx_saveState', '_captureChildren', '_disposeUnprojected',
+    '_hydrateLater', '_renderTarget', '_restoreLightChildren',
 ]);

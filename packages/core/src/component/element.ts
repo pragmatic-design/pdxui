@@ -7,7 +7,7 @@ import type { Signal, Dispose } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
 import { registerComponent, unregisterComponent, emitDevTools } from '../debug/inspector';
 import { trackInstance, untrackInstance } from './define';
-import { watchPartNodes, unwatchPartNodes } from '../renderer/part-nodes';
+import type { SlotProjection } from './slots';
 import { componentLabel, componentFile } from './global-error';
 import { devInstanceId, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
@@ -70,8 +70,11 @@ const HTMLElementBase: typeof HTMLElement = (typeof HTMLElement !== 'undefined'
     ? HTMLElement
     : (class {} as unknown as typeof HTMLElement));
 
-/** Every <slot> in a rendered template, the root included. */
-function slotsIn(content: Node | null): Element[] {
+/**
+ * Every <slot> in a rendered template, the root included: what slot projection places the host's
+ * children into (slots.ts), and what development reads to say a template renders one with none.
+ */
+export function slotsIn(content: Node | null): Element[] {
     if (!content) return [];
     const out: Element[] = [];
     if (content instanceof Element && content.localName === 'slot') out.push(content);
@@ -143,12 +146,18 @@ export abstract class PdxElement extends HTMLElementBase {
     static attrCanonical?: Map<string, string>;
     /** The `.pdx` this component was compiled from — development builds only. See component(). */
     static file?: string;
+    /**
+     * Slot projection (#1246): set for a component whose template renders a <slot> — `defineComponent`
+     * with the `projection` feature, and `component()` — which places the host's children there. Null,
+     * the children captured at the mount are disposed, as for a template with no slot.
+     */
+    static slotProjection: SlotProjection | null = null;
 
     /** Attribute-backed signals, keyed by attribute name. */
     private _attrSignals = new Map<string, Signal<string | null>>();
 
     /** Effect disposers for cleanup on disconnect. */
-    private _disposers: Dispose[] = [];
+    _disposers: Dispose[] = [];
 
     /** Whether the component has been connected and rendered. */
     private _mounted = false;
@@ -183,7 +192,7 @@ export abstract class PdxElement extends HTMLElementBase {
     _routeChangeCallbacks: ((params: Record<string, string>) => void)[] = [];
 
     /** The <slot> elements this component's own template rendered — the only ones it projects into. */
-    private _ownSlots: Element[] = [];
+    _ownSlots: Element[] = [];
 
     /**
      * What a prop does when its observed attribute changes, by canonical attribute name: set in
@@ -295,12 +304,20 @@ export abstract class PdxElement extends HTMLElementBase {
                 // The slots this template rendered — taken NOW, while the content is detached and
                 // no child component has rendered its own <slot> into it. A hydrated render is in place
                 // already: its own slots are the ones the adoption left, which received nothing.
-                this._ownSlots = rendered.slots ?? slotsIn(content);
+                const projection = (this.constructor as typeof PdxElement).slotProjection;
+                if (projection) this._ownSlots = rendered.slots ?? projection.find(content);
+                else if (DEV && slotsIn(content).length > 0) {
+                    console.warn(`[pdx] <${this.localName}> renders a <slot> and its class has no slot projection: its children are not placed in it. Define it with component(), or give defineComponent the projection feature ({ projection: slotProjection }).`);
+                }
                 if (content) {
                     target.appendChild(content);
                 }
-                this._projectSlots();
-                this._watchLateSlots();
+                if (projection) {
+                    projection.project(this);
+                    projection.watch(this);
+                } else {
+                    this._disposeUnprojected();
+                }
 
                 // HMR's registry of live instances, which only a hot update reads (#1246, part 3a).
                 if (DEV) trackInstance(this.tagName.toLowerCase(), this);
@@ -485,14 +502,14 @@ export abstract class PdxElement extends HTMLElementBase {
     // --- Slot Projection (Light DOM) ---
 
     /** Children captured before render, for slot projection. */
-    private _projectedChildren: Node[] = [];
+    _projectedChildren: Node[] = [];
 
     /**
      * The author's light-DOM children, kept past the projection (which clears `_projectedChildren`):
      * the ones captured at mount and the ones placed into a slot later. A destroying disconnect puts
      * them back as the element's children.
      */
-    private _lightChildren: Node[] = [];
+    _lightChildren: Node[] = [];
 
     /**
      * Take the host's children as the ones to project: kept as its light children, and moved out of
@@ -520,54 +537,11 @@ export abstract class PdxElement extends HTMLElementBase {
         }
     }
 
-    /** Replace <slot> placeholders with projected children. */
-    private _projectSlots(): void {
-        if (this._projectedChildren.length === 0) return;
-
-        // Only the slots OUR template rendered (captured from body() before it was inserted — see
-        // connectedCallback). `querySelectorAll` does not stop at component boundaries: an empty
-        // <pdx-alert-dialog> in this template keeps its own <slot>, and this component's children
-        // would be projected into it — the dialog would hold a copy of the screen hosting it.
-        // "No component between the slot and the host" is not the test either: a slot this template
-        // passes into a child (`<inner><slot></slot></inner>`) is ours and sits inside `inner`.
-        const slots = this._ownSlots.filter(s => this.contains(s));
-        if (slots.length === 0) { this._disposeUnprojected(); return; }
-
-        // Group projected children by slot name
-        const named = new Map<string, Node[]>();
-        const defaultNodes: Node[] = [];
-
-        for (const child of this._projectedChildren) {
-            const slotName = child instanceof Element ? child.getAttribute('slot') : null;
-            if (slotName) {
-                if (!named.has(slotName)) named.set(slotName, []);
-                named.get(slotName)!.push(child);
-            } else {
-                defaultNodes.push(child);
-            }
-        }
-
-        // Replace each <slot> with matching projected content
-        for (const slot of Array.from(slots)) {
-            const name = slot.getAttribute('name');
-            const content = name ? named.get(name) : defaultNodes;
-
-            if (content && content.length > 0) {
-                const parent = slot.parentNode!;
-                for (const n of content) parent.insertBefore(n, slot);
-                parent.removeChild(slot);
-            }
-            // If no projected content, leave <slot> default content
-        }
-
-        this._disposeUnprojected();
-    }
-
     /** The captured children that were NOT projected (a template with no <slot>, or a slot
      *  with no match) were frozen with _keepAlive during the capture: without a dispose
      *  they stay detached subtrees with live effects forever. It destroys the mounted
      *  PdxElements left orphaned and frees the capture list (retention). */
-    private _disposeUnprojected(): void {
+    _disposeUnprojected(): void {
         for (const child of this._projectedChildren) {
             if (!(child instanceof Element)) continue;
             if (child.isConnected) continue; // projected into the DOM → alive
@@ -581,76 +555,6 @@ export abstract class PdxElement extends HTMLElementBase {
         this._projectedChildren = [];
     }
 
-    /** Some frameworks (e.g. Angular, which bootstraps async via zone.js) append
-     *  light-DOM children AFTER connectedCallback — i.e. after _projectSlots already
-     *  ran with no children, leaving empty <slot>s. Observe the host and relocate any
-     *  late-added direct child into its matching EMPTY slot. No-op when every slot is
-     *  already filled (the common case: children present at connect → slots removed). */
-    /** True when `node` is rendered by THIS component — no other custom element sits between it
-     *  and the host. Slot lookups must not cross a component boundary: a nested component's
-     *  <slot> belongs to that component, and filling it from out here steals its children. */
-    private _ownsNode(node: Node): boolean {
-        let p = node.parentNode;
-        while (p && p !== this) {
-            if (p instanceof Element && p.tagName.includes('-')) return false;
-            p = p.parentNode;
-        }
-        return p === this;
-    }
-
-    private _watchLateSlots(): void {
-        // Only OUR slots. `querySelectorAll` does not stop at component boundaries, so a nested
-        // component's own empty <slot> would arm this observer on the outer host and then attract
-        // its children — the outer component filling a slot it does not own.
-        const ownSlots = (): Element[] => Array.from(this.querySelectorAll('slot'))
-            .filter(s => this._ownsNode(s));
-        const hasEmpty = ownSlots().some(s => s.childNodes.length === 0);
-        if (!hasEmpty) return;
-        const relocate = (node: Node): void => {
-            const slotName = node instanceof Element ? node.getAttribute('slot') : null;
-            const mine = ownSlots();
-            const slot = (slotName
-                ? mine.find(s => s.getAttribute('name') === slotName)
-                : mine.find(s => !s.hasAttribute('name')) ?? mine[0]) ?? null;
-            if (!slot || !slot.parentNode || slot.childNodes.length !== 0) return;
-            // A node can never be inserted before a slot it CONTAINS — `insertBefore(ancestor,
-            // descendant)` throws HierarchyRequestError, uncaught, from inside the observer. The
-            // own-slot filter above already rules this out for nested components, but the
-            // invariant is worth stating where the insertion happens: it holds for any shape.
-            if (node.contains(slot)) return;
-            // Already where it belongs → do NOTHING. Moving a node that is already before
-            // its slot is a no-op for the DOM but still emits a childList record, which
-            // brings us straight back here: infinite relocation, starved microtask queue,
-            // frozen page. It only bites when the slot is a DIRECT child of the host (then
-            // the relocated node keeps `parentNode === this` and stays in scope) — which is
-            // the shape of any component whose render is just `<slot></slot>` and that
-            // appends its own UI onto the host, e.g. pdx-rich-text's toolbar + editor.
-            // The same-parent test is not redundant: `compareDocumentPosition` on a node in a
-            // different tree returns DISCONNECTED plus an ARBITRARY (but self-consistent)
-            // PRECEDING/FOLLOWING, so position alone could skip a relocation that must happen.
-            // Same parent ⇒ same tree ⇒ the ordering bit is meaningful.
-            if (node.parentNode === slot.parentNode
-                && (slot.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_PRECEDING)) return;
-            // Insert BEFORE the slot (not inside) — keeps default content out, allows multiple.
-            slot.parentNode.insertBefore(node, slot);
-            if (!this._lightChildren.includes(node)) this._lightChildren.push(node);
-        };
-        // The nodes template parts placed on this host since the last batch of records.
-        const placed = watchPartNodes(this);
-        const obs = new MutationObserver((records) => {
-            for (const r of records) {
-                for (const node of Array.from(r.addedNodes)) {
-                    // A node a template part placed — this component's own redraw, most often — is
-                    // where its template wants it: only foreign late children go to the slot. Moving
-                    // a redraw into a hidden slot, with a redraw following it, freezes the page.
-                    if (node.parentNode === this && !placed.has(node)) relocate(node);
-                }
-            }
-            placed.clear();
-        });
-        obs.observe(this, { childList: true });
-        this._disposers.push(() => { obs.disconnect(); unwatchPartNodes(this); });
-    }
 }
 
 /**

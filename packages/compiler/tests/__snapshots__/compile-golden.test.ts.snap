@@ -2918,7 +2918,7 @@ exports[`compile golden — demo corpus > showcase/_layout.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, computed, defineComponent, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, computed, defineComponent, slotProjection, staticBlock, staticMarkup } from '@pdxui/core';
 import { currentPath } from '@pdxui/router';
 
 {
@@ -2942,7 +2942,7 @@ defineComponent('app-showcase-layout', {
     bindInterpolation(__t4,()=>ctx.currentPage());
     return __frag;
   })(),
-});
+}, { projection: slotProjection });
 "
 `;
 

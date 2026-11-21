@@ -88,12 +88,17 @@ import { scenarioDist } from './scenarios-build';
  * 12.3 (12,824 → 12,571 B), dashboard 19.3 → 19.1, crud 51.5 as it was. The benchmark had read 13.1
  * here: it is built with the compiler's dist, and a stale one emitted the definition every feature
  * carries. Each budget the measurement + 0.3.
+ *
+ * #1246's part 3c, slot projection in its own module, carried by a component whose template renders
+ * a <slot>: hello 7.1 → 6.6, benchmark 12.3 → 11.8, dashboard 19.1 → 18.6; crud 51.5 → 51.6, an app
+ * whose library components are defined with component(), which carries every feature. Each budget the
+ * measurement + 0.3.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 7.4, css: 0 },
-    benchmark: { js: 12.6, css: 0 },
-    crud: { js: 51.8, css: 1.6 },
-    dashboard: { js: 19.4, css: 21.9 },
+    hello: { js: 6.9, css: 0 },
+    benchmark: { js: 12.1, css: 0 },
+    crud: { js: 51.9, css: 1.6 },
+    dashboard: { js: 18.9, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -183,7 +188,27 @@ const DEBUG_CODE = [
     '__pdx_saveState', '__pdx_restoreState',
 ];
 
+/**
+ * The features of a component's definition (#1246, part 3c), each a module a compiled component names
+ * when it declares it: `@expose`, `@host` and `@variants`, a form model, a `<slot>`. The hello and
+ * benchmark apps declare none.
+ */
+const FEATURE_MODULES = [
+    'packages/core/src/component/channel.ts',
+    'packages/core/src/component/host.ts',
+    'packages/core/src/component/form-element.ts',
+    'packages/core/src/component/slots.ts',
+];
+
 for (const name of ['hello', 'benchmark']) {
+    test(`the ${name} bundle carries no feature of a definition its components do not declare (#1246)`, () => {
+        const modules = Object.values(chunksOf(name)).flat();
+        expect(modules.some((m) => m.includes('packages/core/src/component/element.ts')), 'the bundle defines no component')
+            .toBe(true);
+        const found = modules.filter((m) => FEATURE_MODULES.some((p) => m.includes(p)));
+        expect(found, `features the ${name} app does not declare`).toEqual([]);
+    });
+
     test(`the ${name} bundle carries none of core's modules that worked at load (#1246)`, () => {
         const modules = Object.values(chunksOf(name)).flat();
         expect(modules.some((m) => m.includes('packages/core/src/')), 'modules.json names no module of core\'s sources')

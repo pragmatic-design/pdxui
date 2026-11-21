@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-493 value exports.
+494 value exports.
 
 ### `__adoptStyles`
 
@@ -5386,6 +5386,16 @@ function slot(): SlotSpec<F>
 ```
 
 Declare a slot: `slot<(o: Option) => Node>()`.
+
+### `slotProjection`
+
+```ts
+import { slotProjection } from '@pdxui/core';
+
+const slotProjection: SlotProjection
+```
+
+The projection a component whose template renders a <slot> is defined with.
 
 ### `SPLASH_ID`
 

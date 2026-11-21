@@ -10,6 +10,7 @@ import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { PdxElement } from '../src/component/element';
 import { FormPdxElement } from '../src/component/form-element';
+import { slotProjection } from '../src/component/slots';
 import { define } from '../src/component/define';
 
 let tagCounter = 0;
@@ -23,6 +24,8 @@ function defineEl(
     const tag = uniqueTag();
     class El extends PdxElement {
         static attrs = extra.attrs ?? [];
+        // A class written by hand carries slot projection by declaring it, as component() does (#1246).
+        static slotProjection = slotProjection;
         body() { return body(this); }
         connected() { extra.onConnected?.(); }
         disconnected() { extra.onDisconnected?.(); }

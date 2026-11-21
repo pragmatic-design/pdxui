@@ -47,6 +47,15 @@ describe('a compiled component names the features it uses (#1246)', () => {
         expect(d.imports).toEqual(expect.arrayContaining(['FormPdxElement', 'wireFormModel']));
     });
 
+    it('a template that renders a <slot> is given slotProjection; one that renders none is not', () => {
+        const slotted = definition(`<template><div class="box"><slot></slot><slot name="end"></slot></div></template>\n<script>\n</script>`);
+        expect(slotted.features).toBe('{ projection: slotProjection }');
+        expect(slotted.imports).toContain('slotProjection');
+        const plain = definition(`<template><div class="box"></div></template>\n<script>\n</script>`);
+        expect(plain.features).toBeNull();
+        expect(plain.imports).not.toContain('slotProjection');
+    });
+
     it('both, in one object', () => {
         const d = definition(`<template><p></p></template>\n<script>\n@host { role="button" }\n@expose open;\nfunction open() {}\n</script>`);
         expect(d.features).toBe('{ expose: exposeOnElement, host: bindHost }');

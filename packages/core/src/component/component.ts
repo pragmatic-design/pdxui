@@ -6,6 +6,8 @@ import type { Signal } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
 import { PdxElement, attrValue, watchAttr } from './element';
 import { FormPdxElement } from './form-element';
+import { slotProjection } from './slots';
+import type { SlotProjection } from './slots';
 import type { EmitOptions } from './element';
 import { define } from './define';
 import { pushScope, popScope } from './lifecycle';
@@ -292,10 +294,12 @@ export interface ComponentFeatures {
      * ElementInternals and the platform's form API. A component that is not one extends PdxElement.
      */
     form?: typeof FormPdxElement;
+    /** Slot projection, for a component whose template renders a <slot>: the host's children go there. */
+    projection?: SlotProjection;
 }
 
 /** What `component()` defines with: every feature, for a descriptor written by hand. */
-const EVERY_FEATURE: ComponentFeatures = { expose: exposeOnElement, host: bindHost, form: FormPdxElement };
+const EVERY_FEATURE: ComponentFeatures = { expose: exposeOnElement, host: bindHost, form: FormPdxElement, projection: slotProjection };
 
 /**
  * Define a component with the features given and no other (#1246): the definition a compiled `.pdx`
@@ -308,7 +312,7 @@ export function defineComponent<P extends PropMap, S extends Record<string, unkn
 export function defineComponent<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
     tag: string, options: ComponentOptions<P, E, M, V>, features?: ComponentFeatures): void;
 export function defineComponent<P extends PropMap, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>, features: ComponentFeatures = {}): void {
-    const { expose, host: hostFeature, form: formBase } = features;
+    const { expose, host: hostFeature, form: formBase, projection } = features;
     // A descriptor whose `host` or variant axes nothing would bind: the definition was not given the
     // host feature. The compiler gives it to every component that declares either.
     if (DEV && !hostFeature && (Object.keys(options.host ?? {}).length > 0 || Object.keys(options.variants ?? {}).length > 0)) {
@@ -425,6 +429,7 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
         static attrCanonical = attrCanonical;
         static formAssociated = useFormAssociated;
         static file = options.file;
+        static slotProjection = projection ?? null;
         /** The props a parent may bind both ways (#124): `bindTwoWay` listens to their events only. */
         static models: ReadonlySet<string> = modelNames;
 

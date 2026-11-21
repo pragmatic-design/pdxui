@@ -395,7 +395,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // component only (hello 7,505 → 7,237 B). This app still defines most of its library components with
 // component(), which carries every feature, so it carries FormPdxElement as a subclass: entry 44,180 →
 // 44,237 B. The built dist: entry 43.2 KB, blocking 102.2 KB, js 477.3 KB locally; a tenth kept.
-const BUDGET_KB = { entry: 43.3, js: 477.4, css: 67, blocking: 102.3 };
+// entry 43.3 → 43.4, blocking 102.3 → 102.4 (#1246, part 3c): slot projection in its own module, carried
+// by a component whose template renders a <slot> (hello: 7,237 → 6,784 B). This app's library still
+// defines most components with component(), which carries every feature: entry 44,237 → 44,303 B, a
+// module's boundary and its import. The built dist: entry 43.3 KB, blocking 102.3 KB, js 477.1 KB
+// locally; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.4, js: 477.4, css: 67, blocking: 102.4 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

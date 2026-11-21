@@ -1,8 +1,8 @@
 // `defineComponent` carries the features it is given and no other (#1246); `component()` is it with
 // every feature. A descriptor that uses a feature the definition was not given is refused in development.
 
-import { describe, it, expect, afterEach } from 'vitest';
-import { defineComponent, component, exposeOnElement, bindHost, FormPdxElement, PdxElement, model } from '../src/index';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { defineComponent, component, exposeOnElement, bindHost, FormPdxElement, PdxElement, model, slotProjection } from '../src/index';
 
 let n = 0;
 const tag = (): string => `x-features-${++n}`;
@@ -16,6 +16,23 @@ function mount(name: string): HTMLElement {
 afterEach(() => { for (const el of mounted.splice(0)) el.remove(); });
 
 const render = () => document.createTextNode('');
+
+/** A render with a <slot> in a box. */
+const slotted = () => {
+    const box = document.createElement('div');
+    box.className = 'box';
+    box.append(document.createElement('slot'));
+    return box;
+};
+
+/** Build the host with its children, then insert it: the order a page gives the upgrade. */
+function mountWith(name: string, childrenHtml: string): HTMLElement {
+    const el = document.createElement(name);
+    el.innerHTML = childrenHtml;
+    document.body.appendChild(el);
+    mounted.push(el);
+    return el;
+}
 
 describe('defineComponent: the features given, and no other (#1246)', () => {
     it('given none, the context has no expose', () => {
@@ -63,6 +80,27 @@ describe('defineComponent: the features given, and no other (#1246)', () => {
     it('refuses, in development, a form-associated component it was not given the form feature for', () => {
         expect(() => defineComponent(tag(), { models: { value: model('', { form: true }) }, render })).toThrow(/form feature/);
         expect(() => defineComponent(tag(), { formAssociated: true, render })).toThrow(/form feature/);
+    });
+
+    it('given projection, the host\'s children go into the <slot> its template renders', () => {
+        const name = tag();
+        defineComponent(name, { render: slotted }, { projection: slotProjection });
+        const el = mountWith(name, '<p>child</p>');
+        expect(el.querySelector('.box > p')?.textContent).toBe('child');
+        expect(el.querySelector('slot'), 'the placeholder was left').toBeNull();
+    });
+
+    it('without it, they are not placed in the slot, and development says so', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const name = tag();
+            defineComponent(name, { render: slotted });
+            const el = mountWith(name, '<p>child</p>');
+            expect(el.querySelector('p'), 'the child was projected without the feature').toBeNull();
+            expect(warn.mock.calls.some((c) => String(c[0]).includes(name) && String(c[0]).includes('slot projection'))).toBe(true);
+        } finally {
+            warn.mockRestore();
+        }
     });
 
     it('component() is defineComponent with every feature', () => {
