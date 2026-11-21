@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/checkbox/pdx-checkbox';
+import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/checkbox-group/pdx-checkbox-group';
 
 describe('pdx-checkbox-group', () => {

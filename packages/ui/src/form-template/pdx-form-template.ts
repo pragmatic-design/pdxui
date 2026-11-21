@@ -29,7 +29,7 @@ import '../number-input/pdx-number-input';
 import '../date-picker/pdx-date-picker';
 import '../select/pdx-select';
 import '../autocomplete/pdx-autocomplete';
-import '../checkbox/pdx-checkbox';
+import '../checkbox/pdx-checkbox.pdx';
 import '../checkbox-group/pdx-checkbox-group';
 import '../radio/pdx-radio.pdx';
 import '../radio-group/pdx-radio-group';

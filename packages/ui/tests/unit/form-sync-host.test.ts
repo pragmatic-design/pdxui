@@ -11,7 +11,7 @@ import * as core from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import '../../src/form/pdx-form';
-import '../../src/checkbox/pdx-checkbox';
+import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/input/pdx-input';

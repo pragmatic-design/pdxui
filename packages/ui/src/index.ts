@@ -18,7 +18,7 @@ import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
 import './label/pdx-label';
 import './input/pdx-input';
-import './checkbox/pdx-checkbox';
+import './checkbox/pdx-checkbox.pdx';
 import './radio/pdx-radio.pdx';
 import './switch-toggle/pdx-switch.pdx';
 import './flag/pdx-flag.pdx';

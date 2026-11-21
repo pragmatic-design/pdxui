@@ -3,7 +3,7 @@
 // style hung on it silently stops matching. A component uses classList on its own classes.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/checkbox/pdx-checkbox';
+import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/checkbox-group/pdx-checkbox-group';
 import '../../src/radio-group/pdx-radio-group';
 import '../../src/input-group/pdx-input-group';

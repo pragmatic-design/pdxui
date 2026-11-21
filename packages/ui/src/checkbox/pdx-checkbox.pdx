@@ -1,0 +1,119 @@
+<template>
+  <label class="pdx-checkbox-wrap" :class="{ 'pdx-checkbox-label-left': labelPosition === 'left' }">
+    <!-- `indeterminate` is a property only (no attribute holds it): bound as one. The change handler
+         writes the box itself as well as `checked` in each phase of the tristate cycle, which a
+         two-way binding would race, so the one-way binding stays. -->
+    <!-- pdx-ignore PDX_ONE_WAY_EDITED_FIELD: onChange sets input.checked and input.indeterminate itself in every phase of the tristate cycle, so the box never keeps a state `checked` does not hold -->
+    <input type="checkbox" :checked="checked"
+      class="pdx-checkbox"
+      data-part="root"
+      :indeterminate="!!indeterminate"
+      :disabled="disabled"
+      :required="required"
+      :value="value"
+      :aria-invalid="error ? 'true' : null"
+      :aria-required="required ? 'true' : null"
+      :aria-checked="indeterminate ? 'mixed' : null"
+      @change="onChange($event)"
+    />
+    @if (label || description) {
+      <span class="pdx-checkbox-content">
+        @if (label) {
+          <span class="pdx-checkbox-label" data-part="label">{{ label }}</span>
+        } @else {
+          <slot></slot>
+        }
+        @if (description) {
+          <span class="pdx-checkbox-desc" data-part="description">{{ description }}</span>
+        }
+      </span>
+    } @else {
+      <slot></slot>
+    }
+  </label>
+</template>
+
+<script>
+/**
+ * A checkbox with a label and a description, which can be indeterminate or, as a tristate, cycle
+ * through unchecked, checked and indeterminate.
+ *
+ * @csspart root - The native checkbox, the box drawn; the size variants key by it.
+ * @csspart label - The `label` text, when set.
+ * @csspart description - The `description` text, when set.
+ *
+ * @cssstate checked - It is checked.
+ * @cssstate indeterminate - It is indeterminate; the box is aria-checked="mixed".
+ * @cssstate invalid - `error` is set; the box is aria-invalid.
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail checked $event.detail.value
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail indeterminate $event.currentTarget.indeterminate
+ * @alphadetail state ($event.currentTarget.indeterminate ? null : $event.detail.value)
+ */
+// tristate=true: a click cycles unchecked → checked → indeterminate → unchecked.
+// A container rule in form.css (`.has-warning .pdx-checkbox`) styles this element, and it owns no
+// stylesheet of its own, so nothing else would carry it.
+import '@pdxui/design/components/form';
+
+// A click writes them (#480): `checked-change`, and in a tristate `indeterminate-change` too.
+// `checked` is what a form submits, as a native checkbox: `value`, or `on`, when checked (#135).
+@model checked: boolean = false { form };
+@model indeterminate: boolean = false;
+// On the host as custom states (#132); the box and its label carry no state class.
+@state checked = !!checked;
+@state indeterminate = !!indeterminate;
+@state invalid = !!error;
+@state disabled = !!disabled;
+@part root, label, description;
+// The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that draws
+// the same look on native markup. `md` is the base size, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the box's size. */
+  size: { md: '.pdx-checkbox-md', sm: '.pdx-checkbox-sm', lg: '.pdx-checkbox-lg' } = md;
+}
+@prop disabled: boolean = false;
+/** Enable 3-state cycle: unchecked → checked → indeterminate → unchecked */
+@prop tristate: boolean = false;
+@prop label: string = '';
+@prop description: string = '';
+@prop value: string = '';
+@prop name: string = '';
+@prop error: boolean = false;
+@prop required: boolean = false;
+@prop labelPosition: string = 'right';
+
+// The host is the one submitter, under its name (#133); an inner checkbox carrying the name too would
+// send the value a second time.
+@host { :name="name || null" }
+
+// The tristate cycle's phase: 0 unchecked, 1 checked, 2 indeterminate. It follows the models, which
+// the page may set too.
+let tristatePhase = 0;
+$effect(() => {
+  if (tristate) tristatePhase = indeterminate ? 2 : checked ? 1 : 0;
+});
+
+// `checked` and `indeterminate` are models: a click writes them, and each write dispatches its event.
+// `indeterminate` first, so a `checked-change` listener reading the element sees both.
+function onChange(e) {
+  if (disabled) return;
+  const input = e.target;
+  if (tristate) {
+    e.preventDefault();
+    tristatePhase = (tristatePhase + 1) % 3;
+    const isChecked = tristatePhase === 1;
+    const isIndeterminate = tristatePhase === 2;
+    input.checked = isChecked;
+    input.indeterminate = isIndeterminate;
+    indeterminate = isIndeterminate;
+    checked = isChecked;
+  } else {
+    // A click settles an indeterminate box, as it does a native one.
+    indeterminate = false;
+    checked = input.checked;
+  }
+}
+</script>

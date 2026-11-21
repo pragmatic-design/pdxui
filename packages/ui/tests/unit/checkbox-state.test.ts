@@ -5,7 +5,7 @@
 // keeps its initial value.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/checkbox/pdx-checkbox';
+import '../../src/checkbox/pdx-checkbox.pdx';
 
 type Box = HTMLElement & { checked: boolean; indeterminate: boolean };
 

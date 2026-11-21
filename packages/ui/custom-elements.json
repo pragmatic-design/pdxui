@@ -7035,7 +7035,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/checkbox/pdx-checkbox.ts",
+      "path": "src/checkbox/pdx-checkbox.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -7369,7 +7369,7 @@
           "name": "pdx-checkbox",
           "declaration": {
             "name": "PdxCheckbox",
-            "module": "src/checkbox/pdx-checkbox.ts"
+            "module": "src/checkbox/pdx-checkbox.pdx"
           }
         }
       ]
