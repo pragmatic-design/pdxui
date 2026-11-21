@@ -61,7 +61,7 @@ import './form-field/pdx-form-field.pdx';
 import './fieldset/pdx-fieldset';
 import './field-group/pdx-field-group';
 import './field-list/pdx-field-list';
-import './wizard/pdx-wizard';
+import './wizard/pdx-wizard.pdx';
 
 // Tier 1D: Navigation
 import './navbar/pdx-navbar';

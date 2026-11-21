@@ -293,7 +293,7 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     'tag-input': { label: 'Tag input', add: 'Add tag', remove: 'Remove {tag}', added: '{tag} added', removed: '{tag} removed' },
     popover: { label: 'Popover' },
     // `back`, `next`, `complete` and `stepOf` are registered by the component itself
-    // (`wizard/pdx-wizard.ts`) and are NOT repeated here: two defaults for one key means whichever
+    // (`wizard/wizard-strings.ts`) and are NOT repeated here: two defaults for one key means whichever
     // module loads last wins, which is not a thing anyone should have to reason about.
     // `stepAnnounce` is said politely when the step changes.
     wizard: { navigation: 'Wizard navigation', steps: 'Wizard steps', stepAnnounce: 'Step {current} of {total}: {label}' },

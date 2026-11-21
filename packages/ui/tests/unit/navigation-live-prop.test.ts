@@ -11,7 +11,7 @@ import { cleanup, tick, whenUpgraded } from './helpers';
 
 import '../../src/tabs/pdx-tabs';
 import '../../src/pagination/pdx-pagination';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 // The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
 // that reads the select before it is upgraded fails every time instead of once in a while (#692).

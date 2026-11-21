@@ -34056,7 +34056,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/wizard/pdx-wizard.ts",
+      "path": "src/wizard/pdx-wizard.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -34364,7 +34364,7 @@
           "name": "pdx-wizard",
           "declaration": {
             "name": "PdxWizard",
-            "module": "src/wizard/pdx-wizard.ts"
+            "module": "src/wizard/pdx-wizard.pdx"
           }
         }
       ]

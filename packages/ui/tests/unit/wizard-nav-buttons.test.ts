@@ -6,7 +6,7 @@
 // secondary action in the app has.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 beforeEach(cleanup);
 
