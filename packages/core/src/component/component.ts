@@ -17,7 +17,7 @@ import { devSetupBegin, devSetupEnd, devRecordError } from '../debug/devtools-ap
 import { DEV } from '../utils/env';
 import { replacesDomMember } from './reserved-dom-members';
 import { bindHost } from './host';
-import type { HostBindings } from './host';
+import type { HostBinder, HostBindings } from './host';
 import type { ComponentScope } from './lifecycle';
 import type { Dispose } from '../utils/types';
 
@@ -201,7 +201,7 @@ export interface ComponentDeclarations<E extends EventMap = EventMap, M extends 
  * unless the page set it; `:aria-expanded` a function of the context, written whenever what it reads
  * changes; `@keydown.enter` a listener, with the template's modifiers.
  */
-export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown)>;
+export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown) | HostBinder>;
 
 export interface ComponentOptions<P extends PropMap = PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>>
     extends ComponentDeclarations<E, M, V> {

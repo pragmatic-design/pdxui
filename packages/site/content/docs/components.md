@@ -641,7 +641,9 @@ rest of the inline style. A listener (`@keydown.enter`) takes the same forms
 and modifiers as in the template, and is removed when the element leaves the page. `::x`, `data-part`
 and a generic argument mean nothing on a host and are `PDX_HOST_INVALID_ATTRIBUTE`. A TypeScript
 component declares the same thing in its descriptor:
-`host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown.enter': (ctx, e) => … }`.
+`host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown.enter': (ctx, e) => … }`,
+with `:class` and `:style` wrapped in core's `hostClass(…)` and `hostStyle(…)`, as a compiled `@host`
+writes them: a component that binds neither does not carry their code.
 
 When the script needs the element itself — its `id` for a `<label for>`, its size, a place to anchor a
 popup — give it a name. The name is the element, from the first line of the script and in the template:

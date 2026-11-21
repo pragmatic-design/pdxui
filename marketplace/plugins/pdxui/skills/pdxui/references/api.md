@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-496 value exports.
+498 value exports.
 
 ### `__adoptStyles`
 
@@ -2971,6 +2971,30 @@ function hideSkeleton(el: HTMLElement): void
 ```
 
 Restore original content from skeleton.
+
+### `hostClass`
+
+```ts
+import { hostClass } from '@pdxui/core';
+
+function hostClass(read: (ctx: C) => unknown): HostBinder
+```
+
+`:class` on the host: the object form toggles each class it names, a string adds its classes. A class
+it named last time and names no more is removed; one it never named — the author's `class="toolbar"`
+— stays. Writing the attribute replaced them all, and wrote an object as `[object Object]`.
+
+### `hostStyle`
+
+```ts
+import { hostStyle } from '@pdxui/core';
+
+function hostStyle(read: (ctx: C) => unknown): HostBinder
+```
+
+`:style` on the host: the object form sets each property it names (`String(value ?? '')`, so null
+clears it) and removes one it named last time and names no more, keeping the author's inline style;
+a string is written to `style.cssText`, null as '' (#1240).
 
 ### `html`
 

@@ -223,6 +223,7 @@ export { exposeOnElement } from './component/channel';
 // The features `defineComponent` is given (#1246), beside `exposeOnElement`: what a compiled `.pdx` names
 // for `@host`, and for a model declared `{ form }`.
 export { bindHost } from './component/host';
+export { hostClass, hostStyle } from './component/host-class-style';
 export { FormPdxElement } from './component/form-element';
 export { slotProjection } from './component/slots';
 export type { SlotProjection } from './component/slots';

@@ -1,8 +1,9 @@
 // The host's attributes, bindings and listeners, declared (#133): `host` in the descriptor, which a
 // `.pdx` `@host { … }` compiles into.
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { component } from '../src/component/component';
+import { hostClass, hostStyle } from '../src/component/host-class-style';
 import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { tick } from '../src/testing';
@@ -97,7 +98,7 @@ describe('a descriptor\'s host', () => {
 describe("a host's :class and :style, read as the template's (#1242)", () => {
     type Ctx = { on: () => boolean; width: () => string | null; words: () => string };
     /** A host whose :class or :style follows `on`, `width` and `words`. */
-    function styled(host: Record<string, (ctx: Ctx) => unknown>) {
+    function styled(host: Record<string, unknown>) {
         const name = tag();
         const on = signal(false);
         const width = signal<string | null>('10px');
@@ -107,7 +108,7 @@ describe("a host's :class and :style, read as the template's (#1242)", () => {
     }
 
     it("the object form of :class toggles each class and keeps the author's", async () => {
-        const { name, on } = styled({ ':class': (ctx) => ({ active: ctx.on(), 'pdx-off': !ctx.on() }) });
+        const { name, on } = styled({ ':class': hostClass((ctx: Ctx) => ({ active: ctx.on(), 'pdx-off': !ctx.on() })) });
         const el = mount(name, { class: 'toolbar' });
         expect([...el.classList].sort()).toEqual(['pdx-off', 'toolbar']);
         on.set(true);
@@ -119,7 +120,7 @@ describe("a host's :class and :style, read as the template's (#1242)", () => {
     });
 
     it("the string form of :class removes only the classes it named last, never the author's", async () => {
-        const { name, words } = styled({ ':class': (ctx) => ctx.words() });
+        const { name, words } = styled({ ':class': hostClass((ctx: Ctx) => ctx.words()) });
         const el = mount(name, { class: 'toolbar' });
         expect([...el.classList].sort()).toEqual(['a', 'b', 'toolbar']);
         words.set('b c');
@@ -131,7 +132,7 @@ describe("a host's :class and :style, read as the template's (#1242)", () => {
     });
 
     it("the object form of :style sets and clears its property, and keeps the author's inline style", async () => {
-        const { name, width } = styled({ ':style': (ctx) => ({ width: ctx.width(), marginTop: '2px' }) });
+        const { name, width } = styled({ ':style': hostStyle((ctx: Ctx) => ({ width: ctx.width(), marginTop: '2px' })) });
         const el = mount(name, { style: 'color: red' });
         expect(el.style.width).toBe('10px');
         expect(el.style.marginTop, 'a camelCase key is its kebab-case property').toBe('2px');
@@ -143,11 +144,23 @@ describe("a host's :class and :style, read as the template's (#1242)", () => {
     });
 
     it('the string form of :style writes style.cssText, null as empty (#1240)', async () => {
-        const { name, width } = styled({ ':style': (ctx) => (ctx.width() === null ? null : `width: ${ctx.width()}`) });
+        const { name, width } = styled({ ':style': hostStyle((ctx: Ctx) => (ctx.width() === null ? null : `width: ${ctx.width()}`)) });
         const el = mount(name);
         expect(el.style.width).toBe('10px');
         width.set(null);
         await tick();
         expect(el.style.cssText).toBe('');
+    });
+
+    it('a plain function for :class or :style is written as the attribute, and development says so', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const { name } = styled({ ':class': (ctx: Ctx) => (ctx.on() ? 'on' : 'off') });
+            const el = mount(name, { class: 'toolbar' });
+            expect(el.getAttribute('class'), 'the attribute, over the page\'s').toBe('off');
+            expect(warn.mock.calls.some((c) => /host ':class' is a plain function.*hostClass/.test(String(c[0])))).toBe(true);
+        } finally {
+            warn.mockRestore();
+        }
     });
 });

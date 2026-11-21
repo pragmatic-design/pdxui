@@ -44,8 +44,14 @@ describe('@host compiles into the descriptor', () => {
             "let w = $signal('1px');",
             '@host { :class="{ a: x, \'b-c\': !x }" :style="{ width: w }" }',
         ].join('\n')), 'test.pdx');
-        expect(code).toContain(`':class': (ctx) => ({ a: ctx.x(), 'b-c': !ctx.x() })`);
-        expect(code).toContain(`':style': (ctx) => ({ width: ctx.w() })`);
+        expect(code).toContain(`':class': hostClass((ctx) => ({ a: ctx.x(), 'b-c': !ctx.x() }))`);
+        expect(code).toContain(`':style': hostStyle((ctx) => ({ width: ctx.w() }))`);
+        expect(code).toMatch(/import \{[^}]*\bhostClass\b[^}]*\bhostStyle\b[^}]*\} from '@pdxui\/core'/);
+    });
+
+    it('control: a host that binds neither :class nor :style imports neither binder (#1242)', () => {
+        const { code } = compile(pdx('let open = $signal(false);\n@host { :aria-expanded="open" }'), 'test.pdx');
+        expect(code).not.toMatch(/hostClass|hostStyle/);
     });
 
     it('a signal only @host reads is kept in a production build, as in dev (#1242)', () => {

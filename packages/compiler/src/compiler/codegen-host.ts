@@ -23,7 +23,12 @@ export function hostDescriptor(attrs: readonly HostAttr[], ctx: CompileContext, 
             // `:hidden` with no value reads the identifier of the same name, as in the template.
             const expr = value ?? name.slice(1);
             // An object literal (`:class="{ a: x }"`) is returned, not read as a block (#1242).
-            entries.push(`${jsQuote(name)}: (ctx) => ${arrowBody(callSignals(prefixCtx(expr, ctx), ctx))}`);
+            const read = `(ctx) => ${arrowBody(callSignals(prefixCtx(expr, ctx), ctx))}`;
+            // `:class` and `:style` are the template's, not attributes (#1242): core's binders, imported
+            // only by a host that writes them, so a host that does not carries none of their code.
+            const binder = name === ':class' ? 'hostClass' : name === ':style' ? 'hostStyle' : null;
+            if (binder) imports.add(binder);
+            entries.push(`${jsQuote(name)}: ${binder ? `${binder}(${read})` : read}`);
         } else if (name.startsWith('@')) {
             if (value === undefined) continue;
             const event = name.slice(1).split('.')[0];

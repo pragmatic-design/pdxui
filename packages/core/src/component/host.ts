@@ -7,12 +7,24 @@
 //     role: 'combobox',                            // static: set at connection, unless the page set it
 //     ':aria-expanded': (ctx) => ctx.open(),       // bound: follows what it reads
 //     '@keydown.enter': (ctx, e) => ctx.toggle(e), // a listener, with the template's modifiers
+//     ':class': hostClass((ctx) => ({ on: ctx.on() })), // :class and :style, as the template's (#1242)
 //   }
 
 import { eventListenerFor } from '../renderer/template';
+import { DEV } from '../utils/env';
 
-/** One entry of `host`: a static value, a bound one, or a listener. */
-export type HostValue = string | ((ctx: never, event: Event) => unknown);
+/**
+ * A bound entry that writes its value its own way, not as an attribute: `hostClass` and `hostStyle`
+ * (host-class-style.ts, #1242). `bind` is given the host, its value read with the render's context, and
+ * the host's `track`.
+ */
+export interface HostBinder {
+    readonly read: (ctx: never) => unknown;
+    readonly bind: (el: HTMLElement, value: () => unknown, track: (fn: () => void) => unknown) => void;
+}
+
+/** One entry of `host`: a static value, a bound one, a binder, or a listener. */
+export type HostValue = string | ((ctx: never, event: Event) => unknown) | HostBinder;
 
 /** The `host` field of a descriptor, by attribute name: `role`, `:aria-expanded`, `@keydown.enter`. */
 export type HostBindings = Record<string, HostValue>;
@@ -24,62 +36,6 @@ export type HostBindings = Record<string, HostValue>;
 function writeAttribute(el: Element, name: string, value: unknown): void {
     if (value === null || value === undefined || value === false) el.removeAttribute(name);
     else el.setAttribute(name, value === true ? '' : String(value));
-}
-
-/** The classes a `:class` value names: `{ name: on }` by key (a key may hold several), a string by word. */
-function classesOf(value: unknown): { on: string[]; off: string[] } {
-    const on: string[] = [];
-    const off: string[] = [];
-    if (value !== null && typeof value === 'object') {
-        for (const [key, cond] of Object.entries(value)) for (const t of key.split(/\s+/)) if (t) (cond ? on : off).push(t);
-    } else if (value != null && value !== false) {
-        for (const t of String(value).split(/\s+/)) if (t) on.push(t);
-    }
-    return { on, off };
-}
-
-/**
- * `:class` on the host, read as the template's (#1242): the object form toggles each class it names, a
- * string adds its classes. A class it named last time and names no more is removed; one it never
- * named — the author's `class="toolbar"` — stays. Writing the attribute replaced them all.
- */
-function bindHostClass(el: HTMLElement, read: () => unknown, track: (fn: () => void) => unknown): void {
-    let named: string[] = [];
-    track(() => {
-        const { on, off } = classesOf(read());
-        for (const t of named) if (!on.includes(t) && !off.includes(t)) el.classList.remove(t);
-        for (const t of off) el.classList.remove(t);
-        for (const t of on) el.classList.add(t);
-        named = on.concat(off);
-    });
-}
-
-/** A `:style` object's key as its CSS property: `marginTop` is `margin-top`, a custom property as written. */
-const cssProperty = (key: string): string => (key.startsWith('--') ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`));
-
-/**
- * `:style` on the host, read as the template's (#1242): the object form sets each property it names
- * (`String(value ?? '')`, so null clears it) and removes one it named last time and names no more,
- * keeping the author's inline style; a string is written to `style.cssText`, null as '' (#1240).
- */
-function bindHostStyle(el: HTMLElement, read: () => unknown, track: (fn: () => void) => unknown): void {
-    let named: string[] = [];
-    track(() => {
-        const value = read();
-        if (value !== null && typeof value === 'object') {
-            const now: string[] = [];
-            for (const [key, v] of Object.entries(value)) {
-                const name = cssProperty(key);
-                now.push(name);
-                el.style.setProperty(name, String(v ?? ''));
-            }
-            for (const name of named) if (!now.includes(name)) el.style.removeProperty(name);
-            named = now;
-        } else {
-            named = [];
-            el.style.cssText = value == null ? '' : String(value);
-        }
-    });
 }
 
 /**
@@ -102,11 +58,19 @@ export function bindHost(
                 return () => el.removeEventListener(type, listener, options);
             });
         } else if (key.startsWith(':')) {
-            const fn = value as (ctx: unknown) => unknown;
             const name = key.slice(1);
-            if (name === 'class') bindHostClass(el, () => fn(ctx), track);
-            else if (name === 'style') bindHostStyle(el, () => fn(ctx), track);
-            else track(() => { writeAttribute(el, name, fn(ctx)); });
+            if (typeof value === 'object') {
+                const read = value.read as (ctx: unknown) => unknown;
+                value.bind(el, () => read(ctx), track);
+                continue;
+            }
+            // Written as an attribute, `:class` would replace the author's classes and `:style` their
+            // inline style: those two take hostClass() and hostStyle(), as a compiled @host does.
+            if (DEV && (name === 'class' || name === 'style')) {
+                console.warn(`[pdx] host '${key}' is a plain function, written as the attribute over what the page set. Wrap it in host${name === 'class' ? 'Class' : 'Style'}(…) from @pdxui/core, as a compiled @host does.`);
+            }
+            const fn = value as (ctx: unknown) => unknown;
+            track(() => { writeAttribute(el, name, fn(ctx)); });
         } else if (!el.hasAttribute(key)) {
             el.setAttribute(key, String(value));
         }
