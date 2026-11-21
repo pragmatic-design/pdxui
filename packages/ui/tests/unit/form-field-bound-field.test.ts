@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { html, createForm, required, email } from '@pdxui/core';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/input/pdx-input.pdx';
 import { cleanup, tick } from './helpers';
 

@@ -27,6 +27,7 @@ const PORTED: Record<string, string> = {
     'pdx-chip': 'src/chip/pdx-chip.pdx',
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-form-actions': 'src/form-actions/pdx-form-actions.pdx',
+    'pdx-form-field': 'src/form-field/pdx-form-field.pdx',
     'pdx-input': 'src/input/pdx-input.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',

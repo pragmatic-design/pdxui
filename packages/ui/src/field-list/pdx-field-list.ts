@@ -16,7 +16,7 @@ import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
 // Each cell's control is wrapped in a field (#293): named, marked required and described by its error
 // the way any field is (A1, A2), not by a second mechanism here.
-import '../form-field/pdx-form-field';
+import '../form-field/pdx-form-field.pdx';
 // The controls of TYPE_TAG, rendered by this component and registered by nobody else: an app's compiler
 // imports the tags its templates name, and these are built from script (#293).
 import '../input/pdx-input.pdx';

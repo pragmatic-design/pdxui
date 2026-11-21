@@ -1,0 +1,399 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFormField",
+  "tagName": "pdx-form-field",
+  "category": "Forms",
+  "order": 48,
+  "description": "Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA\nwiring between them and no validation of its own.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "field",
+      "description": "The form field this field shows (#128): `:field=\"f.email\"`. Its error, warning, touched state and\nrequired-ness, with no `name` and no surrounding `<pdx-form>`.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Field name — if set and inside <pdx-form>, auto-wires error/touched from form context.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "hint",
+      "description": "Helper text shown under the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "hint"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "The error message. Shown only when the field is touched, when `show-error` is set, or when\nits form validates onChange: an error decided by code (a server rejection, a check on save)\ngoes with `show-error`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Non-blocking warning message (yellow, below error).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "required",
+      "description": "Marks the field required: `aria-required` on its control and the required marker on its\nlabel. Not needed for a field the form requires — one whose validators include\n`required()` is marked the same way without it.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "required"
+    },
+    {
+      "kind": "field",
+      "name": "optional",
+      "description": "Shows an 'optional' marker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "optional"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "touched",
+      "description": "Whether the field has been interacted with (gates validation display).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "touched"
+    },
+    {
+      "kind": "field",
+      "name": "showError",
+      "description": "Force error display even if not touched",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showerror"
+    },
+    {
+      "kind": "field",
+      "name": "horizontal",
+      "description": "Horizontal layout: label left, input right",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "horizontal"
+    },
+    {
+      "kind": "field",
+      "name": "a11yLabel",
+      "description": "The control's name when the field shows no `label`: set as its aria-label. A visible label\nwins, and a control that names itself keeps its own name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "a11ylabel"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md"
+    }
+  ],
+  "roles": [
+    "alert"
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Field name — if set and inside <pdx-form>, auto-wires error/touched from form context.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "hint",
+      "fieldName": "hint",
+      "description": "Helper text shown under the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "The error message. Shown only when the field is touched, when `show-error` is set, or when\nits form validates onChange: an error decided by code (a server rejection, a check on save)\ngoes with `show-error`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Non-blocking warning message (yellow, below error).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "required",
+      "fieldName": "required",
+      "description": "Marks the field required: `aria-required` on its control and the required marker on its\nlabel. Not needed for a field the form requires — one whose validators include\n`required()` is marked the same way without it.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "optional",
+      "fieldName": "optional",
+      "description": "Shows an 'optional' marker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "touched",
+      "fieldName": "touched",
+      "description": "Whether the field has been interacted with (gates validation display).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "showerror",
+      "fieldName": "showError",
+      "description": "Force error display even if not touched",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "horizontal",
+      "fieldName": "horizontal",
+      "description": "Horizontal layout: label left, input right",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "a11ylabel",
+      "fieldName": "a11yLabel",
+      "description": "The control's name when the field shows no `label`: set as its aria-label. A visible label\nwins, and a control that names itself keeps its own name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The field's wrapper."
+    },
+    {
+      "name": "label",
+      "description": "The `<label>`, with `label`."
+    },
+    {
+      "name": "description",
+      "description": "The description under the label, with `description`."
+    },
+    {
+      "name": "control",
+      "description": "The box that holds the slotted control."
+    },
+    {
+      "name": "error",
+      "description": "The error message, while it is shown."
+    },
+    {
+      "name": "warning",
+      "description": "The warning message, while it is shown."
+    },
+    {
+      "name": "success",
+      "description": "The success message, while it is shown."
+    },
+    {
+      "name": "hint",
+      "description": "The hint, while no message takes its place."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "required",
+      "description": "`required`: required by its prop or by its form; the label carries the marker (`--pdx-field-required-marker`)."
+    },
+    {
+      "name": "optional",
+      "description": "`optional`: the label says the field is optional."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled`: the field and its control are disabled."
+    },
+    {
+      "name": "invalid",
+      "description": "`invalid`: its error is shown; the control is aria-invalid and described by it."
+    },
+    {
+      "name": "warning",
+      "description": "`warning`: its warning is shown, and no error."
+    },
+    {
+      "name": "success",
+      "description": "`success`: its success message is shown, and no error or warning."
+    },
+    {
+      "name": "horizontal",
+      "description": "`horizontal`: the label sits beside the control."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-form-field-gap",
+      "default": "var(--pdx-space-md)"
+    }
+  ]
+}

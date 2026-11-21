@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { createForm, required, minLength } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 import '../../src/form/pdx-form';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 import { cleanup, tick } from './helpers';
 
 /** <pdx-form .form=f> around the fields, connected in one append — the way a template mounts it. */

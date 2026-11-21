@@ -11,7 +11,7 @@ import '../../src/wizard/pdx-wizard';
 import '../../src/timeline/pdx-timeline';
 import '../../src/slider/pdx-slider';
 import '../../src/label/pdx-label';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/scroll-area/pdx-scroll-area';
 import '../../src/statistic/pdx-statistic';
 import '../../src/splitter/pdx-splitter';

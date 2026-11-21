@@ -1,0 +1,238 @@
+<template>
+  <div class="pdx-form-field" data-part="root">
+    @if (label) {<label class="pdx-field-label" data-part="label" :id="labelId" :for="inputId">{{ label }}</label>}
+    @if (description) {<span class="pdx-field-description" data-part="description" :id="descId">{{ description }}</span>}
+    <div class="pdx-form-field-input" data-part="control"><slot></slot></div>
+    @if (shouldShowError()) {<span class="pdx-field-error" data-part="error" :id="errorId" role="alert">{{ resolveError() }}</span>}
+    @else if (resolveWarning()) {<span class="pdx-field-warning" data-part="warning">{{ resolveWarning() }}</span>}
+    @else if (success) {<span class="pdx-field-success" data-part="success">{{ success }}</span>}
+    @else if (hint) {<span class="pdx-field-hint" data-part="hint" :id="hintId">{{ hint }}</span>}
+  </div>
+</template>
+
+<script>
+/**
+ * Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA
+ * wiring between them and no validation of its own.
+ *
+ * @cssstate required - `required`: required by its prop or by its form; the label carries the marker (`--pdx-field-required-marker`).
+ * @cssstate optional - `optional`: the label says the field is optional.
+ * @cssstate disabled - `disabled`: the field and its control are disabled.
+ * @cssstate invalid - `invalid`: its error is shown; the control is aria-invalid and described by it.
+ * @cssstate warning - `warning`: its warning is shown, and no error.
+ * @cssstate success - `success`: its success message is shown, and no error or warning.
+ * @cssstate horizontal - `horizontal`: the label sits beside the control.
+ *
+ * @csspart root - The field's wrapper.
+ * @csspart label - The `<label>`, with `label`.
+ * @csspart description - The description under the label, with `description`.
+ * @csspart control - The box that holds the slotted control.
+ * @csspart error - The error message, while it is shown.
+ * @csspart warning - The warning message, while it is shown.
+ * @csspart success - The success message, while it is shown.
+ * @csspart hint - The hint, while no message takes its place.
+ */
+// Layout wrapper: label + input (slot) + hint + error. Auto-wires aria-describedby, aria-invalid and
+// htmlFor between label and input (form-field-wiring.ts). Error display is touched-gated: shows only
+// when touched, when showError is forced, or when the form validates onChange. ZERO validation
+// built-in: validation lives in the @form rune or the dev's code.
+import { tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField, untracked, onDestroy } from '@pdxui/core';
+import { wireControl } from './form-field-wiring';
+// Its warning message and the border of a control in warning are drawn by form.css, written where the
+// form is. Imported here so they travel with a field used without a form.
+import '@pdxui/design/components/form';
+
+// Its conditions are states of the host (#293), which forms.css draws; the wrapper and its label keep
+// only their base classes, the ones native markup shares with the state classes it adds.
+@state required = isRequired();
+@state optional = !!optional;
+@state disabled = !!disabled;
+// One message at a time, as the render shows it: the error, else the warning, else the success.
+@state invalid = shouldShowError();
+@state warning = !shouldShowError() && !!resolveWarning();
+@state success = !shouldShowError() && !resolveWarning() && !!success;
+@state horizontal = !!horizontal;
+// pdx-ignore PDX_PART_NAME_TAKEN: label, description and the messages are the theme's parts; the script reads the props of those names
+@part root, label, description, control, error, warning, success, hint;
+// The axis forms.css keys by (#627), reflected on the host: the label's text size, the same scale as
+// pdx-label. A size other than `md` is also passed on to the field's library controls.
+@variants {
+  /** xs, sm, md (the default), lg or xl. */
+  size: { md, xs, sm, lg, xl } = md;
+}
+/**
+ * The form field this field shows (#128): `:field="f.email"`. Its error, warning, touched state and
+ * required-ness, with no `name` and no surrounding `<pdx-form>`.
+ */
+@prop field: Record<string, unknown> | null = null;
+/** Field name — if set and inside <pdx-form>, auto-wires error/touched from form context. */
+@prop name: string = '';
+@prop label: string = '';
+@prop hint: string = '';
+@prop description: string = '';
+/**
+ * The error message. Shown only when the field is touched, when `show-error` is set, or when
+ * its form validates onChange: an error decided by code (a server rejection, a check on save)
+ * goes with `show-error`.
+ */
+@prop error: string = '';
+/** Non-blocking warning message (yellow, below error). */
+@prop warning: string = '';
+@prop success: string = '';
+/**
+ * Marks the field required: `aria-required` on its control and the required marker on its
+ * label. Not needed for a field the form requires — one whose validators include
+ * `required()` is marked the same way without it.
+ */
+@prop required: boolean = false;
+@prop optional: boolean = false;
+@prop disabled: boolean = false;
+@prop touched: boolean = false;
+/** Force error display even if not touched */
+@prop showError: boolean = false;
+/** Horizontal layout: label left, input right */
+@prop horizontal: boolean = false;
+/**
+ * The control's name when the field shows no `label`: set as its aria-label. A visible label
+ * wins, and a control that names itself keeps its own name.
+ */
+@prop a11yLabel: string = '';
+
+@host el;
+
+const fieldId = generatedId('pdx-ff');
+const inputId = fieldId + '-input';
+const labelId = fieldId + '-label';
+const hintId = fieldId + '-hint';
+const errorId = fieldId + '-error';
+const descId = fieldId + '-desc';
+const ids = { fieldId, inputId, labelId, hintId, errorId, descId };
+
+// Auto-wire from form context if `name` is set and no inline override. Looked up when read, not once
+// at setup: a field set up before its <pdx-form> (happy-dom connects children first; a browser does
+// when pdx-form's module loads later) would never find it. A miss subscribes the reading effect to the
+// next provideForm(); once found, the form is kept.
+let foundForm;
+function currentForm() {
+  return foundForm ??= tryUseForm(el);
+}
+
+/** Resolve the full field name, prefixing with group path if needed. */
+function resolveFieldName() {
+  if (!name) return '';
+  const form = currentForm();
+  // If the form already has this field, use it directly (the compiler already prefixed it at build time).
+  if (form && formField(form, name)) return name;
+  // Runtime fallback: prefix with the field-group path — for when the compiler cannot resolve it
+  // statically (e.g. inside pdx-field-list, which creates items dynamically). Read here, not kept: set
+  // up before its group, the field would find none.
+  const groupPath = useFieldGroupPath(el);
+  if (groupPath) {
+    const fullPath = `${groupPath}.${name}`;
+    if (form && formField(form, fullPath)) return fullPath;
+  }
+  return name;
+}
+
+/** The field shown: the one bound with `:field`, else the form's field of that `name`. */
+function currentField() {
+  if (field) return field;
+  const form = currentForm();
+  const fieldName = resolveFieldName();
+  return form && fieldName ? formField(form, fieldName) : undefined;
+}
+
+// Reactive locale tracking: bumped when the locale changes, to resolve the messages again. Unsubscribed
+// when the field is destroyed: the listener set is global, and the callback reaches this field, so a
+// field never unsubscribed stayed alive with everything it holds (#881).
+let localeVer = $signal(0);
+$effect(() => {
+  const unsubscribe = onLocaleChange(() => { localeVer++; });
+  return () => { unsubscribe(); };
+});
+
+function resolveError() {
+  void localeVer; // read to depend on the locale
+  // Cascade: the inline error prop, then the form's error.
+  if (error) return resolveValidationMessage(error) || error;
+  const f = currentField();
+  if (f) {
+    const err = f.error();
+    return err ? (resolveValidationMessage(err) || err) : '';
+  }
+  return '';
+}
+
+function resolveWarning() {
+  void localeVer; // read to depend on the locale
+  if (warning) return warning;
+  const f = currentField();
+  if (f) return f.warning() ?? '';
+  return '';
+}
+
+function resolveTouched() {
+  if (touched) return true;
+  const f = currentField();
+  if (f) return f.touched();
+  return false;
+}
+
+/**
+ * Required by the markup (`required`) or by the form: a field whose validators include `required()`
+ * (`FormField.required`). One answer for the control's `aria-required` and the label's marker, so the
+ * two cannot disagree.
+ */
+function isRequired() {
+  if (required) return true;
+  return currentField()?.required === true;
+}
+
+function shouldShowError() {
+  const err = resolveError();
+  if (!err) return false;
+  if (showError) return true;
+  if (resolveTouched()) return true;
+  // In onChange mode, show errors immediately (no touch required).
+  const form = currentForm();
+  if (form && form.validateOn === 'onChange') return true;
+  return false;
+}
+
+/** The wiring for the props as last read; run again when the slot's content grows. */
+let lastWire = null;
+
+// Auto-wire the ARIA attributes to the first control found in the slot.
+$effect(() => {
+  const w = {
+    err: shouldShowError(),
+    hasHint: !!hint,
+    hasDesc: !!description,
+    disabled,
+    size,
+    required: isRequired(),
+    hasLabel: !!label,
+    a11yLabel,
+  };
+  lastWire = () => wireControl(el, ids, w);
+  // Now as well as in a frame (A2, #786): a control bound to a form field (`::value`) is marked invalid
+  // in the flush that makes the field invalid, and a description written a frame later leaves it
+  // aria-invalid with nothing that says why. The frame stays for a control whose DOM is not built yet.
+  untracked(lastWire);
+  requestAnimationFrame(lastWire);
+});
+
+// Wired again when the slot's content GROWS. The wiring runs a frame after the field's props, and a
+// control that builds its own DOM in a later frame — the date picker does, in its first rAF — is not
+// there yet: run once, nothing would be found, nothing named, and nothing would ever look again. Added
+// nodes only: the wiring writes attributes, never nodes, so it cannot wake itself. One frame per burst,
+// whatever the number of records.
+let rewireQueued = false;
+const slotWatch = new MutationObserver((records) => {
+  if (rewireQueued || !lastWire || !records.some((r) => r.addedNodes.length > 0)) return;
+  rewireQueued = true;
+  requestAnimationFrame(() => { rewireQueued = false; lastWire?.(); });
+});
+slotWatch.observe(el, { childList: true, subtree: true });
+onDestroy(() => slotWatch.disconnect());
+</script>

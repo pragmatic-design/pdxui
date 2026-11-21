@@ -6,7 +6,7 @@
 // no name. pdx-wizard moves its panels into its slot (pdx-form-template's wizard layout, #293).
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 
 describe('pdx-form-field moved to another parent', () => {
     beforeEach(cleanup);

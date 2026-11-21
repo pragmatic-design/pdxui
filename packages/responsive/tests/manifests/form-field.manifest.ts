@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-form-field
  *
- * Contracts written by inspecting the source (packages/ui/src/form-field/pdx-form-field.ts)
+ * Contracts written by inspecting the source (packages/ui/src/form-field/pdx-form-field.pdx)
  * and the CSS (packages/design/src/surfaces/forms.css, the .pdx-form-field / .pdx-field-* block).
  *
  * DOM STRUCTURE (Light DOM, render in pdx-form-field.ts):

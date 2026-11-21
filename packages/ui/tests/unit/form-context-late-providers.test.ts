@@ -13,7 +13,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { component, html, createForm, formField, createFormCoordinator, provideFormCoordinator, minLength } from '@pdxui/core';
 import type { FormCoordinator } from '@pdxui/core';
 import '../../src/form/pdx-form';
-import '../../src/form-field/pdx-form-field';
+import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/field-group/pdx-field-group';
 import { cleanup, tick } from './helpers';
 
