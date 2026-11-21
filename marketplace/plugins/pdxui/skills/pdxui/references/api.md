@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-495 value exports.
+496 value exports.
 
 ### `__adoptStyles`
 
@@ -665,6 +665,18 @@ Put `el` in the ref signal `value`, and take it out again — back to `null` —
 rendered it is disposed (#262), unless another element has taken the ref meanwhile, as the other
 branch of an `@if`/`@else` does. A value that is not a signal is ignored. Both render paths bind a
 `:ref` through it.
+
+### `bindStyleText`
+
+```ts
+import { bindStyleText } from '@pdxui/core';
+
+function bindStyleText(el: Element, value: () => unknown): void
+```
+
+`:style="expr"` on a plain element, HTML or SVG (#1240): the string is written to `style.cssText`,
+null or undefined as `''`. Assigning `el.style` relies on the browser forwarding it to `cssText`
+([PutForwards=cssText]), and throws where `style` is a bare getter — happy-dom, for SVG.
 
 ### `bindTwoWay`
 

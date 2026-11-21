@@ -65,3 +65,18 @@ export function bindAttributeOrProperty(el: Element, attr: string, prop: string,
         else writeAttribute(el, attr, next);
     });
 }
+
+/**
+ * `:style="expr"` on a plain element, HTML or SVG (#1240): the string is written to `style.cssText`,
+ * null or undefined as `''`. Assigning `el.style` relies on the browser forwarding it to `cssText`
+ * ([PutForwards=cssText]), and throws where `style` is a bare getter — happy-dom, for SVG.
+ */
+export function bindStyleText(el: Element, value: () => unknown): void {
+    let written: unknown = {};
+    effect(() => {
+        const next = value();
+        if (Object.is(next, written)) return;
+        written = next;
+        (el as HTMLElement).style.cssText = next == null ? '' : String(next);
+    });
+}

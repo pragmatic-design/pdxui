@@ -86,8 +86,8 @@ that is *not* rewritten, because a store is a proxy and its keys are properties,
 What the compiler decides stays in the module, and what is the same in every component is a call to
 core. A bound attribute on an element compiles to `bindAttribute(el, 'aria-label', () => …)`; a
 property the element certainly has, `:disabled` on an `<input>`, to `bindNativeProperty`; a name the
-element may or may not have to `bindAttributeOrProperty`, which asks it. The compiler picks which of the
-three from the element and the name; core holds the effect, the value written last, and what `null`
+element may or may not have to `bindAttributeOrProperty`, which asks it; and `:style="…"`, a string, to
+`bindStyleText`, which writes `style.cssText`. The compiler picks which from the element and the name; core holds the effect, the value written last, and what `null`
 does. A handler is `eventHandler(fn, ctx.el, 'click')`, which runs it in one batch and routes what it
 throws; the `@state` runes are one `ctx.states({ … })`. Written out in every component, each of these
 weighed more than the component's own markup.

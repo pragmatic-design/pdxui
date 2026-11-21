@@ -608,6 +608,12 @@ class InlineGen {
         if (kind.custom || URL_BINDINGS.has(prop.toLowerCase())) return null;
         // Parenthesised when the value starts with `{`: `() => { a: 'x' }['a']` is a block (render-parity).
         const getter = arrowOf(value);
+        // `:style="expr"` writes `style.cssText`, HTML and SVG alike (#1240): not the property, which
+        // only a browser forwards to cssText.
+        if (prop === 'style') {
+            this.imports.add('bindStyleText');
+            return `bindStyleText(${el}, ${getter});`;
+        }
         if (isAttributeBinding(prop, kind)) {
             this.imports.add('bindAttribute');
             return `bindAttribute(${el}, ${jsString(prop)}, ${getter});`;
@@ -669,6 +675,8 @@ class InlineGen {
      * null or false, as core's attribute branch does.
      */
     private assign(el: string, prop: string, value: string, kind: ElementKind): string {
+        // `:style` on a plain element: its string to `style.cssText`, null as '' (#1240, `bindStyleText`).
+        if (!kind.custom && prop === 'style') return `const __v = ${value}; ${el}.style.cssText = __v == null ? '' : String(__v);`;
         const url = URL_BINDINGS.has(prop.toLowerCase());
         if (url) this.imports.add('sanitizeBoundUrl');
         if (isAttributeBinding(prop, kind)) return this.attributeWrite(el, prop, value, url);
