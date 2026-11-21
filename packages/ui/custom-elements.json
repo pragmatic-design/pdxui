@@ -14707,7 +14707,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/form-actions/pdx-form-actions.ts",
+      "path": "src/form-actions/pdx-form-actions.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -14849,7 +14849,7 @@
           "name": "pdx-form-actions",
           "declaration": {
             "name": "PdxFormActions",
-            "module": "src/form-actions/pdx-form-actions.ts"
+            "module": "src/form-actions/pdx-form-actions.pdx"
           }
         }
       ]

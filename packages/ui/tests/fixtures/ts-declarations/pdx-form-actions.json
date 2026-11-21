@@ -1,0 +1,133 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFormActions",
+  "tagName": "pdx-form-actions",
+  "category": "Forms",
+  "order": 47,
+  "description": "The submit and reset button bar of a form, wired to the form it sits in, with configurable\nlabels, alignment and a loading state.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "submitLabel",
+      "description": "Submit button label. Uses i18n registry default if not set.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "submitlabel"
+    },
+    {
+      "kind": "field",
+      "name": "resetLabel",
+      "description": "Reset button label. Set to 'none' to hide. Uses i18n registry default if not set.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "resetlabel"
+    },
+    {
+      "kind": "field",
+      "name": "showLoading",
+      "description": "Show loading spinner on submit button while submitting.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showloading"
+    },
+    {
+      "kind": "field",
+      "name": "align",
+      "description": "Where the buttons sit: end (the default), start, center, or apart.",
+      "type": {
+        "text": "'end' | 'start' | 'center' | 'between'"
+      },
+      "default": "'end'",
+      "attribute": "align"
+    }
+  ],
+  "variants": [
+    {
+      "name": "align",
+      "values": [
+        "end",
+        "start",
+        "center",
+        "between"
+      ],
+      "default": "end",
+      "native": {
+        "end": ".pdx-form-actions-end",
+        "start": ".pdx-form-actions-start",
+        "center": ".pdx-form-actions-center",
+        "between": ".pdx-form-actions-between"
+      }
+    }
+  ],
+  "attributes": [
+    {
+      "name": "submitlabel",
+      "fieldName": "submitLabel",
+      "description": "Submit button label. Uses i18n registry default if not set.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "resetlabel",
+      "fieldName": "resetLabel",
+      "description": "Reset button label. Set to 'none' to hide. Uses i18n registry default if not set.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showloading",
+      "fieldName": "showLoading",
+      "description": "Show loading spinner on submit button while submitting.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "align",
+      "fieldName": "align",
+      "description": "Where the buttons sit: end (the default), start, center, or apart.",
+      "type": {
+        "text": "'end' | 'start' | 'center' | 'between'"
+      },
+      "default": "'end'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The bar."
+    },
+    {
+      "name": "reset",
+      "description": "The reset button, unless `reset-label=\"none\"`."
+    },
+    {
+      "name": "submit",
+      "description": "The submit button."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "submitting",
+      "description": "The form it sits in is submitting; its buttons are disabled meanwhile."
+    }
+  ]
+}

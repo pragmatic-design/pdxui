@@ -254,8 +254,8 @@ placeholders, filled at render: keep them in the translation.
 | `filter-builder` | `editFilter` | `Edit filter: {filter}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `filter-builder` | `removeFilter` | `Remove filter: {filter}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `filter-builder` | `selectField` | `Select field...` | `@pdxui/ui/src/shared/i18n.ts` |
-| `form-actions` | `reset` | `Reset` | `@pdxui/ui/src/form-actions/pdx-form-actions.ts` |
-| `form-actions` | `submit` | `Submit` | `@pdxui/ui/src/form-actions/pdx-form-actions.ts` |
+| `form-actions` | `reset` | `Reset` | `@pdxui/ui/src/shared/i18n.ts` |
+| `form-actions` | `submit` | `Submit` | `@pdxui/ui/src/shared/i18n.ts` |
 | `form-template` | `list.add` | `+ Add` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
 | `form-template` | `list.cell` | `{label}, line {n}` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
 | `form-template` | `list.empty` | `No items yet` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |

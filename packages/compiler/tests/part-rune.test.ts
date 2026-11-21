@@ -42,6 +42,14 @@ describe('a @part nothing reads has no ref (#1268)', () => {
         expect(code).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
     });
 
+    it("a template literal's text is no read, nor what follows it (#1210, pdx-field-group)", () => {
+        // `${…}-root` is a string ending in the part's name, and the comment after the literal names the
+        // other: read as one more literal running to the end of the script, both kept a ref.
+        const script = '@part root, label;\nconst id = `${Math.random()}-root`;\n// the label, in a comment after the literal\nconst t = `a ${`b ${1}`} c`;';
+        const { code } = compile(pdx(template, script), 'test.pdx');
+        expect(code).not.toMatch(/bindRef\(__el\d+,ctx\.(root|label)\)/);
+    });
+
     it('a part @host or @expose reads keeps its ref', () => {
         const host = compile(pdx(template, '@part root, label;\n@host { :title="root?.id" }'), 'test.pdx').code;
         expect(host).toMatch(/bindRef\(__el\d+,ctx\.root\)/);

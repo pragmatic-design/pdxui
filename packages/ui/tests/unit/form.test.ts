@@ -6,7 +6,7 @@ import { cleanup, mount, tick } from './helpers';
 // Import components to register them
 import '../../src/form/pdx-form';
 import '../../src/form-field/pdx-form-field';
-import '../../src/form-actions/pdx-form-actions';
+import '../../src/form-actions/pdx-form-actions.pdx';
 import '../../src/form-section/pdx-form-section';
 
 // ─── pdx-form ─────────────────────────────────────────────────
