@@ -13,7 +13,7 @@ import '../../src/input/pdx-input';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/select/pdx-select';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 
 type Editor = HTMLElement & { schema: unknown; value: unknown };
 

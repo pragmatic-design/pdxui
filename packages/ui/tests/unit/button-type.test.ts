@@ -5,7 +5,7 @@
 // `<pdx-button>` in a form would be a submit button, including one wired to `@click="saveDraft()"`.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

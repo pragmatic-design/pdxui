@@ -5,7 +5,7 @@
 // double tap on Save would save twice. pdx-toggle has the same shape.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 import '../../src/toggle/pdx-toggle';
 
 async function until<T>(pick: () => T | null | undefined, what: string): Promise<T> {

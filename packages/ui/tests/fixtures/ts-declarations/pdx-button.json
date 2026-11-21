@@ -1,0 +1,306 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxButton",
+  "tagName": "pdx-button",
+  "category": "Atoms",
+  "order": 1,
+  "description": "A button over the Pragmatic CSS button styles, with variants, sizes and a loading state.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Native button type: 'button', 'submit' or 'reset'.",
+      "type": {
+        "text": "'button' | 'submit' | 'reset'"
+      },
+      "default": "'button'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "full",
+      "description": "Stretches to the full width of its container.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "full"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabelledby",
+      "description": "The id of an element whose text names the button, forwarded to the inner `<button>`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabelledby"
+    },
+    {
+      "kind": "field",
+      "name": "action",
+      "description": "A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "actionArg",
+      "description": "The value a click passes to `action.execute`.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "'primary' | 'solid' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
+      },
+      "default": "'primary'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "primary",
+        "solid",
+        "secondary",
+        "outline",
+        "ghost",
+        "link",
+        "danger",
+        "success",
+        "warning",
+        "info"
+      ],
+      "default": "primary",
+      "native": {
+        "primary": ".pdx-primary",
+        "solid": ".pdx-primary",
+        "secondary": ".pdx-secondary",
+        "outline": ".pdx-outline",
+        "ghost": ".pdx-ghost",
+        "link": ".pdx-link",
+        "danger": ".pdx-danger",
+        "success": ".pdx-success",
+        "warning": ".pdx-warning",
+        "info": ".pdx-info"
+      }
+    },
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": "[size=\"md\"]",
+        "xs": "[size=\"xs\"]",
+        "sm": "[size=\"sm\"]",
+        "lg": "[size=\"lg\"]",
+        "xl": "[size=\"xl\"]"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-action-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "When the `action`'s `execute` rejects. The error is the one\nthe action keeps on its `error()`; the button is idle again.",
+      "detail": "{ error: unknown }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Native button type: 'button', 'submit' or 'reset'.",
+      "type": {
+        "text": "'button' | 'submit' | 'reset'"
+      },
+      "default": "'button'"
+    },
+    {
+      "name": "full",
+      "fieldName": "full",
+      "description": "Stretches to the full width of its container.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabelledby",
+      "fieldName": "ariaLabelledby",
+      "description": "The id of an element whose text names the button, forwarded to the inner `<button>`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "'primary' | 'solid' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
+      },
+      "default": "'primary'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The native `<button>`."
+    },
+    {
+      "name": "label",
+      "description": "The text of `label`, after any slotted content."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "`loading` is set, or the `action` is pending: the button shows a spinner and is\n`aria-busy`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-button-bg"
+    },
+    {
+      "name": "--pdx-button-bg-hover"
+    },
+    {
+      "name": "--pdx-button-color"
+    },
+    {
+      "name": "--pdx-button-min-height",
+      "default": "2.5rem"
+    },
+    {
+      "name": "--pdx-button-radius"
+    },
+    {
+      "name": "--pdx-button-shadow-hover"
+    },
+    {
+      "name": "--pdx-button-transform-hover"
+    }
+  ]
+}

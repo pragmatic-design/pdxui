@@ -49,11 +49,6 @@
       "types": "./dist/icon/lucide-icons.d.ts",
       "import": "./dist/icon/lucide-icons.js"
     },
-    "./button": {
-      "development": "./src/button/pdx-button.ts",
-      "types": "./dist/button/pdx-button.d.ts",
-      "import": "./dist/button/pdx-button.js"
-    },
     "./avatar-group": {
       "development": "./src/avatar-group/pdx-avatar-group.ts",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
@@ -658,6 +653,11 @@
       "development": "./src/radio/pdx-radio.pdx",
       "types": "./dist/radio/pdx-radio.d.ts",
       "import": "./dist/radio/pdx-radio.js"
+    },
+    "./button": {
+      "development": "./src/button/pdx-button.pdx",
+      "types": "./dist/button/pdx-button.d.ts",
+      "import": "./dist/button/pdx-button.js"
     },
     "./package.json": "./package.json"
   },

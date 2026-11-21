@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 import '../../src/popover/pdx-popover';
 import '../../src/tooltip/pdx-tooltip';
 import '../../src/progress/pdx-progress.pdx';

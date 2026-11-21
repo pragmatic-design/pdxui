@@ -7,7 +7,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { mutation } from '@pdxui/core';
 import { tick } from './helpers';
-import '../../src/button/pdx-button';
+import '../../src/button/pdx-button.pdx';
 
 type ButtonHost = HTMLElement & { action: unknown; actionArg: unknown; disabled: boolean };
 

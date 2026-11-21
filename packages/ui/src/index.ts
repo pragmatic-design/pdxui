@@ -6,7 +6,7 @@
 // the page first, so no icon loads on demand. pdx-icon alone registers only the set's resolver (#47).
 import './icon/pragmatic-all';
 import './icon/pdx-icon';
-import './button/pdx-button';
+import './button/pdx-button.pdx';
 import './button-group/pdx-button-group.pdx';
 import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';

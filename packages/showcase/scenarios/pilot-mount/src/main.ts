@@ -13,7 +13,7 @@
 // side's buttons would stay unknown elements that draw nothing.
 // The switch was measured here until it moved to .pdx (#1008): with no TypeScript side left, both
 // builds would measure the same component. PILOT.md keeps its numbers.
-import '../../../../ui/src/button/pdx-button';
+import '../../../../ui/src/button/pdx-button.pdx';
 import '../../../../ui/src/select/pdx-select';
 import '../../../../ui/src/input/pdx-input';
 import '../../../../ui/src/number-input/pdx-number-input';

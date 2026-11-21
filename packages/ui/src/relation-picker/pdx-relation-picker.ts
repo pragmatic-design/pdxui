@@ -11,7 +11,7 @@
 import { component, html, event, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import '../data-grid/pdx-data-grid';
-import '../button/pdx-button';
+import '../button/pdx-button.pdx';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/relation-picker';
