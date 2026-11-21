@@ -1,8 +1,9 @@
 // The host's attributes, bindings and listeners, declared (#133): `host` in the descriptor, which a
 // `.pdx` `@host { … }` compiles into.
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { component } from '../src/component/component';
+import { hostClass, hostStyle } from '../src/component/host-class-style';
 import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { tick } from '../src/testing';
@@ -91,5 +92,75 @@ describe('a descriptor\'s host', () => {
         component(name, { render: () => html`<span>x</span>` });
         const el = mount(name);
         expect(el.hasAttribute('role')).toBe(false);
+    });
+});
+
+describe("a host's :class and :style, read as the template's (#1242)", () => {
+    type Ctx = { on: () => boolean; width: () => string | null; words: () => string };
+    /** A host whose :class or :style follows `on`, `width` and `words`. */
+    function styled(host: Record<string, unknown>) {
+        const name = tag();
+        const on = signal(false);
+        const width = signal<string | null>('10px');
+        const words = signal('a b');
+        component(name, { setup: () => ({ on, width, words }), host: host as never, render: () => html`<span>x</span>` });
+        return { name, on, width, words };
+    }
+
+    it("the object form of :class toggles each class and keeps the author's", async () => {
+        const { name, on } = styled({ ':class': hostClass((ctx: Ctx) => ({ active: ctx.on(), 'pdx-off': !ctx.on() })) });
+        const el = mount(name, { class: 'toolbar' });
+        expect([...el.classList].sort()).toEqual(['pdx-off', 'toolbar']);
+        on.set(true);
+        await tick();
+        expect([...el.classList].sort()).toEqual(['active', 'toolbar']);
+        on.set(false);
+        await tick();
+        expect([...el.classList].sort()).toEqual(['pdx-off', 'toolbar']);
+    });
+
+    it("the string form of :class removes only the classes it named last, never the author's", async () => {
+        const { name, words } = styled({ ':class': hostClass((ctx: Ctx) => ctx.words()) });
+        const el = mount(name, { class: 'toolbar' });
+        expect([...el.classList].sort()).toEqual(['a', 'b', 'toolbar']);
+        words.set('b c');
+        await tick();
+        expect([...el.classList].sort()).toEqual(['b', 'c', 'toolbar']);
+        words.set('');
+        await tick();
+        expect([...el.classList]).toEqual(['toolbar']);
+    });
+
+    it("the object form of :style sets and clears its property, and keeps the author's inline style", async () => {
+        const { name, width } = styled({ ':style': hostStyle((ctx: Ctx) => ({ width: ctx.width(), marginTop: '2px' })) });
+        const el = mount(name, { style: 'color: red' });
+        expect(el.style.width).toBe('10px');
+        expect(el.style.marginTop, 'a camelCase key is its kebab-case property').toBe('2px');
+        expect(el.style.color).toBe('red');
+        width.set(null);
+        await tick();
+        expect(el.style.width).toBe('');
+        expect(el.style.color, "the author's").toBe('red');
+    });
+
+    it('the string form of :style writes style.cssText, null as empty (#1240)', async () => {
+        const { name, width } = styled({ ':style': hostStyle((ctx: Ctx) => (ctx.width() === null ? null : `width: ${ctx.width()}`)) });
+        const el = mount(name);
+        expect(el.style.width).toBe('10px');
+        width.set(null);
+        await tick();
+        expect(el.style.cssText).toBe('');
+    });
+
+    it('a plain function for :class or :style is written as the attribute, and development says so', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        try {
+            const { name } = styled({ ':class': (ctx: Ctx) => (ctx.on() ? 'on' : 'off') });
+            const el = mount(name, { class: 'toolbar' });
+            expect(el.getAttribute('class'), 'the attribute, over the page\'s').toBe('off');
+            expect(warn.mock.calls.some((c) => /host ':class' is a plain function.*hostClass/.test(String(c[0])))).toBe(true);
+        } finally {
+            warn.mockRestore();
+        }
     });
 });

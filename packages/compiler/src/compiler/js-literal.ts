@@ -58,6 +58,14 @@ function escapeQuoted(ch: string): string {
  * then, so the code every other binding compiles to is what it was.
  */
 export function arrowOf(body: string): string {
+    return `()=>${arrowBody(body)}`;
+}
+
+/**
+ * `body`, an expression, as the body of an arrow: parenthesised when it starts with `{`, which an arrow
+ * reads as a block (`arrowOf`). For an arrow with parameters, `@host`'s `(ctx) => …` (#1242).
+ */
+export function arrowBody(body: string): string {
     // Match: an expression whose first character, past spaces, is `{`.
-    return /^\s*\{/.test(body) ? `()=>(${body})` : `()=>${body}`;
+    return /^\s*\{/.test(body) ? `(${body})` : body;
 }

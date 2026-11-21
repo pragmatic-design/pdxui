@@ -202,6 +202,7 @@ const DEBUG_CODE = [
 const FEATURE_MODULES = [
     'packages/core/src/component/channel.ts',
     'packages/core/src/component/host.ts',
+    'packages/core/src/component/host-class-style.ts',
     'packages/core/src/component/form-element.ts',
     'packages/core/src/component/slots.ts',
     'packages/core/src/renderer/transitions.ts',

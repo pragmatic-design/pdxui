@@ -9,7 +9,7 @@ import { prefixCtx, callSignals } from './codegen-prefix';
 import { templateEventHandler } from './codegen-template-rewrite';
 import { decodeEntities } from './codegen-template-inline';
 import { invalidHostAttribute } from './host-block';
-import { jsQuote, jsString } from './js-literal';
+import { arrowBody, jsQuote, jsString } from './js-literal';
 
 /**
  * The `host: { … }` entries for these attributes, or '' when there are none. The forms a host has no
@@ -22,7 +22,13 @@ export function hostDescriptor(attrs: readonly HostAttr[], ctx: CompileContext, 
         if (name.startsWith(':')) {
             // `:hidden` with no value reads the identifier of the same name, as in the template.
             const expr = value ?? name.slice(1);
-            entries.push(`${jsQuote(name)}: (ctx) => ${callSignals(prefixCtx(expr, ctx), ctx)}`);
+            // An object literal (`:class="{ a: x }"`) is returned, not read as a block (#1242).
+            const read = `(ctx) => ${arrowBody(callSignals(prefixCtx(expr, ctx), ctx))}`;
+            // `:class` and `:style` are the template's, not attributes (#1242): core's binders, imported
+            // only by a host that writes them, so a host that does not carries none of their code.
+            const binder = name === ':class' ? 'hostClass' : name === ':style' ? 'hostStyle' : null;
+            if (binder) imports.add(binder);
+            entries.push(`${jsQuote(name)}: ${binder ? `${binder}(${read})` : read}`);
         } else if (name.startsWith('@')) {
             if (value === undefined) continue;
             const event = name.slice(1).split('.')[0];

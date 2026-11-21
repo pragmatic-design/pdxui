@@ -613,6 +613,11 @@ render's context:
   the page's own `role` or `tabindex` wins;
 - a binding (`:aria-expanded="open"`) is read like the template's and written whenever what it reads
   changes; `null`, `undefined` and `false` remove the attribute;
+- `:class` and `:style` are the template's, not attributes (#1242), and keep what the host's author
+  wrote. `:class="{ name: cond }"` toggles each class it names; a string adds its classes, and a class
+  it named last time and names no more is removed. `:style="{ width: w }"` sets each property it names
+  (a camelCase key is its kebab-case property, `null` clears it); a string is written to
+  `style.cssText`, `null` as `''`, as in the template;
 - a listener (`@keydown.enter="onKey"`) is built like the template's — a reference, an inline mutation,
   a call, an arrow — with its modifiers, and removed when the component disconnects.
 
@@ -628,7 +633,8 @@ not a form control has none (#1246).
 
 - A two-way binding (`::x`), `data-part` and a generic argument (`T="User"`) have no meaning on a host:
   each raises `PDX_HOST_INVALID_ATTRIBUTE`, whose message says which, and is not compiled.
-- A `$signal` read only by `@host` counts as read.
+- A `$signal` read only by `@host` counts as read, by the diagnostics and by a production build,
+  which keeps it (#1242).
 - The name counts as a script name: one declared again is `PDX_DUP_DECLARATION`, and a member of the
   element is `PDX_NAME_RESERVED`.
 
