@@ -3,7 +3,7 @@
 // as core's own binding (`bindProperty` in template.ts).
 
 import { describe, it, expect } from 'vitest';
-import { bindAttribute, bindNativeProperty, bindAttributeOrProperty } from '../src/renderer/bound-attribute';
+import { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindStyleText } from '../src/renderer/bound-attribute';
 import { signal, collectDisposers } from '../src/reactivity/signal';
 
 describe('bindAttribute', () => {
@@ -84,5 +84,37 @@ describe('bindAttributeOrProperty', () => {
         expect((div as unknown as Record<string, unknown>).itemprop, 'an expando changes nothing').toBeUndefined();
         v.setRaw(null);
         expect(div.hasAttribute('itemprop')).toBe(false);
+    });
+});
+
+describe('bindStyleText (#1240)', () => {
+    it('writes style.cssText on an SVG element, whose style has only a getter, and null empties it', () => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const v = signal<string | null>('fill: red');
+        bindStyleText(circle, () => v());
+        expect(circle.style.getPropertyValue('fill')).toBe('red');
+        v.setRaw(null);
+        expect(circle.style.cssText, 'null leaves no declaration').toBe('');
+        v.setRaw('opacity: 0.5');
+        expect(circle.style.getPropertyValue('opacity')).toBe('0.5');
+    });
+
+    it('writes style.cssText on an HTML element, and undefined empties it', () => {
+        const div = document.createElement('div');
+        const v = signal<string | undefined>('color: blue');
+        bindStyleText(div, () => v());
+        expect(div.style.color).toBe('blue');
+        v.setRaw(undefined);
+        expect(div.style.cssText).toBe('');
+    });
+
+    it('does not write the same value again over what the element holds since (#44)', () => {
+        const div = document.createElement('div');
+        const v = signal('color: blue');
+        const other = signal(0);
+        bindStyleText(div, () => { other(); return v(); });
+        div.style.color = 'green';
+        other.set(1);
+        expect(div.style.color).toBe('green');
     });
 });

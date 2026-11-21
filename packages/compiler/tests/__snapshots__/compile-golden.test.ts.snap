@@ -4,7 +4,7 @@ exports[`compile golden — demo corpus > color-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, bindTwoWay, computed, defineComponent, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindStyleText, bindTwoWay, computed, defineComponent, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tdfsr4");
@@ -30,7 +30,7 @@ defineComponent('app-color-card', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el2,__t4,__el8,__t10,__el11,__t13,__el14]=__walk0(__frag);
-    bindAttributeOrProperty(__el2, "style", "style", ()=>ctx.previewStyle());
+    bindStyleText(__el2, ()=>ctx.previewStyle());
     bindInterpolation(__t4,()=>ctx.emoji());
     bindTwoWay(__el8, 'value', ctx.color);
     bindInterpolation(__t10,()=>ctx.radius());
@@ -1022,7 +1022,7 @@ exports[`compile golden — demo corpus > infra/demo-i18n-mobile.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, bindRef, defineComponent, direction, effect, eventHandler, getComponentString, injectSafeAreaCSS, isRTL, onDestroy, onMount, registerComponentStrings, setComponentStrings, setDirection, setLocaleStrings, signal, staticBlock, staticMarkup, useBottomSheet, useSafeArea } from '@pdxui/core';
+import { bindInterpolation, bindRef, bindStyleText, defineComponent, direction, effect, eventHandler, getComponentString, injectSafeAreaCSS, isRTL, onDestroy, onMount, registerComponentStrings, setComponentStrings, setDirection, setLocaleStrings, signal, staticBlock, staticMarkup, useBottomSheet, useSafeArea } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-y860fw");
@@ -1135,7 +1135,7 @@ defineComponent('app-demo-i18n-mobile', {
     bindInterpolation(__t14,()=>ctx.selectNoResults());
     bindInterpolation(__t17,()=>ctx.dir());
     bindInterpolation(__t19,()=>ctx.rtl());
-    bindAttributeOrProperty(__el23, "style", "style", ()=>'direction:' + ctx.dir());
+    bindStyleText(__el23, ()=>'direction:' + ctx.dir());
     bindInterpolation(__t26,()=>ctx.dir());
     __el32.addEventListener('click', eventHandler(ctx.openSheet, ctx.el, 'click'));
     bindRef(__el33,ctx.sheetRef);
@@ -1157,7 +1157,7 @@ exports[`compile golden — demo corpus > infra/demo-icons.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, bindRef, clearBoundProperty, clearIconSets, defineComponent, eachStatic, eventHandler, onMount, registerIconSet, resolveIcon, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, bindStyleText, clearIconSets, defineComponent, eachStatic, eventHandler, onMount, registerIconSet, resolveIcon, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import '../../../ui/src/icon/pdx-icon';
 
 {
@@ -1267,11 +1267,11 @@ const ICONS = {
     __el7.addEventListener('click', eventHandler(ctx.doResolve, ctx.el, 'click'));
     __el8.addEventListener('click', eventHandler(ctx.doMissing, ctx.el, 'click'));
     bindInterpolation(__t10,()=>ctx.resultText());
-    const __cf21=eachStatic(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);bindAttributeOrProperty(__el16, "style", "style", ()=>'width:' + s().px + 'px;height:' + s().px + 'px');bindInterpolation(__t19,()=>s().name,true);bindInterpolation(__t20,()=>s().px);return __frag;});
+    const __cf21=eachStatic(()=>ctx.sizeList,'name',(s)=>{const __frag=__blk0();const [__el16,__t19,__t20]=__walk0(__frag);bindStyleText(__el16, ()=>'width:' + s().px + 'px;height:' + s().px + 'px');bindInterpolation(__t19,()=>s().name,true);bindInterpolation(__t20,()=>s().px);return __frag;});
     __m22.replaceWith(__cf21);
     const __cf29=eachStatic(()=>ctx.iconEntries,'name',(entry)=>{const __frag=__blk1();const [__el26,__t28]=__walk1(__frag);bindRef(__el26,entry().ref);bindInterpolation(__t28,()=>entry().name,true);return __frag;});
     __m30.replaceWith(__cf29);
-    const __cf69=eachStatic(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);{ if ("style" in __el68) { const __v = 'color:' + c().color; if (__v == null) clearBoundProperty(__el68, "style", "style"); else __el68["style"] = __v; } else { const __v = 'color:' + c().color; if (__v == null || __v === false) __el68.removeAttribute("style"); else { __el68.setAttribute("style", __v === true ? '' : String(__v)); } } }bindRef(__el68,c().ref);return __frag;});
+    const __cf69=eachStatic(()=>ctx.colors,'color',(c)=>{const __frag=__blk2();const [__el68]=__walk2(__frag);{ const __v = 'color:' + c().color; __el68.style.cssText = __v == null ? '' : String(__v); }bindRef(__el68,c().ref);return __frag;});
     __m70.replaceWith(__cf69);
     return __frag;
   })(),
@@ -3211,7 +3211,7 @@ exports[`compile golden — demo corpus > showcase/stats-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, computed, defineComponent, prop, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindStyleText, computed, defineComponent, prop, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-u033yi");
@@ -3242,7 +3242,7 @@ defineComponent('app-stats-card', {
     bindInterpolation(__t9,()=>ctx.done());
     bindInterpolation(__t13,()=>ctx.pending());
     bindInterpolation(__t17,()=>ctx.percent());
-    bindAttributeOrProperty(__el20, "style", "style", ()=>ctx.barStyle());
+    bindStyleText(__el20, ()=>ctx.barStyle());
     return __frag;
   })(),
 });
@@ -3474,7 +3474,7 @@ exports[`compile golden — demo corpus > showcase/theme-picker.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, bindTwoWay, computed, currentTheme, debounced, defineComponent, effect, eventHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
+import { bindInterpolation, bindStyleText, bindTwoWay, computed, currentTheme, debounced, defineComponent, effect, eventHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7pjpe2");
@@ -3517,7 +3517,7 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
     bindInterpolation(__t10,()=>ctx.theme());
     bindTwoWay(__el15, 'value', ctx.primary);
     bindTwoWay(__el17, 'value', ctx.accent);
-    bindAttributeOrProperty(__el18, "style", "style", ()=>ctx.previewStyle());
+    bindStyleText(__el18, ()=>ctx.previewStyle());
     bindInterpolation(__t20,()=>ctx.primary());
     bindInterpolation(__t21,()=>ctx.accent());
     bindTwoWay(__el24, 'value', ctx.searchRaw);
@@ -4537,7 +4537,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-button.pdx 1`]
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindInterpolation, computed, defineComponent, eachStatic, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
+import { bindInterpolation, bindStyleText, computed, defineComponent, eachStatic, eventHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
 import { useButtonConsole } from './sections/comp-button/state.pdx';
 
 {
@@ -4571,7 +4571,7 @@ defineComponent('app-comp-button', {
     const __frag=__blk2();
     const [__el13,__m25]=__walk2(__frag);
     __el13.addEventListener('click', eventHandler(ctx.clearLog, ctx.el, 'click'));
-    const __cf24=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf23=eachStatic(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t18,__el19,__t20,__t22]=__walk1(__frag);bindInterpolation(__t18,()=>entry().time);bindAttributeOrProperty(__el19, "style", "style", ()=>'color:' + entry().color);bindInterpolation(__t20,()=>entry().variant);bindInterpolation(__t22,()=>entry().text);return __frag;});return __cf23;});
+    const __cf24=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __cf23=eachStatic(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t18,__el19,__t20,__t22]=__walk1(__frag);bindInterpolation(__t18,()=>entry().time);bindStyleText(__el19, ()=>'color:' + entry().color);bindInterpolation(__t20,()=>entry().variant);bindInterpolation(__t22,()=>entry().text);return __frag;});return __cf23;});
     __m25.replaceWith(__cf24);
     return __frag;
   })(),
@@ -20696,7 +20696,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-form-
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttributeOrProperty, bindNativeProperty, bindTwoWay, createForm, defineComponent, effect, eventHandler, formField, interpolationText, minLength, required, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindAttributeOrProperty, bindNativeProperty, bindStyleText, bindTwoWay, createForm, defineComponent, effect, eventHandler, formField, interpolationText, minLength, required, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-hqclme");
@@ -20745,17 +20745,17 @@ defineComponent('app-demo-comp-form-advanced-tab-wizard', {
     effect(()=>{__el7.className=interpolationText(ctx.tabClass2());});
     __el7.addEventListener('click', eventHandler(() => ctx.goToStep(2), ctx.el, 'click'));
     let __el8w_form = {}; effect(() => { const __b = ctx.wizardForm; if (Object.is(__b, __el8w_form)) return; __el8w_form = __b; assignBoundProperty(__el8, "form", __b); });
-    bindAttributeOrProperty(__el9, "style", "style", ()=>ctx.step0Style());
+    bindStyleText(__el9, ()=>ctx.step0Style());
     let __el10w_field = {}; effect(() => { const __b = ctx.wizardForm.username; if (Object.is(__b, __el10w_field)) return; __el10w_field = __b; assignBoundProperty(__el10, "field", __b); });
     bindTwoWay(__el11, 'value', ctx.wizardForm.username);
     let __el12w_field = {}; effect(() => { const __b = ctx.wizardForm.password; if (Object.is(__b, __el12w_field)) return; __el12w_field = __b; assignBoundProperty(__el12, "field", __b); });
     bindTwoWay(__el13, 'value', ctx.wizardForm.password);
-    bindAttributeOrProperty(__el14, "style", "style", ()=>ctx.step1Style());
+    bindStyleText(__el14, ()=>ctx.step1Style());
     let __el15w_field = {}; effect(() => { const __b = ctx.wizardForm.fullName; if (Object.is(__b, __el15w_field)) return; __el15w_field = __b; assignBoundProperty(__el15, "field", __b); });
     bindTwoWay(__el16, 'value', ctx.wizardForm.fullName);
     let __el17w_field = {}; effect(() => { const __b = ctx.wizardForm.avatar; if (Object.is(__b, __el17w_field)) return; __el17w_field = __b; assignBoundProperty(__el17, "field", __b); });
     bindTwoWay(__el18, 'value', ctx.wizardForm.avatar);
-    bindAttributeOrProperty(__el19, "style", "style", ()=>ctx.step2Style());
+    bindStyleText(__el19, ()=>ctx.step2Style());
     bindAttributeOrProperty(__el22, "textContent", "textContent", ()=>ctx.wizardSummary());
     bindNativeProperty(__el24, "disabled", "disabled", ()=>ctx.isFirstStep());
     __el24.addEventListener('click', eventHandler(ctx.prevStep, ctx.el, 'click'));
@@ -32913,7 +32913,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-toggl
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttributeOrProperty, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindStyleText, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useToggleGroupDemo } from './state.pdx';
 
 {
@@ -32947,7 +32947,7 @@ defineComponent('app-demo-comp-toggle-group-composition', {
     __el5.addEventListener('value-change', eventHandler(e => ctx.setFormatting(e.detail.value), ctx.el, 'value-change'));
     let __el13w_value = {}; effect(() => { const __b = ctx.align(); if (Object.is(__b, __el13w_value)) return; __el13w_value = __b; assignBoundProperty(__el13, "value", __b); });
     __el13.addEventListener('value-change', eventHandler(e => ctx.setAlign(e.detail.value), ctx.el, 'value-change'));
-    bindAttributeOrProperty(__el17, "style", "style", ()=>ctx.sampleStyle() + ';text-align:' + (ctx.align() || 'left'));
+    bindStyleText(__el17, ()=>ctx.sampleStyle() + ';text-align:' + (ctx.align() || 'left'));
     return __frag;
   })(),
 });
@@ -32998,7 +32998,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-toggl
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttributeOrProperty, bindInterpolation, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, bindStyleText, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useToggleGroupDemo } from './state.pdx';
 
 {
@@ -33028,7 +33028,7 @@ defineComponent('app-demo-comp-toggle-group-multiple', {
     let __el8w_value = {}; effect(() => { const __b = ctx.formatting(); if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });
     __el8.addEventListener('value-change', eventHandler(e => ctx.setFormatting(e.detail.value), ctx.el, 'value-change'));
     bindInterpolation(__t19,()=>ctx.formatting() || '(none)');
-    bindAttributeOrProperty(__el20, "style", "style", ()=>ctx.sampleStyle());
+    bindStyleText(__el20, ()=>ctx.sampleStyle());
     return __frag;
   })(),
 });
@@ -33039,7 +33039,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-toggl
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttributeOrProperty, bindInterpolation, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, bindStyleText, computed, defineComponent, effect, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useToggleGroupDemo } from './state.pdx';
 
 {
@@ -33068,7 +33068,7 @@ defineComponent('app-demo-comp-toggle-group-single', {
     let __el4w_value = {}; effect(() => { const __b = ctx.align(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
     __el4.addEventListener('value-change', eventHandler(e => ctx.setAlign(e.detail.value), ctx.el, 'value-change'));
     bindInterpolation(__t11,()=>ctx.align() || '(none)');
-    bindAttributeOrProperty(__el12, "style", "style", ()=>'text-align:' + (ctx.align() || 'left'));
+    bindStyleText(__el12, ()=>'text-align:' + (ctx.align() || 'left'));
     return __frag;
   })(),
 });
@@ -38204,7 +38204,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/design-the
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindAttributeOrProperty, bindInterpolation, computed, defineComponent, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindInterpolation, bindStyleText, computed, defineComponent, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
 import { useThemeMeasure } from './state.pdx';
 
 {
@@ -38229,7 +38229,7 @@ defineComponent('app-demo-design-themes-contrast', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m26]=__walk1(__frag);
-    const __cf25=eachStatic(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken);bindAttribute(__el15, "data-ratio", ()=>row().ratio);bindAttributeOrProperty(__el16, "style", "style", ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')');bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
+    const __cf25=eachStatic(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken);bindAttribute(__el15, "data-ratio", ()=>row().ratio);bindStyleText(__el16, ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')');bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
     __m26.replaceWith(__cf25);
     return __frag;
   })(),

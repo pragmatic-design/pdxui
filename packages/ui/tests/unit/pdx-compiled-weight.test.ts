@@ -19,7 +19,10 @@
 // the class whose form API leaves every component that is not one (hello: 7505 → 7237 B). The switch
 // 1255 → 1273 B with #1246's slot projection: its template renders a <slot>, and it names
 // `projection: slotProjection`, which leaves every component whose template renders none (hello: 7237 →
-// 6784 B); the select renders none, and did not move.
+// 6784 B); the select renders none, and did not move. The select 7800 → 7806 B with #1240: its two
+// `:style="…"` write `style.cssText` through `bindStyleText`, shorter calls than the property binding
+// they were, and the module names one more import (its other bindings still use
+// `bindAttributeOrProperty`): the six bytes are that name, which an app's bundle makes a local identifier.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -37,7 +40,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1273,
-    'pilot/select.pdx': 7800,
+    'pilot/select.pdx': 7806,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

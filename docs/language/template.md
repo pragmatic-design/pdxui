@@ -294,7 +294,8 @@ StylePair      ::= S? ( Identifier | StringLiteral ) S? ":" S? Expression S?
 The object form `:style="{ width: w, 'background-color': c, '--accent': a }"` sets each property
 with `style.setProperty(name, String(value ?? ''))`, a camelCase key turned to kebab-case
 (`fontSize` → `font-size`); a custom property is a quoted key. `:style="expr"` writes a string to
-`style.cssText`.
+`style.cssText`, on an HTML element and on an SVG one alike; `null` or `undefined` writes `''`, which
+empties the inline style (#1240).
 
 #### Rules
 

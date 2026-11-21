@@ -126,6 +126,11 @@ export const ROWS: Row[] = [
     { name: ':class beside a static class, after a change', expected: '<p class="b base">x</p><button>t</button>', template: "<p class=\"base\" :class=\"name\">x</p><button @click=\"name = 'b'\">t</button>", script: "let name = $signal('a');", act: click('button') },
     // The inline path assigned the object to el.style, which keeps no colour (#96).
     { name: ':style with an object', expected: '<p style="color: red;">x</p>', template: "<p :style=\"{ color: 'red' }\">x</p>" },
+    // `:style="expr"` writes style.cssText (#1240), on HTML and on SVG, whose style has only a getter in happy-dom.
+    { name: ':style with a string', expected: '<p style="color: red;">x</p>', template: '<p :style="s">x</p>', script: "let s = $signal('color: red');" },
+    { name: ':style with a string on SVG', expected: '<svg><circle style="fill: red;"></circle></svg>', template: '<svg><circle :style="s"></circle></svg>', script: "let s = $signal('fill: red');" },
+    { name: ':style with a string, changed to another', expected: '<p style="color: blue;">x</p><svg><circle style="color: blue;"></circle></svg><button>b</button>', template: "<p :style=\"s\">x</p><svg><circle :style=\"s\"></circle></svg><button @click=\"s = 'color: blue'\">b</button>", script: "let s = $signal('color: red');", act: click('button') },
+    { name: ':style with a string, changed to null', expected: '<p style="">x</p><svg><circle style=""></circle></svg><button>n</button>', template: "<p :style=\"s\">x</p><svg><circle :style=\"s\"></circle></svg><button @click=\"s = null\">n</button>", script: "let s = $signal('color: red');", act: click('button') },
     { name: ':style with an object over a signal', expected: '<p style="color: blue;">x</p>', template: '<p :style="{ color: c }">x</p>', script: "let c = $signal('blue');" },
     { name: '@show over an element', expected: '<p>x</p><p style="display: none;">y</p>', template: '@show (on) { <p>x</p> }@show (!on) { <p>y</p> }', script: 'let on = $signal(true);' },
     { name: '@click', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
