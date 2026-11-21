@@ -23,7 +23,8 @@ describe('a @part named like an import (#1066, 1)', () => {
     });
 
     it('the control: a part with a name nothing declares is still the element\'s signal', () => {
-        const { code } = compile(pdx('<span data-part="badge">x</span>', '@part badge;'), 'test.pdx');
+        // Read by the script: a part nothing reads has no signal (#1268).
+        const { code } = compile(pdx('<span data-part="badge">x</span>', '@part badge;\nfunction f() { return badge; }'), 'test.pdx');
         expect(code).toMatch(/\b__badge\b/);
     });
 });

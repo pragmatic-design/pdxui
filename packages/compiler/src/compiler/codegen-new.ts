@@ -21,6 +21,7 @@ import { jsQuote } from './js-literal';
 import { coreRuleImports } from './form-rules';
 import { variantsDescriptor } from './variants';
 import { repeatedParts } from './validate-parts';
+import { readParts } from './part-reads';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -128,6 +129,16 @@ export function compileNewMode(
     // A literal `data-part` naming a declared part is also that part's ref (#134), when the part's
     // name is a signal: its own, or a `$signal` the script declares. A name the script declares as
     // anything else keeps its meaning (#999), and the element is not handed to it.
+    // A part's own signal exists for what reads the part's name (#1268): one nothing reads is no ref,
+    // no signal and no binding, at every mount; it keeps its data-part, its descriptor entry and its
+    // diagnostics. A `$signal` the script declares under a part's name is the script's, and stays.
+    const partsRead = readParts(analysis.parts, descriptor.script?.content ?? '', ast, new Set(analysis.signals.map(s => s.name)),
+        (analysis.host ?? []).map(h => h.value ?? h.name));
+    const unreadParts = new Set(analysis.signals.filter(s => s.part && !partsRead.has(s.name)).map(s => s.name));
+    if (unreadParts.size > 0) {
+        analysis.signals = analysis.signals.filter(s => !unreadParts.has(s.name));
+        analysis.exports = analysis.exports.filter(e => !(e.kind === 'signal' && unreadParts.has(e.name)));
+    }
     ctx.parts = new Set(analysis.parts.filter(name => analysis.signals.some(s => s.name === name)));
     // One the template can render more than once is the array of its elements (#988): its signal,
     // declared by the part, starts empty. The setup is written below, after this.

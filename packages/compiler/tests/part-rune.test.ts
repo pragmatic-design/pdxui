@@ -17,9 +17,43 @@ function codes(template: string, script: string, code: string) {
     return found.filter(w => w.code === code);
 }
 
+describe('a @part nothing reads has no ref (#1268)', () => {
+    const template = '<div data-part="root"><span data-part="label">x</span></div>';
+
+    it('a part the script never names gets no signal and no bindRef, and keeps its data-part', () => {
+        const { code } = compile(pdx(template, '@part root, label;\n// the root, the label: names in a comment\nconst s = \'root\';\nfunction f() { label?.focus(); }'), 'test.pdx');
+        expect(code).not.toMatch(/const __root = signal/);
+        expect(code).not.toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+        expect(markup(code).join('')).toContain('data-part="root"');
+        expect(code).toContain(`parts: ['root', 'label'],`);
+        // The control beside it: the part the script reads keeps its ref.
+        expect(code).toMatch(/const __label = signal\(null/);
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.label\)/);
+    });
+
+    it('a part a template expression reads keeps its ref', () => {
+        const { code } = compile(pdx(`${template}<p :title="root?.id">t</p>`, '@part root, label;'), 'test.pdx');
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+        expect(code).not.toMatch(/bindRef\(__el\d+,ctx\.label\)/);
+    });
+
+    it('a part read inside a template literal of the script keeps its ref', () => {
+        const { code } = compile(pdx(template, '@part root, label;\nfunction f() { return `${root?.id}`; }'), 'test.pdx');
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+    });
+
+    it('a part @host or @expose reads keeps its ref', () => {
+        const host = compile(pdx(template, '@part root, label;\n@host { :title="root?.id" }'), 'test.pdx').code;
+        expect(host).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+        const exposed = compile(pdx(template, '@part root, label;\n@expose root;'), 'test.pdx').code;
+        expect(exposed).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+    });
+});
+
 describe('@part compiles into a ref and the descriptor', () => {
+    // A part's ref is for what reads it (#1268): these read it.
     it('the element is the part\'s ref, and keeps its data-part', () => {
-        const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;'), 'test.pdx');
+        const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;\nfunction f() { trigger?.focus(); }'), 'test.pdx');
         // Kept in the block's static markup, written as HTML (#369).
         expect(markup(code).join('')).toContain('<button data-part="trigger">x</button>');
         expect(code).toMatch(/bindRef\(__el\d+,ctx\.trigger\)/);
@@ -30,12 +64,12 @@ describe('@part compiles into a ref and the descriptor', () => {
     it('a component whose only declaration is a part imports the signal its ref is', () => {
         // The ref is `signal(null)`: without the import the setup throws, and the component mounts
         // with no scope attribute and no host bindings.
-        const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;'), 'test.pdx');
+        const { code } = compile(pdx('<button data-part="trigger">x</button>', '@part trigger;\nfunction f() { trigger?.focus(); }'), 'test.pdx');
         expect(code).toMatch(/^import \{[^}]*\bsignal\b[^}]*\} from '@pdxui\/core';/m);
     });
 
     it('a part inside a block is bound when the block renders', () => {
-        const { code } = compile(pdx('<p>x</p>@if (open) { <div data-part="popup">y</div> }', '@part popup;\nlet open = $signal(false);'), 'test.pdx');
+        const { code } = compile(pdx('<p>x</p>@if (open) { <div data-part="popup">y</div> }', '@part popup;\nlet open = $signal(false);\nfunction f() { popup?.focus(); }'), 'test.pdx');
         expect(code).toMatch(/when\([\s\S]*bindRef\(__el\d+,ctx\.popup\)/);
     });
 
@@ -58,7 +92,7 @@ describe('@part compiles into a ref and the descriptor', () => {
 // A part is every element that carries it (#988). When the template can render at most one at a
 // time, the name is that element; otherwise it is the array of the rendered elements.
 describe('a part on several elements', () => {
-    const SCRIPT = '@part x;\nlet a = $signal(true);\nlet b = $signal(true);\nlet items = $signal([1, 2]);';
+    const SCRIPT = '@part x;\nlet a = $signal(true);\nlet b = $signal(true);\nlet items = $signal([1, 2]);\nfunction f() { return x; }';
     const many = (template: string) => {
         const { code } = compile(pdx(template, SCRIPT), 'test.pdx');
         return code;
