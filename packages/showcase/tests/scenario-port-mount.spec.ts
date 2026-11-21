@@ -24,6 +24,7 @@ import { createServer, type Server } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
 import { extname, join, normalize, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
+import { cpus } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scenarioDist, COMPONENT_MOUNT_MAIN } from './scenarios-build';
 import { portRatio, coupleRatios, type PairResult } from './port-ratio';
@@ -94,12 +95,13 @@ async function open(browser: Browser, url: string): Promise<Page> {
  * One pair of fresh pages: the median of each side's alternated samples. `oursFirst` is the order the
  * two are opened in, which `portRatio` balances (#1277).
  */
-async function pair(browser: Browser, ours: string, theirs: string, tag: string, oursFirst: boolean): Promise<PairResult> {
+async function pair(browser: Browser, ours: string, theirs: string, tag: string, oursFirst: boolean): Promise<RawPair> {
     let pa: Page;
     let pb: Page;
     if (oursFirst) { pa = await open(browser, ours); pb = await open(browser, theirs); }
     else { pb = await open(browser, theirs); pa = await open(browser, ours); }
-    for (let i = 0; i < WARM_UP; i++) { await mount(pa, tag); await mount(pb, tag); }
+    const warm: number[] = [];
+    for (let i = 0; i < WARM_UP; i++) { warm.push(await mount(pa, tag)); warm.push(await mount(pb, tag)); }
     const a: number[] = [];
     const b: number[] = [];
     for (let i = 0; i < SAMPLES; i++) {
@@ -108,18 +110,31 @@ async function pair(browser: Browser, ours: string, theirs: string, tag: string,
         else { b.push(await mount(pb, tag)); a.push(await mount(pa, tag)); }
     }
     await Promise.all([pa.close(), pb.close()]);
-    return { a: median(a), b: median(b), oursFirst };
+    return { a: median(a), b: median(b), oursFirst, warm, rawA: a, rawB: b };
 }
+
+/**
+ * A pair with its raw times, logged by the control (#1277): the warm-up (a, b, a, b, …) and each side's
+ * samples in the order they were taken — sample i ran `b` first when i is even, `a` first when odd.
+ * On Azure runners one side read 5–6% slower with the same build on both; these say which mount is.
+ */
+interface RawPair extends PairResult { warm: number[]; rawA: number[]; rawB: number[] }
+
+/** One raw pair as a log line. */
+const rawLine = (p: RawPair, i: number): string => {
+    const f = (xs: number[]) => xs.map((x) => x.toFixed(1)).join(',');
+    return `[port-raw] pair ${i} ${p.oursFirst ? 'a-opened-first' : 'b-opened-first'} warm=${f(p.warm)} a=${f(p.rawA)} b=${f(p.rawB)}`;
+};
 
 /**
  * The tag's ratio, ours over theirs: COUPLES couples of fresh pairs, one opened ours first and one theirs
  * first (`portRatio`, #1277). `pairs` are the couples' ratios, each pair's the median of its samples.
  */
-async function ratioOf(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ ratio: number; a: number; b: number; pairs: number[] }> {
-    const results: PairResult[] = [];
+async function ratioOf(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ ratio: number; a: number; b: number; pairs: number[]; raw: RawPair[] }> {
+    const results: RawPair[] = [];
     for (let p = 0; p < COUPLES * 2; p++) results.push(await pair(browser, ours, theirs, tag, p % 2 === 0));
     const pairs = coupleRatios(results).map((r) => Math.round(r * 100) / 100);
-    return { ratio: portRatio(results), a: median(results.map((r) => r.a)), b: median(results.map((r) => r.b)), pairs };
+    return { ratio: portRatio(results), a: median(results.map((r) => r.a)), b: median(results.map((r) => r.b)), pairs, raw: results };
 }
 
 let site: { url: string; server: Server };
@@ -138,6 +153,9 @@ test.describe('a component moved to .pdx against its TypeScript version, on this
     test(`control: ${CONTROL_TAG} against itself reads within ${BAND} of 1.0`, async ({ browser }) => {
         const r = await ratioOf(browser, site.url, site.url, CONTROL_TAG);
         console.log(`[port] control ${CONTROL_TAG} against itself: ${r.a.toFixed(2)} ms / ${r.b.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
+        // The raw times, and the runner's cores, for #1277: always logged, so every run is a data point.
+        console.log(`[port-raw] cores ${cpus().length} (${cpus()[0]?.model ?? '?'})`);
+        r.raw.forEach((p, i) => console.log(rawLine(p, i)));
         // The ratio is to a hundredth, and so is its distance from 1: in floating point 1.05 - 1 is
         // 0.050000000000000044, which read a control exactly at the band as outside it.
         const off = Math.round(Math.abs(r.ratio - 1) * 100) / 100;
