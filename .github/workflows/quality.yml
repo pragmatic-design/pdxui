@@ -166,7 +166,11 @@ jobs:
         with:
           name: ${{ matrix.suite }}-report-${{ strategy.job-index }}
           # `dir` where the suite's package folder is not its name (showcase-timing, showcase-scenarios).
-          path: packages/${{ matrix.dir || matrix.suite }}/test-results
+          # `test-results-kept` too: `keep-failed-runs.mjs` moves a failed run's traces there, which
+          # left `test-results` empty and the failure with nothing to read (#1277).
+          path: |
+            packages/${{ matrix.dir || matrix.suite }}/test-results
+            packages/${{ matrix.dir || matrix.suite }}/test-results-kept
 
   # The builder has a `test` script, so `pnpm test` reaches these suites too. This job is where CI
   # runs them: in the image that carries a browser for them, uploading the report on failure; naming the
