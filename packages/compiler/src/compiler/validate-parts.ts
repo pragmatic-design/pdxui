@@ -129,11 +129,16 @@ function partHasRef(name: string, ast: readonly TemplateNode[]): boolean {
  * own `data-part`s its owner checks. `scriptReads` says whether the script reads a name.
  */
 export function checkParts(parts: readonly string[], ast: TemplateNode[], signalNames: ReadonlySet<string>,
-    { internal = false, drawnBy = new Map(), scriptReads = () => false }: PartContext = {}): ValidationWarning[] {
+    { internal = false, drawnBy = new Map(), scriptReads = () => false, external = [], scriptWrites = () => false }: PartContext = {}): ValidationWarning[] {
     const counts = dataPartCounts(ast);
     const declared = new Set(parts);
+    const outside = new Set(external);
     const warnings: ValidationWarning[] = [];
     for (const name of declared) {
+        if (outside.has(name)) {
+            warnings.push(...checkExternalPart(name, (counts.get(name) ?? 0) > 0 || drawnBy.has(name), scriptWrites(name)));
+            continue;
+        }
         const view = drawnBy.get(name);
         if ((counts.get(name) ?? 0) === 0 && view) {
             // The owner's part, on an element of its view: the owner's script never holds that element.
@@ -182,9 +187,48 @@ export function checkParts(parts: readonly string[], ast: TemplateNode[], signal
     return warnings;
 }
 
+/**
+ * An `@part(external)` part (#1284): the template draws none of its elements, the script writes it on
+ * those it builds or marks. Drawn by the template, the declaration says the opposite of what is
+ * there (`PDX_PART_EXTERNAL_DRAWN`); written by nothing, it is a name no element carries
+ * (`PDX_PART_EXTERNAL_UNWRITTEN`), what `PDX_PART_MISSING` is for a template's part.
+ */
+function checkExternalPart(name: string, drawn: boolean, written: boolean): ValidationWarning[] {
+    if (drawn) {
+        return [{
+            code: 'PDX_PART_EXTERNAL_DRAWN', severity: 'error',
+            message: `@part(external) '${name}' is on an element of the template: an external part is one the template does not draw.`,
+            hint: `Declare it with the template's parts, @part ${name};, or take data-part="${name}" off the template.`,
+        }];
+    }
+    if (!written) {
+        return [{
+            code: 'PDX_PART_EXTERNAL_UNWRITTEN', severity: 'error',
+            message: `@part(external) '${name}' is written by nothing in the script: no setAttribute('data-part', '${name}'), no .dataset.part = '${name}'.`,
+            hint: `Write it on the element it names, el.setAttribute('data-part', '${name}'), or remove it from @part.`,
+        }];
+    }
+    return [];
+}
+
+/** Does the script write `name` as a part, with `setAttribute('data-part', …)` or `.dataset.part =`? (#1284) */
+export function writesPart(code: string, name: string): boolean {
+    const n = escapeName(name);
+    // Match: setAttribute('data-part', 'name'), any quotes, the name whole.  Groups: [1]/[2]=the quotes
+    const attribute = new RegExp(`setAttribute\\(\\s*(['"\`])data-part\\1\\s*,\\s*(['"\`])${n}\\2\\s*\\)`);
+    // Match: .dataset.part = 'name', any quote.  Groups: [1]=the quote
+    const dataset = new RegExp(`\\.dataset\\.part\\s*=\\s*(['"\`])${n}\\1`);
+    return attribute.test(code) || dataset.test(code);
+}
+
+const escapeName = (name: string) => name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
 /** What `checkParts` knows beyond the file: its @internal views, and whether it is one (#1110). */
 export interface PartContext {
     internal?: boolean;
     drawnBy?: ReadonlyMap<string, string>;
     scriptReads?: (name: string) => boolean;
+    /** The `@part(external)` names (#1284), and whether the script writes one. */
+    external?: readonly string[];
+    scriptWrites?: (name: string) => boolean;
 }

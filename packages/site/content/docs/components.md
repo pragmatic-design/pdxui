@@ -622,6 +622,13 @@ leaves `label` the text, and the element is reached with a `:ref` on it (without
 `$signal` of the part's name receives the element. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
 and the manifest lists a component's parts.
 
+A part can sit on elements the template does not draw: ones the script builds, or the page's own
+markup the component marks, as a wizard marks each of its step panels. `@part(external) panel;`
+declares it. It is listed with the other parts and has no element in the script; the script writes it
+with the name as a literal, `el.setAttribute('data-part', 'panel')` or `el.dataset.part = 'panel'`.
+With no such write, it is `PDX_PART_EXTERNAL_UNWRITTEN`; with `data-part="panel"` in the template,
+`PDX_PART_EXTERNAL_DRAWN`.
+
 ## @host — the component's own element
 
 In a web component the element on the page **is** the component. Its role, its ARIA state and a

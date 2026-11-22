@@ -199,6 +199,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     let hostName: string | undefined;
     const variants: VariantAxis[] = [];
     const parts: string[] = [];
+    const externalParts: string[] = [];
     const route: RouteInfo = {};
     // The `{ … }` of `@params`, read once @page's pattern is known (#564).
     let paramsBlockText: string | null = null;
@@ -792,10 +793,14 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── @part name1, name2; — named, public parts of the component (#134) ───
-        // Match: @part trigger, popup;   Groups: [1]=the names
-        const partMatch = trimmed.match(/^@part\s+([\w\s,]+?)\s*;?\s*$/);
+        // `@part(external) panel;` (#1284): parts the script writes on elements the template does not
+        // draw — ones it builds, or the page's own. Listed with the others, checked against the script.
+        // Match: @part trigger, popup;  or  @part(external) panel;   Groups: [1]=external [2]=the names
+        const partMatch = trimmed.match(/^@part(?:\((external)\))?\s+([\w\s,]+?)\s*;?\s*$/);
         if (partMatch) {
-            parts.push(...partMatch[1].split(',').map(n => n.trim()).filter(Boolean));
+            const names = partMatch[2].split(',').map(n => n.trim()).filter(Boolean);
+            parts.push(...names);
+            if (partMatch[1]) externalParts.push(...names);
             continue;
         }
 
@@ -1365,6 +1370,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // (#1112): the part's signal replaced the snippet on the context, and `@render` drew the fallback.
     const importedHere = new Set(importedNames);
     for (const name of parts) {
+        // An external part (#1284) is on no element the template renders: no ref would ever hold one.
+        if (externalParts.includes(name)) continue;
         if (signals.some(s => s.name === name) || props.some(p => p.name === name) || exports.some(e => e.name === name)
             || importedHere.has(name) || slots.some(s => s.name === name)) continue;
         signals.push({ name, initialExpr: 'null', part: true });
@@ -1426,6 +1433,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         ...(hostName ? { hostName } : {}),
         ...(variants.length ? { variants } : {}),
         parts,
+        ...(externalParts.length ? { externalParts } : {}),
         route,
         globalStore,
         customTag,

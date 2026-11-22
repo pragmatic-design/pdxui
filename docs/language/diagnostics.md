@@ -58,6 +58,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_SLOT_REQUIRED` | error | A component used without a snippet it requires (#489). | `@slot`, [script.md](script.md); `@snippet`, [template.md](template.md) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not one of its models (#124). | `::name`, [template.md](template.md); `@model`, [script.md](script.md) |
 | `PDX_PART_MISSING` | error | A declared `@part` that no element of the template, nor of an `@internal` view it imports, carries. | `@part`, [script.md](script.md) |
+| `PDX_PART_EXTERNAL_UNWRITTEN` | error | An `@part(external)` part the script writes on no element: no literal `setAttribute('data-part', 'x')` or `.dataset.part = 'x'` (#1284). | `@part`, [script.md](script.md) |
+| `PDX_PART_EXTERNAL_DRAWN` | error | An `@part(external)` part that an element of the template carries (#1284). | `@part`, [script.md](script.md) |
 | `PDX_PART_IN_VIEW` | warn | The script reads a `@part` that only one of its `@internal` views draws (#1110). | `@part`, [script.md](script.md) |
 | `PDX_PART_NAME_TAKEN` | info | A `@part` whose name the script declares as a prop, a model, a slot, an import, a function or a constant, with no `:ref` on its element: that declaration keeps its meaning. | `@part`, [script.md](script.md) |
 | `PDX_PART_UNDECLARED` | error | A `data-part` that names no `@part` — of this component, or of the component an `@internal` view belongs to. | `@part`, [script.md](script.md) |

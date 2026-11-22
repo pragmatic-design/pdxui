@@ -183,7 +183,10 @@ array of the rendered elements, in document order (`option[0]?.focus()`); on alt
 one `@if` chain it stays one element. A part on no element, or a `data-part` with no `@part`, are
 `PDX_PART_MISSING` / `PDX_PART_UNDECLARED`. A part named like a prop, a model, a function or a
 constant leaves that name its meaning (a `label` prop stays the text): reach the element with a
-`:ref` to another `$signal` (`PDX_PART_NAME_TAKEN`, info).
+`:ref` to another `$signal` (`PDX_PART_NAME_TAKEN`, info). A part on elements the template does not
+draw (built by the script, or the page's own) is `@part(external) panel;`, written by the script as
+`el.setAttribute('data-part', 'panel')` or `el.dataset.part = 'panel'` (`PDX_PART_EXTERNAL_UNWRITTEN`
+when nothing writes it).
 
 **`@host { role="combobox" :aria-expanded="open" @keydown.enter="onKey" }`** puts attributes, bindings
 and listeners on the component's own element — the template's attribute syntax, one line or several.

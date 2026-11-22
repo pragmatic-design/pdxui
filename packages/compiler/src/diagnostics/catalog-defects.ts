@@ -371,6 +371,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'To reach the element, bind it with `:ref` to a `$signal` of another name. A `$signal` of the part\'s own name receives the element, as a part does. A part only a theme needs can stay as it is: the finding is information.',
         example: { bad: pdx('<span data-part="label">{{ label }}</span>', "@prop label: string = '';\n@part label;"), good: pdx('<span data-part="label" :ref="labelEl">{{ label }}</span>', "@prop label: string = '';\n@part label;\nlet labelEl = $signal<HTMLElement | null>(null);") },
     },
+    PDX_PART_EXTERNAL_UNWRITTEN: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@part(external)` part that the script writes on no element: no `setAttribute(\'data-part\', \'x\')`, no `.dataset.part = \'x\'` (#1284).',
+        explanation: 'An external part is one the template does not draw: the script writes it on the elements it builds, or on the page\'s own it marks. The compiler cannot follow those elements, so it reads the writes instead: with none, the manifest lists a part no element carries, which is what `PDX_PART_MISSING` says of a template\'s part.',
+        fix: 'Write it on the element it names, `el.setAttribute(\'data-part\', \'x\')` or `el.dataset.part = \'x\'`, with the name as a literal, or remove `x` from `@part`.',
+        example: { bad: pdx('<slot></slot>', '@part(external) panel;'), good: pdx('<slot></slot>', "@part(external) panel;\nfunction mark(el: HTMLElement) { el.setAttribute('data-part', 'panel'); }") },
+    },
+    PDX_PART_EXTERNAL_DRAWN: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@part(external)` part that an element of the template carries (#1284).',
+        explanation: '`external` says the template draws none of the part\'s elements, so the part gets no ref: the script cannot read the element by the part\'s name. A `data-part` in the template contradicts the declaration, and the element drawn there would be a part the script could not reach.',
+        fix: 'Declare it with the template\'s parts, `@part x;`, or take `data-part="x"` off the template.',
+        example: { bad: pdx('<div data-part="panel"></div>', "@part(external) panel;\nfunction mark(el: HTMLElement) { el.setAttribute('data-part', 'panel'); }"), good: pdx('<div data-part="panel"></div>', '@part panel;') },
+    },
     PDX_PART_IN_VIEW: {
         severity: 'warn', category: 'defect',
         summary: 'The script reads a `@part` that only one of its `@internal` views draws (#1110).',

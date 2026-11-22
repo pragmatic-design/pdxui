@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 117 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 119 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1170,6 +1170,68 @@ write:
 <script>
 @page '/users';
 @guard 'admin';
+</script>
+```
+
+### PDX_PART_EXTERNAL_DRAWN
+
+*error* — An `@part(external)` part that an element of the template carries (#1284).
+
+`external` says the template draws none of the part's elements, so the part gets no ref: the script cannot read the element by the part's name. A `data-part` in the template contradicts the declaration, and the element drawn there would be a part the script could not reach.
+
+**Fix.** Declare it with the template's parts, `@part x;`, or take `data-part="x"` off the template.
+
+Instead of:
+
+```html
+<template>
+  <div data-part="panel"></div>
+</template>
+<script>
+@part(external) panel;
+function mark(el: HTMLElement) { el.setAttribute('data-part', 'panel'); }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <div data-part="panel"></div>
+</template>
+<script>
+@part panel;
+</script>
+```
+
+### PDX_PART_EXTERNAL_UNWRITTEN
+
+*error* — An `@part(external)` part that the script writes on no element: no `setAttribute('data-part', 'x')`, no `.dataset.part = 'x'` (#1284).
+
+An external part is one the template does not draw: the script writes it on the elements it builds, or on the page's own it marks. The compiler cannot follow those elements, so it reads the writes instead: with none, the manifest lists a part no element carries, which is what `PDX_PART_MISSING` says of a template's part.
+
+**Fix.** Write it on the element it names, `el.setAttribute('data-part', 'x')` or `el.dataset.part = 'x'`, with the name as a literal, or remove `x` from `@part`.
+
+Instead of:
+
+```html
+<template>
+  <slot></slot>
+</template>
+<script>
+@part(external) panel;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <slot></slot>
+</template>
+<script>
+@part(external) panel;
+function mark(el: HTMLElement) { el.setAttribute('data-part', 'panel'); }
 </script>
 ```
 

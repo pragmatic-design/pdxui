@@ -404,7 +404,7 @@ beta (#132)
 ### Syntax
 
 ```ebnf
-PartDecl      ::= "@part" S Identifier ( S? "," S? Identifier )* End
+PartDecl      ::= "@part" ( "(external)" )? S Identifier ( S? "," S? Identifier )* End
 PartAttribute ::= 'data-part="' Identifier '"'
 ```
 
@@ -438,6 +438,10 @@ the template can render at the same time:
   reaches the element through a `:ref` on it; without one, `PDX_PART_NAME_TAKEN` (info) says so. A part's
   name is chosen by the styling contract, so it never turns a public prop into an element:
   `pdx-switch` has a `label` prop and a `label` part.
+- `@part(external) panel;` (#1284) is a part the template does not draw: the script writes it with a
+  literal `setAttribute('data-part', 'panel')` or `.dataset.part = 'panel'`, on elements it builds or
+  on the page's own. It is in the manifest like the others, and has no ref. Written by nothing in the
+  script: `PDX_PART_EXTERNAL_UNWRITTEN`; drawn by the template: `PDX_PART_EXTERNAL_DRAWN`.
 - `:part=` and the HTML `part` attribute are not this: `part` is the shadow-parts attribute.
 
 ### Examples

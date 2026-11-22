@@ -533,7 +533,7 @@ alpha
 #### Syntax
 
 ```ebnf
-PartDecl      ::= "@part" S Identifier ( S? "," S? Identifier )* S? ";"?
+PartDecl      ::= "@part" ( "(external)" )? S Identifier ( S? "," S? Identifier )* S? ";"?
 PartAttribute ::= 'data-part="' Identifier '"'
 ```
 
@@ -574,6 +574,12 @@ element or `null`.
   `PDX_PART_MISSING`. The view declares none, and a `data-part` it draws that its owner does not declare
   is `PDX_PART_UNDECLARED` on the owner. The owner's script does not hold such an element: reading the
   name there is `PDX_PART_IN_VIEW`; the view reaches it with a `:ref`.
+- `@part(external) panel;` declares a part the template does not draw (#1284): the script writes it
+  on elements it builds, or on the page's own it marks, as `pdx-wizard` marks each step panel. It is
+  in the descriptor and the manifest with the others, and has no ref: no rendered element would ever
+  fill it. The compiler reads the writes instead, a literal `setAttribute('data-part', 'panel')` or
+  `.dataset.part = 'panel'`, outside comments: with none, `PDX_PART_EXTERNAL_UNWRITTEN`; a
+  `data-part="panel"` in the template contradicts the declaration, `PDX_PART_EXTERNAL_DRAWN`.
 
 #### Examples
 

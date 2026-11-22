@@ -303,6 +303,8 @@ export interface ScriptAnalysis {
     hostName?: string;
     variants?: VariantAxis[]; // @variants { variant: { primary, ghost } = primary; } (#153)
     parts: string[];         // @part trigger, popup;
+    /** The parts of `parts` declared `@part(external)` (#1284): the script writes them, the template draws none. */
+    externalParts?: string[];
     route: RouteInfo;       // route metadata from @page/@guard/etc.
     globalStore?: GlobalStoreDirective;  // @store rune (file = store module)
     customTag?: string;      // @tag 'app-custom-name' — overrides file-derived tag
