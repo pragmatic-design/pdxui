@@ -795,8 +795,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // ─── @part name1, name2; — named, public parts of the component (#134) ───
         // `@part(external) panel;` (#1284): parts the script writes on elements the template does not
         // draw — ones it builds, or the page's own. Listed with the others, checked against the script.
-        // Match: @part trigger, popup;  or  @part(external) panel;   Groups: [1]=external [2]=the names
-        const partMatch = trimmed.match(/^@part(?:\((external)\))?\s+([\w\s,]+?)\s*;?\s*$/);
+        // A name may have a hyphen (#1299): `word-count` is a styling name, which the script cannot name.
+        // Match: @part trigger, word-count;  or  @part(external) panel;   Groups: [1]=external [2]=the names
+        const partMatch = trimmed.match(/^@part(?:\((external)\))?\s+([\w\s,-]+?)\s*;?\s*$/);
         if (partMatch) {
             const names = partMatch[2].split(',').map(n => n.trim()).filter(Boolean);
             parts.push(...names);
@@ -1372,6 +1373,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     for (const name of parts) {
         // An external part (#1284) is on no element the template renders: no ref would ever hold one.
         if (externalParts.includes(name)) continue;
+        // A hyphenated name (#1299) is no identifier: the script cannot read it, so it has no ref.
+        if (!/^[A-Za-z_$][\w$]*$/.test(name)) continue;
         if (signals.some(s => s.name === name) || props.some(p => p.name === name) || exports.some(e => e.name === name)
             || importedHere.has(name) || slots.some(s => s.name === name)) continue;
         signals.push({ name, initialExpr: 'null', part: true });
