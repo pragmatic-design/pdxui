@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/input/pdx-input.pdx';
 import '../../src/textarea/pdx-textarea';
-import '../../src/password-input/pdx-password-input';
-import '../../src/search-input/pdx-search-input';
+import '../../src/password-input/pdx-password-input.pdx';
+import '../../src/search-input/pdx-search-input.pdx';
 
 describe('theme integration — pdx-input class on inner elements', () => {
     beforeEach(cleanup);

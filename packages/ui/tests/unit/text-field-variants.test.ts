@@ -3,8 +3,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/input/pdx-input.pdx';
-import '../../src/password-input/pdx-password-input';
-import '../../src/search-input/pdx-search-input';
+import '../../src/password-input/pdx-password-input.pdx';
+import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/textarea/pdx-textarea';
 import '../../src/masked-input/pdx-masked-input';
 import '../../src/tag-input/pdx-tag-input';

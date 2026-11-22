@@ -2,8 +2,8 @@
 // its site page.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/search-input/pdx-search-input';
-import '../../src/password-input/pdx-password-input';
+import '../../src/search-input/pdx-search-input.pdx';
+import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/tabs/pdx-tabs';

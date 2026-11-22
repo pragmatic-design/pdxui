@@ -24,8 +24,8 @@ import './switch-toggle/pdx-switch.pdx';
 import './flag/pdx-flag.pdx';
 
 // Tier 1B: Specialized Inputs
-import './password-input/pdx-password-input';
-import './search-input/pdx-search-input';
+import './password-input/pdx-password-input.pdx';
+import './search-input/pdx-search-input.pdx';
 import './number-input/pdx-number-input';
 import './textarea/pdx-textarea';
 import './input-group/pdx-input-group.pdx';

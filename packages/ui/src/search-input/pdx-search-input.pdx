@@ -1,0 +1,183 @@
+<template>
+  <div class="pdx-input-wrap" data-part="root" @click="onWrapClick">
+    <span class="pdx-input-prefix" data-part="prefix">
+      @if (loading) {
+        <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="uiString('search-input', 'searching')"></span>
+      } @else {
+        <pdx-icon name="search" size="sm"></pdx-icon>
+      }
+    </span>
+    <input class="pdx-input" data-part="input" :ref="inputEl"
+      type="search"
+      ::value="value"
+      :placeholder="placeholder || uiString('search-input', 'placeholder')"
+      :disabled="disabled"
+      :name="name"
+      :aria-label="ariaLabel || null"
+      role="searchbox"
+      :aria-busy="loading ? 'true' : null"
+      autocomplete="off"
+      data-lpignore="true"
+      data-1p-ignore=""
+      data-form-type="other"
+      @input="onInput"
+      @keydown="onKeydown"
+      @focus="onFocus"
+      @blur="onBlur" />
+    @if (liveValue) {
+      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="uiString('search-input', 'clear')" tabindex="-1" @click="clear">×</button>
+    } @else if (shortcut) {
+      <span class="pdx-input-suffix" data-part="shortcut" style="font-size:var(--pdx-text-xs);opacity:0.5"><kbd style="font-family:var(--pdx-font-mono)">{{ shortcut }}</kbd></span>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A search field with a search icon, a clear button and Escape to clear, that emits the search after
+ * a debounce or on Enter.
+ *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input type="search">`, the searchbox a form submits.
+ * @csspart prefix - The space before the text: the search icon, or the spinner while `loading`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while `loading`.
+ * @csspart clear - The clear button, while there is text.
+ * @csspart shortcut - The `shortcut` hint, while the field is empty.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set.
+ *
+ * @alphaevent pdx-input
+ * @alphadetail value $event.currentTarget.value
+ */
+// pdx-search-input — Input with search icon, clear, debounce, Escape to clear.
+// Uses pdx-input wrapper pattern. Emits pdx-search after debounce.
+import { onNextFrame, onDestroy } from '@pdxui/core';
+// The search glyph is a <pdx-icon> in this component's own template, so it is registered
+// here: on a page that does not import the whole library the tag would never upgrade and the
+// prefix would measure 0x0.
+import '../icon/pdx-icon';
+import './search-input-icons';
+import { uiString } from '../shared/i18n';
+import { dispatchCommit } from '../shared/commit-change';
+
+// Typing writes it (#479), and the write dispatches `value-change`, live. `pdx-search` stays: it is
+// the debounced query, not the value. The inner <input> submits — `name` and the value verbatim. The
+// host submits nothing of its own, or it would send it a second time (#135): its form value is null;
+// the model is still the form's, for a reset.
+@model value: string = '' { form: () => null };
+/** The query, after the debounce or on Enter; not repeated for the same text. */
+@event 'pdx-search': { value: string };
+/** The clear button or Escape emptied the field, after its `value-change`. */
+@event 'pdx-clear': void;
+/** The searchbox received focus. */
+@event 'pdx-focus': void;
+/** The searchbox lost focus. */
+@event 'pdx-blur': void;
+// The visual states, on the host as custom states (#132), as pdx-input's.
+@state disabled = !!disabled;
+@state loading = !!loading;
+// pdx-ignore PDX_PART_NAME_TAKEN: `clear` is the theme's part on the clear button; the script's `clear` is the verb
+@part root, input, prefix, spinner, clear, shortcut;
+// The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+/** The input's placeholder. Empty: the search-input.placeholder component string, «Search...». */
+@prop placeholder: string = '';
+@prop ariaLabel: string = '';
+@prop disabled: boolean = false;
+@prop loading: boolean = false;
+@prop name: string = '';
+/** Debounce delay in ms for pdx-search event (0 = no debounce) */
+@prop debounce: number = 300;
+/** Keyboard shortcut hint displayed in suffix (e.g. "Ctrl+K") */
+@prop shortcut: string = '';
+
+// Imperative API: focus/blur/clear
+@expose focus, blur, clear, selectText;
+
+let inputEl = $signal(null);
+let liveValue = $signal('');
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+// The debounce must not emit pdx-search after the unmount
+onDestroy(() => { if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; } });
+
+// A native reset puts a field back to its default value, which a property binding never sets: the
+// default is the value the component mounted with, so the field's own reset and the host's model agree.
+const mounted = value;
+onNextFrame(() => {
+  if (inputEl) inputEl.defaultValue = mounted === null || mounted === undefined ? '' : String(mounted);
+});
+
+/**
+ * One pdx-search per search: a value that was just searched is not searched again: Enter after
+ * the debounce has fired would emit the same query a second time, and a consumer would run
+ * it twice. Null until the first search, so a first Enter always searches.
+ */
+let lastSearched: string | null = null;
+function emitSearch(query: string): void {
+  if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; }
+  if (query === lastSearched) return;
+  lastSearched = query;
+  pdxSearch({ value: query });
+}
+
+// The model is the field's, two-way (`::value`); this follows the text and debounces the search.
+function onInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value;
+  liveValue = val;
+
+  // Debounced search event (cancelled on destroy too)
+  if (debounceTimer) clearTimeout(debounceTimer);
+  const delay = debounce as number;
+  if (delay > 0) {
+    debounceTimer = setTimeout(() => { debounceTimer = null; emitSearch(val); }, delay);
+  } else {
+    emitSearch(val);
+  }
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    clear();
+  }
+  if (e.key === 'Enter') {
+    // Immediate search on Enter: cancels the pending debounce
+    emitSearch(liveValue);
+  }
+}
+
+// A commit no typing produced: the model's write, then the native change a commit makes.
+function clear() {
+  liveValue = '';
+  const input = inputEl as HTMLInputElement | null;
+  if (input) { input.value = ''; input.focus(); }
+  value = '';
+  dispatchCommit(input);
+  emitSearch('');
+  pdxClear();
+}
+
+function onWrapClick(e: Event) {
+  const t = e.target as HTMLElement;
+  if (t.tagName === 'INPUT' || t.tagName === 'BUTTON') return;
+  inputEl?.focus();
+}
+
+function onFocus() { pdxFocus(); }
+function onBlur() { pdxBlur(); }
+
+$effect(() => {
+  const propVal = value as string;
+  if (propVal) liveValue = propVal;
+});
+
+function focus() { inputEl?.focus(); }
+function blur() { inputEl?.blur(); }
+/** Select the whole text, so the next keystroke replaces it. Does not focus first. */
+function selectText() { inputEl?.select(); }
+</script>
