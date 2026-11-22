@@ -62,6 +62,18 @@ describe('@host compiles into the descriptor', () => {
         }
     });
 
+    // The same hole for @state (#1306): on the server the template's handlers are not compiled, so a
+    // signal only they write and only a @state reads looked unread, and the state named a variable gone.
+    it('a signal only @state reads is kept in a production server build (#1306)', () => {
+        const source = '<template><button @click="on = !on">x</button></template>\n<script>\nlet on = $signal(false);\n@state lit = on;\n</script>';
+        for (const options of [{ production: true, ssr: true }, { production: true }, { production: false, ssr: true }]) {
+            const { code } = compile(source, 'test.pdx', [], undefined, options);
+            const name = JSON.stringify(options);
+            expect(code, name).toMatch(/const __on = signal\(false[,)]/);
+            expect(code, name).toContain('lit: ()=>__on()');
+        }
+    });
+
     it('the control: a component with no @host declares no host', () => {
         expect(compile(pdx('let open = $signal(false);'), 'test.pdx').code).not.toContain('host:');
     });
