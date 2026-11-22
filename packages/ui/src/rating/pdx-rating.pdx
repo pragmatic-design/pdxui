@@ -1,0 +1,239 @@
+<template>
+  <div class="pdx-rating" data-part="root"
+    role="slider"
+    :aria-valuenow="String(current)"
+    aria-valuemin="0"
+    :aria-valuemax="String(count)"
+    :aria-label="label || uiString('rating', 'label')"
+    :aria-disabled="disabled ? 'true' : null"
+    :aria-readonly="readonly ? 'true' : null"
+    :tabindex="disabled ? '-1' : '0'"
+    @mouseleave="onMouseLeave"
+    @keydown="onKeydown"
+    @focus="isFocused = true"
+    @blur="isFocused = false">
+    @for (starIndexes() as i; track i) {
+      <span :class="'pdx-rating-star pdx-rating-star-' + starFill(i)" data-part="star"
+        :title="tooltipList()[i] || ''"
+        :style="starColor(i)"
+        @click="onStarClick(i, $event)"
+        @mousemove="onStarHover(i, $event)">
+        <svg viewBox="0 0 24 24" class="pdx-rating-icon pdx-rating-bg" aria-hidden="true">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        @if (starFill(i) === 'half') {
+          <svg viewBox="0 0 24 24" class="pdx-rating-icon pdx-rating-fill" aria-hidden="true"
+            :style="'clip-path:inset(0 ' + (100 - halfPercent(i)) + '% 0 0)'">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+        }
+      </span>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value
+ * takes part in a form.
+ *
+ * @csspart root - The frame, `role="slider"`.
+ * @csspart star - One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate focused - The slider has focus.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent change
+ * @alphadetail value $event.detail.value
+ */
+// pdx-rating — Star rating with precision, keyboard nav, form integration.
+// Features: half/quarter precision (MUI), custom icons (slot), tooltips (Ant),
+// threshold colors (Element+), hover preview, readonly vs disabled.
+// Uses aria-valuenow/min/max on role="slider" (WAI pattern).
+import { uiString } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/rating';
+
+// A click or a key writes it (#480), and the write dispatches `value-change`.
+@model value: number = 0 { form };
+/** The pointer is over a star: the value a click would set, or -1 when it leaves. */
+@event hover: { value: number };
+// On the host as custom states (#132); the frame carries no state class.
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state focused = isFocused;
+@part root, star;
+// The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+// draws the same look on native markup. `md` is the base size, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the icons' size. */
+  size: { md: '.pdx-rating-md', sm: '.pdx-rating-sm', lg: '.pdx-rating-lg' } = md;
+}
+@prop count: number = 5;
+@prop precision: number = 1;
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop name: string = '';
+@prop color: string = '';
+/** Comma-separated tooltip labels, e.g. "Bad,Poor,OK,Good,Great" */
+@prop tooltips: string = '';
+/** Comma-separated threshold:color pairs, e.g. "2:red,3:orange,5:green" */
+@prop colors: string = '';
+/** Allow clearing to 0 by clicking current value */
+@prop clearable: boolean = false;
+/** Accessible name. Empty: the rating.label component string, «Rating» in English. */
+@prop label: string = '';
+
+// The host is the one submitter. No hidden input carries the name, or it would send the value
+// a second time.
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear (clear resets rating to 0)
+@expose focus, blur, clear;
+
+let hoverValue = $signal(-1);
+let isFocused = $signal(false);
+// Uncontrolled-friendly value: click/keyboard update the internal state and the model; the
+// `value` prop seeds it and overrides whenever the host updates it. Without this the rating
+// was purely controlled → clicking emitted but the stars never changed.
+let current = $signal((value as number) || 0);
+$effect(() => { current = (value as number) || 0; });
+
+/** A new value from the user: the shown one and the model, whose write dispatches `value-change` (#480). */
+function writeValue(next: number): void {
+  current = next;
+  value = next;
+}
+
+function isInteractive(): boolean {
+  return !disabled && !readonly;
+}
+
+function snapToPrec(v: number): number {
+  const p = precision as number || 1;
+  return Math.round(v / p) * p;
+}
+
+function getDisplayValue(): number {
+  const hv = hoverValue as number;
+  return hv >= 0 ? hv : current;
+}
+
+function starIndexes(): number[] {
+  return Array.from({ length: count as number }, (_, i) => i);
+}
+
+function tooltipList(): string[] {
+  const t = tooltips as string;
+  return t ? t.split(',').map(s => s.trim()) : [];
+}
+
+function getColorForValue(v: number): string {
+  const c = colors as string;
+  if (!c) return color as string || '';
+  const pairs = c.split(',').map(p => {
+    const [threshold, col] = p.trim().split(':');
+    return { threshold: parseFloat(threshold), color: col.trim() };
+  }).sort((a, b) => a.threshold - b.threshold);
+
+  for (let i = pairs.length - 1; i >= 0; i--) {
+    if (v <= pairs[i].threshold) continue;
+    if (i < pairs.length - 1) return pairs[i + 1].color;
+  }
+  return pairs.length > 0 ? pairs[0].color : '';
+}
+
+function starColor(index: number): string {
+  const col = getColorForValue(index + 1);
+  return col ? 'color:' + col : '';
+}
+
+function starFill(index: number): 'full' | 'half' | 'empty' {
+  const dv = getDisplayValue();
+  const i1 = index + 1;
+  if (dv >= i1) return 'full';
+  if (dv > index && dv < i1) return 'half';
+  return 'empty';
+}
+
+function halfPercent(index: number): number {
+  const frac = getDisplayValue() - index;
+  if (frac <= 0) return 0;
+  if (frac >= 1) return 100;
+  return Math.round(frac * 100);
+}
+
+function onStarClick(index: number, e: MouseEvent) {
+  if (!isInteractive()) return;
+  const prec = precision as number || 1;
+  let next: number;
+  if (prec < 1) {
+    // Calculate precise value from click position within star
+    const hit = e.currentTarget as HTMLElement;
+    const rect = hit.getBoundingClientRect();
+    next = snapToPrec(index + (e.clientX - rect.left) / rect.width);
+  } else {
+    next = index + 1;
+  }
+  // Clearable: click on same value clears
+  if (clearable && next === current) {
+    next = 0;
+  }
+  writeValue(next);
+}
+
+function onStarHover(index: number, e: MouseEvent) {
+  if (!isInteractive()) return;
+  const prec = precision as number || 1;
+  if (prec < 1) {
+    const hit = e.currentTarget as HTMLElement;
+    const rect = hit.getBoundingClientRect();
+    hoverValue = snapToPrec(index + (e.clientX - rect.left) / rect.width);
+  } else {
+    hoverValue = index + 1;
+  }
+  hover({ value: hoverValue as number });
+}
+
+function onMouseLeave() {
+  hoverValue = -1;
+  hover({ value: -1 });
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (!isInteractive()) return;
+  const prec = precision as number || 1;
+  const now = current as number;
+  const top = count as number;
+  let next = now;
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowUp':
+      next = Math.min(top, now + prec);
+      e.preventDefault();
+      break;
+    case 'ArrowLeft': case 'ArrowDown':
+      next = Math.max(0, now - prec);
+      e.preventDefault();
+      break;
+    case 'Home':
+      next = 0;
+      e.preventDefault();
+      break;
+    case 'End':
+      next = top;
+      e.preventDefault();
+      break;
+    default: return;
+  }
+  next = snapToPrec(next);
+  if (next !== now) writeValue(next);
+}
+
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+function clear() { writeValue(0); }
+</script>

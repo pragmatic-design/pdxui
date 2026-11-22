@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-slider
  *
- * Contracts WRITTEN by inspecting the source (packages/ui/src/slider/pdx-slider.ts)
+ * Contracts WRITTEN by inspecting the source (packages/ui/src/slider/pdx-slider.pdx)
  * and the CSS (packages/design/src/surfaces/slider.css). The slider is a custom component
  * (NOT an <input type=range>): a track plus a fill plus a thumb, with role="slider" on the thumb.
  *

@@ -1,0 +1,465 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSlider",
+  "tagName": "pdx-slider",
+  "category": "Specialized Inputs",
+  "order": 30,
+  "description": "A slider the user drags or moves from the keyboard to pick a value, or a range with two thumbs,\nwith marks and value labels.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "100",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "step"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "What the slider sets (\"Volume\"): the thumb's name, and in range mode \"{label}, minimum\" /\n\"{label}, maximum\". Not needed after a pdx-label, which names it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "marks",
+      "description": "Comma-separated mark values, or \"step\" to show all steps",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "marks"
+    },
+    {
+      "kind": "field",
+      "name": "showLabel",
+      "description": "Show value label on thumb while dragging",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showlabel"
+    },
+    {
+      "kind": "field",
+      "name": "labelAlways",
+      "description": "Always show label (not just on drag)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "labelalways"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "range",
+      "description": "Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `\"low,high\"`.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "range"
+    },
+    {
+      "kind": "field",
+      "name": "minGap",
+      "description": "Minimum gap between thumbs in range mode",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "mingap"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the track's and thumb's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "color",
+      "description": "primary (the default), success or warning: the fill's and thumb's colour.",
+      "type": {
+        "text": "'primary' | 'success' | 'warning'"
+      },
+      "default": "'primary'",
+      "attribute": "color"
+    },
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "horizontal (the default) or vertical.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135).",
+      "type": {
+        "text": "number | number[]"
+      },
+      "default": "0",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-slider-md",
+        "sm": ".pdx-slider-sm",
+        "lg": ".pdx-slider-lg"
+      }
+    },
+    {
+      "name": "color",
+      "values": [
+        "primary",
+        "success",
+        "warning"
+      ],
+      "default": "primary",
+      "native": {
+        "primary": ".pdx-slider-primary",
+        "success": ".pdx-slider-success",
+        "warning": ".pdx-slider-warning"
+      }
+    },
+    {
+      "name": "orientation",
+      "values": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal",
+      "native": {
+        "horizontal": ".pdx-slider-horizontal",
+        "vertical": ".pdx-slider-vertical"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "min": "$event.detail.value[0]",
+    "max": "$event.detail.value[1]"
+  },
+  "events": [
+    {
+      "name": "pdx-change-end",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A drag ended: the value it left, `[low, high]` in range mode.",
+      "detail": "{ value: number | number[] }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: number | number[] }"
+    }
+  ],
+  "roles": [
+    "slider"
+  ],
+  "attributes": [
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "100"
+    },
+    {
+      "name": "step",
+      "fieldName": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "What the slider sets (\"Volume\"): the thumb's name, and in range mode \"{label}, minimum\" /\n\"{label}, maximum\". Not needed after a pdx-label, which names it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "marks",
+      "fieldName": "marks",
+      "description": "Comma-separated mark values, or \"step\" to show all steps",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showlabel",
+      "fieldName": "showLabel",
+      "description": "Show value label on thumb while dragging",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "labelalways",
+      "fieldName": "labelAlways",
+      "description": "Always show label (not just on drag)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "range",
+      "fieldName": "range",
+      "description": "Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `\"low,high\"`.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "mingap",
+      "fieldName": "minGap",
+      "description": "Minimum gap between thumbs in range mode",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the track's and thumb's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "color",
+      "fieldName": "color",
+      "description": "primary (the default), success or warning: the fill's and thumb's colour.",
+      "type": {
+        "text": "'primary' | 'success' | 'warning'"
+      },
+      "default": "'primary'"
+    },
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "horizontal (the default) or vertical.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135).",
+      "type": {
+        "text": "number | number[]"
+      },
+      "default": "0"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame the pointer acts on."
+    },
+    {
+      "name": "track",
+      "description": "The rail."
+    },
+    {
+      "name": "fill",
+      "description": "The coloured portion: from the minimum to the value, or between the thumbs."
+    },
+    {
+      "name": "thumb",
+      "description": "A thumb, `role=\"slider\"`: one, or two in range mode; aria-invalid with `error`."
+    },
+    {
+      "name": "mark",
+      "description": "One of `marks`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "invalid",
+      "description": "`error` is set; every thumb is aria-invalid."
+    },
+    {
+      "name": "dragging",
+      "description": "A pointer is dragging a thumb."
+    }
+  ]
+}

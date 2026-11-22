@@ -7,8 +7,8 @@ import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/segmented/pdx-segmented.pdx';
-import '../../src/slider/pdx-slider';
-import '../../src/rating/pdx-rating';
+import '../../src/slider/pdx-slider.pdx';
+import '../../src/rating/pdx-rating.pdx';
 
 /** Each control, the root part's selector from the host, and the class it used to put on itself. */
 const CONTROLS: [tag: string, root: string, oldClass: string][] = [
