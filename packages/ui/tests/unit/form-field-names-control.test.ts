@@ -13,7 +13,7 @@ import '../../src/date-picker/pdx-date-picker';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/tag-input/pdx-tag-input';
-import '../../src/radio-group/pdx-radio-group';
+import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/radio/pdx-radio.pdx';
 
 beforeEach(cleanup);

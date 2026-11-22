@@ -2,7 +2,7 @@
  * MANIFEST — pdx-checkbox-group
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/checkbox-group/pdx-checkbox-group.ts
+ *  - source: packages/ui/src/checkbox-group/pdx-checkbox-group.pdx
  *      the HOST <pdx-checkbox-group> → renders `<slot></slot>` (light DOM); in ctx.track():
  *        the class 'pdx-choice-group'; orientation is the host's attribute, a variant axis (#286);
  *        el.setAttribute('role', 'group');  // multi-selection → group, NOT radiogroup

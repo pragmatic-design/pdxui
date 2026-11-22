@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/input/pdx-input.pdx';
-import '../../src/radio-group/pdx-radio-group';
+import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/form-template/pdx-form-template';
 
 async function mount(html: string): Promise<HTMLElement> {

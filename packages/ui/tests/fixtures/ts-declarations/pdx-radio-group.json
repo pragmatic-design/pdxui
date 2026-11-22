@@ -1,0 +1,192 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRadioGroup",
+  "tagName": "pdx-radio-group",
+  "category": "Specialized Inputs",
+  "order": 24,
+  "description": "Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that\nmove and check, and the chosen value takes part in a form.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name of the group. Without it, a <pdx-label> right before the group names it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "vertical (the default) or horizontal: the radios in a column or a row.",
+      "type": {
+        "text": "'vertical' | 'horizontal'"
+      },
+      "default": "'vertical'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "orientation",
+      "values": [
+        "vertical",
+        "horizontal"
+      ],
+      "default": "vertical"
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name of the group. Without it, a <pdx-label> right before the group names it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "vertical (the default) or horizontal: the radios in a column or a row.",
+      "type": {
+        "text": "'vertical' | 'horizontal'"
+      },
+      "default": "'vertical'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set; every radio is aria-invalid."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set; the group is aria-disabled and every radio disabled."
+    }
+  ]
+}

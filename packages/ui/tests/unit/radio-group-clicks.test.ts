@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/radio/pdx-radio.pdx';
-import '../../src/radio-group/pdx-radio-group';
+import '../../src/radio-group/pdx-radio-group.pdx';
 
 type Group = HTMLElement & { value: string };
 
