@@ -399,6 +399,9 @@ template; the `.d.ts` gets `name: {}` in its `Slots` interface. The alpha object
 
 - A use of the component that does not fill a slot declared without `?` raises `PDX_SLOT_REQUIRED`
   (error), at the tag.
+- The script reads a typed snippet by its name, as it reads a prop (#1291): `row` is the function the
+  parent gave, or `undefined`, for a component that draws from its script (`row(item, i)` builds the
+  node). A projection slot is not a value, and the script has no name for it.
 - A signature whose parentheses do not close (`@slot row: (item`) raises `PDX_UNKNOWN_DECLARATION`,
   and so does `@slot` with no name.
 - The name becomes a property of the element: a member of the element class (`body`, `track`,
