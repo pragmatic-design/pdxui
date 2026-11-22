@@ -11,7 +11,7 @@ import '../../src/dropdown-menu/pdx-dropdown-menu';
 import '../../src/menu/pdx-menu';
 import '../../src/context-menu/pdx-context-menu';
 import '../../src/menubar/pdx-menubar';
-import '../../src/inline-edit/pdx-inline-edit';
+import '../../src/inline-edit/pdx-inline-edit.pdx';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import { openColumnChooser, closeColumnChooser } from '../../src/shared/column-chooser';

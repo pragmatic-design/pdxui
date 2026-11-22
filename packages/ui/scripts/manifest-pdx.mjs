@@ -128,7 +128,8 @@ export function analyzePdxFile(file, text, categories) {
         }])),
         emitted: new Map(),
         emittedNames: [],
-        roles: scanRoles([template, withoutComments(body), ...viewRoles].join('\n')),
+        // The `$effect`s are out of the body in the analysis: a role one of them writes is read there (#1210).
+        roles: scanRoles([template, withoutComments(body), ...a.effects, ...viewRoles].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,

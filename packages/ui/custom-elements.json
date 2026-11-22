@@ -16651,7 +16651,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/inline-edit/pdx-inline-edit.ts",
+      "path": "src/inline-edit/pdx-inline-edit.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -17038,7 +17038,7 @@
           "name": "pdx-inline-edit",
           "declaration": {
             "name": "PdxInlineEdit",
-            "module": "src/inline-edit/pdx-inline-edit.ts"
+            "module": "src/inline-edit/pdx-inline-edit.pdx"
           }
         }
       ]

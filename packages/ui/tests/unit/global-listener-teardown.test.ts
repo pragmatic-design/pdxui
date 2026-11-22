@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mount, tick, cleanup, uniqueTag } from './helpers';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
-import '../../src/inline-edit/pdx-inline-edit';
+import '../../src/inline-edit/pdx-inline-edit.pdx';
 import '../../src/chart/pdx-sparkline';
 
 void uniqueTag; // helper importato per uniformità

@@ -1,0 +1,606 @@
+<template></template>
+
+<script>
+/**
+ * A value the user clicks to edit in place, in the editor its `type` calls for.
+ *
+ * @csspart root - The frame around the display and the editor.
+ * @csspart display - The value at rest, a `role="button"` that opens the editor; with `edit-on="icon"` it only shows the value.
+ * @csspart edit - With `edit-on="icon"`, the pencil button that opens the editor, and the only thing that does.
+ * @csspart editor - The editor's container, shown while editing.
+ * @csspart save - The save button, with `save-on="action"`, while editing.
+ * @csspart cancel - The cancel button, with `save-on="action"`, while editing.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate editing - The editor is open.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ */
+// pdx-inline-edit — Click to edit, renders the right editor per data type.
+// Display mode shows formatted value, edit mode shows the appropriate pdx-* component.
+// Supports: text, number, currency, date, datetime, boolean, select, multiselect,
+// color, rating, textarea. Its DOM is built by the script, a frame after mount, as the TypeScript
+// version built it: the template draws nothing.
+import { untracked, getComponentString, onNextFrame, onDestroy } from '@pdxui/core';
+import { resolveLocale } from '../shared/locale';
+import { onControlValue } from '../shared/model-event';
+import { onPressOutside } from '../shared/press-outside';
+// `formatText`: i18n's `format`, named apart from the script's own names.
+import { uiString, format as formatText } from '../shared/i18n';
+// Its strings and its form-control registration, once per page (a module beside it).
+import './inline-edit-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/inline-edit';
+import '../color-picker/pdx-color-picker.pdx'; // rendered by this component, and registered by nobody else
+import '../number-input/pdx-number-input.pdx'; // rendered by this component, and registered by nobody else
+import '../rating/pdx-rating.pdx'; // rendered by this component, and registered by nobody else
+import '../select/pdx-select'; // rendered by this component, and registered by nobody else
+import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
+
+// A commit writes it (#482), and the write dispatches `value-change`.
+// A form submits the value (#135): text and a number as they are, a boolean as true/false, an
+// object as JSON. The host is the one submitter, under its name.
+/** Current value */
+@model value: unknown = null { form: () => formValueOf(value) };
+/** The edit was cancelled: Escape, or the cancel button. The value is unchanged. */
+@event 'pdx-cancel': void;
+// On the host as custom states (#132); the root carries no state class of its own.
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state editing = editing;
+// Every element is built by the script, a frame after mount (#1284).
+@part(external) root, display, edit, editor, save, cancel;
+/** Data type — determines which editor to show */
+@prop type: string = 'text';
+/** Options for select/multiselect: [{ value, label }] */
+@prop options: unknown[] = [];
+/** Placeholder when value is empty */
+@prop placeholder: string = '';
+/** What opens the editor: a click on the value, a double click, or only the pencil button ('icon'). */
+@prop editOn: 'click' | 'dblclick' | 'icon' = 'click';
+/** When to save: 'blur' (auto-save on blur/Enter) | 'action' (confirm/cancel buttons) */
+@prop saveOn: string = 'blur';
+/** Disabled */
+@prop disabled: boolean = false;
+/** Readonly */
+@prop readonly: boolean = false;
+/** Component size */
+@prop size: string = '';
+/** Currency code for type=currency (default: 'EUR') */
+@prop currency: string = 'EUR';
+/** Decimals kept by the number and currency editors. -1: the currency's own (2 for EUR, 0 for JPY), or what the number display shows (3). */
+@prop precision: number = -1;
+/** Locale for formatting. Empty: the page's language (`lang`), then the browser's. */
+@prop locale: string = '';
+/** Form field name */
+@prop name: string = '';
+/** Show edit icon on hover */
+@prop showIcon: boolean = true;
+/** The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}». */
+@prop label: string = '';
+
+// The host is the one submitter, under its name (#133).
+@host el { :name="name || null" }
+
+@expose startEdit, confirmEdit, cancelEdit, focus, blur;
+
+let editing = $signal(false);
+let domReady = $signal(false);
+let internalValue = $signal<any>(null);
+let editValue: any = null; // temp value during editing
+let editorBuilt = false; // the open editor exists: built once per edit
+
+// DOM refs
+let displayEl: HTMLElement | null = null;
+// The pencil button of `edit-on="icon"`, made once: a field's labelling on it survives a redraw.
+let editBtn: HTMLButtonElement | null = null;
+let editorEl: HTMLElement | null = null;
+let rootEl: HTMLElement | null = null;
+/** Removes the press-outside listener, added when editing starts (#427). */
+let outsideDispose: (() => void) | null = null;
+
+/** What a form submits for the value: text and a number as they are, a boolean as true/false, an object as JSON. */
+function formValueOf(v: unknown): string | null {
+  if (v === null || v === undefined) return null;
+  return typeof v === 'object' ? JSON.stringify(v) : String(v);
+}
+
+function getType(): string {
+  return (type as string) || 'text';
+}
+
+/** What opens the editor; a value outside the three is the default, a click. */
+function editMode(): 'click' | 'dblclick' | 'icon' {
+  const mode = editOn as string;
+  return mode === 'dblclick' || mode === 'icon' ? mode : 'click';
+}
+
+/** The prop, then the page's lang, then the browser. */
+function getLocale(): string {
+  return resolveLocale(el, locale as string);
+}
+
+/**
+ * The decimals the number/currency editor keeps. With no step and no precision on its
+ * pdx-number-input, step 1 would mean 0 decimals and every typed value would be rounded to
+ * an integer: 29.5 edited to 30.2 would save 30. Automatic is what the display can show.
+ */
+function editorPrecision(kind: string): number {
+  const own = precision as number;
+  if (own >= 0) return own;
+  const loc = getLocale();
+  const opts: Intl.NumberFormatOptions = kind === 'currency'
+    ? { style: 'currency', currency: (currency as string) || 'EUR' }
+    : {};
+  return new Intl.NumberFormat(loc, opts).resolvedOptions().maximumFractionDigits ?? 0;
+}
+
+// ── Format value for display ──
+
+function formatDisplay(val: any): string {
+  if (val === null || val === undefined || val === '') {
+    return (placeholder as string) || getComponentString('inline-edit', 'empty')();
+  }
+  const kind = getType();
+  const loc = getLocale();
+
+  switch (kind) {
+    case 'number':
+      return new Intl.NumberFormat(loc).format(Number(val));
+    case 'currency': {
+      const curr = (currency as string) || 'EUR';
+      return new Intl.NumberFormat(loc, { style: 'currency', currency: curr }).format(Number(val));
+    }
+    case 'date':
+      return formatDate(val, { dateStyle: 'medium' });
+    case 'datetime':
+      return formatDate(val, { dateStyle: 'medium', timeStyle: 'short' });
+    case 'boolean':
+      return val ? getComponentString('inline-edit', 'yes')() : getComponentString('inline-edit', 'no')();
+    case 'select': {
+      const opts = (options as any[]) || [];
+      const opt = opts.find(o => o.value === val);
+      return opt ? opt.label : String(val);
+    }
+    case 'multiselect': {
+      const opts = (options as any[]) || [];
+      const vals = Array.isArray(val) ? val : [];
+      return vals.map(v => {
+        const o = opts.find(item => item.value === v);
+        return o ? o.label : String(v);
+      }).join(', ');
+    }
+    case 'color':
+      return String(val);
+    case 'rating':
+      return `${val} / 5`;
+    default:
+      return String(val);
+  }
+}
+
+function formatDate(val: any, opts: Intl.DateTimeFormatOptions): string {
+  try {
+    const d = val instanceof Date ? val : new Date(val);
+    if (isNaN(d.getTime())) return String(val);
+    return new Intl.DateTimeFormat(getLocale(), opts).format(d);
+  } catch { return String(val); }
+}
+
+function isEmpty(val: any): boolean {
+  return val === null || val === undefined || val === '' ||
+    (Array.isArray(val) && val.length === 0);
+}
+
+// ── Edit mode ──
+
+/** Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`. */
+function startEdit(): void {
+  if (disabled || readonly) return;
+  editValue = untracked(() => internalValue);
+  // Boolean: toggle immediately without showing editor
+  if (getType() === 'boolean') {
+    editValue = !editValue;
+    internalValue = editValue;
+    value = editValue;
+    return;
+  }
+  // Rating: show editor inline (no separate edit mode needed)
+  editing = true;
+  // Click outside → auto-confirm (unless action mode)
+  // listened for from now (#427); a second start replaces the listener.
+  if ((saveOn as string) !== 'action') {
+    removeOutsideHandler();
+    outsideDispose = onPressOutside({
+      inside: (t) => el.contains(t),
+      outside: () => confirmEdit(),
+    });
+  }
+}
+
+function removeOutsideHandler(): void {
+  outsideDispose?.(); outsideDispose = null;
+}
+
+// Teardown on destroy: otherwise unmounting while editing would leave the
+// mousedown orphaned on document.
+onDestroy(() => removeOutsideHandler());
+
+// Closing the editor removes the element that had focus, and focus would fall to <body>: a
+// keyboard user who saved or cancelled would have to find their place again. It goes back to the
+// display — only when the editor had it, so a click or Tab elsewhere keeps where it went. With
+// `edit-on="icon"` the display is no tab stop: it goes to the pencil button that opened it.
+function editorHasFocus(): boolean {
+  return !!editorEl && editorEl.contains(document.activeElement);
+}
+function refocusDisplay(hadFocus: boolean): void {
+  if (!hadFocus || untracked(() => editing)) return;
+  (editMode() === 'icon' && editBtn?.isConnected ? editBtn : displayEl)?.focus();
+}
+
+/** Save the edited value and close the editor. */
+function confirmEdit(): void {
+  const hadFocus = editorHasFocus();
+  removeOutsideHandler();
+  internalValue = editValue;
+  editing = false;
+  // The saved value is the host's `value`, its model, as registerFormControl declares.
+  value = editValue;
+  refocusDisplay(hadFocus);
+}
+
+/** Close the editor and keep the value; emits `pdx-cancel`. */
+function cancelEdit(): void {
+  const hadFocus = editorHasFocus();
+  removeOutsideHandler();
+  editValue = untracked(() => internalValue);
+  editing = false;
+  pdxCancel();
+  refocusDisplay(hadFocus);
+}
+
+// ── Build editor DOM for current type ──
+
+function buildEditor(container: HTMLElement): void {
+  container.innerHTML = '';
+  const kind = getType();
+  const val = editValue;
+  const sz = size as string;
+  // The editor's accessible name (no visible <label>): WCAG 4.1.2 on the input/textarea/date.
+  // The field's label, else the value it edits, so every editor is not "Edit value".
+  const ariaName = (label as string)
+    || (isEmpty(val) ? '' : formatText(uiString('inline-edit', 'edit'), { value: formatDisplay(val) }))
+    || (name as string) || (placeholder as string) || getComponentString('inline-edit', 'label')();
+
+  switch (kind) {
+    case 'text': {
+      const field = document.createElement('input');
+      field.type = 'text';
+      field.className = 'pdx-inline-edit-input' + (sz ? ` pdx-input-${sz}` : '');
+      field.setAttribute('aria-label', ariaName);
+      field.value = val ?? '';
+      field.addEventListener('input', () => { editValue = field.value; });
+      wireKeyboard(field);
+      container.appendChild(field);
+      // Focus now, not on a timer: the display is already hidden, and what was typed in
+      // between would go to <body> — "Jane Roe" typed after Enter would save "e Roe".
+      field.focus(); field.select();
+      break;
+    }
+    case 'textarea': {
+      const ta = document.createElement('textarea');
+      ta.className = 'pdx-inline-edit-textarea' + (sz ? ` pdx-input-${sz}` : '');
+      ta.setAttribute('aria-label', ariaName);
+      ta.value = val ?? '';
+      ta.rows = 3;
+      ta.addEventListener('input', () => { editValue = ta.value; });
+      // Textarea: Ctrl+Enter to confirm, Escape to cancel
+      ta.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); confirmEdit(); }
+      });
+      container.appendChild(ta);
+      ta.focus();
+      break;
+    }
+    case 'number':
+    case 'currency': {
+      const num = document.createElement('pdx-number-input') as any;
+      num.setAttribute('aria-label', ariaName);
+      if (sz) num.setAttribute('size', sz);
+      if (kind === 'currency') {
+        num.setAttribute('currency', (currency as string) || 'EUR');
+        num.setAttribute('locale', getLocale());
+      }
+      num.setAttribute('precision', String(editorPrecision(kind)));
+      // The editor opens on the value, not on its padding: 29.5 would be "29.500", because
+      // `precision` decides the decimals drawn as well as the rounding.
+      num.setAttribute('trim-zeros', '');
+      // Set value as attribute BEFORE append — CE reads it during init
+      if (val != null) num.setAttribute('value', String(val));
+      num.style.width = '100%';
+      num.style.minWidth = '180px';
+      // Typing and stepping: the number input's model event, `value-change`, carries the
+      // parsed value on each write (#479), so Enter saves what was typed.
+      onControlValue(num, 'pdx-change', (e) => e.detail?.value ?? num.value, (v) => { editValue = v; });
+      container.appendChild(num);
+      // Focus the inner input: now, when the element is defined and rendered on append
+      // (so nothing typed before the focus arrives is lost); else once it has built.
+      const focusNumber = (): boolean => {
+        const inp = num.querySelector('input');
+        if (!inp) return false;
+        inp.focus();
+        inp.select();
+        // Wire Escape on the inner input
+        inp.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+          if (e.key === 'Enter') { e.preventDefault(); confirmEdit(); }
+        });
+        return true;
+      };
+      if (!focusNumber()) requestAnimationFrame(() => requestAnimationFrame(focusNumber));
+      break;
+    }
+    case 'date':
+    case 'datetime': {
+      // Use native input for reliable inline editing
+      const field = document.createElement('input');
+      field.type = kind === 'datetime' ? 'datetime-local' : 'date';
+      field.className = 'pdx-inline-edit-input' + (sz ? ` pdx-input-${sz}` : '');
+      field.setAttribute('aria-label', ariaName);
+      if (val) field.value = String(val);
+      field.addEventListener('change', () => {
+        editValue = field.value;
+        if ((saveOn as string) !== 'action') confirmEdit();
+      });
+      field.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+      });
+      container.appendChild(field);
+      field.focus();
+      break;
+    }
+    case 'boolean': {
+      const sw = document.createElement('pdx-switch') as any;
+      sw.checked = !!val;
+      onControlValue(sw, 'pdx-change', (e) => e.detail?.checked ?? sw.checked, (v) => {
+        editValue = v;
+        // Boolean auto-confirms immediately
+        confirmEdit();
+      });
+      container.appendChild(sw);
+      break;
+    }
+    case 'select': {
+      const sel = document.createElement('pdx-select') as any;
+      if (sz) sel.setAttribute('size', sz);
+      sel.options = (options as any[]) || [];
+      sel.value = val ?? '';
+      // Its model event, `value-change` (#481).
+      onControlValue(sel, 'pdx-change', (e) => e.detail?.value ?? sel.value, (v) => {
+        editValue = v;
+        // Auto-confirm on select (unless action mode)
+        if ((saveOn as string) !== 'action') confirmEdit();
+      });
+      container.appendChild(sel);
+      break;
+    }
+    case 'multiselect': {
+      const sel = document.createElement('pdx-select') as any;
+      sel.setAttribute('multiple', '');
+      if (sz) sel.setAttribute('size', sz);
+      sel.options = (options as any[]) || [];
+      sel.value = Array.isArray(val) ? val : [];
+      onControlValue(sel, 'pdx-change', (e) => e.detail?.value ?? sel.value, (v) => { editValue = v; });
+      container.appendChild(sel);
+      break;
+    }
+    case 'color': {
+      const cp = document.createElement('pdx-color-picker') as any;
+      cp.value = val ?? '#000000';
+      onControlValue(cp, 'pdx-change', (e) => e.detail?.value ?? cp.value, (v) => { editValue = v; });
+      container.appendChild(cp);
+      break;
+    }
+    case 'rating': {
+      const rt = document.createElement('pdx-rating') as any;
+      rt.value = val ?? 0;
+      onControlValue(rt, 'pdx-change', (e) => e.detail?.value ?? rt.value, (v) => {
+        editValue = v;
+        confirmEdit();
+      });
+      container.appendChild(rt);
+      break;
+    }
+    default: {
+      // Fallback to text input
+      const field = document.createElement('input');
+      field.type = 'text';
+      field.className = 'pdx-inline-edit-input';
+      field.setAttribute('aria-label', ariaName);
+      field.value = val ?? '';
+      field.addEventListener('input', () => { editValue = field.value; });
+      wireKeyboard(field);
+      container.appendChild(field);
+      field.focus(); field.select();
+    }
+  }
+
+  // Add confirm/cancel buttons for action mode
+  if ((saveOn as string) === 'action' && kind !== 'boolean' && kind !== 'rating') {
+    const actions = document.createElement('div');
+    actions.className = 'pdx-inline-edit-actions';
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'pdx-inline-edit-save';
+    saveBtn.dataset.part = 'save';
+    saveBtn.textContent = '✓';
+    saveBtn.setAttribute('aria-label', getComponentString('inline-edit', 'save')());
+    saveBtn.addEventListener('click', confirmEdit);
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'pdx-inline-edit-cancel';
+    cancelBtn.dataset.part = 'cancel';
+    cancelBtn.textContent = '✕';
+    cancelBtn.setAttribute('aria-label', getComponentString('inline-edit', 'cancel')());
+    cancelBtn.addEventListener('click', cancelEdit);
+    actions.appendChild(saveBtn);
+    actions.appendChild(cancelBtn);
+    container.appendChild(actions);
+  }
+}
+
+/** Wire Enter/Escape for text-like inputs */
+function wireKeyboard(field: HTMLElement): void {
+  field.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key === 'Enter') { e.preventDefault(); confirmEdit(); }
+    if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); }
+  });
+}
+
+// ── Sync external value → internal ──
+$effect(() => {
+  const val = value;
+  if (val !== undefined) {
+    const cur = untracked(() => internalValue);
+    if (JSON.stringify(val) !== JSON.stringify(cur)) {
+      internalValue = val;
+    }
+  }
+});
+
+// ── Build DOM ── (a frame after mount; a setup a move destroyed does not build again)
+onNextFrame(() => {
+  rootEl = document.createElement('div');
+  rootEl.className = 'pdx-inline-edit';
+  rootEl.dataset.part = 'root';
+
+  // Display element (visible when not editing)
+  displayEl = document.createElement('div');
+  displayEl.className = 'pdx-inline-edit-display';
+  displayEl.dataset.part = 'display';
+
+  // `edit-on` is read when the event comes, so a change after mount takes effect (#710). With
+  // `icon` the display opens nothing: the pencil button does, and a key on it bubbles here.
+  displayEl.addEventListener('click', () => { if (editMode() === 'click') startEdit(); });
+  displayEl.addEventListener('dblclick', () => { if (editMode() === 'dblclick') startEdit(); });
+  displayEl.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (editMode() === 'icon') return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startEdit(); }
+  });
+
+  editBtn = document.createElement('button');
+  editBtn.type = 'button';
+  editBtn.className = 'pdx-inline-edit-icon';
+  editBtn.dataset.part = 'edit';
+  editBtn.textContent = '✎';
+  editBtn.addEventListener('click', startEdit);
+
+  rootEl.appendChild(displayEl);
+
+  // Editor container (visible when editing)
+  editorEl = document.createElement('div');
+  editorEl.className = 'pdx-inline-edit-editor';
+  editorEl.dataset.part = 'editor';
+  editorEl.style.display = 'none';
+  // Focus leaving the editor saves it, as save-on="blur" says: otherwise Tab would move on
+  // and leave it open, two editors at once. Only a move to somewhere else — the editor's own
+  // buttons and popups are inside the host; no target (the window lost focus, or the
+  // mousedown-outside handler is already saving) does nothing.
+  editorEl.addEventListener('focusout', (e: FocusEvent) => {
+    if (!untracked(() => editing) || (saveOn as string) === 'action') return;
+    const to = e.relatedTarget as Node | null;
+    if (to && !el.contains(to)) confirmEdit();
+  });
+  rootEl.appendChild(editorEl);
+
+  el.appendChild(rootEl);
+  domReady = true;
+});
+
+// ── Reactive update ──
+$effect(() => {
+  if (!domReady) return;
+  const isEditing = editing as boolean;
+  const val = internalValue;
+  const isDisabled = disabled as boolean;
+  const isReadonly = readonly as boolean;
+  const withIcon = showIcon as boolean;
+  const kind = getType();
+  const mode = editMode();
+
+  if (!displayEl || !editorEl || !rootEl) return;
+
+  // With `icon` the display only shows the value: no button, no tab stop. The pencil is.
+  if (mode === 'icon') {
+    displayEl.removeAttribute('role');
+    displayEl.removeAttribute('tabindex');
+  } else {
+    displayEl.setAttribute('role', 'button');
+    displayEl.setAttribute('tabindex', '0');
+  }
+
+  // The type is an attribute: as a class, `pdx-inline-edit-${type}`, "text" and "textarea"
+  // would be the value span's and the editor's own classes, and their styles would land on
+  // the root.
+  rootEl.dataset.type = kind;
+
+  if (isEditing) {
+    displayEl.style.display = 'none';
+    editorEl.style.display = '';
+    // Once per edit, and untracked. Built here on every run, the editor would be rebuilt by
+    // any prop or string the build reads (size, label, the i18n strings) changing while it
+    // is open: a new input, the typed text all selected, and the next key would replace it —
+    // "Jane Roe" saved as "Roe". A change while editing shows at the next edit.
+    if (!editorBuilt) {
+      editorBuilt = true;
+      const container = editorEl;
+      untracked(() => buildEditor(container));
+    }
+  } else {
+    editorBuilt = false;
+    displayEl.style.display = '';
+    editorEl.style.display = 'none';
+    editorEl.innerHTML = '';
+
+    // Build display content
+    displayEl.innerHTML = '';
+    const isEmptyVal = isEmpty(val);
+
+    // Color swatch
+    if (kind === 'color' && !isEmptyVal) {
+      const swatch = document.createElement('span');
+      swatch.className = 'pdx-inline-edit-swatch';
+      swatch.style.backgroundColor = String(val);
+      displayEl.appendChild(swatch);
+    }
+
+    const text = document.createElement('span');
+    text.className = 'pdx-inline-edit-text' + (isEmptyVal ? ' empty' : '');
+    text.textContent = formatDisplay(val);
+    displayEl.appendChild(text);
+
+    // Edit icon: with `icon` a real button, named for what it edits, whatever `show-icon` says
+    // — it is the only way in; otherwise a decoration of the clickable value.
+    if (mode === 'icon' && editBtn && !isDisabled && !isReadonly) {
+      editBtn.setAttribute('aria-label', isEmptyVal
+        ? getComponentString('inline-edit', 'label')()
+        : formatText(uiString('inline-edit', 'edit'), { value: formatDisplay(val) }));
+      displayEl.appendChild(editBtn);
+    } else if (mode !== 'icon' && withIcon && !isDisabled && !isReadonly) {
+      const icon = document.createElement('span');
+      icon.className = 'pdx-inline-edit-icon';
+      icon.textContent = '✎';
+      icon.setAttribute('aria-hidden', 'true');
+      displayEl.appendChild(icon);
+    }
+  }
+});
+
+/** Focus what opens the editor: the value, or with `edit-on="icon"` the pencil button. */
+function focus() { (editMode() === 'icon' && editBtn?.isConnected ? editBtn : displayEl)?.focus(); }
+function blur() { (editMode() === 'icon' && editBtn?.isConnected ? editBtn : displayEl)?.blur(); }
+</script>

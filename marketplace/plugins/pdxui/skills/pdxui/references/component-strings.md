@@ -267,13 +267,13 @@ placeholders, filled at render: keep them in the translation.
 | `image` | `zoom` | `Zoom {alt}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `infinite-scroll` | `end` | `No more data` | `@pdxui/ui/src/shared/i18n.ts` |
 | `infinite-scroll` | `loading` | `Loading...` | `@pdxui/ui/src/shared/i18n.ts` |
-| `inline-edit` | `cancel` | `Cancel` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `edit` | `Edit {value}` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `empty` | `Click to edit` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `label` | `Edit value` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `no` | `No` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `save` | `Save` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
-| `inline-edit` | `yes` | `Yes` | `@pdxui/ui/src/inline-edit/pdx-inline-edit.ts` |
+| `inline-edit` | `cancel` | `Cancel` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `edit` | `Edit {value}` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `empty` | `Click to edit` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `label` | `Edit value` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `no` | `No` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `save` | `Save` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
+| `inline-edit` | `yes` | `Yes` | `@pdxui/ui/src/inline-edit/inline-edit-strings.ts` |
 | `input` | `clear` | `Clear` | `@pdxui/ui/src/shared/i18n.ts` |
 | `input` | `loading` | `Loading` | `@pdxui/ui/src/shared/i18n.ts` |
 | `json-editor` | `addItem` | `＋ Add item` | `@pdxui/ui/src/shared/i18n.ts` |

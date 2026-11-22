@@ -14,7 +14,7 @@ import '../../src/rich-text/pdx-rich-text';
 import '../../src/json-editor/pdx-json-editor';
 import '../../src/input/pdx-input.pdx';
 import '../../src/file-upload/pdx-file-upload';
-import '../../src/inline-edit/pdx-inline-edit';
+import '../../src/inline-edit/pdx-inline-edit.pdx';
 
 const TAGS = ['pdx-rich-text', 'pdx-json-editor', 'pdx-file-upload', 'pdx-inline-edit'];
 const ALPHA = ['pdx-change', 'change', 'pdx-input'];

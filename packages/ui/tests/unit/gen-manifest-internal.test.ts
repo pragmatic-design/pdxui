@@ -51,3 +51,23 @@ describe('the roles an @internal view draws', () => {
         expect(roles).toEqual(expect.arrayContaining(['grid', 'rowgroup', 'row']));
     });
 });
+
+// A role the script writes is the component's as much as one its template draws. The analysis takes the
+// `$effect`s out of the script's body, and a role set in one was not read: pdx-inline-edit builds its
+// display in script and names it a button in the effect that redraws it (#1210).
+describe('the roles a .pdx script writes', () => {
+    it('are read inside a $effect, as in the body', () => {
+        write('y/pdx-y.pdx', [
+            '<template></template>',
+            '<script>',
+            '@host el;',
+            "$effect(() => { el.setAttribute('role', 'button'); });",
+            "el.setAttribute('aria-roledescription', 'x');",
+            "function f(n: HTMLElement) { n.setAttribute('role', 'note'); }",
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 'y/pdx-y.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect((mod.declarations[0].roles as string[]).sort()).toEqual(['button', 'note']);
+    });
+});

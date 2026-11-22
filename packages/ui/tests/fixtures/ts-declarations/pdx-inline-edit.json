@@ -1,0 +1,378 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxInlineEdit",
+  "tagName": "pdx-inline-edit",
+  "category": "Specialized Inputs",
+  "order": 44,
+  "description": "A value the user clicks to edit in place, in the editor its `type` calls for.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Data type — determines which editor to show",
+      "type": {
+        "text": "string"
+      },
+      "default": "'text'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "options",
+      "description": "Options for select/multiselect: [{ value, label }]",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder when value is empty",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "editOn",
+      "description": "What opens the editor: a click on the value, a double click, or only the pencil button ('icon').",
+      "type": {
+        "text": "'click' | 'dblclick' | 'icon'"
+      },
+      "default": "'click'",
+      "attribute": "editon"
+    },
+    {
+      "kind": "field",
+      "name": "saveOn",
+      "description": "When to save: 'blur' (auto-save on blur/Enter) | 'action' (confirm/cancel buttons)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'blur'",
+      "attribute": "saveon"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Readonly",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Component size",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "currency",
+      "description": "Currency code for type=currency (default: 'EUR')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'EUR'",
+      "attribute": "currency"
+    },
+    {
+      "kind": "field",
+      "name": "precision",
+      "description": "Decimals kept by the number and currency editors. -1: the currency's own (2 for EUR, 0 for JPY), or what the number display shows (3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "precision"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale for formatting. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "showIcon",
+      "description": "Show edit icon on hover",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showicon"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Current value",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "method",
+      "name": "startEdit",
+      "parameters": [],
+      "description": "Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`."
+    },
+    {
+      "kind": "method",
+      "name": "confirmEdit",
+      "parameters": [],
+      "description": "Save the edited value and close the editor."
+    },
+    {
+      "kind": "method",
+      "name": "cancelEdit",
+      "parameters": [],
+      "description": "Close the editor and keep the value; emits `pdx-cancel`."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Focus what opens the editor: the value, or with `edit-on=\"icon\"` the pencil button."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pdx-cancel",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The edit was cancelled: Escape, or the cancel button. The value is unchanged."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: unknown }"
+    }
+  ],
+  "roles": [
+    "button"
+  ],
+  "attributes": [
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Data type — determines which editor to show",
+      "type": {
+        "text": "string"
+      },
+      "default": "'text'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder when value is empty",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "editon",
+      "fieldName": "editOn",
+      "description": "What opens the editor: a click on the value, a double click, or only the pencil button ('icon').",
+      "type": {
+        "text": "'click' | 'dblclick' | 'icon'"
+      },
+      "default": "'click'"
+    },
+    {
+      "name": "saveon",
+      "fieldName": "saveOn",
+      "description": "When to save: 'blur' (auto-save on blur/Enter) | 'action' (confirm/cancel buttons)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'blur'"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Readonly",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Component size",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "currency",
+      "fieldName": "currency",
+      "description": "Currency code for type=currency (default: 'EUR')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'EUR'"
+    },
+    {
+      "name": "precision",
+      "fieldName": "precision",
+      "description": "Decimals kept by the number and currency editors. -1: the currency's own (2 for EUR, 0 for JPY), or what the number display shows (3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale for formatting. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showicon",
+      "fieldName": "showIcon",
+      "description": "Show edit icon on hover",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame around the display and the editor."
+    },
+    {
+      "name": "display",
+      "description": "The value at rest, a `role=\"button\"` that opens the editor; with `edit-on=\"icon\"` it only shows the value."
+    },
+    {
+      "name": "edit",
+      "description": "With `edit-on=\"icon\"`, the pencil button that opens the editor, and the only thing that does."
+    },
+    {
+      "name": "editor",
+      "description": "The editor's container, shown while editing."
+    },
+    {
+      "name": "save",
+      "description": "The save button, with `save-on=\"action\"`, while editing."
+    },
+    {
+      "name": "cancel",
+      "description": "The cancel button, with `save-on=\"action\"`, while editing."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "editing",
+      "description": "The editor is open."
+    }
+  ]
+}
