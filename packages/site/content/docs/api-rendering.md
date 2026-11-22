@@ -1016,8 +1016,12 @@ to the fragment it is handed, creating them with the document it is handed.
 
 The markup is built on the first call, not at import (#93), into a `<template>`'s content: that
 document has no custom-element registry and loads nothing, so no component constructor runs and no
-image is fetched while it is built. Each call returns `importNode` of it, which brings the copy into
-the page and upgrades its components, as `createElement` did.
+image is fetched while it is built.
+
+A block that holds a component is copied with `importNode`, which brings the copy into the page and
+upgrades its components before the bindings set their properties, as `createElement` did. A block
+that holds none has nothing to upgrade: it is copied with `cloneNode`, and adopted by the page when
+it is inserted, as `html```'s copies are (#1282).
 
 ## `staticMarkup`
 
