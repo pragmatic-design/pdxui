@@ -64,12 +64,7 @@ describe('the barrel registers every documented component', () => {
         for (const m of notAComponent.keys()) expect(importedModules().has(m), `${m} is excused, and the barrel no longer imports it`).toBe(true);
     });
 
-    it('covers a module that declares two components with one import', () => {
-        // The case a tag-name version of this check gets wrong: one import, two registrations.
-        const byTag = new Map(documented().map(d => [d.tag, d.module]));
-        expect(byTag.get('pdx-toggle-group'), 'pdx-toggle-group is not documented').toBeTruthy();
-        expect(byTag.get('pdx-toggle-group')).toBe(byTag.get('pdx-toggle'));
-        expect(importedModules().has(byTag.get('pdx-toggle-group')!),
-            'the shared module is not imported by the barrel').toBe(true);
-    });
+    // The case a tag-name version of this check got wrong, one import and two registrations, was
+    // pdx-toggle.ts declaring pdx-toggle-group: since #1210 each has a module of its own, and the
+    // group's is one more documented module the first test above holds the barrel to.
 });

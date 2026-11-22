@@ -4,7 +4,7 @@
   "name": "PdxFieldList",
   "tagName": "pdx-field-list",
   "category": "Forms",
-  "order": 51,
+  "order": 52,
   "description": "An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,\nand the values come back as an array.",
   "members": [
     {

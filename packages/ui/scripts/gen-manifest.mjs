@@ -569,9 +569,10 @@ export function analyzeFile(file, text, categories) {
     // Normalising here rather than in main() is deliberate: this function owns the source-text →
     // data step, so the invariant holds for every caller.
     const sourceFile = ts.createSourceFile(file, normalizeEol(text), ts.ScriptTarget.Latest, /*setParentNodes*/ true);
-    // ALL of them, not one per file: `pdx-toggle-group` is declared beside `pdx-toggle` in the same
-    // module, and reading only the first would leave it out of the manifest, the site's index,
-    // llms.txt and auto-import, while importing the module registers both.
+    // ALL of them, not one per file: a module may declare a second component beside its own, as
+    // `pdx-toggle.ts` declared `pdx-toggle-group` until #1210 moved each to a .pdx of its own, and
+    // reading only the first would leave it out of the manifest, the site's index, llms.txt and
+    // auto-import, while importing the module registers both.
     return findComponentCalls(sourceFile).map(found =>
         analyzeComponent(found, { file, text, sourceFile, categories, shared: findComponentCalls(sourceFile).length > 1 }));
 }

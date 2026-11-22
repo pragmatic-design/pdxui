@@ -1,0 +1,82 @@
+<template>
+  <button type="button" class="pdx-toggle-btn" data-part="root"
+    :size="size"
+    :role="radio ? 'radio' : null"
+    :aria-pressed="radio ? null : pressed ? 'true' : 'false'"
+    :aria-checked="radio ? (pressed ? 'true' : 'false') : null"
+    :aria-label="ariaLabel || null"
+    :disabled="disabled"
+    :data-state="pressed ? 'on' : 'off'"
+    @click="toggle">
+    <slot></slot>
+  </button>
+</template>
+
+<script>
+/**
+ * A button the user presses on and off, its state exposed with `aria-pressed`.
+ *
+ * @csspart root - The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute.
+ *
+ * @cssstate pressed - It is pressed.
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-pressed-change
+ * @alphaevent pressedchange
+ * @alphadetail pressed $event.detail.value
+ */
+// pdx-toggle — Toggle button with pressed state + group support.
+// Single: aria-pressed (on/off action). Group: single or multiple selection.
+// Distinct from Segmented: toggle = action state (0..N), segmented = exclusive selection (1).
+import { guardDisabledClicks } from '../shared/disabled-click';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/toggle';
+// `@pdxui/ui/toggle` registers the group too, as it did when both were one module (#1210).
+import '../toggle-group/pdx-toggle-group.pdx';
+
+// A click writes it (#480), and the write dispatches `pressed-change`.
+@model pressed: boolean = false { form };
+// On the host as custom states (#132); the button carries no state class.
+@state pressed = !!pressed;
+@state disabled = !!disabled;
+@part root;
+// The axis toggle.css keys by (#286), reflected on the host; each value maps the classes that draw
+// the same look on a native button. Compound, so pdx-button's own `.pdx-ghost` is not reached.
+@variants {
+  /** outline (the default), ghost or solid. */
+  variant: { outline: '.pdx-toggle-btn.pdx-outline', ghost: '.pdx-toggle-btn.pdx-ghost', solid: '.pdx-toggle-btn.pdx-solid' } = outline;
+}
+@prop disabled: boolean = false;
+@prop value: string = '';
+@prop size: string = '';
+/** The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
+@prop ariaLabel: string = '';
+/**
+ * Set by a `pdx-toggle-group type="single"` on its toggles: the button is a `radio` with
+ * `aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.
+ * Not for a toggle on its own: a radio belongs in a radiogroup.
+ */
+@prop radio: boolean = false;
+
+@host el;
+
+// Imperative API: focus/blur/clear
+@expose focus, blur, clear;
+
+// Disabled: the click stops at the host, before the app's @click.
+$effect(() => guardDisabledClicks(el, () => !!disabled));
+
+function toggle() {
+  if (disabled) return;
+  // `pressed` is the live state and the model: a click writes it, so the button does not
+  // depend on a parent binding the event back. In a group, the group's value then rewrites
+  // every child's `pressed`.
+  pressed = !pressed;
+}
+
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+function clear() { pressed = false; }
+</script>

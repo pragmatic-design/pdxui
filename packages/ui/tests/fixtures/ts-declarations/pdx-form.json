@@ -4,7 +4,7 @@
   "name": "PdxForm",
   "tagName": "pdx-form",
   "category": "Forms",
-  "order": 44,
+  "order": 45,
   "description": "A form that provides its Form to the controls and form fields inside it and validates them, with\nsave modes and DataSource integration.",
   "members": [
     {

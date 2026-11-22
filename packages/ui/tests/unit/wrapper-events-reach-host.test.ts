@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/form-template/pdx-form-template';
-import '../../src/toggle/pdx-toggle';
+import '../../src/toggle/pdx-toggle.pdx';
 
 beforeEach(cleanup);
 

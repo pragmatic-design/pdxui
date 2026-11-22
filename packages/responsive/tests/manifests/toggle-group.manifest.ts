@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-toggle-group
  *
- * Source: packages/ui/src/toggle/pdx-toggle.ts
+ * Source: packages/ui/src/toggle-group/pdx-toggle-group.pdx
  *   HOST <pdx-toggle-group class="pdx-toggle-group" role="radiogroup|group" orientation="horizontal|vertical">
  *        :state(disabled)                       (radiogroup for type="single", group for "multiple")
  *     └── <pdx-toggle> … (display: contents) └── <button class="pdx-toggle-btn" data-part="root">

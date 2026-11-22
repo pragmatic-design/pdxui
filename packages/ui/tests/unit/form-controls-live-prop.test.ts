@@ -30,7 +30,7 @@ import '../../src/time-picker/pdx-time-picker';
 import '../../src/rating/pdx-rating.pdx';
 import '../../src/segmented/pdx-segmented.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/toggle/pdx-toggle';
+import '../../src/toggle/pdx-toggle.pdx';
 import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/inline-edit/pdx-inline-edit';
 import '../../src/json-editor/pdx-json-editor';
