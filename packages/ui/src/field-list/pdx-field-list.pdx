@@ -49,7 +49,7 @@ import '../form-field/pdx-form-field.pdx';
 // imports the tags its templates name, and these are built from script (#293).
 import '../input/pdx-input.pdx';
 import '../number-input/pdx-number-input';
-import '../textarea/pdx-textarea';
+import '../textarea/pdx-textarea.pdx';
 import '../select/pdx-select';
 import '../checkbox/pdx-checkbox.pdx';
 import '../switch-toggle/pdx-switch.pdx';

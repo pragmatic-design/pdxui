@@ -103,7 +103,9 @@ describe('a @part with a hyphenated name (#1299)', () => {
     it('is declared, with no diagnostic, and listed in the descriptor', () => {
         const all = [...analyzeScript('@part root, word-count;', 'test.pdx').warnings,
             ...validate(analyzeScript('@part root, word-count;', 'test.pdx'), parseTemplate(template), 'test.pdx')];
-        expect(all.filter(w => w.severity === 'error').map(w => w.code)).toEqual([]);
+        // No diagnostic of any severity: a hyphenated name cannot be a script declaration, so it is not
+        // PDX_PART_NAME_TAKEN either (which once suggested `:ref="word-countEl"`).
+        expect(all.map(w => w.code)).toEqual([]);
         const { code } = compile(pdx(template, '@part root, word-count;'), 'test.pdx');
         expect(code).toContain(`parts: ['root', 'word-count'],`);
     });

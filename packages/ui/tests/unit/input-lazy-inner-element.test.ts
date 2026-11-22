@@ -10,7 +10,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/input/pdx-input.pdx';
-import '../../src/textarea/pdx-textarea';
+import '../../src/textarea/pdx-textarea.pdx';
 
 async function mountHtml(html: string): Promise<HTMLElement> {
     document.body.innerHTML = html;

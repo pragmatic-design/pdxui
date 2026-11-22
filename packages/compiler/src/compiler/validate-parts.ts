@@ -104,6 +104,9 @@ export function repeatedParts(parts: readonly string[], ast: readonly TemplateNo
     return new Set(parts.filter((name) => (counts.get(name) ?? 0) > 1));
 }
 
+// Match: a name the script can declare. Groups: none
+const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+
 // Match: a `:ref=` binding in an opening tag.
 const REF_BINDING = /(?<=\s):ref=/;
 
@@ -157,7 +160,8 @@ export function checkParts(parts: readonly string[], ast: TemplateNode[], signal
                 message: `@part '${name}' is on no element of the template.`,
                 hint: `Write data-part="${name}" on the element it names, or remove it from @part.`,
             });
-        } else if (!signalNames.has(name) && !partHasRef(name, ast)) {
+        } else if (!signalNames.has(name) && !partHasRef(name, ast) && IDENTIFIER.test(name)) {
+            // A hyphenated name (#1299) is no identifier: no script declaration can have it.
             warnings.push({
                 code: 'PDX_PART_NAME_TAKEN', severity: 'info',
                 message: `@part '${name}' has the name of a script declaration, which keeps its meaning: the script does not read the part's element by that name.`,

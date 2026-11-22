@@ -2,7 +2,7 @@
  * MANIFEST — pdx-textarea
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/textarea/pdx-textarea.ts
+ *  - source: packages/ui/src/textarea/pdx-textarea.pdx
  *      the HOST <pdx-textarea> → render:
  *        <div class="pdx-input-wrap pdx-textarea-wrap" data-part="root"  ← sized by the host's size (#627); its states are the host's :state() (#286)
  *             style="height:auto;min-height:auto">

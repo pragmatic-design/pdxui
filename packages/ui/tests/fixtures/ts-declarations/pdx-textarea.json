@@ -1,0 +1,506 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTextarea",
+  "tagName": "pdx-textarea",
+  "category": "Specialized Inputs",
+  "order": 20,
+  "description": "A multi-line text input with auto-resize, a character or word count and validation states.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "required"
+    },
+    {
+      "kind": "field",
+      "name": "rows",
+      "description": "Initial number of visible text rows.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3",
+      "attribute": "rows"
+    },
+    {
+      "kind": "field",
+      "name": "minRows",
+      "description": "Minimum rows when auto-growing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "minrows"
+    },
+    {
+      "kind": "field",
+      "name": "maxRows",
+      "description": "Maximum rows when auto-growing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxrows"
+    },
+    {
+      "kind": "field",
+      "name": "maxlength",
+      "description": "Maximum number of characters allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxlength"
+    },
+    {
+      "kind": "field",
+      "name": "showCount",
+      "description": "Shows a live character counter.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showcount"
+    },
+    {
+      "kind": "field",
+      "name": "wordCount",
+      "description": "Counts words instead of characters.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "wordcount"
+    },
+    {
+      "kind": "field",
+      "name": "resize",
+      "description": "Resize behaviour: 'none', 'vertical', 'auto', ….",
+      "type": {
+        "text": "string"
+      },
+      "default": "'vertical'",
+      "attribute": "resize"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "selectText",
+      "parameters": [],
+      "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox lost focus."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "required",
+      "fieldName": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "rows",
+      "fieldName": "rows",
+      "description": "Initial number of visible text rows.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3"
+    },
+    {
+      "name": "minrows",
+      "fieldName": "minRows",
+      "description": "Minimum rows when auto-growing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxrows",
+      "fieldName": "maxRows",
+      "description": "Maximum rows when auto-growing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxlength",
+      "fieldName": "maxlength",
+      "description": "Maximum number of characters allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "showcount",
+      "fieldName": "showCount",
+      "description": "Shows a live character counter.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "wordcount",
+      "fieldName": "wordCount",
+      "description": "Counts words instead of characters.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "resize",
+      "fieldName": "resize",
+      "description": "Resize behaviour: 'none', 'vertical', 'auto', ….",
+      "type": {
+        "text": "string"
+      },
+      "default": "'vertical'"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<textarea>`, the textbox a form submits."
+    },
+    {
+      "name": "footer",
+      "description": "The row under the frame that holds the counts, with `show-count` or `word-count`."
+    },
+    {
+      "name": "count",
+      "description": "The character count, with `show-count`."
+    },
+    {
+      "name": "word-count",
+      "description": "The word count, with `word-count`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set."
+    },
+    {
+      "name": "success",
+      "description": "`success` is set."
+    },
+    {
+      "name": "warning",
+      "description": "`warning` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set."
+    },
+    {
+      "name": "over-limit",
+      "description": "The text is longer than `maxlength`; the character count shows it."
+    }
+  ]
+}
