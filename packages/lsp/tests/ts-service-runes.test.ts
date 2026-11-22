@@ -97,6 +97,13 @@ describe('the rune declarations', () => {
         expect(hover?.contents.value).toMatch(/label: string/);
     });
 
+    it('a @part(external) line is no code and declares no element (#1284)', () => {
+        const script = "@part(external) panel, step;\nfunction mark(el: HTMLElement) { el.setAttribute('data-part', 'panel'); el.dataset.part = 'step'; }\nmark;\n";
+        expect(diagnose(script)).toEqual([]);
+        // No element is its ref: a name the script does not declare is unknown, as without the part.
+        expect(diagnose(`${script}panel;\n`)).toEqual([expect.stringMatching(/Cannot find name 'panel'/)]);
+    });
+
     it('a @part the template renders more than once is the array of its elements (#988)', () => {
         const script = '@part option, search;\nlet items = $signal([1]);\nlet a = $signal(true);\nfunction f() { option.forEach((o) => o.focus()); search?.focus(); }\nf;\n';
         const template = '@for (items as it; track it) { <li data-part="option">{{ it }}</li> }<li data-part="option">+</li>'

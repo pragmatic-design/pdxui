@@ -197,6 +197,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         }
         case 'PDX_PART_MISSING':
         case 'PDX_PART_NAME_TAKEN':
+        case 'PDX_PART_EXTERNAL_UNWRITTEN':
+        case 'PDX_PART_EXTERNAL_DRAWN':
             // Match: the `@part` line that lists the name.
             return name ? find(source, script, new RegExp(`@part\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;
         case 'PDX_PART_UNDECLARED':

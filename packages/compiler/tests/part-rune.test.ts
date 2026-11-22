@@ -58,6 +58,45 @@ describe('a @part nothing reads has no ref (#1268)', () => {
     });
 });
 
+describe('@part(external): a part the script writes outside the template (#1284)', () => {
+    const script = (more: string) => `@part trigger;\n@part(external) panel, step;\nfunction f() { trigger?.focus(); }\n${more}`;
+    const writes = "function mark(el, b) { el.setAttribute('data-part', 'panel'); b.dataset.part = \"step\"; }";
+
+    it('is declared, and on no element of the template is not PDX_PART_MISSING', () => {
+        expect(codes('<button data-part="trigger">x</button><slot></slot>', script(writes), 'PDX_PART_MISSING')).toEqual([]);
+        // The control: the same parts declared plainly are missing.
+        const plain = `@part trigger, panel, step;\nfunction f() { trigger?.focus(); }\n${writes}`;
+        expect(codes('<button data-part="trigger">x</button><slot></slot>', plain, 'PDX_PART_MISSING').map(w => w.message))
+            .toEqual(["@part 'panel' is on no element of the template.", "@part 'step' is on no element of the template."]);
+    });
+
+    it('is in the descriptor and the analysis with the other parts, and has no ref', () => {
+        const analysis = analyzeScript(script(writes), 'test.pdx');
+        expect(analysis.parts).toEqual(['trigger', 'panel', 'step']);
+        expect(analysis.externalParts).toEqual(['panel', 'step']);
+        const { code } = compile(pdx('<button data-part="trigger">x</button><slot></slot>', script(`${writes}\nfunction g() { return panel; }`)), 'test.pdx');
+        expect(code).toContain(`parts: ['trigger', 'panel', 'step'],`);
+        expect(code).not.toMatch(/const __(panel|step) = signal/);
+    });
+
+    it('written by nothing in the script is PDX_PART_EXTERNAL_UNWRITTEN', () => {
+        // A comment and an unrelated string name it: neither writes it.
+        const found = codes('<button data-part="trigger">x</button>', script("// el.setAttribute('data-part', 'step')\nconst s = 'panel';\nfunction m(el) { el.dataset.part = 'step'; }"), 'PDX_PART_EXTERNAL_UNWRITTEN');
+        expect(found.map(w => w.message)).toEqual(["@part(external) 'panel' is written by nothing in the script: no setAttribute('data-part', 'panel'), no .dataset.part = 'panel'."]);
+        expect(found[0].severity).toBe('error');
+    });
+
+    it('drawn by the template is PDX_PART_EXTERNAL_DRAWN', () => {
+        const found = codes('<button data-part="trigger">x</button><div data-part="panel"></div>', script(writes), 'PDX_PART_EXTERNAL_DRAWN');
+        expect(found.map(w => w.message)).toEqual(["@part(external) 'panel' is on an element of the template: an external part is one the template does not draw."]);
+        expect(found[0].severity).toBe('error');
+    });
+
+    it('a data-part the template draws still needs a declaration', () => {
+        expect(codes('<i data-part="other"></i>', script(writes), 'PDX_PART_UNDECLARED')).toHaveLength(1);
+    });
+});
+
 describe('@part compiles into a ref and the descriptor', () => {
     // A part's ref is for what reads it (#1268): these read it.
     it('the element is the part\'s ref, and keeps its data-part', () => {

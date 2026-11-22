@@ -12,13 +12,13 @@ import { checkFormRules, checkFormFieldNames } from './form-rules';
 import { DEFER_TRIGGERS, unknownDeferTriggers, unknownHydrateTriggers, parseDeferTriggers } from './defer-triggers';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
-import { skipNonCode, findClosing, maskNonCode } from './tokenizer';
+import { skipNonCode, findClosing, maskNonCode, maskComments } from './tokenizer';
 import { openingTagTexts, routeParams } from '../text-scan';
 import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
 import { invalidHostAttribute } from './host-block';
-import { checkParts } from './validate-parts';
+import { checkParts, writesPart } from './validate-parts';
 import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
@@ -582,12 +582,16 @@ export function validate(
     // ─── Check 10d: the @part declarations and the data-part attributes (#134, #988, #999) ────
 
     // The script's code as the analyzer split it: the setup body, the effects, the lifecycle bodies.
-    const setupCode = maskNonCode([analysis.body, ...analysis.effects, ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy].join('\n'));
+    const scriptWithStrings = maskComments([analysis.body, ...analysis.effects, ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy].join('\n'));
+    const setupCode = maskNonCode(scriptWithStrings);
     warnings.push(...checkParts(analysis.parts, ast, new Set(analysis.signals.map(s => s.name)), {
         internal: analysis.internal === true,
         drawnBy: options?.viewParts,
         // Match: the name as a whole identifier, not a member (`x.grid`) — strings and comments masked.
         scriptReads: (name) => new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`).test(setupCode),
+        external: analysis.externalParts,
+        // The same code with its strings kept: an external part is written as one (#1284).
+        scriptWrites: (name) => writesPart(scriptWithStrings, name),
     }));
 
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
