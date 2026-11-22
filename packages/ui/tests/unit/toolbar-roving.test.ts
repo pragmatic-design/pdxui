@@ -7,7 +7,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/toolbar/pdx-toolbar';
 import '../../src/button/pdx-button.pdx';
 import '../../src/select/pdx-select';
-import '../../src/toggle/pdx-toggle';
+import '../../src/toggle/pdx-toggle.pdx';
 
 beforeEach(cleanup);
 afterEach(() => vi.restoreAllMocks());

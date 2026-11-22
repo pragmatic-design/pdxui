@@ -79,11 +79,6 @@
       "types": "./dist/otp-input/pdx-otp-input.d.ts",
       "import": "./dist/otp-input/pdx-otp-input.js"
     },
-    "./toggle": {
-      "development": "./src/toggle/pdx-toggle.ts",
-      "types": "./dist/toggle/pdx-toggle.d.ts",
-      "import": "./dist/toggle/pdx-toggle.js"
-    },
     "./fieldset": {
       "development": "./src/fieldset/pdx-fieldset.ts",
       "types": "./dist/fieldset/pdx-fieldset.d.ts",
@@ -658,6 +653,16 @@
       "development": "./src/slider/pdx-slider.pdx",
       "types": "./dist/slider/pdx-slider.d.ts",
       "import": "./dist/slider/pdx-slider.js"
+    },
+    "./toggle-group": {
+      "development": "./src/toggle-group/pdx-toggle-group.pdx",
+      "types": "./dist/toggle-group/pdx-toggle-group.d.ts",
+      "import": "./dist/toggle-group/pdx-toggle-group.js"
+    },
+    "./toggle": {
+      "development": "./src/toggle/pdx-toggle.pdx",
+      "types": "./dist/toggle/pdx-toggle.d.ts",
+      "import": "./dist/toggle/pdx-toggle.js"
     },
     "./package.json": "./package.json"
   },

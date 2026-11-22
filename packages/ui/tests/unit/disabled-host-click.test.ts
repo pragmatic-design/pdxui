@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/button/pdx-button.pdx';
-import '../../src/toggle/pdx-toggle';
+import '../../src/toggle/pdx-toggle.pdx';
 
 async function until<T>(pick: () => T | null | undefined, what: string): Promise<T> {
     for (let i = 0; i < 30; i++) {

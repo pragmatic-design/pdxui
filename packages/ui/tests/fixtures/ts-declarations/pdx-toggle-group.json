@@ -1,0 +1,205 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxToggleGroup",
+  "tagName": "pdx-toggle-group",
+  "category": "Specialized Inputs",
+  "order": 35,
+  "description": "A set of toggle buttons that share one value, keeping at most one pressed or any number as a\ncomma-separated value, with the arrow keys moving between them.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "type",
+      "type": {
+        "text": "string"
+      },
+      "default": "'single'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Passed to every toggle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'outline'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Passed to every toggle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "loop",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "loop"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "horizontal (the default) or vertical: the toggles joined in a row or a column.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The pressed toggles' values: one for `single`, comma-separated for `multiple`. A form submits\none entry per value, and resets it (#135). A press writes it, and the write dispatches\n`value-change`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "orientation",
+      "values": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal"
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change",
+    "valuechange"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "values": "$event.detail.value.split(',').filter(Boolean)"
+  },
+  "events": [
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "type",
+      "fieldName": "type",
+      "type": {
+        "text": "string"
+      },
+      "default": "'single'"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Passed to every toggle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'outline'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Passed to every toggle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loop",
+      "fieldName": "loop",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "horizontal (the default) or vertical: the toggles joined in a row or a column.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The pressed toggles' values: one for `single`, comma-separated for `multiple`. A form submits\none entry per value, and resets it (#135). A press writes it, and the write dispatches\n`value-change`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set; the group is aria-disabled and every toggle disabled."
+    }
+  ]
+}

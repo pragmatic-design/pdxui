@@ -1,0 +1,234 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxToggle",
+  "tagName": "pdx-toggle",
+  "category": "Specialized Inputs",
+  "order": 34,
+  "description": "A button the user presses on and off, its state exposed with `aria-pressed`.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "The toggle's name when its content does not say it (\"B\" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "radio",
+      "description": "Set by a `pdx-toggle-group type=\"single\"` on its toggles: the button is a `radio` with\n`aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.\nNot for a toggle on its own: a radio belongs in a radiogroup.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "radio"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "outline (the default), ghost or solid.",
+      "type": {
+        "text": "'outline' | 'ghost' | 'solid'"
+      },
+      "default": "'outline'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "pressed",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "pressed"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "pressed"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "outline",
+        "ghost",
+        "solid"
+      ],
+      "default": "outline",
+      "native": {
+        "outline": ".pdx-toggle-btn.pdx-outline",
+        "ghost": ".pdx-toggle-btn.pdx-ghost",
+        "solid": ".pdx-toggle-btn.pdx-solid"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-pressed-change",
+    "pressedchange"
+  ],
+  "alphaDetail": {
+    "pressed": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pressed-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `pressed`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "radio"
+  ],
+  "attributes": [
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "The toggle's name when its content does not say it (\"B\" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "radio",
+      "fieldName": "radio",
+      "description": "Set by a `pdx-toggle-group type=\"single\"` on its toggles: the button is a `radio` with\n`aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.\nNot for a toggle on its own: a radio belongs in a radiogroup.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "outline (the default), ghost or solid.",
+      "type": {
+        "text": "'outline' | 'ghost' | 'solid'"
+      },
+      "default": "'outline'"
+    },
+    {
+      "name": "pressed",
+      "fieldName": "pressed",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "pressed",
+      "description": "It is pressed."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-toggle-height",
+      "default": "1.5rem"
+    },
+    {
+      "name": "--pdx-toggle-width",
+      "default": "2.75rem"
+    }
+  ]
+}

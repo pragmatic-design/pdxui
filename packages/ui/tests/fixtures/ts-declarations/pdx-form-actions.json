@@ -4,7 +4,7 @@
   "name": "PdxFormActions",
   "tagName": "pdx-form-actions",
   "category": "Forms",
-  "order": 47,
+  "order": 48,
   "description": "The submit and reset button bar of a form, wired to the form it sits in, with configurable\nlabels, alignment and a loading state.",
   "members": [
     {

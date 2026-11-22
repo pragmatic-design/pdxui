@@ -34,7 +34,7 @@ import '../checkbox-group/pdx-checkbox-group.pdx';
 import '../radio/pdx-radio.pdx';
 import '../radio-group/pdx-radio-group.pdx';
 import '../switch-toggle/pdx-switch.pdx';
-import '../toggle/pdx-toggle';
+import '../toggle/pdx-toggle.pdx';
 import '../segmented/pdx-segmented.pdx';
 import '../slider/pdx-slider.pdx';
 import '../rating/pdx-rating.pdx';

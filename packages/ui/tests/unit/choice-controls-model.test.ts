@@ -15,7 +15,7 @@ import { tick, cleanup } from './helpers';
 import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/radio/pdx-radio.pdx';
-import '../../src/toggle/pdx-toggle';
+import '../../src/toggle/pdx-toggle.pdx';
 import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/checkbox-group/pdx-checkbox-group.pdx';
 import '../../src/segmented/pdx-segmented.pdx';

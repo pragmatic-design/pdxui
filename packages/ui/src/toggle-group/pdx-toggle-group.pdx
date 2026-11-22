@@ -1,0 +1,184 @@
+<template>
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * A set of toggle buttons that share one value, keeping at most one pressed or any number as a
+ * comma-separated value, with the arrow keys moving between them.
+ *
+ * @cssstate disabled - `disabled` is set; the group is aria-disabled and every toggle disabled.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent valuechange
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value.split(',').filter(Boolean)
+ */
+// pdx-toggle-group — the toggles of one value, single or multiple; its own module since #1210,
+// imported by pdx-toggle so that `@pdxui/ui/toggle` still registers both.
+// This component's styles travel with it: the joined row is toggle.css's.
+import '@pdxui/design/components/toggle';
+
+/** The pressed toggles' values: one for `single`, comma-separated for `multiple`. A form submits
+ *  one entry per value, and resets it (#135). A press writes it, and the write dispatches
+ *  `value-change`. */
+@model value: string = '' { form: () => getValues() };
+// On the host as a custom state (#132).
+@state disabled = !!disabled;
+// Its layout axis (#286), reflected on the host, where toggle.css joins the toggles in a column;
+// no class for it.
+@variants {
+  /** horizontal (the default) or vertical: the toggles joined in a row or a column. */
+  orientation: { horizontal, vertical } = horizontal;
+}
+@prop type: string = 'single';
+@prop disabled: boolean = false;
+/** Passed to every toggle. */
+@prop variant: string = 'outline';
+/** Passed to every toggle. */
+@prop size: string = '';
+@prop loop: boolean = true;
+@prop label: string = '';
+
+// Its role, ARIA and keys (#133): a `radiogroup` for `single`, a `group` for `multiple`.
+// aria-orientation only on the radiogroup: a `group` may not carry it (axe's aria-allowed-attr).
+@host el {
+  :role="type === 'multiple' ? 'group' : 'radiogroup'"
+  :aria-orientation="type === 'multiple' ? null : orientation"
+  :aria-label="label || null"
+  :aria-disabled="disabled ? 'true' : null"
+  @keydown="onKeydown"
+}
+
+/**
+ * A toggle's value: its `value` property, which a template's `:value` binding writes without an
+ * attribute, or else the attribute markup wrote.
+ */
+function valueOf(t: Element): string {
+  const v = (t as Element & { value?: unknown }).value;
+  return typeof v === 'string' && v ? v : t.getAttribute('value') || '';
+}
+
+function getValues(): string[] {
+  const v = value as string;
+  if (!v) return [];
+  return type === 'multiple' ? v.split(',').filter(Boolean) : [v];
+}
+
+function isPressed(val: string): boolean {
+  return getValues().includes(val);
+}
+
+function handleToggle(val: string) {
+  if (disabled) return;
+  const isSingle = type !== 'multiple';
+  let nextValues: string[];
+
+  if (isSingle) {
+    // Single mode: select this value (can deselect by clicking again)
+    nextValues = isPressed(val) ? [] : [val];
+  } else {
+    // Multiple mode: toggle this value in the set
+    const current = getValues();
+    nextValues = current.includes(val)
+      ? current.filter(v => v !== val)
+      : current.concat(val);
+  }
+
+  value = isSingle ? (nextValues[0] || '') : nextValues.join(',');
+}
+
+// Wire child toggles. One ARIA pattern per type, in full: `single` is an APG radio group — each
+// toggle a radio (its `radio` prop), the tab stop on the checked one or else the first enabled;
+// `multiple` is a group of aria-pressed toggle buttons, each in the tab order.
+$effect(() => {
+  const vals = getValues();
+  const dis = disabled;
+  const v = variant as string;
+  const s = size as string;
+  const single = type !== 'multiple';
+
+  requestAnimationFrame(() => {
+    const toggles = Array.from(el.querySelectorAll('pdx-toggle'));
+    for (const t of toggles) {
+      // Set pressed state
+      if (vals.includes(valueOf(t))) {
+        t.setAttribute('pressed', '');
+      } else {
+        t.removeAttribute('pressed');
+      }
+      // Propagate disabled, variant, size, and the radio role of a single group
+      if (dis) t.setAttribute('disabled', '');
+      if (v) t.setAttribute('variant', v);
+      if (s) t.setAttribute('size', s);
+      t.toggleAttribute('radio', single);
+    }
+    const enabled = toggles.filter((t) => !t.hasAttribute('disabled'));
+    const stop = single ? (enabled.find((t) => vals.includes(valueOf(t))) ?? enabled[0]) : undefined;
+    for (const t of toggles) {
+      const btn = t.querySelector('button');
+      if (!btn) continue;
+      if (single) btn.tabIndex = t === stop ? 0 : -1;
+      else btn.removeAttribute('tabindex');
+    }
+  });
+});
+
+// Listen for child toggle events: their model's, `pressed-change` (#480). A toggle's event stays
+// on it (#138), so the group hears it on the way down, in the capture phase, which passes
+// through the host whether or not it bubbles.
+$effect(() => {
+  function onChildToggle(e: Event) {
+    const toggle = (e.target as HTMLElement).closest('pdx-toggle');
+    if (!toggle || toggle === el) return;
+    const val = valueOf(toggle);
+    if (val) handleToggle(val);
+  }
+  el.addEventListener('pressed-change', onChildToggle, true);
+  return () => el.removeEventListener('pressed-change', onChildToggle, true);
+});
+
+// Keyboard navigation (roving tabindex)
+function onKeydown(e: KeyboardEvent) {
+  if (disabled) return;
+  const isVert = orientation === 'vertical';
+  const items = el.querySelectorAll('pdx-toggle:not([disabled])') as NodeListOf<HTMLElement>;
+  if (!items.length) return;
+
+  const focused = el.querySelector('pdx-toggle button:focus')?.closest('pdx-toggle') as HTMLElement;
+  const idx = focused ? Array.from(items).indexOf(focused) : -1;
+  let next = idx;
+
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowDown':
+      if ((!isVert && e.key === 'ArrowRight') || (isVert && e.key === 'ArrowDown')) {
+        next = loop ? (idx + 1) % items.length : Math.min(idx + 1, items.length - 1);
+        e.preventDefault();
+      }
+      break;
+    case 'ArrowLeft': case 'ArrowUp':
+      if ((!isVert && e.key === 'ArrowLeft') || (isVert && e.key === 'ArrowUp')) {
+        next = loop ? (idx - 1 + items.length) % items.length : Math.max(idx - 1, 0);
+        e.preventDefault();
+      }
+      break;
+    case 'Home':
+      next = 0; e.preventDefault(); break;
+    case 'End':
+      next = items.length - 1; e.preventDefault(); break;
+    default: return;
+  }
+  if (next !== idx && items[next]) {
+    const btn = items[next].querySelector('button') as HTMLElement;
+    btn?.focus();
+    // In a radio group the arrows select what they reach, through the path a click takes.
+    // Whether it is chosen is the group's value, written now: the toggle's `pressed`
+    // attribute follows it a frame later, and keys can come faster than frames.
+    if (type !== 'multiple' && !isPressed(valueOf(items[next]))) btn?.click();
+  }
+}
+
+// Its own class only, via classList: the author's classes survive. The joined row; the
+// orientation is the host's attribute.
+el.classList.add('pdx-toggle-group');
+</script>

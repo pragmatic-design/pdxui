@@ -1440,6 +1440,16 @@ exports[`observed attributes > are the ones each component has always observed 1
     "value",
     "variant",
   ],
+  "pdx-toggle-group": [
+    "disabled",
+    "label",
+    "loop",
+    "orientation",
+    "size",
+    "type",
+    "value",
+    "variant",
+  ],
   "pdx-toolbar": [
     "bordered",
     "compact",

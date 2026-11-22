@@ -47,6 +47,9 @@ const PORTED: Record<string, string> = {
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
     'pdx-tag-input': 'src/tag-input/pdx-tag-input.pdx',
     'pdx-textarea': 'src/textarea/pdx-textarea.pdx',
+    'pdx-toggle': 'src/toggle/pdx-toggle.pdx',
+    // Its own module since its move (#1210): it was a second component() in pdx-toggle.ts.
+    'pdx-toggle-group': 'src/toggle-group/pdx-toggle-group.pdx',
 };
 
 const manifest = read('custom-elements.json') as { modules: Module[] };

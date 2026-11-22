@@ -4,7 +4,7 @@
   "name": "PdxFormField",
   "tagName": "pdx-form-field",
   "category": "Forms",
-  "order": 48,
+  "order": 49,
   "description": "Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA\nwiring between them and no validation of its own.",
   "members": [
     {

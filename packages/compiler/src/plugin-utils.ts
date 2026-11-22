@@ -700,8 +700,9 @@ export function injectComponentImports(
         if (!tag.startsWith(RESERVED_TAG_PREFIX) && !tag.startsWith(`${resolver.prefix}-`)) continue;
         // `knownWithoutImport`, not `has`: a tag can be legitimate with nothing to import — the
         // design system styles pdx-split/center/container/cluster/stack/grid/spacer as element
-        // selectors, @pdxui/router defines pdx-router-outlet, and pdx-toggle-group is a second
-        // component() inside pdx-toggle.ts. With `has`, this warning fires for every one of them, and
+        // selectors, @pdxui/router defines pdx-router-outlet, and a module may define a second
+        // component() beside its own (pdx-toggle-group did, until #1210 gave it a module of its own).
+        // With `has`, this warning fires for every one of them, and
         // a warning that is always wrong is the same as not having the diagnostic at all.
         if (!resolver.knownWithoutImport(tag)) {
             console.warn(`[pdx] PDX_UNRESOLVED_COMPONENT (${currentFile}): <${tag}> is unresolved — nothing in @pdxui/*, no design-system element style, and no project component. The custom element will not be registered.`);

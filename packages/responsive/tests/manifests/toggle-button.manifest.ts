@@ -5,7 +5,7 @@
  * the element #286 brought to the beta contract, whose buttons pdx-button's removed toggle mode
  * becomes (#291).
  *
- * Source: packages/ui/src/toggle/pdx-toggle.ts
+ * Source: packages/ui/src/toggle/pdx-toggle.pdx
  *   HOST <pdx-toggle variant="outline|ghost|solid">  :state(pressed), :state(disabled)
  *     └── <button class="pdx-toggle-btn" data-part="root" aria-pressed="true|false">
  * CSS: packages/design/src/components/toggle.css, generated from variant-sources: each variant keyed on
