@@ -24,6 +24,6 @@ export const RESERVED_ELEMENT_NAMES: ReadonlySet<string> = new Set<string>([
     'checkValidity', 'formDisabledCallback', 'formResetCallback', 'formStateRestoreCallback', 'reportValidity', 'setFormValue',
     'setValidity', 'validationMessage', 'validity',
     // its internals, and the ones component() adds; slot projection is a module of its own (#1246)
-    '__pdx_restoreState', '__pdx_saveState', '_captureChildren', '_disposeUnprojected',
+    '__pdx_restoreState', '__pdx_saveState', '_captureChildren', '_connect', '_disposeUnprojected',
     '_hydrateLater', '_renderTarget', '_restoreLightChildren',
 ]);

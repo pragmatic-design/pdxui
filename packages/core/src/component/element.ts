@@ -1,7 +1,7 @@
 // PdxElement — base class for Pragmatic Web Components.
 // Light DOM rendering (no Shadow DOM) so CSS tokens pass through.
 
-import { signal, effect, collectScope, suspendScope, resumeScope, runInScope, currentScope, pushErrorOwner, popErrorOwner, getTopErrorHandler } from '../reactivity/signal';
+import { signal, effect, untracked, collectScope, suspendScope, resumeScope, runInScope, currentScope, pushErrorOwner, popErrorOwner, getTopErrorHandler } from '../reactivity/signal';
 import type { OwnerScope } from '../reactivity/signal';
 import type { Signal, Dispose } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
@@ -224,6 +224,15 @@ export abstract class PdxElement extends HTMLElementBase {
     get _hydrateLater(): HydrateOnOptions | null { return null; }
 
     connectedCallback(): void {
+        // Untracked (#1309): a component connected inside someone else's effect — a parent that builds
+        // its children in one — must not subscribe that effect to what its setup, render and onMount
+        // read. Its own effects track their reads still: this clears the current effect, not the owner
+        // scope the mount collects into.
+        untracked(() => this._connect());
+    }
+
+    /** What connectedCallback does, run untracked by it: the first mount, or the resume from a freeze. */
+    private _connect(): void {
         // A connectedCallback can arrive after the element has left the document. The case that
         // happens here: a parent removes its light-DOM children to project them, the removal is a
         // CEReactions operation, and it flushes the child's reaction still queued from the insertion —
