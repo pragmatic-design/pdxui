@@ -1,0 +1,317 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSearchInput",
+  "tagName": "pdx-search-input",
+  "category": "Specialized Inputs",
+  "order": 18,
+  "description": "A search field with a search icon, a clear button and Escape to clear, that emits the search after\na debounce or on Enter.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "The input's placeholder. Empty: the search-input.placeholder component string, «Search...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "debounce",
+      "description": "Debounce delay in ms for pdx-search event (0 = no debounce)",
+      "type": {
+        "text": "number"
+      },
+      "default": "300",
+      "attribute": "debounce"
+    },
+    {
+      "kind": "field",
+      "name": "shortcut",
+      "description": "Keyboard shortcut hint displayed in suffix (e.g. \"Ctrl+K\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "shortcut"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "selectText",
+      "parameters": [],
+      "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value"
+  },
+  "events": [
+    {
+      "name": "pdx-search",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The query, after the debounce or on Enter; not repeated for the same text.",
+      "detail": "{ value: string }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The clear button or Escape emptied the field, after its `value-change`."
+    },
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The searchbox received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The searchbox lost focus."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "searchbox",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "The input's placeholder. Empty: the search-input.placeholder component string, «Search...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "debounce",
+      "fieldName": "debounce",
+      "description": "Debounce delay in ms for pdx-search event (0 = no debounce)",
+      "type": {
+        "text": "number"
+      },
+      "default": "300"
+    },
+    {
+      "name": "shortcut",
+      "fieldName": "shortcut",
+      "description": "Keyboard shortcut hint displayed in suffix (e.g. \"Ctrl+K\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<input type=\"search\">`, the searchbox a form submits."
+    },
+    {
+      "name": "prefix",
+      "description": "The space before the text: the search icon, or the spinner while `loading`."
+    },
+    {
+      "name": "spinner",
+      "description": "The loading spinner, a `role=\"status\"`, while `loading`."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while there is text."
+    },
+    {
+      "name": "shortcut",
+      "description": "The `shortcut` hint, while the field is empty."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set."
+    }
+  ]
+}

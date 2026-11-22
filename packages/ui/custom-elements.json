@@ -22344,7 +22344,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/password-input/pdx-password-input.ts",
+      "path": "src/password-input/pdx-password-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -22687,7 +22687,7 @@
           "name": "pdx-password-input",
           "declaration": {
             "name": "PdxPasswordInput",
-            "module": "src/password-input/pdx-password-input.ts"
+            "module": "src/password-input/pdx-password-input.pdx"
           }
         }
       ]
@@ -26206,7 +26206,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/search-input/pdx-search-input.ts",
+      "path": "src/search-input/pdx-search-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -26532,7 +26532,7 @@
           "name": "pdx-search-input",
           "declaration": {
             "name": "PdxSearchInput",
-            "module": "src/search-input/pdx-search-input.ts"
+            "module": "src/search-input/pdx-search-input.pdx"
           }
         }
       ]

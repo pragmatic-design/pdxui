@@ -59,11 +59,6 @@
       "types": "./dist/label/pdx-label.d.ts",
       "import": "./dist/label/pdx-label.js"
     },
-    "./textarea": {
-      "development": "./src/textarea/pdx-textarea.ts",
-      "types": "./dist/textarea/pdx-textarea.d.ts",
-      "import": "./dist/textarea/pdx-textarea.js"
-    },
     "./form-section": {
       "development": "./src/form-section/pdx-form-section.ts",
       "types": "./dist/form-section/pdx-form-section.d.ts",
@@ -73,16 +68,6 @@
       "development": "./src/form-template/pdx-form-template.ts",
       "types": "./dist/form-template/pdx-form-template.d.ts",
       "import": "./dist/form-template/pdx-form-template.js"
-    },
-    "./password-input": {
-      "development": "./src/password-input/pdx-password-input.ts",
-      "types": "./dist/password-input/pdx-password-input.d.ts",
-      "import": "./dist/password-input/pdx-password-input.js"
-    },
-    "./search-input": {
-      "development": "./src/search-input/pdx-search-input.ts",
-      "types": "./dist/search-input/pdx-search-input.d.ts",
-      "import": "./dist/search-input/pdx-search-input.js"
     },
     "./number-input": {
       "development": "./src/number-input/pdx-number-input.ts",
@@ -659,6 +644,21 @@
       "types": "./dist/radio-group/pdx-radio-group.d.ts",
       "import": "./dist/radio-group/pdx-radio-group.js"
     },
+    "./password-input": {
+      "development": "./src/password-input/pdx-password-input.pdx",
+      "types": "./dist/password-input/pdx-password-input.d.ts",
+      "import": "./dist/password-input/pdx-password-input.js"
+    },
+    "./search-input": {
+      "development": "./src/search-input/pdx-search-input.pdx",
+      "types": "./dist/search-input/pdx-search-input.d.ts",
+      "import": "./dist/search-input/pdx-search-input.js"
+    },
+    "./textarea": {
+      "development": "./src/textarea/pdx-textarea.ts",
+      "types": "./dist/textarea/pdx-textarea.d.ts",
+      "import": "./dist/textarea/pdx-textarea.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -666,12 +666,14 @@
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
     "dist/field-list/field-list-strings.js",
+    "dist/search-input/search-input-icons.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
     "src/field-list/field-list-strings.ts",
+    "src/search-input/search-input-icons.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],
