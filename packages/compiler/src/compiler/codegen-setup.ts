@@ -258,6 +258,8 @@ export function buildSetupBody(
     for (const p of analysis.props) if (p.model) signalNames.add(p.name);
     const callableNames = new Set<string>();
     for (const p of analysis.props) if (!p.model) callableNames.add(p.name);
+    // A typed snippet is the signal core keeps on the context, read as a prop is (#1291).
+    for (const s of typedSlots(analysis)) callableNames.add(s);
     for (const d of analysis.deriveds) callableNames.add(d.name);
     // @params: typed route params are generated as computed() → need () reads
     if (analysis.route.params) {
@@ -738,16 +740,22 @@ function propAccessors(analysis: ScriptAnalysis, bodyText: string, generated: st
     // `value`, and each was an accessor nothing called. Strings stay: a template literal's `${…}` reads.
     const code = maskComments(bodyText);
     const generatedCode = maskComments(generated);
-    for (const p of analysis.props) {
-        if (p.model) continue;
-        const word = new RegExp(`\\b${escapeForRegExp(p.name)}\\b`);
-        const read = new RegExp(`(?<![\\w$.])${escapeForRegExp(p.name)}(?![\\w$])`);
+    // A typed snippet is read the same way: core keeps it in a signal on the context (#1291).
+    const names = [...analysis.props.filter(p => !p.model).map(p => p.name), ...typedSlots(analysis)];
+    for (const name of names) {
+        const word = new RegExp(`\\b${escapeForRegExp(name)}\\b`);
+        const read = new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`);
         if (word.test(code) || analysis.signals.some(s => word.test(s.initialExpr))
             || analysis.deriveds.some(d => word.test(d.expr)) || read.test(generatedCode)) {
-            lines.push(`    const ${p.name} = ctx.${p.name};`);
+            lines.push(`    const ${name} = ctx.${name};`);
         }
     }
     return lines.join('\n');
+}
+
+/** The typed snippets the script declares (`@slot row?: (…)`): a projection slot is not a value. */
+function typedSlots(analysis: ScriptAnalysis): string[] {
+    return analysis.slots.filter(s => s.signature !== undefined).map(s => s.name);
 }
 
 // ─── Internal Helpers ──────────────────────────────────────────────
