@@ -30,7 +30,7 @@ Pick a number by dragging.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change-end` → `detail: { value }` — Fired on `pdx-change-end`.; `value-change` → `detail: { value: number | number[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-change-end` → `detail: { value: number | number[] }` — A drag ended: the value it left, `[low, high]` in range mode.; `value-change` → `detail: { value: number | number[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `slider`
 

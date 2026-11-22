@@ -12,7 +12,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import ts from 'typescript';
 import { tick, cleanup } from './helpers';
-import '../../src/rating/pdx-rating';
+import '../../src/rating/pdx-rating.pdx';
 
 const SRC = join(__dirname, '..', '..', 'src');
 

@@ -1,0 +1,388 @@
+<template>
+  <div :class="rootClass()" data-part="root" style="touch-action:none">
+    <div class="pdx-slider-track" data-part="track" :ref="trackEl">
+      <div class="pdx-slider-fill" data-part="fill"></div>
+    </div>
+    <div class="pdx-slider-marks"></div>
+    @if (range) {
+      <div class="pdx-slider-thumb pdx-slider-thumb-min" data-part="thumb" role="slider"
+        :aria-invalid="error ? 'true' : null"
+        tabindex="0" :aria-label="label ? formatText(uiString('slider', 'minimumOf'), { label }) : uiString('slider', 'minimum')"
+        :aria-valuemin="min" :aria-valuemax="max" aria-valuenow="0"
+        :aria-orientation="orientation">
+        <span class="pdx-slider-label"></span>
+      </div>
+      <div class="pdx-slider-thumb pdx-slider-thumb-max" data-part="thumb" role="slider"
+        :aria-invalid="error ? 'true' : null"
+        tabindex="0" :aria-label="label ? formatText(uiString('slider', 'maximumOf'), { label }) : uiString('slider', 'maximum')"
+        :aria-valuemin="min" :aria-valuemax="max" aria-valuenow="100"
+        :aria-orientation="orientation">
+        <span class="pdx-slider-label"></span>
+      </div>
+    } @else {
+      <div class="pdx-slider-thumb" data-part="thumb" role="slider"
+        :aria-invalid="error ? 'true' : null"
+        tabindex="0" :aria-label="ariaLabel || label || uiString('slider', 'value')"
+        :aria-valuemin="min" :aria-valuemax="max" aria-valuenow="0"
+        :aria-orientation="orientation">
+        <span class="pdx-slider-label"></span>
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A slider the user drags or moves from the keyboard to pick a value, or a range with two thumbs,
+ * with marks and value labels.
+ *
+ * @csspart root - The frame the pointer acts on.
+ * @csspart track - The rail.
+ * @csspart fill - The coloured portion: from the minimum to the value, or between the thumbs.
+ * @csspart thumb - A thumb, `role="slider"`: one, or two in range mode; aria-invalid with `error`.
+ * @csspart mark - One of `marks`.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate invalid - `error` is set; every thumb is aria-invalid.
+ * @cssstate dragging - A pointer is dragging a thumb.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail min $event.detail.value[0]
+ * @alphadetail max $event.detail.value[1]
+ */
+// pdx-slider — Single and range slider with keyboard nav, marks, labels.
+// Custom DOM (not <input type="range">) for full control over track/fill/thumb styling.
+// Uses PointerEvents for unified mouse/touch/pen. ARIA slider role.
+// `formatText`: i18n's `format`, named apart from the props.
+import { uiString, format as formatText } from '../shared/i18n';
+
+// A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
+// still marks the end of a drag. In range mode it holds `[min, max]`.
+/** The value, or `[low, high]` with `range`. A form submits it; a range as two entries, the low then the high (#135). */
+// The attribute is read as a number, as the TypeScript version's `type: Number`: in range mode
+// `value="20,80"` reads NaN, and the effect below falls back to the attribute's text.
+@model value: number | number[] = 0 { attribute: number, form: () => formVal };
+/** A drag ended: the value it left, `[low, high]` in range mode. */
+@event 'pdx-change-end': { value: number | number[] };
+// On the host as custom states (#132); the root carries no state class.
+@state disabled = !!disabled;
+@state invalid = !!error;
+@state dragging = isDragging;
+@part root, track, fill, thumb;
+// The marks are built by the script, not drawn by the template (#1284).
+@part(external) mark;
+// The axes its stylesheet keys by (#629, #286), reflected on the host; each value maps the class
+// that draws the same look on native markup. `md` and `horizontal` are the base, which no class
+// adds to.
+@variants {
+  /** sm, md (the default) or lg: the track's and thumb's size. */
+  size: { md: '.pdx-slider-md', sm: '.pdx-slider-sm', lg: '.pdx-slider-lg' } = md;
+  /** primary (the default), success or warning: the fill's and thumb's colour. */
+  color: { primary: '.pdx-slider-primary', success: '.pdx-slider-success', warning: '.pdx-slider-warning' } = primary;
+  /** horizontal (the default) or vertical. */
+  orientation: { horizontal: '.pdx-slider-horizontal', vertical: '.pdx-slider-vertical' } = horizontal;
+}
+@prop min: number = 0;
+@prop max: number = 100;
+@prop step: number = 1;
+@prop disabled: boolean = false;
+@prop ariaLabel: string = '';
+/** What the slider sets ("Volume"): the thumb's name, and in range mode "{label}, minimum" /
+ *  "{label}, maximum". Not needed after a pdx-label, which names it. */
+@prop label: string = '';
+/** Comma-separated mark values, or "step" to show all steps */
+@prop marks: string = '';
+/** Show value label on thumb while dragging */
+@prop showLabel: boolean = false;
+/** Always show label (not just on drag) */
+@prop labelAlways: boolean = false;
+@prop name: string = '';
+@prop error: boolean = false;
+/** Two thumbs: `value` is `[low, high]`; the `value` attribute may give it as `"low,high"`. */
+@prop range: boolean = false;
+/** Minimum gap between thumbs in range mode */
+@prop minGap: number = 0;
+
+// The host is the one submitter: a hidden input carrying the name would send the value a
+// second time.
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear (clear resets to min)
+@expose focus, blur, clear;
+
+let trackEl = $signal(null);
+let single = 0;
+let rangeMin = 0;
+let rangeMax = 100;
+let draggingThumb: 'single' | 'min' | 'max' | null = null;
+let isDragging = $signal(false);
+// The form value, snapped and clamped: the low and the high in range mode, two entries (#135).
+let formVal = $signal<number | number[]>(0);
+function syncFormVal() {
+  formVal = range ? [rangeMin, rangeMax] : single;
+}
+
+function clamp(v: number): number {
+  return Math.max(min as number, Math.min(max as number, v));
+}
+
+function snapToStep(v: number): number {
+  const mn = min as number;
+  const s = step as number;
+  return mn + Math.round((v - mn) / s) * s;
+}
+
+function percent(v: number): number {
+  const mn = min as number;
+  const mx = max as number;
+  if (mx === mn) return 0;
+  return ((v - mn) / (mx - mn)) * 100;
+}
+
+function valueFromPointer(e: PointerEvent): number {
+  const track = trackEl as HTMLElement | null;
+  if (!track) return min as number;
+  const rect = track.getBoundingClientRect();
+  const isVert = (orientation as string) === 'vertical';
+  let ratio: number;
+  if (isVert) {
+    ratio = 1 - (e.clientY - rect.top) / rect.height;
+  } else {
+    ratio = (e.clientX - rect.left) / rect.width;
+  }
+  ratio = Math.max(0, Math.min(1, ratio));
+  const mn = min as number;
+  const mx = max as number;
+  return snapToStep(mn + ratio * (mx - mn));
+}
+
+function emitChange() {
+  syncFormVal();
+  // `value` is live. In range mode it is written as the array the event
+  // carries: the prop is a Number, and a "min,max" STRING would be coerced to NaN, which
+  // the sync effect below reads as "fall back to the attribute" — the initial range.
+  // The model's write dispatches `value-change` (#480).
+  if (range) value = [rangeMin, rangeMax];
+  else value = single;
+}
+
+function setSingleValue(v: number) {
+  single = clamp(snapToStep(v));
+  emitChange();
+  updateDOM();
+}
+
+function setRangeMin(v: number) {
+  const gap = minGap as number;
+  v = clamp(snapToStep(v));
+  if (v > rangeMax - gap) v = rangeMax - gap;
+  rangeMin = v;
+  emitChange();
+  updateDOM();
+}
+
+function setRangeMax(v: number) {
+  const gap = minGap as number;
+  v = clamp(snapToStep(v));
+  if (v < rangeMin + gap) v = rangeMin + gap;
+  rangeMax = v;
+  emitChange();
+  updateDOM();
+}
+
+function updateDOM() {
+  const fillEl = el.querySelector('.pdx-slider-fill') as HTMLElement;
+  const isVert = (orientation as string) === 'vertical';
+
+  if (range) {
+    const thumbMin = el.querySelector('.pdx-slider-thumb-min') as HTMLElement;
+    const thumbMax = el.querySelector('.pdx-slider-thumb-max') as HTMLElement;
+    const pMin = percent(rangeMin);
+    const pMax = percent(rangeMax);
+    if (isVert) {
+      if (fillEl) { fillEl.style.bottom = pMin + '%'; fillEl.style.height = (pMax - pMin) + '%'; fillEl.style.left = ''; fillEl.style.width = ''; }
+      if (thumbMin) { thumbMin.style.bottom = pMin + '%'; thumbMin.style.left = ''; thumbMin.setAttribute('aria-valuenow', String(rangeMin)); }
+      if (thumbMax) { thumbMax.style.bottom = pMax + '%'; thumbMax.style.left = ''; thumbMax.setAttribute('aria-valuenow', String(rangeMax)); }
+    } else {
+      if (fillEl) { fillEl.style.left = pMin + '%'; fillEl.style.width = (pMax - pMin) + '%'; fillEl.style.bottom = ''; fillEl.style.height = ''; }
+      if (thumbMin) { thumbMin.style.left = pMin + '%'; thumbMin.style.bottom = ''; thumbMin.setAttribute('aria-valuenow', String(rangeMin)); }
+      if (thumbMax) { thumbMax.style.left = pMax + '%'; thumbMax.style.bottom = ''; thumbMax.setAttribute('aria-valuenow', String(rangeMax)); }
+    }
+    // Labels
+    const lMin = thumbMin?.querySelector('.pdx-slider-label') as HTMLElement;
+    const lMax = thumbMax?.querySelector('.pdx-slider-label') as HTMLElement;
+    if (lMin) lMin.textContent = String(rangeMin);
+    if (lMax) lMax.textContent = String(rangeMax);
+  } else {
+    const thumbEl = el.querySelector('.pdx-slider-thumb') as HTMLElement;
+    const p = percent(single);
+    if (isVert) {
+      if (fillEl) { fillEl.style.height = p + '%'; fillEl.style.width = ''; }
+      if (thumbEl) { thumbEl.style.bottom = p + '%'; thumbEl.style.left = ''; thumbEl.setAttribute('aria-valuenow', String(single)); }
+    } else {
+      if (fillEl) { fillEl.style.width = p + '%'; fillEl.style.height = ''; }
+      if (thumbEl) { thumbEl.style.left = p + '%'; thumbEl.style.bottom = ''; thumbEl.setAttribute('aria-valuenow', String(single)); }
+    }
+    const labelEl = thumbEl?.querySelector('.pdx-slider-label') as HTMLElement;
+    if (labelEl) labelEl.textContent = String(single);
+  }
+}
+
+// Pointer drag
+function onPointerDown(e: PointerEvent) {
+  if (disabled) return;
+  e.preventDefault();
+  const target = e.target as HTMLElement;
+
+  if (range) {
+    if (target.closest('.pdx-slider-thumb-min')) draggingThumb = 'min';
+    else if (target.closest('.pdx-slider-thumb-max')) draggingThumb = 'max';
+    else {
+      // Click on track: move nearest thumb
+      const v = valueFromPointer(e);
+      const distMin = Math.abs(v - rangeMin);
+      const distMax = Math.abs(v - rangeMax);
+      if (distMin <= distMax) { draggingThumb = 'min'; setRangeMin(v); }
+      else { draggingThumb = 'max'; setRangeMax(v); }
+    }
+  } else {
+    draggingThumb = 'single';
+    setSingleValue(valueFromPointer(e));
+  }
+
+  isDragging = true;
+  // Focus the active thumb for keyboard nav after click
+  let thumbToFocus: HTMLElement | null = null;
+  if (range) {
+    thumbToFocus = el.querySelector(draggingThumb === 'min' ? '.pdx-slider-thumb-min' : '.pdx-slider-thumb-max');
+  } else {
+    thumbToFocus = el.querySelector('.pdx-slider-thumb');
+  }
+  if (thumbToFocus) thumbToFocus.focus();
+
+  el.setPointerCapture(e.pointerId);
+  el.addEventListener('pointermove', onPointerMove);
+  el.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (!draggingThumb) return;
+  const v = valueFromPointer(e);
+  if (draggingThumb === 'single') setSingleValue(v);
+  else if (draggingThumb === 'min') setRangeMin(v);
+  else if (draggingThumb === 'max') setRangeMax(v);
+}
+
+function onPointerUp(e: PointerEvent) {
+  el.releasePointerCapture(e.pointerId);
+  el.removeEventListener('pointermove', onPointerMove);
+  el.removeEventListener('pointerup', onPointerUp);
+  draggingThumb = null;
+  isDragging = false;
+  pdxChangeEnd(range ? { value: [rangeMin, rangeMax] } : { value: single });
+}
+
+// Keyboard
+function onKeydown(e: KeyboardEvent) {
+  if (disabled) return;
+  const target = e.target as HTMLElement;
+  const s = step as number;
+  const bigStep = s * 10;
+  let delta = 0;
+
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowUp': delta = s; break;
+    case 'ArrowLeft': case 'ArrowDown': delta = -s; break;
+    case 'PageUp': delta = bigStep; break;
+    case 'PageDown': delta = -bigStep; break;
+    case 'Home': delta = (min as number) - 99999; break;
+    case 'End': delta = (max as number) + 99999; break;
+    default: return;
+  }
+  e.preventDefault();
+
+  if (range) {
+    if (target.closest('.pdx-slider-thumb-min')) setRangeMin(rangeMin + delta);
+    else if (target.closest('.pdx-slider-thumb-max')) setRangeMax(rangeMax + delta);
+  } else {
+    setSingleValue(single + delta);
+  }
+}
+
+// The states (#132). The value label's two classes stay: they follow `showLabel` and
+// `labelAlways`, two settings, not states of the control.
+function rootClass(): string {
+  let cls = 'pdx-slider';
+  if (showLabel || labelAlways) cls += ' pdx-slider-has-label';
+  if (labelAlways) cls += ' pdx-slider-label-always';
+  return cls;
+}
+
+// Init + sync
+let bound = false;
+$effect(() => {
+  const propVal = value as number;
+  const isRange = range;
+
+  if (isRange) {
+    // Parse "min,max" from prop value (string or number)
+    const raw = String(propVal || el.getAttribute('value') || '0,100');
+    const parts = raw.split(',').map(Number);
+    rangeMin = clamp(snapToStep(parts[0] || 0));
+    rangeMax = clamp(snapToStep(parts[1] || 100));
+  } else {
+    single = clamp(snapToStep(propVal));
+  }
+  syncFormVal();
+
+  requestAnimationFrame(() => {
+    if (!bound) {
+      bound = true;
+      el.addEventListener('pointerdown', onPointerDown);
+      el.addEventListener('keydown', onKeydown);
+
+      // Build marks imperatively
+      const marksStr = marks as string;
+      if (marksStr) {
+        const marksContainer = el.querySelector('.pdx-slider-marks');
+        if (marksContainer) {
+          let values: number[];
+          if (marksStr === 'step') {
+            values = [];
+            const mn = min as number;
+            const mx = max as number;
+            const s = step as number;
+            for (let v = mn; v <= mx; v += s) values.push(v);
+          } else {
+            values = marksStr.split(',').map(Number).filter(n => !isNaN(n));
+          }
+          for (const v of values) {
+            const markEl = document.createElement('span');
+            markEl.className = 'pdx-slider-mark';
+            markEl.dataset.part = 'mark';
+            const isVert = (orientation as string) === 'vertical';
+            if (isVert) markEl.style.bottom = percent(v) + '%';
+            else markEl.style.left = percent(v) + '%';
+            marksContainer.appendChild(markEl);
+          }
+        }
+      }
+    }
+    updateDOM();
+  });
+});
+
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+function clear() {
+  const mn = min as number;
+  if (range) {
+    setRangeMin(mn);
+    setRangeMax(mn);
+  } else {
+    setSingleValue(mn);
+  }
+}
+</script>

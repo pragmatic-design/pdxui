@@ -19,8 +19,8 @@ import '../../src/toggle/pdx-toggle';
 import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/checkbox-group/pdx-checkbox-group.pdx';
 import '../../src/segmented/pdx-segmented.pdx';
-import '../../src/rating/pdx-rating';
-import '../../src/slider/pdx-slider';
+import '../../src/rating/pdx-rating.pdx';
+import '../../src/slider/pdx-slider.pdx';
 
 /** Each control of the batch and the models it declares. */
 const MODELS: Record<string, string[]> = {

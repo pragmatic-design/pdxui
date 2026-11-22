@@ -1,0 +1,331 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRating",
+  "tagName": "pdx-rating",
+  "category": "Specialized Inputs",
+  "order": 31,
+  "description": "A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value\ntakes part in a form.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "count",
+      "description": "Number of rating symbols.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5",
+      "attribute": "count"
+    },
+    {
+      "kind": "field",
+      "name": "precision",
+      "description": "Smallest selectable step (e.g. 0.5 for half stars).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "precision"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "color",
+      "description": "Colour of the component.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "color"
+    },
+    {
+      "kind": "field",
+      "name": "tooltips",
+      "description": "Comma-separated tooltip labels, e.g. \"Bad,Poor,OK,Good,Great\"",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "tooltips"
+    },
+    {
+      "kind": "field",
+      "name": "colors",
+      "description": "Comma-separated threshold:color pairs, e.g. \"2:red,3:orange,5:green\"",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "colors"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Allow clearing to 0 by clicking current value",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name. Empty: the rating.label component string, «Rating» in English.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the icons' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-rating-md",
+        "sm": ".pdx-rating-sm",
+        "lg": ".pdx-rating-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change",
+    "change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "hover",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The pointer is over a star: the value a click would set, or -1 when it leaves.",
+      "detail": "{ value: number }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: number }"
+    }
+  ],
+  "roles": [
+    "slider"
+  ],
+  "attributes": [
+    {
+      "name": "count",
+      "fieldName": "count",
+      "description": "Number of rating symbols.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5"
+    },
+    {
+      "name": "precision",
+      "fieldName": "precision",
+      "description": "Smallest selectable step (e.g. 0.5 for half stars).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "color",
+      "fieldName": "color",
+      "description": "Colour of the component.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "tooltips",
+      "fieldName": "tooltips",
+      "description": "Comma-separated tooltip labels, e.g. \"Bad,Poor,OK,Good,Great\"",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "colors",
+      "fieldName": "colors",
+      "description": "Comma-separated threshold:color pairs, e.g. \"2:red,3:orange,5:green\"",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Allow clearing to 0 by clicking current value",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name. Empty: the rating.label component string, «Rating» in English.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the icons' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, `role=\"slider\"`."
+    },
+    {
+      "name": "star",
+      "description": "One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "focused",
+      "description": "The slider has focus."
+    }
+  ]
+}

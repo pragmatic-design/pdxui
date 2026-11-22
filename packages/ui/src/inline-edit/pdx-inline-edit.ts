@@ -14,7 +14,7 @@ import { uiString, format } from '../shared/i18n';
 import '@pdxui/design/components/inline-edit';
 import '../color-picker/pdx-color-picker.pdx'; // rendered by this component, and registered by nobody else
 import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
-import '../rating/pdx-rating'; // rendered by this component, and registered by nobody else
+import '../rating/pdx-rating.pdx'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else
 import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
 

@@ -11,7 +11,7 @@ import '../../src/shared/i18n';
 import '../../src/split-button/pdx-split-button';
 import '../../src/scroll-area/pdx-scroll-area';
 import '../../src/progress/pdx-progress.pdx';
-import '../../src/rating/pdx-rating';
+import '../../src/rating/pdx-rating.pdx';
 import '../../src/fab/pdx-fab';
 import '../../src/file-upload/pdx-file-upload';
 import '../../src/date-picker/pdx-date-picker';
@@ -29,7 +29,7 @@ import '../../src/command/pdx-command';
 import '../../src/dialog/pdx-dialog';
 import '../../src/drawer/pdx-drawer';
 import '../../src/popover/pdx-popover';
-import '../../src/slider/pdx-slider';
+import '../../src/slider/pdx-slider.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
 
 interface Case {

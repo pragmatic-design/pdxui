@@ -2,7 +2,7 @@
  * MANIFEST — pdx-rating
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/rating/pdx-rating.ts
+ *  - source: packages/ui/src/rating/pdx-rating.pdx
  *      the HOST <pdx-rating size="sm|md|lg"> :state(disabled|readonly|focused) → render: an inner
  *        <div class="pdx-rating" data-part="root"
  *        role="slider" :aria-valuenow :aria-valuemin="0" :aria-valuemax="count"

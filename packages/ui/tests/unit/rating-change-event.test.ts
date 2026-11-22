@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/rating/pdx-rating';
+import '../../src/rating/pdx-rating.pdx';
 
 type Seen = { type: string; value: unknown }[];
 function record(el: HTMLElement): Seen {
@@ -54,22 +54,33 @@ describe('pdx-rating: the value event', () => {
 // A component that emitted it would answer a listener the migration flags as one for the native event.
 describe('no component emits change', () => {
     const SRC = join(__dirname, '..', '..', 'src');
-    function tsFiles(dir: string): string[] {
+    function sources(dir: string, ext: string): string[] {
         return readdirSync(dir).flatMap((name) => {
             const path = join(dir, name);
-            return statSync(path).isDirectory() ? tsFiles(path) : (name.endsWith('.ts') ? [path] : []);
+            return statSync(path).isDirectory() ? sources(path, ext) : (name.endsWith(ext) ? [path] : []);
         });
     }
+    const relative = (file: string) => file.slice(SRC.length + 1).replace(/\\/g, '/');
 
     it('no source calls emit(\'change\')', () => {
-        const emitting = tsFiles(SRC)
+        const emitting = sources(SRC, '.ts')
             .filter((file) => readFileSync(file, 'utf8').includes("emit('change'"))
-            .map((file) => file.slice(SRC.length + 1).replace(/\\/g, '/'));
+            .map(relative);
         expect(emitting).toEqual([]);
     });
 
+    // A .pdx emits only what it declares (#1210): `change` would be an `@event change` line.
+    it('no .pdx declares @event change', () => {
+        const declaring = sources(SRC, '.pdx')
+            .filter((file) => /^@event\s+['"]?change['"]?\s*:/m.test(readFileSync(file, 'utf8')))
+            .map(relative);
+        expect(declaring).toEqual([]);
+    });
+
     it('the scan reads the sources — the control', () => {
-        expect(tsFiles(SRC).length).toBeGreaterThan(100);
-        expect(readFileSync(join(SRC, 'rating', 'pdx-rating.ts'), 'utf8')).toContain('ctx.value.set(');
+        expect(sources(SRC, '.ts').length).toBeGreaterThan(50);
+        expect(sources(SRC, '.pdx').length).toBeGreaterThan(30);
+        // The declaration the second scan reads, on a component that has one.
+        expect(readFileSync(join(SRC, 'rating', 'pdx-rating.pdx'), 'utf8')).toMatch(/^@event\s+hover\s*:/m);
     });
 });

@@ -25,7 +25,7 @@ Star rating with halves and tooltips.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `hover` → `detail: { value }` — Fired on `hover`.; `value-change` → `detail: { value: number }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `hover` → `detail: { value: number }` — The pointer is over a star: the value a click would set, or -1 when it leaves.; `value-change` → `detail: { value: number }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `slider`
 

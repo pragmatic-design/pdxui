@@ -23695,7 +23695,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/rating/pdx-rating.ts",
+      "path": "src/rating/pdx-rating.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23874,20 +23874,20 @@
           },
           "events": [
             {
+              "name": "hover",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The pointer is over a star: the value a click would set, or -1 when it leaves.",
+              "detail": "{ value: number }"
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: number }"
-            },
-            {
-              "name": "hover",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on `hover`.",
-              "detail": "{ value }"
             }
           ],
           "roles": [
@@ -24035,7 +24035,7 @@
           "name": "pdx-rating",
           "declaration": {
             "name": "PdxRating",
-            "module": "src/rating/pdx-rating.ts"
+            "module": "src/rating/pdx-rating.pdx"
           }
         }
       ]
@@ -28078,7 +28078,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/slider/pdx-slider.ts",
+      "path": "src/slider/pdx-slider.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -28334,20 +28334,20 @@
           },
           "events": [
             {
+              "name": "pdx-change-end",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A drag ended: the value it left, `[low, high]` in range mode.",
+              "detail": "{ value: number | number[] }"
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: number | number[] }"
-            },
-            {
-              "name": "pdx-change-end",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on `pdx-change-end`.",
-              "detail": "{ value }"
             }
           ],
           "roles": [
@@ -28552,7 +28552,7 @@
           "name": "pdx-slider",
           "declaration": {
             "name": "PdxSlider",
-            "module": "src/slider/pdx-slider.ts"
+            "module": "src/slider/pdx-slider.pdx"
           }
         }
       ]

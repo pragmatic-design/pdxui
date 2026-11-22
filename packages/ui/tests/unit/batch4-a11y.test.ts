@@ -9,7 +9,7 @@ import '../../src/time-picker/pdx-time-picker';
 import '../../src/tabs/pdx-tabs';
 import '../../src/wizard/pdx-wizard';
 import '../../src/timeline/pdx-timeline';
-import '../../src/slider/pdx-slider';
+import '../../src/slider/pdx-slider.pdx';
 import '../../src/label/pdx-label';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/scroll-area/pdx-scroll-area';
