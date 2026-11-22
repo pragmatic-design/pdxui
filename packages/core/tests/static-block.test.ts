@@ -1,6 +1,6 @@
 // core's staticBlock: a compiled block's static markup, built once and copied per render (#109).
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { staticBlock, staticMarkup } from '../src/renderer/dom';
 
 describe('staticBlock', () => {
@@ -20,7 +20,7 @@ describe('staticBlock', () => {
         expect(builds).toBe(1);
     });
 
-    it('every call is a separate copy of the same markup, owned by the page', () => {
+    it('every call is a separate copy of the same markup, the page\'s once inserted', () => {
         const block = staticBlock((frag, d) => {
             const p = d.createElement('p');
             p.setAttribute('class', 'a');
@@ -33,10 +33,42 @@ describe('staticBlock', () => {
         expect(one.firstChild).not.toBe(two.firstChild);
         expect((one.firstChild as Element).outerHTML).toBe('<p class="a">hi</p>');
         expect((two.firstChild as Element).outerHTML).toBe('<p class="a">hi</p>');
-        expect(one.ownerDocument).toBe(document);
         // A copy changed by its render does not reach the next one.
         (one.firstChild as Element).setAttribute('class', 'changed');
         expect((block().firstChild as Element).getAttribute('class')).toBe('a');
+        // Adopted when it is inserted, as html``'s copies are.
+        const p = one.firstChild as Element;
+        document.body.appendChild(one);
+        expect(p.ownerDocument).toBe(document);
+        p.remove();
+    });
+
+    it('a block with no custom element is copied with cloneNode, not importNode (#1282)', () => {
+        // importNode of a block made every DOM call on the copy slower in a component's render: a
+        // `<slot>` block mounted pdx-wizard 1.43x its TypeScript version, a `<form>` block pdx-form 1.66x.
+        const block = staticBlock(staticMarkup('<form class="f"><slot></slot></form><!---->'));
+        const importNode = vi.spyOn(document, 'importNode');
+        try {
+            const frag = block();
+            expect(importNode).not.toHaveBeenCalled();
+            expect((frag.firstChild as Element).outerHTML).toBe('<form class="f"><slot></slot></form>');
+        } finally {
+            importNode.mockRestore();
+        }
+    });
+
+    it('the control: a block with a custom element is imported, which upgrades it before the bindings', () => {
+        class StaticBlockNested extends HTMLElement {}
+        customElements.define('static-block-nested', StaticBlockNested);
+        const block = staticBlock(staticMarkup('<div><static-block-nested></static-block-nested></div>'));
+        const importNode = vi.spyOn(document, 'importNode');
+        try {
+            const frag = block();
+            expect(importNode).toHaveBeenCalledTimes(1);
+            expect(frag.firstChild!.firstChild).toBeInstanceOf(StaticBlockNested);
+        } finally {
+            importNode.mockRestore();
+        }
     });
 
     it('staticMarkup builds the same block from HTML, an empty comment standing for an empty text node (#369)', () => {

@@ -122,18 +122,35 @@ export function marker(label?: string): Comment {
  *
  * The markup is built on the first call, not at import (#93), into a `<template>`'s content: that
  * document has no custom-element registry and loads nothing, so no component constructor runs and no
- * image is fetched while it is built. Each call returns `importNode` of it, which brings the copy into
- * the page and upgrades its components, as `createElement` did.
+ * image is fetched while it is built.
+ *
+ * A block that holds a component is copied with `importNode`, which brings the copy into the page and
+ * upgrades its components before the bindings set their properties, as `createElement` did. A block
+ * that holds none has nothing to upgrade: it is copied with `cloneNode`, and adopted by the page when
+ * it is inserted, as `html```'s copies are (#1282).
  */
 export function staticBlock(build: (frag: DocumentFragment, doc: Document) => void): () => DocumentFragment {
     let content: DocumentFragment | null = null;
+    let upgrades = false;
     return () => {
         if (!content) {
             content = document.createElement('template').content;
             build(content, content.ownerDocument);
+            upgrades = holdsCustomElement(content);
         }
-        return document.importNode(content, true);
+        // importNode of a block with no component made every later DOM call on the copy slower inside a
+        // component's render (#1282): measured on mount, a `<slot>` block put pdx-wizard at 1.43× its
+        // TypeScript version and a `<form>` block pdx-form at 1.66×; copied with cloneNode, 1.08× and 1.065×.
+        return upgrades ? document.importNode(content, true) : content.cloneNode(true) as DocumentFragment;
     };
+}
+
+/** Does the markup hold an element a custom-element definition can upgrade: a hyphenated tag, or `is`? */
+function holdsCustomElement(root: DocumentFragment): boolean {
+    for (const el of Array.from(root.querySelectorAll('*'))) {
+        if (el.localName.includes('-') || el.hasAttribute('is')) return true;
+    }
+    return false;
 }
 
 /**
