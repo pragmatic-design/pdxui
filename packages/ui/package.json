@@ -89,11 +89,6 @@
       "types": "./dist/rating/pdx-rating.d.ts",
       "import": "./dist/rating/pdx-rating.js"
     },
-    "./segmented": {
-      "development": "./src/segmented/pdx-segmented.ts",
-      "types": "./dist/segmented/pdx-segmented.d.ts",
-      "import": "./dist/segmented/pdx-segmented.js"
-    },
     "./toggle": {
       "development": "./src/toggle/pdx-toggle.ts",
       "types": "./dist/toggle/pdx-toggle.d.ts",
@@ -183,11 +178,6 @@
       "development": "./src/autocomplete/pdx-autocomplete.ts",
       "types": "./dist/autocomplete/pdx-autocomplete.d.ts",
       "import": "./dist/autocomplete/pdx-autocomplete.js"
-    },
-    "./color-picker": {
-      "development": "./src/color-picker/pdx-color-picker.ts",
-      "types": "./dist/color-picker/pdx-color-picker.d.ts",
-      "import": "./dist/color-picker/pdx-color-picker.js"
     },
     "./file-upload": {
       "development": "./src/file-upload/pdx-file-upload.ts",
@@ -658,6 +648,16 @@
       "development": "./src/tag-input/pdx-tag-input.pdx",
       "types": "./dist/tag-input/pdx-tag-input.d.ts",
       "import": "./dist/tag-input/pdx-tag-input.js"
+    },
+    "./segmented": {
+      "development": "./src/segmented/pdx-segmented.pdx",
+      "types": "./dist/segmented/pdx-segmented.d.ts",
+      "import": "./dist/segmented/pdx-segmented.js"
+    },
+    "./color-picker": {
+      "development": "./src/color-picker/pdx-color-picker.pdx",
+      "types": "./dist/color-picker/pdx-color-picker.d.ts",
+      "import": "./dist/color-picker/pdx-color-picker.js"
     },
     "./package.json": "./package.json"
   },

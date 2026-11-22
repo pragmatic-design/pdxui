@@ -12,7 +12,7 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/inline-edit';
-import '../color-picker/pdx-color-picker'; // rendered by this component, and registered by nobody else
+import '../color-picker/pdx-color-picker.pdx'; // rendered by this component, and registered by nobody else
 import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
 import '../rating/pdx-rating'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else

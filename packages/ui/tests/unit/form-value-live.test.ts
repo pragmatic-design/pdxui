@@ -12,7 +12,7 @@ import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/number-input/pdx-number-input';
 import '../../src/slider/pdx-slider';
-import '../../src/color-picker/pdx-color-picker';
+import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/mention/pdx-mention';
 
 // ── Polyfill ElementInternals.setFormValue capture ──────────────────────────

@@ -7,7 +7,7 @@
 // a name, and opening it moves focus off the swatch.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/color-picker/pdx-color-picker';
+import '../../src/color-picker/pdx-color-picker.pdx';
 
 type Picker = HTMLElement & { value: string; getHex(): string; getRgb(): { a: number } };
 /** A commit: the native `change` (#481), with the colour as the element then held it. */

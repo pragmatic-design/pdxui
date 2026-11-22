@@ -432,7 +432,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // renderer/snippet.ts, beside the `declaredSnippet` most components read, it went into the chunk that
 // loads before the first paint (blocking 102.5 → 102.7). The built dist: blocking 102.5 KB (unchanged),
 // entry 43.5 KB, js 480.3 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 481.0, css: 67, blocking: 102.6 };
+// js 481.0 → 482.0 (the same standing OK for #1210's batches, at its +1 KB): pdx-segmented and
+// pdx-color-picker move to .pdx, 1.09× and 1.03× alone (color-picker with its colour-math module). Their
+// chunks grow more than they do, +410 and +594 B against +185 and +132 B alone, with the compiled code
+// they are the first to use while html`` stays for the others; Rollup rearranges three shared modules
+// (form-registry, own-prop, selector: net +224 B), every other chunk −351 B. The whole +0.9 KB. The
+// built dist: entry 43.5 KB, blocking 102.5 KB (unchanged), js 481.2 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 482.0, css: 67, blocking: 102.6 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

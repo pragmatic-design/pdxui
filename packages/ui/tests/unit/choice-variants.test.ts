@@ -6,7 +6,7 @@ import { cleanup, mount, tick } from './helpers';
 import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
-import '../../src/segmented/pdx-segmented';
+import '../../src/segmented/pdx-segmented.pdx';
 import '../../src/slider/pdx-slider';
 import '../../src/rating/pdx-rating';
 
