@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/command/pdx-command';
 import '../../src/nav-menu/pdx-nav-menu';
-import '../../src/radio-group/pdx-radio-group';
+import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/radio/pdx-radio.pdx';
 
 beforeEach(() => {

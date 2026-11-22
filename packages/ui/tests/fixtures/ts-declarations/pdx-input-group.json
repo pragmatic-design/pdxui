@@ -1,0 +1,63 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxInputGroup",
+  "tagName": "pdx-input-group",
+  "category": "Specialized Inputs",
+  "order": 21,
+  "description": "Groups inputs, buttons and addons into one control with joined borders, passing its size and\ndisabled state to its children.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "A size its children take; the group draws none of its own, so it is not a variant axis.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "A size its children take; the group draws none of its own, so it is not a variant axis.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled`: the group and its children are disabled."
+    }
+  ]
+}

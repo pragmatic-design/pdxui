@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/checkbox/pdx-checkbox.pdx';
-import '../../src/checkbox-group/pdx-checkbox-group';
+import '../../src/checkbox-group/pdx-checkbox-group.pdx';
 
 type Group = HTMLElement & { value: string };
 

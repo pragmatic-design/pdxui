@@ -1,0 +1,105 @@
+<template>
+  <!-- The host IS the group: the radios the author wrote are projected into it. -->
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that
+ * move and check, and the chosen value takes part in a form.
+ *
+ * @cssstate invalid - `error` is set; every radio is aria-invalid.
+ * @cssstate disabled - `disabled` is set; the group is aria-disabled and every radio disabled.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ */
+// pdx-radio-group — Manages single selection across child <pdx-radio> elements.
+// Propagates name/size/disabled/error. Its model is `value` (#480): choosing a radio writes it, and
+// the write dispatches `value-change`.
+//
+// The group follows its children. It handles the `checked-change` its CHILDREN emit, in the capture
+// phase, since a model's event does not bubble, and stops it at the child (shared/child-event.ts), so a
+// listener on the group hears the group's event alone.
+//
+// Keyboard: the radios share one `name`, so the browser's own radio group gives one tab stop and
+// arrow keys that move AND check. A focusGroup() on the <pdx-radio> hosts would fight that: it finds
+// no current item while focus sits on the inner input, and sends ArrowDown back to the first radio.
+import { untracked, generatedId, onDestroy } from '@pdxui/core';
+import { interceptChildEvent } from '../shared/child-event';
+import { nameGroup, authoredName } from '../shared/group-name';
+
+// A form submits the chosen value, nothing with no choice as a native radio group, and resets it (#135).
+@model value: string = '' { form: () => (value as string) || null };
+// On the host as custom states (#132).
+@state invalid = !!error;
+@state disabled = !!disabled;
+// Its layout axis (#286), reflected on the host, where forms.css draws the row; no class for it.
+@variants {
+  /** vertical (the default) or horizontal: the radios in a column or a row. */
+  orientation: { vertical, horizontal } = vertical;
+}
+@prop name: string = '';
+@prop size: string = '';
+@prop disabled: boolean = false;
+@prop error: boolean = false;
+/** Accessible name of the group. Without it, a <pdx-label> right before the group names it. */
+@prop label: string = '';
+
+// Its role and ARIA (#133).
+@host el {
+  role="radiogroup"
+  :aria-orientation="orientation"
+  :aria-disabled="disabled ? 'true' : null"
+}
+
+const fallbackName = generatedId('pdx-rg');
+
+function getRadios(): HTMLElement[] {
+  return Array.from(el.querySelectorAll('pdx-radio'));
+}
+
+// A radio announces that it was checked; the choice is its value, or its label without one.
+function handleChange(ce: CustomEvent<{ value?: boolean }>) {
+  if (ce.detail?.value !== true) return;
+  const radio = ce.target as HTMLElement & { value?: string; label?: string };
+  const chosen = String(radio.value || radio.label || '');
+  if (!chosen || chosen === untracked(() => value as string)) return;
+  value = chosen;
+}
+const stopChildEvents = interceptChildEvent(el, 'checked-change',
+  (t) => t.tagName === 'PDX-RADIO' && t.closest('pdx-radio-group') === el, handleChange);
+onDestroy(stopChildEvents);
+
+// The group's name: `label`, or a pdx-label right before it.
+const authored = authoredName(el);
+$effect(() => {
+  const l = label as string;
+  if (!authored) requestAnimationFrame(() => nameGroup(el, el, l));
+});
+
+// Its own class only, via classList: `className =` would wipe the author's classes. The base
+// look of a choice group; the orientation is the host's attribute.
+el.classList.add('pdx-choice-group');
+
+$effect(() => {
+  const s = size as string;
+  const d = disabled;
+  const e = error;
+  const val = value as string;
+
+  requestAnimationFrame(() => {
+    const radios = getRadios();
+    const groupName = untracked(() => name as string) || fallbackName;
+    for (const r of radios) {
+      r.setAttribute('name', groupName);
+      if (s) r.setAttribute('size', s); else r.removeAttribute('size');
+      if (d) r.setAttribute('disabled', ''); else r.removeAttribute('disabled');
+      if (e) r.setAttribute('error', ''); else r.removeAttribute('error');
+      const rv = r.getAttribute('value') || '';
+      if (val && rv === val) r.setAttribute('checked', '');
+      else r.removeAttribute('checked');
+    }
+  });
+});
+</script>

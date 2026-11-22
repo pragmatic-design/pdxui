@@ -24,6 +24,7 @@ const PORTED: Record<string, string> = {
     'pdx-button': 'src/button/pdx-button.pdx',
     'pdx-button-group': 'src/button-group/pdx-button-group.pdx',
     'pdx-checkbox': 'src/checkbox/pdx-checkbox.pdx',
+    'pdx-checkbox-group': 'src/checkbox-group/pdx-checkbox-group.pdx',
     'pdx-chip': 'src/chip/pdx-chip.pdx',
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-field-list': 'src/field-list/pdx-field-list.pdx',
@@ -31,9 +32,11 @@ const PORTED: Record<string, string> = {
     'pdx-form-actions': 'src/form-actions/pdx-form-actions.pdx',
     'pdx-form-field': 'src/form-field/pdx-form-field.pdx',
     'pdx-input': 'src/input/pdx-input.pdx',
+    'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',
     'pdx-radio': 'src/radio/pdx-radio.pdx',
+    'pdx-radio-group': 'src/radio-group/pdx-radio-group.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
 };
 

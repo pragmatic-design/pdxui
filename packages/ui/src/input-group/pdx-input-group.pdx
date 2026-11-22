@@ -1,0 +1,61 @@
+<template>
+  <!-- The host IS the group: the inputs, buttons and addons the author wrote are projected into it. -->
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * Groups inputs, buttons and addons into one control with joined borders, passing its size and
+ * disabled state to its children.
+ *
+ * @cssstate disabled - `disabled`: the group and its children are disabled.
+ */
+// pdx-input-group — Groups inputs, buttons, and addons with joined borders.
+// Propagates size to children. Uses host element directly (Light DOM).
+// Pattern: same approach as pdx-button-group.
+
+// No class on the host (#293): inputs.css selects the tag, `:is(.pdx-input-group, pdx-input-group)`.
+@state disabled = !!disabled;
+
+/** A size its children take; the group draws none of its own, so it is not a variant axis. */
+@prop size: string = '';
+@prop disabled: boolean = false;
+
+@host el {
+  role="group"
+  :aria-disabled="disabled ? 'true' : null"
+}
+
+$effect(() => {
+  // Read first, so the effect follows them; written a frame later, when the children are in place. A
+  // plain frame, not onNextFrame: that one needs the setup's scope, which a re-run of the effect has not.
+  const s = size as string;
+  const d = disabled;
+
+  // Propagate size/disabled to children after render
+  requestAnimationFrame(() => {
+    // Two-way propagation: taking size/disabled off the group must
+    // remove them from the children too.
+    const applyGroupAttrs = (node: HTMLElement): void => {
+      if (s) node.setAttribute('size', s);
+      else node.removeAttribute('size');
+      if (d) node.setAttribute('disabled', '');
+      else node.removeAttribute('disabled');
+    };
+    // pdx-input children
+    const inputs = el.querySelectorAll<HTMLElement>('pdx-input');
+    for (const inp of inputs) applyGroupAttrs(inp);
+
+    // pdx-button children
+    const buttons = el.querySelectorAll<HTMLElement>('pdx-button');
+    for (const btn of buttons) applyGroupAttrs(btn);
+
+    // Native input/button children (CSS-only usage)
+    const nativeInputs = el.querySelectorAll<HTMLElement>(':scope > input, :scope > button, :scope > select');
+    for (const native of nativeInputs) {
+      if (s) native.setAttribute('size', s);
+      if (d) (native as HTMLInputElement).disabled = true;
+    }
+  });
+});
+</script>

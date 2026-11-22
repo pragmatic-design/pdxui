@@ -13,7 +13,7 @@ import { compile } from '../../../compiler/src/plugin';
 import '../../src/form/pdx-form.pdx';
 import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/radio/pdx-radio.pdx';
-import '../../src/radio-group/pdx-radio-group';
+import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/input/pdx-input.pdx';
 import { cleanup, tick } from './helpers';
 

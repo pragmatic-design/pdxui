@@ -4,9 +4,9 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/checkbox/pdx-checkbox.pdx';
-import '../../src/checkbox-group/pdx-checkbox-group';
-import '../../src/radio-group/pdx-radio-group';
-import '../../src/input-group/pdx-input-group';
+import '../../src/checkbox-group/pdx-checkbox-group.pdx';
+import '../../src/radio-group/pdx-radio-group.pdx';
+import '../../src/input-group/pdx-input-group.pdx';
 import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/statistic/pdx-statistic';
 

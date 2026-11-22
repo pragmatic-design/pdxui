@@ -6845,7 +6845,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/checkbox-group/pdx-checkbox-group.ts",
+      "path": "src/checkbox-group/pdx-checkbox-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -7028,7 +7028,7 @@
           "name": "pdx-checkbox-group",
           "declaration": {
             "name": "PdxCheckboxGroup",
-            "module": "src/checkbox-group/pdx-checkbox-group.ts"
+            "module": "src/checkbox-group/pdx-checkbox-group.pdx"
           }
         }
       ]
@@ -17045,7 +17045,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/input-group/pdx-input-group.ts",
+      "path": "src/input-group/pdx-input-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -17117,7 +17117,7 @@
           "name": "pdx-input-group",
           "declaration": {
             "name": "PdxInputGroup",
-            "module": "src/input-group/pdx-input-group.ts"
+            "module": "src/input-group/pdx-input-group.pdx"
           }
         }
       ]
@@ -23217,7 +23217,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/radio-group/pdx-radio-group.ts",
+      "path": "src/radio-group/pdx-radio-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23418,7 +23418,7 @@
           "name": "pdx-radio-group",
           "declaration": {
             "name": "PdxRadioGroup",
-            "module": "src/radio-group/pdx-radio-group.ts"
+            "module": "src/radio-group/pdx-radio-group.pdx"
           }
         }
       ]

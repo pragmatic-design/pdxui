@@ -64,21 +64,6 @@
       "types": "./dist/textarea/pdx-textarea.d.ts",
       "import": "./dist/textarea/pdx-textarea.js"
     },
-    "./input-group": {
-      "development": "./src/input-group/pdx-input-group.ts",
-      "types": "./dist/input-group/pdx-input-group.d.ts",
-      "import": "./dist/input-group/pdx-input-group.js"
-    },
-    "./radio-group": {
-      "development": "./src/radio-group/pdx-radio-group.ts",
-      "types": "./dist/radio-group/pdx-radio-group.d.ts",
-      "import": "./dist/radio-group/pdx-radio-group.js"
-    },
-    "./checkbox-group": {
-      "development": "./src/checkbox-group/pdx-checkbox-group.ts",
-      "types": "./dist/checkbox-group/pdx-checkbox-group.d.ts",
-      "import": "./dist/checkbox-group/pdx-checkbox-group.js"
-    },
     "./form-section": {
       "development": "./src/form-section/pdx-form-section.ts",
       "types": "./dist/form-section/pdx-form-section.d.ts",
@@ -658,6 +643,21 @@
       "development": "./src/field-list/pdx-field-list.pdx",
       "types": "./dist/field-list/pdx-field-list.d.ts",
       "import": "./dist/field-list/pdx-field-list.js"
+    },
+    "./checkbox-group": {
+      "development": "./src/checkbox-group/pdx-checkbox-group.pdx",
+      "types": "./dist/checkbox-group/pdx-checkbox-group.d.ts",
+      "import": "./dist/checkbox-group/pdx-checkbox-group.js"
+    },
+    "./input-group": {
+      "development": "./src/input-group/pdx-input-group.pdx",
+      "types": "./dist/input-group/pdx-input-group.d.ts",
+      "import": "./dist/input-group/pdx-input-group.js"
+    },
+    "./radio-group": {
+      "development": "./src/radio-group/pdx-radio-group.pdx",
+      "types": "./dist/radio-group/pdx-radio-group.d.ts",
+      "import": "./dist/radio-group/pdx-radio-group.js"
     },
     "./package.json": "./package.json"
   },
