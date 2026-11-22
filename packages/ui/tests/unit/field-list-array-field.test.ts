@@ -18,7 +18,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm, formField } from '@pdxui/core';
-import '../../src/field-list/pdx-field-list';
+import '../../src/field-list/pdx-field-list.pdx';
 import { cleanup } from './helpers';
 
 type Row = Record<string, unknown>;

@@ -16,7 +16,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm, createFieldArray, formField, FORM_INTERNALS } from '@pdxui/core';
-import '../../src/field-list/pdx-field-list';
+import '../../src/field-list/pdx-field-list.pdx';
 import { cleanup } from './helpers';
 
 describe('createFieldArray: a row is addressed by a key that survives', () => {

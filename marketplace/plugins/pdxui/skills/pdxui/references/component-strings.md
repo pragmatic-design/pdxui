@@ -229,15 +229,15 @@ placeholders, filled at render: keep them in the translation.
 | `fab` | `label` | `Actions` | `@pdxui/ui/src/shared/i18n.ts` |
 | `field-group` | `edit` | `Edit` | `@pdxui/ui/src/shared/i18n.ts` |
 | `field-group` | `toggle` | `Show or hide section` | `@pdxui/ui/src/shared/i18n.ts` |
-| `field-list` | `add` | `+ Add` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `addItem` | `Add Item` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `cellHint` | `Click to edit` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `done` | `Done` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `edit` | `Edit` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `editItem` | `Edit Item` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `editItemN` | `Edit Item #{n}` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `empty` | `No items` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
-| `field-list` | `remove` | `Remove` | `@pdxui/ui/src/field-list/pdx-field-list.ts` |
+| `field-list` | `add` | `+ Add` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `addItem` | `Add Item` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `cellHint` | `Click to edit` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `done` | `Done` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `edit` | `Edit` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `editItem` | `Edit Item` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `editItemN` | `Edit Item #{n}` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `empty` | `No items` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
+| `field-list` | `remove` | `Remove` | `@pdxui/ui/src/field-list/field-list-strings.ts` |
 | `fieldset` | `toggle` | `Show or hide section` | `@pdxui/ui/src/shared/i18n.ts` |
 | `file-upload` | `drop` | `Drop files here or click to browse` | `@pdxui/ui/src/shared/i18n.ts` |
 | `file-upload` | `maxSize` | `Max {size}` | `@pdxui/ui/src/shared/i18n.ts` |

@@ -1,0 +1,251 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFieldList",
+  "tagName": "pdx-field-list",
+  "category": "Forms",
+  "order": 51,
+  "description": "An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,\nand the values come back as an array.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Array field name in the form (e.g., 'items').",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Optional label rendered above the list.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "form",
+      "description": "Form instance. If not provided, uses form context.",
+      "type": {
+        "text": "import('@pdxui/core').Form<any> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "itemFields",
+      "description": "Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "itemDefault",
+      "description": "Default values for a new item.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "minItems",
+      "description": "Minimum number of items (default: 0).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "minitems"
+    },
+    {
+      "kind": "field",
+      "name": "maxItems",
+      "description": "Maximum number of items (default: 999).",
+      "type": {
+        "text": "number"
+      },
+      "default": "999",
+      "attribute": "maxitems"
+    },
+    {
+      "kind": "field",
+      "name": "addLabel",
+      "description": "Label for the add button. Empty: the `field-list.add` component string (\"+ Add\" in English).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "addlabel"
+    },
+    {
+      "kind": "field",
+      "name": "removable",
+      "description": "Allow removing items (default: true).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "removable"
+    },
+    {
+      "kind": "field",
+      "name": "display",
+      "description": "Display mode: inline (default), dialog.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inline'",
+      "attribute": "display"
+    }
+  ],
+  "roles": [
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Array field name in the form (e.g., 'items').",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Optional label rendered above the list.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "minitems",
+      "fieldName": "minItems",
+      "description": "Minimum number of items (default: 0).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxitems",
+      "fieldName": "maxItems",
+      "description": "Maximum number of items (default: 999).",
+      "type": {
+        "text": "number"
+      },
+      "default": "999"
+    },
+    {
+      "name": "addlabel",
+      "fieldName": "addLabel",
+      "description": "Label for the add button. Empty: the `field-list.add` component string (\"+ Add\" in English).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "removable",
+      "fieldName": "removable",
+      "description": "Allow removing items (default: true).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "display",
+      "fieldName": "display",
+      "description": "Display mode: inline (default), dialog.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inline'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "FieldListItemSchema",
+      "fields": [
+        "name: string",
+        "type?: string",
+        "label?: string",
+        "placeholder?: string",
+        "required?: boolean"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "row",
+      "description": "Renders one row: a snippet `row(item, index, remove)` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).",
+      "signature": "(item: { [field: string]: unknown }, index: number, remove: () => void)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The list's wrapper."
+    },
+    {
+      "name": "header",
+      "description": "The line above the rows: the label and the add button."
+    },
+    {
+      "name": "label",
+      "description": "The list's label, with `label`."
+    },
+    {
+      "name": "add",
+      "description": "An add button, in the header and in the footer."
+    },
+    {
+      "name": "columns",
+      "description": "The column headers."
+    },
+    {
+      "name": "rows",
+      "description": "The box that holds the rows."
+    },
+    {
+      "name": "row",
+      "description": "One row."
+    },
+    {
+      "name": "cell",
+      "description": "One cell: a `pdx-form-field` around its control, or a summary in dialog mode."
+    },
+    {
+      "name": "actions",
+      "description": "A row's buttons: edit (dialog mode) and remove."
+    },
+    {
+      "name": "empty",
+      "description": "The message shown with no rows."
+    },
+    {
+      "name": "footer",
+      "description": "The line under the rows, with its add button."
+    },
+    {
+      "name": "dialog",
+      "description": "The dialog that edits one row, in dialog mode."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "empty",
+      "description": "`empty`: the list has no rows."
+    }
+  ]
+}

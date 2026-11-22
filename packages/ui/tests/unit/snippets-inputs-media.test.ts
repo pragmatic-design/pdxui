@@ -11,7 +11,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
 import '../../src/carousel/pdx-carousel';
-import '../../src/field-list/pdx-field-list';
+import '../../src/field-list/pdx-field-list.pdx';
 import '../../src/file-upload/pdx-file-upload';
 import '../../src/mention/pdx-mention';
 import '../../src/tag-input/pdx-tag-input';

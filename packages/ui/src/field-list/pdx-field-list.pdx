@@ -1,0 +1,623 @@
+<template></template>
+
+<script>
+/**
+ * An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,
+ * and the values come back as an array.
+ *
+ * @slot row - Renders one row: a snippet `row(item, index, remove)` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
+ *
+ * @cssstate empty - `empty`: the list has no rows.
+ *
+ * @csspart root - The list's wrapper.
+ * @csspart header - The line above the rows: the label and the add button.
+ * @csspart label - The list's label, with `label`.
+ * @csspart add - An add button, in the header and in the footer.
+ * @csspart columns - The column headers.
+ * @csspart rows - The box that holds the rows.
+ * @csspart row - One row.
+ * @csspart cell - One cell: a `pdx-form-field` around its control, or a summary in dialog mode.
+ * @csspart actions - A row's buttons: edit (dialog mode) and remove.
+ * @csspart empty - The message shown with no rows.
+ * @csspart footer - The line under the rows, with its add button.
+ * @csspart dialog - The dialog that edits one row, in dialog mode.
+ */
+// pdx-field-list — Manages an array of objects in a form.
+// Each array item gets its own set of form fields at dotted paths (items.0.product, items.1.qty).
+// Supports add/remove with automatic re-indexing of field signals.
+//
+// Display modes:
+//   - inline (default): table of editable rows
+//   - dialog: read-only summary table + dialog for add/edit
+//
+// Usage:
+//   <pdx-field-list name="items" :form="orderForm"
+//       :item-fields="[{ name: 'product', type: 'text', label: 'Product' }]"
+//       :item-default="{ product: '', qty: 1, price: 0 }" />
+//
+// The whole list is built by the script, in a frame after each change: its parts are on those elements
+// (#1284), and its `row` snippet is called once per row (#1291).
+import { tryUseForm, useFieldGroupPath, FORM_INTERNALS, getComponentString, required, formField, untracked, onDestroy } from '@pdxui/core';
+import type { Form, FormInternals, Validator } from '@pdxui/core';
+import { onControlValue } from '../shared/model-event';
+import { TYPE_TAG, CHECKED_TYPES, type FieldListItemSchema } from './field-list-schema';
+import './field-list-strings';
+// Each cell's control is wrapped in a field (#293): named, marked required and described by its error
+// the way any field is (A1, A2), not by a second mechanism here.
+import '../form-field/pdx-form-field.pdx';
+// The controls of TYPE_TAG, rendered by this component and registered by nobody else: an app's compiler
+// imports the tags its templates name, and these are built from script (#293).
+import '../input/pdx-input.pdx';
+import '../number-input/pdx-number-input';
+import '../textarea/pdx-textarea';
+import '../select/pdx-select';
+import '../checkbox/pdx-checkbox.pdx';
+import '../switch-toggle/pdx-switch.pdx';
+// This component's styles live in form.css — written where the
+// container is rather than where the component is. Imported explicitly so they travel anyway.
+import '@pdxui/design/components/form';
+
+@state empty = itemCount === 0;
+@part(external) root, header, label, add, columns, rows, row, cell, actions, empty, footer, dialog;
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+@slot row?: (item: { [field: string]: unknown }, index: number, remove: () => void);
+
+/** Array field name in the form (e.g., 'items'). */
+@prop name: string = '';
+/** Optional label rendered above the list. */
+@prop label: string = '';
+/** Form instance. If not provided, uses form context. */
+@prop form: Form<any> | null = null;
+/** Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot. */
+@prop itemFields: unknown[] = [];
+/** Default values for a new item. */
+@prop itemDefault: Record<string, unknown> | null = null;
+/** Minimum number of items (default: 0). */
+@prop minItems: number = 0;
+/** Maximum number of items (default: 999). */
+@prop maxItems: number = 999;
+/** Label for the add button. Empty: the `field-list.add` component string ("+ Add" in English). */
+@prop addLabel: string = '';
+/** Allow removing items (default: true). */
+@prop removable: boolean = true;
+/** Display mode: inline (default), dialog. */
+@prop display: string = 'inline';
+
+@host el;
+
+// The context form is looked up when read, and kept once found: set up before its
+// <pdx-form>, a one-time lookup at setup would never find it. See tryUseForm(from).
+let formCtx: Form<any> | undefined;
+
+function getForm(): Form<any> | null {
+  return (form as Form<any>) || (formCtx ??= tryUseForm(el) as Form<any> | undefined) || null;
+}
+
+function getInternals(): FormInternals | null {
+  const f = getForm();
+  return f ? (f as any)[FORM_INTERNALS] as FormInternals : null;
+}
+
+function getArrayPath(): string {
+  const arrayName = name as string;
+  // The enclosing field-group's path, read when used.
+  const groupPath = useFieldGroupPath(el);
+  return groupPath ? `${groupPath}.${arrayName}` : arrayName;
+}
+
+// Track item count via signal
+let itemCount = $signal(0);
+
+/**
+ * A row's control in a field: bound to the row's form field, so it is marked required and in
+ * error, and described by its message, as any field's control is. In a row the column header
+ * names it only by sight, so the field names it (`a11y-label`); in the dialog, by a label.
+ */
+function inField(control: HTMLElement, boundField: unknown, fieldName: string, labelled: boolean): HTMLElement {
+  const field = document.createElement('pdx-form-field') as HTMLElement & { field: unknown };
+  field.setAttribute(labelled ? 'label' : 'a11y-label', fieldName);
+  field.field = boundField ?? null;
+  field.appendChild(control);
+  return field;
+}
+
+// Dialog state for display="dialog"
+let editingIndex = $signal<number | null>(null);
+let dialogOpen = $signal(false);
+
+/**
+ * The validators a row field's schema asks for. `required` on `FieldListItemSchema` is
+ * enforced: a form that says a value is mandatory and then saves without it is worse than
+ * one that never asked.
+ */
+function validatorsFor(field: FieldListItemSchema): Validator<unknown>[] {
+  return field.required ? [required() as Validator<unknown>] : [];
+}
+
+/** Attach the row schema's rules to the fields of the rows that already exist. */
+function registerExistingValidators(count: number): void {
+  const internals = getInternals();
+  if (!internals) return;
+  const prefix = getArrayPath();
+  const fields = itemFields as FieldListItemSchema[];
+  for (const field of fields) {
+    const validators = validatorsFor(field);
+    if (validators.length === 0) continue;
+    // `addField` keeps the value of a field it already knows and registers the
+    // validators either way, so this cannot overwrite what a row already holds.
+    for (let i = 0; i < count; i++) {
+      internals.addField(`${prefix}.${i}.${field.name}`, '', validators);
+    }
+  }
+}
+
+function syncItemCount(): void {
+  const internals = getInternals();
+  if (!internals) return;
+  const prefix = getArrayPath();
+  const paths = internals.getFieldPaths();
+  let maxIdx = -1;
+  const prefixDot = prefix + '.';
+  for (const p of paths) {
+    if (p.startsWith(prefixDot)) {
+      const rest = p.slice(prefixDot.length);
+      const idx = parseInt(rest.split('.')[0], 10);
+      if (!isNaN(idx) && idx > maxIdx) maxIdx = idx;
+    }
+  }
+  itemCount = maxIdx + 1;
+  registerExistingValidators(maxIdx + 1);
+}
+
+setTimeout(syncItemCount, 0);
+
+function addItem(): void {
+  const internals = getInternals();
+  if (!internals) return;
+  const count = untracked(() => itemCount);
+  const max = maxItems as number;
+  if (count >= max) return;
+
+  const prefix = getArrayPath();
+  const itemDef = itemDefault as Record<string, unknown> | null;
+  const fields = itemFields as FieldListItemSchema[];
+
+  for (const field of fields) {
+    const defaultVal = itemDef?.[field.name] ?? '';
+    internals.addField(`${prefix}.${count}.${field.name}`, defaultVal, validatorsFor(field));
+  }
+  itemCount = count + 1;
+
+  // In dialog mode, open dialog for the new item
+  if ((display as string) === 'dialog') {
+    editingIndex = count;
+    dialogOpen = true;
+  }
+}
+
+function removeItem(index: number): void {
+  const internals = getInternals();
+  if (!internals) return;
+  const count = untracked(() => itemCount);
+  const min = minItems as number;
+  if (count <= min) return;
+
+  const prefix = getArrayPath();
+  internals.removeFields(`${prefix}.${index}`);
+  for (let i = index + 1; i < count; i++) {
+    internals.renameFields(`${prefix}.${i}`, `${prefix}.${i - 1}`);
+  }
+  itemCount = count - 1;
+}
+
+function editItem(index: number): void {
+  editingIndex = index;
+  dialogOpen = true;
+}
+
+// The dialog's Escape handler, component-scoped: removed on every close, not only on the
+// Escape branch — otherwise every close through Done or the overlay would pile up an
+// orphaned keydown on document.
+let dialogKeydown: ((e: KeyboardEvent) => void) | null = null;
+
+function removeDialogKeydown(): void {
+  if (dialogKeydown) {
+    document.removeEventListener('keydown', dialogKeydown);
+    dialogKeydown = null;
+  }
+}
+
+onDestroy(removeDialogKeydown);
+
+function closeDialog(): void {
+  removeDialogKeydown();
+  dialogOpen = false;
+  editingIndex = null;
+}
+
+function canAdd(): boolean {
+  return itemCount < (maxItems as number);
+}
+
+function canRemove(): boolean {
+  return (removable as boolean) && itemCount > (minItems as number);
+}
+
+/**
+ * Keep the ARRAY FIELD showing the rows this list holds.
+ *
+ * The rows are dotted fields — `lines.0.activity`, `lines.1.activity` — and `getValues()`
+ * assembles them, which is why the payload is right. The leaf the array itself is,
+ * `form.lines`, is updated by nobody else, so without this anything that read it would
+ * see an empty array with rows on screen: a count, a summary, or a step guard asking "are
+ * these rows valid?" would have nothing to look at. `form.ts:646` describes the arrangement as this list
+ * keeping its rows as dotted fields *and mirroring them onto the array field* — this is
+ * the mirror.
+ *
+ * A leaf exists only when the array was seeded EMPTY: `flattenValues` keeps `[]` as a leaf
+ * and expands a filled array into dotted paths. With no leaf there is nothing to mirror
+ * onto, and the dotted fields are the state on their own.
+ *
+ * Reading the row fields here is what subscribes this effect to them, so typing in a row
+ * updates the array field too. It writes only when the value actually changed: an
+ * unconditional `onChange` would mark the form dirty on mount, and dirty is what the
+ * "leave with unsaved work?" guards read.
+ */
+$effect(() => {
+  const count = itemCount;
+  const f = getForm();
+  if (!f) return;
+  const prefix = getArrayPath();
+  const leaf = formField(f, prefix);
+  if (!leaf) return;
+  const fields = itemFields as FieldListItemSchema[];
+  const values: Record<string, unknown>[] = [];
+  for (let i = 0; i < count; i++) {
+    const item: Record<string, unknown> = {};
+    for (const field of fields) {
+      const cell = formField(f, `${prefix}.${i}.${field.name}`);
+      item[field.name] = cell ? cell.value() : undefined;
+    }
+    values.push(item);
+  }
+  if (JSON.stringify(leaf.value() ?? []) === JSON.stringify(values)) return;
+  leaf.onChange(values);
+});
+
+// Render the list imperatively (items are dynamic, can't use static template)
+$effect(() => {
+  const count = itemCount;
+  const f = getForm();
+  const fields = itemFields as FieldListItemSchema[];
+  const prefix = getArrayPath();
+  const labelText = label as string;
+  // The `add` string, not a literal '+ Add' as the prop's default: a translated app would
+  // otherwise show English under its list.
+  const addLbl = (addLabel as string) || getComponentString('field-list', 'add')();
+  const showRemove = canRemove();
+  const showAdd = canAdd();
+  const displayMode = display as string;
+  // The dialog is part of what this effect draws, so its state is read here, tracked: opening
+  // a row and closing the dialog redraw the list.
+  const isDialogOpen = dialogOpen;
+  const editIdx = editingIndex;
+
+  requestAnimationFrame(() => {
+    el.innerHTML = '';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pdx-field-list';
+    wrapper.dataset.part = 'root';
+
+    // Header
+    if (labelText || showAdd) {
+      const header = document.createElement('div');
+      header.className = 'pdx-field-list-header';
+      header.dataset.part = 'header';
+      if (labelText) {
+        const lbl = document.createElement('span');
+        lbl.className = 'pdx-field-list-label';
+        lbl.dataset.part = 'label';
+        lbl.textContent = labelText;
+        header.appendChild(lbl);
+      }
+      if (showAdd) {
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'pdx-outline';
+        addBtn.dataset.part = 'add';
+        addBtn.setAttribute('size', 'sm');
+        addBtn.textContent = addLbl;
+        addBtn.addEventListener('click', addItem);
+        header.appendChild(addBtn);
+      }
+      wrapper.appendChild(header);
+    }
+
+    // Column headers
+    if (count > 0 && fields.length > 0) {
+      const headerRow = document.createElement('div');
+      headerRow.className = 'pdx-field-list-columns';
+      headerRow.dataset.part = 'columns';
+      for (const field of fields) {
+        const col = document.createElement('span');
+        col.className = 'pdx-field-list-col-header';
+        col.textContent = field.label || field.name;
+        headerRow.appendChild(col);
+      }
+      if (showRemove || displayMode === 'dialog') {
+        // The same buttons the rows have, hidden and inert: the column is as wide as the
+        // cells under it in every theme, without measuring them.
+        const col = document.createElement('span');
+        col.className = 'pdx-field-list-col-header pdx-field-list-col-actions';
+        col.setAttribute('aria-hidden', 'true');
+        col.inert = true;
+        for (const b of actionButtons(-1, showRemove, displayMode)) {
+          b.removeAttribute('aria-label');
+          b.removeAttribute('title');
+          b.tabIndex = -1;
+          col.appendChild(b);
+        }
+        headerRow.appendChild(col);
+      }
+      wrapper.appendChild(headerRow);
+    }
+
+    // Rows
+    const rowsEl = document.createElement('div');
+    rowsEl.className = 'pdx-field-list-rows';
+    rowsEl.dataset.part = 'rows';
+
+    for (let i = 0; i < count; i++) {
+      const rowEl = document.createElement('div');
+      rowEl.className = 'pdx-field-list-row';
+      rowEl.dataset.part = 'row';
+      rowEl.dataset.index = String(i);
+
+      // The parent's row snippet draws the row (priority: snippet > default)
+      const rowSnippet = getRowSnippet();
+      if (rowSnippet && displayMode !== 'dialog') {
+        const itemValues: Record<string, unknown> = {};
+        for (const field of fields) {
+          const fieldPath = `${prefix}.${i}.${field.name}`;
+          const boundField = f ? formField(f, fieldPath) : undefined;
+          itemValues[field.name] = boundField?.value() ?? null;
+        }
+        // `remove` for a row that draws its own button.
+        const idx = i;
+        rowEl.appendChild(rowSnippet(itemValues, i, () => removeItem(idx)) ?? document.createDocumentFragment());
+        // The same remove button as any other row, built before the slot branch goes
+        // on to the next row: otherwise a custom row could not be removed.
+        if (showRemove) rowEl.appendChild(actionsCell(i, showRemove, displayMode));
+        rowsEl.appendChild(rowEl);
+        continue;
+      }
+
+      if (displayMode === 'dialog') {
+        // Dialog mode: show read-only summary cells
+        for (const field of fields) {
+          const cell = document.createElement('div');
+          cell.className = 'pdx-field-list-cell';
+          cell.dataset.part = 'cell';
+          const fieldPath = `${prefix}.${i}.${field.name}`;
+          const boundField = f ? formField(f, fieldPath) : undefined;
+          const val = boundField?.value();
+          cell.textContent = val != null ? String(val) : '';
+          cell.style.cursor = 'pointer';
+          cell.title = getComponentString('field-list', 'cellHint')();
+          const idx = i;
+          cell.addEventListener('click', () => editItem(idx));
+          rowEl.appendChild(cell);
+        }
+      } else {
+        // Inline mode: editable controls
+        for (const field of fields) {
+          const cell = document.createElement('div');
+          cell.className = 'pdx-field-list-cell';
+          cell.dataset.part = 'cell';
+          const fieldPath = `${prefix}.${i}.${field.name}`;
+          const boundField = f ? formField(f, fieldPath) : undefined;
+
+          const tag = TYPE_TAG[field.type || 'text'] || 'pdx-input';
+          const input = document.createElement(tag);
+          if (field.placeholder) input.setAttribute('placeholder', field.placeholder);
+
+          if (boundField) {
+            const val = boundField.value();
+            if (CHECKED_TYPES.has(field.type || '')) {
+              if (val) input.setAttribute('checked', '');
+            } else {
+              input.setAttribute('value', String(val ?? ''));
+            }
+          }
+
+          // Its model's event, or the alpha one of a control that has no model yet (#125).
+          const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
+          onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
+            ? e.detail?.checked
+            : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField?.onChange(value));
+          input.addEventListener('pdx-blur', () => boundField?.onBlur());
+
+          cell.appendChild(inField(input, boundField, field.label || field.name, false));
+          rowEl.appendChild(cell);
+        }
+      }
+
+      // Action buttons: edit (dialog) or remove (inline)
+      if (showRemove || displayMode === 'dialog') {
+        rowEl.appendChild(actionsCell(i, showRemove, displayMode));
+      }
+
+      rowsEl.appendChild(rowEl);
+    }
+
+    wrapper.appendChild(rowsEl);
+
+    // Empty state
+    if (count === 0) {
+      const emptyEl = document.createElement('div');
+      emptyEl.className = 'pdx-field-list-empty';
+      emptyEl.dataset.part = 'empty';
+      emptyEl.textContent = getComponentString('field-list', 'empty')();
+      wrapper.appendChild(emptyEl);
+    }
+
+    // Footer add button (when items exist)
+    if (count > 0 && showAdd) {
+      const footer = document.createElement('div');
+      footer.className = 'pdx-field-list-footer';
+      footer.dataset.part = 'footer';
+      const addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'pdx-outline';
+      addBtn.dataset.part = 'add';
+      addBtn.setAttribute('size', 'sm');
+      addBtn.textContent = addLbl;
+      addBtn.addEventListener('click', addItem);
+      footer.appendChild(addBtn);
+      wrapper.appendChild(footer);
+    }
+
+    // Dialog for editing items
+    if (displayMode === 'dialog' && isDialogOpen) {
+      const dialogEl = buildItemDialog(f, fields, prefix, editIdx);
+      wrapper.appendChild(dialogEl);
+    }
+
+    el.appendChild(wrapper);
+  });
+});
+
+/** A row's buttons: edit (dialog display) and remove (when allowed), for the row at `index`. */
+function actionButtons(index: number, showRemove: boolean, displayMode: string): HTMLButtonElement[] {
+  const buttons: HTMLButtonElement[] = [];
+  if (displayMode === 'dialog') {
+    const editBtn = document.createElement('button');
+    editBtn.type = 'button';
+    editBtn.className = 'pdx-ghost';
+    editBtn.setAttribute('size', 'sm');
+    editBtn.textContent = '✎';
+    editBtn.title = getComponentString('field-list', 'edit')();
+    // Icon-only: an explicit accessible name (axe button-name).
+    editBtn.setAttribute('aria-label', getComponentString('field-list', 'edit')());
+    editBtn.addEventListener('click', () => editItem(index));
+    buttons.push(editBtn);
+  }
+  if (showRemove) {
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'pdx-ghost pdx-danger';
+    removeBtn.setAttribute('size', 'sm');
+    removeBtn.textContent = '×';
+    removeBtn.title = getComponentString('field-list', 'remove')();
+    removeBtn.setAttribute('aria-label', getComponentString('field-list', 'remove')());
+    removeBtn.addEventListener('click', () => removeItem(index));
+    buttons.push(removeBtn);
+  }
+  return buttons;
+}
+
+/** The actions cell of the row at `index`. */
+function actionsCell(index: number, showRemove: boolean, displayMode: string): HTMLElement {
+  const cell = document.createElement('div');
+  cell.className = 'pdx-field-list-cell pdx-field-list-cell-actions';
+  cell.dataset.part = 'actions';
+  for (const b of actionButtons(index, showRemove, displayMode)) cell.appendChild(b);
+  return cell;
+}
+
+function buildItemDialog(
+  f: Form<any> | null,
+  fields: FieldListItemSchema[],
+  prefix: string,
+  editIdx: number | null,
+): HTMLElement {
+  const overlay = document.createElement('div');
+  overlay.className = 'pdx-field-list-dialog-overlay';
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeDialog();
+  });
+
+  const dialogEl = document.createElement('div');
+  dialogEl.className = 'pdx-field-list-dialog';
+  dialogEl.dataset.part = 'dialog';
+  dialogEl.setAttribute('role', 'dialog');
+  dialogEl.setAttribute('aria-modal', 'true');
+  dialogEl.setAttribute('aria-label', editIdx != null ? getComponentString('field-list', 'editItem')() : getComponentString('field-list', 'addItem')());
+
+  // Title
+  const title = document.createElement('div');
+  title.className = 'pdx-field-list-dialog-title';
+  title.textContent = editIdx != null
+    ? getComponentString('field-list', 'editItemN')().replace('#{n}', `#${editIdx + 1}`)
+    : getComponentString('field-list', 'addItem')();
+  dialogEl.appendChild(title);
+
+  // Fields
+  const content = document.createElement('div');
+  content.className = 'pdx-field-list-dialog-content';
+
+  if (editIdx != null && f) {
+    for (const field of fields) {
+      const fieldPath = `${prefix}.${editIdx}.${field.name}`;
+      const boundField = formField(f, fieldPath);
+      if (!boundField) continue;
+
+      const line = document.createElement('div');
+      line.className = 'pdx-field-list-dialog-field';
+
+      const tag = TYPE_TAG[field.type || 'text'] || 'pdx-input';
+      const input = document.createElement(tag);
+      if (field.placeholder) input.setAttribute('placeholder', field.placeholder);
+
+      const val = boundField.value();
+      if (CHECKED_TYPES.has(field.type || '')) {
+        if (val) input.setAttribute('checked', '');
+      } else {
+        input.setAttribute('value', String(val ?? ''));
+      }
+
+      // Its model's event, or the alpha one of a control that has no model yet (#125).
+      const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
+      onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
+        ? e.detail?.checked
+        : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField.onChange(value));
+      input.addEventListener('pdx-blur', () => boundField.onBlur());
+
+      // Its label is the field's, tied to the control: a <label> beside it named nothing.
+      line.appendChild(inField(input, boundField, field.label || field.name, true));
+      content.appendChild(line);
+    }
+  }
+  dialogEl.appendChild(content);
+
+  // Actions
+  const actions = document.createElement('div');
+  actions.className = 'pdx-field-list-dialog-actions';
+
+  const doneBtn = document.createElement('button');
+  doneBtn.type = 'button';
+  doneBtn.className = 'pdx-primary';
+  doneBtn.setAttribute('size', 'sm');
+  doneBtn.textContent = getComponentString('field-list', 'done')();
+  doneBtn.addEventListener('click', closeDialog);
+  actions.appendChild(doneBtn);
+
+  dialogEl.appendChild(actions);
+  overlay.appendChild(dialogEl);
+
+  // Escape to close (removed from closeDialog for EVERY close path)
+  removeDialogKeydown();
+  dialogKeydown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') closeDialog();
+  };
+  document.addEventListener('keydown', dialogKeydown);
+
+  return overlay;
+}
+
+/** The parent's row snippet, read where the list draws: one set after mount is the one drawn. */
+function getRowSnippet() {
+  return row;
+}
+</script>
