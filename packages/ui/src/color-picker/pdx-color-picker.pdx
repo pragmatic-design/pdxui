@@ -1,0 +1,409 @@
+<template>
+  @if (!inline) {
+    <button class="pdx-color-swatch" data-part="root" :ref="swatchEl"
+      type="button" aria-haspopup="dialog"
+      :aria-label="label || uiString('color-picker', 'pick')"
+      :aria-expanded="String(isOpen)"
+      :aria-disabled="disabled ? 'true' : null"
+      :style="`--pdx-cp-current: ${hexColor}`"
+      @click="togglePopup"></button>
+  }
+  <div class="pdx-color-panel" :class="{ 'pdx-color-panel-inline': inline }" data-part="popup" :ref="panelEl"
+    :role="inline ? null : 'dialog'"
+    :aria-label="inline ? null : (label || uiString('color-picker', 'dialog'))"
+    :style="!inline && !isOpen ? 'display:none' : ''">
+    <!-- Two dimensions on one slider: the value is the saturation, the text carries both and the
+         colour (the APG 2D pattern). It had aria-valuetext only (axe aria-required-attr). -->
+    <div class="pdx-color-spectrum" data-part="area" :ref="areaEl" role="slider" :aria-label="uiString('color-picker', 'color')"
+      aria-valuemin="0" aria-valuemax="100"
+      :aria-valuenow="String(Math.round(sat))"
+      :aria-valuetext="spectrumText()"
+      :tabindex="interactive() ? '0' : '-1'"
+      :aria-disabled="disabled ? 'true' : null"
+      :style="`--pdx-cp-hue: hsl(${hueDeg}, 100%, 50%)`"
+      @pointerdown="onSpectrumDown" @keydown="onSpectrumKey" @keyup="onSliderKeyup">
+      <div class="pdx-color-spectrum-white"></div>
+      <div class="pdx-color-spectrum-black"></div>
+      <div class="pdx-color-spectrum-thumb" :style="`left:${sat}%;top:${100 - val}%`"></div>
+    </div>
+    <div class="pdx-color-hue-slider" data-part="hue" :ref="hueEl" role="slider" :aria-label="uiString('color-picker', 'hue')"
+      aria-valuemin="0" aria-valuemax="360"
+      :aria-valuenow="String(Math.round(hueDeg))"
+      :tabindex="interactive() ? '0' : '-1'"
+      :aria-disabled="disabled ? 'true' : null"
+      @pointerdown="onHueDown" @keydown="onHueKey" @keyup="onSliderKeyup">
+      <div class="pdx-color-slider-thumb" :style="`left:${(hueDeg / 360) * 100}%`"></div>
+    </div>
+    @if (showAlpha) {
+      <div class="pdx-color-alpha-slider" data-part="alpha" :ref="alphaEl" role="slider" :aria-label="uiString('color-picker', 'opacity')"
+        aria-valuemin="0" aria-valuemax="1"
+        :aria-valuenow="opacity.toFixed(2)"
+        :aria-valuetext="`${Math.round(opacity * 100)}%`"
+        :tabindex="interactive() ? '0' : '-1'"
+        :aria-disabled="disabled ? 'true' : null"
+        @pointerdown="onAlphaDown" @keydown="onAlphaKey" @keyup="onSliderKeyup">
+        <div class="pdx-color-alpha-gradient"
+          :style="`background:linear-gradient(to right,transparent,${hexColor})`"></div>
+        <div class="pdx-color-slider-thumb" :style="`left:${opacity * 100}%`"></div>
+      </div>
+    }
+    <div class="pdx-color-controls">
+      <input class="pdx-color-hex-input pdx-input" data-part="input" type="text"
+        :aria-label="uiString('color-picker', 'hex')"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+        :value="displayValue()"
+        :disabled="disabled || readonly ? true : null"
+        @change="onHexInput" />
+      @if (clearable) {
+        <button class="pdx-color-clear" data-part="clear" type="button" :aria-label="uiString('color-picker', 'clear')"
+          @click="onClear">×</button>
+      }
+    </div>
+    @if (presetList().length) {
+      <div class="pdx-color-presets" role="group" :aria-label="uiString('color-picker', 'presets')">
+        @for (presetList() as c; track c) {
+          <button class="pdx-color-preset" data-part="preset" type="button"
+            :style="`background:${c}`" :aria-label="c"
+            @click="onPresetClick(c)"></button>
+        }
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * Colour selection from a swatch trigger or an inline panel, with alpha channel and preset palettes,
+ * output as hex, rgb or hsl.
+ *
+ * @csspart root - The swatch, the button that opens the popup; absent when `inline`.
+ * @csspart popup - The panel: a floating `role="dialog"`, or in place when `inline`.
+ * @csspart area - The colour area, a two-dimensional `role="slider"`: saturation and brightness.
+ * @csspart hue - The hue slider.
+ * @csspart alpha - The opacity slider, while `showAlpha`.
+ * @csspart input - The text field that reads and writes the colour.
+ * @csspart clear - The clear button, while `clearable`.
+ * @csspart preset - A preset colour's button.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail hex $event.currentTarget.getHex()
+ * @alphadetail rgb $event.currentTarget.getRgb()
+ * @alphadetail hsl $event.currentTarget.getHsl()
+ * @alphacommit pdx-change
+ */
+// pdx-color-picker — Color picker with spectrum panel, hue/alpha sliders, hex input, presets.
+// Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
+// Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
+import { effect, generatedId, onDestroy, untracked, usePopover, overlayStack } from '@pdxui/core';
+// `formatText`: the component's `format` prop has the name of i18n's function.
+import { uiString, format as formatText } from '../shared/i18n';
+import { dispatchCommit } from '../shared/commit-change';
+import { clamp, hsvToHex, hsvToHsl, hsvToRgb, parseColor } from './color-picker-math';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/color-picker';
+
+// The colour in the picker's format (#481). Every step of a drag or a key writes it, and the write
+// dispatches `value-change`, live. The commit is a native `change` bubbling to the host: the hex
+// field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
+// a preset is picked or the colour is cleared.
+/** The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135). */
+@model value: string = '#000000' { form };
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
+// The visual states, on the host as custom states (#132, #287): the design CSS draws the swatch from
+// them. The swatch carries no state class.
+@state open = isOpen;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+// pdx-ignore PDX_PART_NAME_TAKEN: `clear` is the theme's part on the clear button; the script's `clear` is the exposed method
+@part root, popup, area, hue, alpha, input, clear, preset;
+// The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
+// draws the same size on native markup. `md` is the base look, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the swatch's size. */
+  size: { md: '.pdx-color-swatch-md', sm: '.pdx-color-swatch-sm', lg: '.pdx-color-swatch-lg' } = md;
+}
+@prop format: string = 'hex';
+@prop showAlpha: boolean = false;
+@prop presets: unknown[] = [];
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop inline: boolean = false;
+@prop label: string = '';
+@prop name: string = '';
+@prop clearable: boolean = false;
+
+// The host is the one submitter (#135), in FormData under its `name` (#133). A hidden input carrying
+// the name would send the value a second time.
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear, the colour in each format, and the popup driven by the overlay
+// verbs (#287), which replace the undeclared open()/close().
+@expose show, close, toggle, focus, blur, clear, getHex, getRgb, getHsl;
+
+const uid = generatedId('pdx-cp');
+let swatchEl = $signal(null);
+let panelEl = $signal(null);
+let areaEl = $signal(null);
+let hueEl = $signal(null);
+let alphaEl = $signal(null);
+// The colour in HSV, and its opacity. Not `hue` and `alpha`, which are the sliders' parts.
+let hueDeg = $signal(0);
+let sat = $signal(0);
+let val = $signal(100);
+let opacity = $signal(1);
+let isOpen = $signal(false);
+// `value` is the live colour: the picker writes it on every change. The string
+// it last wrote is kept so the effect below can tell its own reflection from a parent's
+// value — re-parsing our own hex into HSV would round it, and at low saturation reset the
+// hue in the middle of a drag.
+let reflected: string | null = null;
+function reflect(v: string): void {
+  reflected = v;
+  value = v;
+}
+
+function setHsva(c: { h: number; s: number; v: number; a: number }) {
+  hueDeg = c.h; sat = c.s; val = c.v; opacity = c.a;
+}
+
+// Sync value prop to internal HSV
+$effect(() => {
+  const raw = value as string;
+  if (raw === reflected) return;
+  const parsed = parseColor(raw);
+  if (parsed) setHsva(parsed);
+});
+
+const hexColor = $derived(hsvToHex(hueDeg, sat, val));
+// Plain functions, read where they are bound, as the TypeScript version's computeds were read: one
+// $derived each would be a computed made at every mount. The hex is read by three bindings, and kept.
+function rgbColor() { return hsvToRgb(hueDeg, sat, val); }
+function hslColor() { return hsvToHsl(hueDeg, sat, val); }
+
+function displayValue(): string {
+  const fmt = format as string;
+  if (fmt === 'rgb') {
+    const c = rgbColor();
+    return showAlpha ? `rgba(${c.r}, ${c.g}, ${c.b}, ${opacity.toFixed(2)})` : `rgb(${c.r}, ${c.g}, ${c.b})`;
+  }
+  if (fmt === 'hsl') {
+    const c = hslColor();
+    return showAlpha ? `hsla(${c.h}, ${c.s}%, ${c.l}%, ${opacity.toFixed(2)})` : `hsl(${c.h}, ${c.s}%, ${c.l}%)`;
+  }
+  return hexColor;
+}
+
+function presetList(): string[] {
+  const p = presets as string[] | null;
+  return p?.length ? p : [];
+}
+
+/** A live write: the model, which dispatches `value-change`. */
+function emitInput() { reflect(displayValue()); }
+/** A commit no typing produced: the write, then the native `change` a commit makes. */
+function emitChange() { reflect(displayValue()); dispatchCommit(el); }
+
+// Shared drag helper — attaches pointermove/pointerup on document
+function startDrag(onMove: (e: PointerEvent) => void) {
+  const move = (e: PointerEvent) => { e.preventDefault(); onMove(e); emitInput(); };
+  const up = () => { document.removeEventListener('pointermove', move); document.removeEventListener('pointerup', up); emitChange(); };
+  document.addEventListener('pointermove', move);
+  document.addEventListener('pointerup', up);
+}
+
+function spectrumFromPointer(e: PointerEvent) {
+  const area = areaEl as HTMLElement | null;
+  if (!area) return;
+  const r = area.getBoundingClientRect();
+  sat = clamp(((e.clientX - r.left) / r.width) * 100, 0, 100);
+  val = clamp(100 - ((e.clientY - r.top) / r.height) * 100, 0, 100);
+}
+function onSpectrumDown(e: PointerEvent) {
+  if (disabled || readonly) return;
+  e.preventDefault(); spectrumFromPointer(e); emitInput(); startDrag(spectrumFromPointer);
+}
+
+function hueFromPointer(e: PointerEvent) {
+  const slider = hueEl as HTMLElement | null;
+  if (!slider) return;
+  const r = slider.getBoundingClientRect();
+  hueDeg = clamp(((e.clientX - r.left) / r.width) * 360, 0, 360);
+}
+function onHueDown(e: PointerEvent) {
+  if (disabled || readonly) return;
+  e.preventDefault(); hueFromPointer(e); emitInput(); startDrag(hueFromPointer);
+}
+
+function alphaFromPointer(e: PointerEvent) {
+  const slider = alphaEl as HTMLElement | null;
+  if (!slider) return;
+  const r = slider.getBoundingClientRect();
+  opacity = clamp((e.clientX - r.left) / r.width, 0, 1);
+}
+function onAlphaDown(e: PointerEvent) {
+  if (disabled || readonly) return;
+  e.preventDefault(); alphaFromPointer(e); emitInput(); startDrag(alphaFromPointer);
+}
+
+// ── Keyboard ─────────────────────────────
+// Every slider, opacity included, has a tab stop and keys, not only a pointer path.
+// Each key step writes the model; the keyup that ends it commits (a native `change`), as a
+// drag's pointerup does.
+function interactive() { return !disabled && !readonly; }
+let keyStepped = false;
+/** The new value for a slider key, or null for a key the slider does not handle. */
+function stepped(e: KeyboardEvent, now: number, min: number, max: number, small: number, big: number): number | null {
+  const d = e.shiftKey ? big : small;
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowUp': return clamp(now + d, min, max);
+    case 'ArrowLeft': case 'ArrowDown': return clamp(now - d, min, max);
+    case 'PageUp': return clamp(now + big, min, max);
+    case 'PageDown': return clamp(now - big, min, max);
+    case 'Home': return min;
+    case 'End': return max;
+    default: return null;
+  }
+}
+function keyStep(e: KeyboardEvent, apply: () => boolean) {
+  if (!interactive() || !apply()) return;
+  e.preventDefault();
+  keyStepped = true;
+  emitInput();
+}
+function onSliderKeyup() {
+  if (!keyStepped) return;
+  keyStepped = false;
+  emitChange();
+}
+function onHueKey(e: KeyboardEvent) {
+  keyStep(e, () => { const n = stepped(e, hueDeg, 0, 360, 1, 10); if (n === null) return false; hueDeg = n; return true; });
+}
+function onAlphaKey(e: KeyboardEvent) {
+  keyStep(e, () => {
+    const n = stepped(e, opacity, 0, 1, 0.01, 0.1);
+    if (n === null) return false;
+    opacity = Math.round(n * 100) / 100;
+    return true;
+  });
+}
+/** The colour area: ←/→ saturation, ↑/↓ brightness (PageUp/PageDown by 10), Home/End saturation. */
+function onSpectrumKey(e: KeyboardEvent) {
+  keyStep(e, () => {
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'PageUp' || e.key === 'PageDown') {
+      const n = stepped(e, val, 0, 100, 1, 10);
+      if (n === null) return false;
+      val = n;
+      return true;
+    }
+    const n = stepped(e, sat, 0, 100, 1, 10);
+    if (n === null) return false;
+    sat = n;
+    return true;
+  });
+}
+/** The area's value as text: saturation and brightness, then the colour. */
+function spectrumText(): string {
+  return formatText(uiString('color-picker', 'area'), {
+    s: Math.round(sat), v: Math.round(val), color: displayValue(),
+  });
+}
+
+// The hex field's own `change` is the commit, and bubbles to the host: only the write is left.
+function onHexInput(e: Event) {
+  const parsed = parseColor((e.target as HTMLInputElement).value);
+  if (parsed) { setHsva(parsed); emitInput(); }
+}
+
+function onPresetClick(color: string) {
+  if (disabled || readonly) return;
+  const parsed = parseColor(color);
+  if (parsed) { setHsva(parsed); emitChange(); }
+}
+
+function onClear() {
+  setHsva({ h: 0, s: 0, v: 100, a: 1 });
+  reflect('');
+  dispatchCommit(el);
+}
+
+function togglePopup() { if (!disabled && !inline) isOpen = !untracked(() => isOpen); }
+/** Open the popup; inline or disabled, there is none to open. */
+function showPopup() { if (!disabled && !inline) isOpen = true; }
+
+// ── Popover (deferred to after first render) ────────
+let popover: ReturnType<typeof usePopover> | null = null;
+let overlayId = '';
+let popoverDispose: (() => void) | null = null;
+
+queueMicrotask(() => {
+  if (inline) return;
+  const triggerEl = swatchEl as HTMLElement | null;
+  const panel = panelEl as HTMLElement | null;
+  if (!triggerEl || !panel) return;
+
+  popover = usePopover({
+    // No offset: `--pdx-float-offset` decides the gap, and a literal 4 here would
+    // repeat its value.
+    trigger: 'manual', placement: 'bottom-start', flip: true,
+    dismissOnOutside: true, dismissOnEscape: true, container: el,
+    onOpenChange: (o) => { if (!o && untracked(() => isOpen)) isOpen = false; },
+  });
+  popover.setTrigger(triggerEl);
+  popover.setContent(panel);
+
+  let wasOpen = false;
+  const disposeSync = effect(() => {
+    const opened = isOpen as boolean;
+    if (!popover) return;
+    if (opened) {
+      popover.open(); overlayId = uid;
+      panel.style.zIndex = String(overlayStack.push(overlayId));
+      // A dialog takes focus: the colour area, once the panel is displayed, not the
+      // swatch.
+      requestAnimationFrame(() => {
+        if (untracked(() => isOpen)) (panel.querySelector('.pdx-color-spectrum') as HTMLElement | null)?.focus();
+      });
+    } else {
+      popover.close(); panel.style.zIndex = '';
+      if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+      // Closed with focus inside (close(), a pick): back to the swatch, not <body>.
+      // Escape already returns it (usePopover).
+      if (wasOpen && panel.contains(document.activeElement)) triggerEl.focus();
+    }
+    // Announced when it changes (#287): this effect runs on every write of `isOpen`.
+    if (opened !== wasOpen) openChange({ value: opened });
+    wasOpen = opened;
+  });
+
+  popoverDispose = () => {
+    disposeSync(); popover?.dispose(); popover = null;
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+  };
+});
+onDestroy(() => { popoverDispose?.(); });
+
+/** Open the popup; open already, or inline, nothing changes. */
+function show() { showPopup(); }
+/** Close the popup. */
+function close() { isOpen = false; }
+/** Open the popup when closed, close it when open. */
+function toggle() { togglePopup(); }
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+function clear() { onClear(); }
+/** The colour as `#rrggbb`, whatever the format. */
+function getHex(): string { return untracked(() => hexColor); }
+/** The colour as `{ r, g, b, a }`. */
+function getRgb(): { r: number; g: number; b: number; a: number } { return untracked(() => ({ ...rgbColor(), a: opacity })); }
+/** The colour as `{ h, s, l, a }`. */
+function getHsl(): { h: number; s: number; l: number; a: number } { return untracked(() => ({ ...hslColor(), a: opacity })); }
+</script>

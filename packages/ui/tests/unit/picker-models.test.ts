@@ -24,7 +24,7 @@ import '../../src/mention/pdx-mention';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/calendar/pdx-calendar';
-import '../../src/color-picker/pdx-color-picker';
+import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/json-editor/pdx-json-editor';
 
 const ALPHA = ['pdx-change', 'change', 'valuechange', 'pressedchange', 'pdx-pressed-change', 'pdx-input'];

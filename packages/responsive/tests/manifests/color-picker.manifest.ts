@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-color-picker (tier 3, a colour picker with a swatch trigger and a floating popover)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/color-picker/pdx-color-picker.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/color-picker/pdx-color-picker.pdx)
  * and the CSS (packages/design/src/components/color-picker.css).
  *
  * ── DOM structure (light DOM, render() in pdx-color-picker.ts:248) ──

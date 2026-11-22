@@ -1,0 +1,373 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxColorPicker",
+  "tagName": "pdx-color-picker",
+  "category": "Specialized Inputs",
+  "order": 28,
+  "description": "Colour selection from a swatch trigger or an inline panel, with alpha channel and preset palettes,\noutput as hex, rgb or hsl.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "format",
+      "description": "Output format: 'hex', 'rgb' or 'hsl'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'hex'",
+      "attribute": "format"
+    },
+    {
+      "kind": "field",
+      "name": "showAlpha",
+      "description": "Shows the opacity (alpha) slider.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showalpha"
+    },
+    {
+      "kind": "field",
+      "name": "presets",
+      "description": "Preset swatch colours.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "inline",
+      "description": "Renders the picker inline instead of in a popover.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "inline"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the swatch's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'#000000'",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the popup; open already, or inline, nothing changes."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the popup."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Open the popup when closed, close it when open."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "getHex",
+      "parameters": [],
+      "description": "The colour as `#rrggbb`, whatever the format."
+    },
+    {
+      "kind": "method",
+      "name": "getRgb",
+      "parameters": [],
+      "description": "The colour as `{ r, g, b, a }`."
+    },
+    {
+      "kind": "method",
+      "name": "getHsl",
+      "parameters": [],
+      "description": "The colour as `{ h, s, l, a }`."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-color-swatch-md",
+        "sm": ".pdx-color-swatch-sm",
+        "lg": ".pdx-color-swatch-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value",
+    "hex": "$event.currentTarget.getHex()",
+    "rgb": "$event.currentTarget.getRgb()",
+    "hsl": "$event.currentTarget.getHsl()"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "dialog",
+    "group",
+    "slider"
+  ],
+  "attributes": [
+    {
+      "name": "format",
+      "fieldName": "format",
+      "description": "Output format: 'hex', 'rgb' or 'hsl'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'hex'"
+    },
+    {
+      "name": "showalpha",
+      "fieldName": "showAlpha",
+      "description": "Shows the opacity (alpha) slider.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "inline",
+      "fieldName": "inline",
+      "description": "Renders the picker inline instead of in a popover.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the swatch's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The colour. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'#000000'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The swatch, the button that opens the popup; absent when `inline`."
+    },
+    {
+      "name": "popup",
+      "description": "The panel: a floating `role=\"dialog\"`, or in place when `inline`."
+    },
+    {
+      "name": "area",
+      "description": "The colour area, a two-dimensional `role=\"slider\"`: saturation and brightness."
+    },
+    {
+      "name": "hue",
+      "description": "The hue slider."
+    },
+    {
+      "name": "alpha",
+      "description": "The opacity slider, while `showAlpha`."
+    },
+    {
+      "name": "input",
+      "description": "The text field that reads and writes the colour."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable`."
+    },
+    {
+      "name": "preset",
+      "description": "A preset colour's button."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "The popup is open."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-color-picker-preset-ring-active"
+    }
+  ]
+}

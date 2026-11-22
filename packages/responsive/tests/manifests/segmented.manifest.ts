@@ -2,7 +2,7 @@
  * MANIFEST — pdx-segmented
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/segmented/pdx-segmented.ts
+ *  - source: packages/ui/src/segmented/pdx-segmented.pdx
  *      HOST <pdx-segmented size="sm|md|lg" orientation="horizontal|vertical"> :state(disabled)
  *        → render:
  *        <div class="pdx-segmented" data-part="root"

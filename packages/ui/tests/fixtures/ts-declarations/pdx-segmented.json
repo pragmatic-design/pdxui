@@ -1,0 +1,242 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSegmented",
+  "tagName": "pdx-segmented",
+  "category": "Specialized Inputs",
+  "order": 33,
+  "description": "A radio-group style selector: the user picks one of its segments, marked by a sliding indicator.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "options",
+      "description": "Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "full",
+      "description": "Stretches to the full width of its container.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "full"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the items' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "horizontal (the default) or vertical: the segments in a row or a column.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-segmented-md",
+        "sm": ".pdx-segmented-sm",
+        "lg": ".pdx-segmented-lg"
+      }
+    },
+    {
+      "name": "orientation",
+      "values": [
+        "horizontal",
+        "vertical"
+      ],
+      "default": "horizontal",
+      "native": {
+        "horizontal": ".pdx-segmented-horizontal",
+        "vertical": ".pdx-segmented-vertical"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change",
+    "change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "radio",
+    "radiogroup"
+  ],
+  "attributes": [
+    {
+      "name": "full",
+      "fieldName": "full",
+      "description": "Stretches to the full width of its container.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the items' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "horizontal (the default) or vertical: the segments in a row or a column.",
+      "type": {
+        "text": "'horizontal' | 'vertical'"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, the `radiogroup`."
+    },
+    {
+      "name": "item",
+      "description": "One segment, a `radio` button; the chosen one is `aria-checked`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set; every segment is disabled."
+    }
+  ]
+}

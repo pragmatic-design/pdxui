@@ -1,0 +1,186 @@
+<template>
+  <div class="pdx-segmented" data-part="root" :ref="frame"
+    role="radiogroup"
+    :aria-orientation="orientation"
+    :aria-disabled="disabled ? 'true' : null"
+    :full="full ? '' : null"
+    @keydown="onKeydown">
+    @for (getOptions() as opt; track opt.value) {
+      <button type="button" class="pdx-segmented-item" data-part="item"
+        role="radio"
+        :aria-checked="value === opt.value ? 'true' : 'false'"
+        :tabindex="tabStop() === opt.value ? '0' : '-1'"
+        :disabled="disabled || !!opt.disabled"
+        :data-value="opt.value"
+        @click="!(disabled || opt.disabled) && selectValue(opt.value)">
+        @if (opt.icon) { {{ optionIcon(opt.icon) }} }
+        {{ opt.label }}
+      </button>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A radio-group style selector: the user picks one of its segments, marked by a sliding indicator.
+ *
+ * @csspart root - The frame, the `radiogroup`.
+ * @csspart item - One segment, a `radio` button; the chosen one is `aria-checked`.
+ *
+ * @cssstate disabled - `disabled` is set; every segment is disabled.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent change
+ * @alphadetail value $event.detail.value
+ */
+// pdx-segmented — Segmented control with sliding indicator animation.
+// Radio-group semantics (exactly one selected). Data-driven or compound.
+// Features: sizes, full width, vertical, disabled per-item, form name,
+// animated indicator (Mantine/Ark pattern), roving tabindex keyboard nav.
+import { DEV } from '@pdxui/core';
+import { nameGroup } from '../shared/group-name';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/segmented';
+
+interface SegmentOption {
+  label: string;
+  value: string;
+  disabled?: boolean;
+  icon?: string;
+}
+
+// A choice writes it (#480), and the write dispatches `value-change`. A form submits it, nothing
+// with no choice as a native radio group, and resets it (#135).
+@model value: string = '' { form: () => (value as string) || null };
+// On the host as a custom state (#132).
+@state disabled = !!disabled;
+@part root, item;
+// The axes its stylesheet keys by (#629, #286), reflected on the host; each value maps the class
+// that draws the same look on native markup. `md` and `horizontal` are the base, which no class
+// adds to.
+@variants {
+  /** sm, md (the default) or lg: the items' size. */
+  size: { md: '.pdx-segmented-md', sm: '.pdx-segmented-sm', lg: '.pdx-segmented-lg' } = md;
+  /** horizontal (the default) or vertical: the segments in a row or a column. */
+  orientation: { horizontal: '.pdx-segmented-horizontal', vertical: '.pdx-segmented-vertical' } = horizontal;
+}
+/** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
+@prop options: unknown[] = [];
+@prop full: boolean = false;
+@prop disabled: boolean = false;
+@prop name: string = '';
+@prop label: string = '';
+
+// The host is the one submitter. No hidden input carries the name, or it would send the value
+// a second time.
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear
+@expose focus, blur, clear;
+
+let frame = $signal(null);
+
+// An array, from a binding or from a JSON attribute (core parses the attribute of an Array
+// prop). Not a String read with JSON.parse in an empty catch, where `:options="choices"`
+// arrives as "[object Object],…" and renders nothing, in silence.
+let warnedUnreadable = false;
+function getOptions(): SegmentOption[] {
+  const raw = options as unknown;
+  if (raw === '' || raw == null) return [];
+  if (!Array.isArray(raw)) {
+    if (DEV && !warnedUnreadable) {
+      warnedUnreadable = true;
+      console.warn(`[pdx-segmented] options is not an array: ${JSON.stringify(raw)}. `
+        + `Bind an array (:options="choices") or write a JSON array (options='["a","b"]').`);
+    }
+    return [];
+  }
+  return raw.map((o: string | SegmentOption) =>
+    typeof o === 'string' ? { label: o, value: o } : o
+  );
+}
+
+/** An option's icon, loading `pdx-icon` the first time one is named: a control of labels never pays for the set. */
+function optionIcon(icon: string): Node {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  const node = document.createElement('pdx-icon') as HTMLElement & { name: string };
+  node.setAttribute('name', icon);
+  return node;
+}
+
+function selectValue(val: string) {
+  if (disabled) return;
+  // The choice is the model: written here, so the segment is selected whether or not a
+  // parent binds the value back.
+  value = val;
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (disabled) return;
+  const isVert = orientation === 'vertical';
+  const items = el.querySelectorAll('[data-part="item"]:not([disabled])') as NodeListOf<HTMLElement>;
+  if (!items || items.length === 0) return;
+
+  // From the focused segment: with no choice made, the tab stop is the first enabled one, and
+  // the arrows move on from where the focus is.
+  const list = Array.from(items);
+  const focused = list.indexOf(document.activeElement as HTMLElement);
+  const current = focused !== -1 ? focused : list.findIndex(it => it.getAttribute('aria-checked') === 'true');
+  let next = current;
+
+  switch (e.key) {
+    case 'ArrowRight': case 'ArrowDown':
+      if ((!isVert && e.key === 'ArrowRight') || (isVert && e.key === 'ArrowDown')) {
+        next = (current + 1) % items.length;
+        e.preventDefault();
+      }
+      break;
+    case 'ArrowLeft': case 'ArrowUp':
+      if ((!isVert && e.key === 'ArrowLeft') || (isVert && e.key === 'ArrowUp')) {
+        next = (current - 1 + items.length) % items.length;
+        e.preventDefault();
+      }
+      break;
+    case 'Home':
+      next = 0;
+      e.preventDefault();
+      break;
+    case 'End':
+      next = items.length - 1;
+      e.preventDefault();
+      break;
+    default: return;
+  }
+  if (next !== current) {
+    items[next].focus();
+    const val = items[next].dataset.value;
+    if (val) selectValue(val);
+  }
+}
+
+/**
+ * The segment that holds the tab stop: the chosen one, or the first enabled one when nothing
+ * is chosen — or the radio group could not be reached with Tab at all.
+ */
+function tabStop(): string | undefined {
+  const opts = getOptions();
+  const enabled = disabled ? [] : opts.filter((o) => !o.disabled);
+  const chosen = enabled.find((o) => o.value === value);
+  return (chosen ?? enabled[0])?.value;
+}
+
+// The radiogroup's name: `label`, or a pdx-label right before the host. Not bound as
+// :aria-label, which writes aria-label="" with no label.
+$effect(() => {
+  const l = label as string;
+  requestAnimationFrame(() => {
+    if (frame) nameGroup(el, frame, l);
+  });
+});
+
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+function clear() { value = ''; }
+</script>

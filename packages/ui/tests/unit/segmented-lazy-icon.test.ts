@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/segmented/pdx-segmented';
+import '../../src/segmented/pdx-segmented.pdx';
 
 async function mount(options: unknown[]): Promise<HTMLElement> {
     const el = document.createElement('pdx-segmented');

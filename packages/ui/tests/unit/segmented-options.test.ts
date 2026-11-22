@@ -5,7 +5,7 @@
 // throw, and render the control empty with nothing said.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { html, signal } from '@pdxui/core';
-import '../../src/segmented/pdx-segmented';
+import '../../src/segmented/pdx-segmented.pdx';
 
 const items = (el: Element): string[] =>
     [...el.querySelectorAll('.pdx-segmented-item')].map(b => (b.textContent ?? '').trim());
@@ -75,5 +75,26 @@ describe('pdx-segmented options', () => {
         await new Promise(r => requestAnimationFrame(() => r(undefined)));
         expect(items(document.body.firstElementChild!)).toEqual([]);
         expect(warn.mock.calls.filter(c => String(c[0]).includes('[pdx-segmented]'))).toHaveLength(0);
+    });
+});
+
+// `full` stretches the frame to its container: segmented.css keys by `.pdx-segmented[full]`.
+describe('pdx-segmented full', () => {
+    it('`full` marks the frame, and taking it off unmarks it', async () => {
+        document.body.innerHTML = `<pdx-segmented full options='["a","b"]'></pdx-segmented>`;
+        const el = document.body.firstElementChild as HTMLElement & { full: boolean };
+        await rendered(el, 2);
+        const frame = el.querySelector('.pdx-segmented')!;
+        expect(frame.hasAttribute('full')).toBe(true);
+        el.full = false;
+        await new Promise(r => requestAnimationFrame(() => r(undefined)));
+        expect(frame.hasAttribute('full')).toBe(false);
+    });
+
+    it('the control: without `full` the frame is not marked', async () => {
+        document.body.innerHTML = `<pdx-segmented options='["a","b"]'></pdx-segmented>`;
+        const el = document.body.firstElementChild as HTMLElement;
+        await rendered(el, 2);
+        expect(el.querySelector('.pdx-segmented')!.hasAttribute('full')).toBe(false);
     });
 });

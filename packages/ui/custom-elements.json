@@ -7855,7 +7855,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/color-picker/pdx-color-picker.ts",
+      "path": "src/color-picker/pdx-color-picker.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -8237,7 +8237,7 @@
           "name": "pdx-color-picker",
           "declaration": {
             "name": "PdxColorPicker",
-            "module": "src/color-picker/pdx-color-picker.ts"
+            "module": "src/color-picker/pdx-color-picker.pdx"
           }
         }
       ]
@@ -26539,7 +26539,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/segmented/pdx-segmented.ts",
+      "path": "src/segmented/pdx-segmented.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -26790,7 +26790,7 @@
           "name": "pdx-segmented",
           "declaration": {
             "name": "PdxSegmented",
-            "module": "src/segmented/pdx-segmented.ts"
+            "module": "src/segmented/pdx-segmented.pdx"
           }
         }
       ]

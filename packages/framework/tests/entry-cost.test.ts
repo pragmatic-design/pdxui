@@ -100,7 +100,10 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 340.2 after #1210's fourth atoms (+0.5): pdx-button, pdx-checkbox and pdx-input, each lighter
     // alone (0.83×, 0.96×, 1.04× with its password-manager module), for the same reason; the compiled
     // two-way bindings they are the first to use (::value, ::checked) come in with them.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 340.3 },
+    // 340.6 after #1210's inputs (CI's line: 340.5): the text fields, the groups, masked-input and
+    // tag-input, then pdx-segmented and pdx-color-picker (1.09×, 1.03× alone), for the same reason; the
+    // compiled `@render` and keyed `@for` come in with tag-input, core's render-snippet module (#1303).
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 340.6 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -109,7 +112,8 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 328.5: what `/ui` is for, an app that wants every component registered (331.6 before #1207).
     // 330.1 after #1233 (+1.1), for the same core code as the root's above. 330.6 after #1237 (+0.2
     // from 330.4), for the root's reason. 331.1 after #1210's fourth atoms, for the root's reason.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331.2 },
+    // 331.7 after #1210's inputs (CI's line: 331.6), for the root's reason.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 331.7 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
