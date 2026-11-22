@@ -5,8 +5,10 @@
 //     each dynamic thing goes) is built by a module-level builder handed to core's `staticBlock`,
 //     which runs it on first use into a <template>'s content: that document has no custom-element
 //     registry and loads nothing, so no component constructor runs and no <img> fetches then;
-//   - every render imports a copy into the document (`importNode`, which upgrades the components in
-//     it) and reaches the nodes the render binds through a WALK, a module-level function of its own
+//   - every render clones a copy, which the page adopts when it is inserted, upgrading the components
+//     in it then; a block that holds an element that is not PDX's is imported instead (`importNode`),
+//     which upgrades it before the bindings run (#1296). The render reaches the nodes it binds
+//     through a WALK, a module-level function of its own
 //     that follows `firstChild`/`nextSibling` paths computed here. It is the same walk a future
 //     adoption of server markup can run on nodes it did not create.
 // The render is left with the dynamic work only: bindings, listeners, and control flow put in place.
@@ -44,6 +46,20 @@ const LEADING_SPACE = /^[ \t\n\r\f]+/;
 const TRAILING_SPACE = /[ \t\n\r\f]+$/;
 /** Elements whose content is laid out or read as written: their text keeps its edges. */
 const VERBATIM_ELEMENTS = new Set(['pre', 'listing', 'textarea', 'plaintext', 'script', 'style']);
+
+/**
+ * Does the block hold an element a definition other than PDX's may upgrade (#1296): a hyphenated tag
+ * that is neither the library's (`pdx-`) nor the project's (`tagPrefix-`), or any element with `is`?
+ * A PDX component takes over a property set before its upgrade; such an element may not.
+ */
+function holdsForeignElement(node: StaticNode, tagPrefix: string): boolean {
+    if (node.kind === 'element' && node.tag) {
+        const tag = node.tag.toLowerCase();
+        if (tag.includes('-') && !tag.startsWith('pdx-') && !tag.startsWith(`${tagPrefix.toLowerCase()}-`)) return true;
+        if (node.attrs?.some(([name]) => name.toLowerCase() === 'is')) return true;
+    }
+    return node.kids.some((kid) => holdsForeignElement(kid, tagPrefix));
+}
 
 /** Where a module's builders and walks go, and the counter that names them. */
 export interface TemplateHoists {
@@ -220,8 +236,11 @@ export class StaticTree {
      * The lines that start the block's render — a copy of the static markup, and the walk to the
      * nodes it binds — after declaring the builder and the walk in `hoists`.
      */
-    prologue(hoists: TemplateHoists, imports: Set<string>, asHtml: boolean, hydrate = false): string[] {
+    prologue(hoists: TemplateHoists, imports: Set<string>, asHtml: boolean, hydrate = false, tagPrefix = 'pdx'): string[] {
         this.trimEdges(this.root);
+        // Cloned, unless the block holds an element that is not PDX's: imported then, so it is upgraded
+        // before the bindings set its properties (#1296).
+        const imported = holdsForeignElement(this.root, tagPrefix) ? ',true' : '';
         if (this.root.kids.length === 0) {
             if (!hydrate) return ['const __frag=document.createDocumentFragment();'];
             imports.add('hydrationRange');
@@ -234,8 +253,8 @@ export class StaticTree {
         const html = asHtml ? blockHtml(this.root) : null;
         if (html !== null) imports.add('staticMarkup');
         const blk = hoistOnce(hoists, `__blk${n}`, html !== null
-            ? `staticBlock(staticMarkup(${htmlLiteral(html)}))`
-            : `staticBlock((__frag,__d)=>{${this.mk.join('')}})`);
+            ? `staticBlock(staticMarkup(${htmlLiteral(html)})${imported})`
+            : `staticBlock((__frag,__d)=>{${this.mk.join('')}}${imported})`);
         if (!hydrate) {
             const lines = [`const __frag=${blk}();`];
             if (this.targets.length > 0) {

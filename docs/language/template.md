@@ -187,6 +187,14 @@ On the inline path the same rule is generated inline, in one `effect` per bindin
 `:name.once="expr"` (#126) reads the value once, untracked, when the element is rendered, assigns it
 the same way, and has no `effect`: a later change of what it read does not reach the element.
 
+A component in a template is upgraded when its block is inserted into the page: the block's static
+markup is cloned per render, as `html``` is, and a binding that runs first sets the value as an own
+property of the element not yet upgraded (#1296). A PDX component — a `pdx-…` tag, or one with the
+project's prefix — takes that property over at its upgrade. An element of another library may not, so
+a block that holds one (any other tag with `-`, or an element with `is`) is imported instead
+(`importNode`), which upgrades it before the bindings run, at a cost: the copy and the DOM calls on it
+are slower in a component's render.
+
 A value that cannot change is written the same way without being asked (#110, #1270): an expression of
 literals, a `@for` row's `track` key, and the names of the script's top-level `const`s whose value is
 literals only (`const MAX = 10`) or certainly a primitive, whatever it reads — a template literal, a `+`
