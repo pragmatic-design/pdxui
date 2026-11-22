@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 describe('pdx-wizard', () => {
     beforeEach(cleanup);

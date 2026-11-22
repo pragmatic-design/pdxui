@@ -7,7 +7,7 @@ import '../../src/password-input/pdx-password-input';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/tabs/pdx-tabs';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 import '../../src/timeline/pdx-timeline';
 import '../../src/slider/pdx-slider';
 import '../../src/label/pdx-label';

@@ -7,7 +7,7 @@ import '../../src/fieldset/pdx-fieldset';
 import '../../src/tabs/pdx-tabs';
 import '../../src/description-list/pdx-description-list';
 import '../../src/statistic/pdx-statistic';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/kbd/pdx-kbd.pdx';
 import '../../src/avatar-group/pdx-avatar-group';

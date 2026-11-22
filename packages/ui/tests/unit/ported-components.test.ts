@@ -33,6 +33,7 @@ const PORTED: Record<string, string> = {
     'pdx-progress': 'src/progress/pdx-progress.pdx',
     'pdx-radio': 'src/radio/pdx-radio.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
+    'pdx-wizard': 'src/wizard/pdx-wizard.pdx',
 };
 
 const manifest = read('custom-elements.json') as { modules: Module[] };
