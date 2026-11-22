@@ -104,6 +104,8 @@ export function buildSetupBody(
     scriptOnly = false,
     /** Codegen diagnostics sink — CompileContext.warnings. Omitted by direct callers in tests. */
     sink?: WarningSink,
+    /** In a build, the names the code outside the setup reads off the context: the return keeps only these (#1289). */
+    returnOnly?: ReadonlySet<string>,
 ): string {
     const propNames = new Set(analysis.props.map(p => p.name));
     // The $signals an initialiser may read (#682): a model is read through ctx like a prop.
@@ -705,10 +707,13 @@ export function buildSetupBody(
     }
 
     // Auto-return (no manual return needed). The emitters go too: the template calls ctx.<name>.
-    const returned = [...analysis.exports];
+    // Core copies it onto the context at every mount. In a build it holds only what the render, the
+    // host and the snippets read (#1289); in development every name, which HMR and the devtools read.
+    let returned = [...analysis.exports];
     for (const { fn: name } of emitters) {
         if (!returned.some(e => e.name === name)) returned.push({ name, kind: 'function' });
     }
+    if (returnOnly) returned = returned.filter(e => returnOnly.has(e.name));
     parts.push(generateAutoReturn(returned));
 
     const accessors = propAccessors(analysis, bodyText, parts.slice(accessorsAt + 1).join('\n'));
