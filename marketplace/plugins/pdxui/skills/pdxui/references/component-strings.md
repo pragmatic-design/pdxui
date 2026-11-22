@@ -256,11 +256,11 @@ placeholders, filled at render: keep them in the translation.
 | `filter-builder` | `selectField` | `Select field...` | `@pdxui/ui/src/shared/i18n.ts` |
 | `form-actions` | `reset` | `Reset` | `@pdxui/ui/src/shared/i18n.ts` |
 | `form-actions` | `submit` | `Submit` | `@pdxui/ui/src/shared/i18n.ts` |
-| `form-template` | `list.add` | `+ Add` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `list.cell` | `{label}, line {n}` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `list.empty` | `No items yet` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `list.remove` | `Remove` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `list.removeLine` | `Remove line {n}` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
+| `form-template` | `list.add` | `+ Add` | `@pdxui/ui/src/form-template/form-template-strings.ts` |
+| `form-template` | `list.cell` | `{label}, line {n}` | `@pdxui/ui/src/form-template/form-template-strings.ts` |
+| `form-template` | `list.empty` | `No items yet` | `@pdxui/ui/src/form-template/form-template-strings.ts` |
+| `form-template` | `list.remove` | `Remove` | `@pdxui/ui/src/form-template/form-template-strings.ts` |
+| `form-template` | `list.removeLine` | `Remove line {n}` | `@pdxui/ui/src/form-template/form-template-strings.ts` |
 | `image` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
 | `image` | `image` | `image` | `@pdxui/ui/src/shared/i18n.ts` |
 | `image` | `view` | `View {alt}` | `@pdxui/ui/src/shared/i18n.ts` |

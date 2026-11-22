@@ -1,0 +1,168 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFormTemplate",
+  "tagName": "pdx-form-template",
+  "category": "Forms",
+  "order": 45,
+  "description": "Renders a complete form from a FormSchema: each field type gets its control, validators run from\nthe schema and sections become fieldsets. With `layout: 'wizard'` the sections are the steps of a\n`pdx-wizard`, and a step with an error is not left.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "schema",
+      "description": "FormSchema defining fields, sections, layout.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "form",
+      "description": "Optional pre-existing Form instance. If not provided, one is created from schema.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "autocomplete",
+      "description": "HTML autocomplete attribute for the generated form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'off'",
+      "attribute": "autocomplete"
+    },
+    {
+      "kind": "field",
+      "name": "formClass",
+      "description": "CSS class applied to the generated form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "formclass"
+    },
+    {
+      "kind": "field",
+      "name": "showActions",
+      "description": "Show default submit/reset buttons. Override via slot=\"actions\".",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showactions"
+    },
+    {
+      "kind": "method",
+      "name": "getForm",
+      "parameters": [],
+      "description": "The Form the template renders: the `form` prop, or the one created from the schema."
+    },
+    {
+      "kind": "method",
+      "name": "next",
+      "parameters": [],
+      "description": "The next step, once the current one is valid. A promise: the validation may be async."
+    },
+    {
+      "kind": "method",
+      "name": "prev",
+      "parameters": [],
+      "description": "The previous step; never held."
+    },
+    {
+      "kind": "method",
+      "name": "goTo",
+      "parameters": [
+        {
+          "name": "n",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "A step by index; forward only once the current step is valid."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-submit",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The form submitted and its values validate; an invalid submit fires nothing and scrolls to the first error.",
+      "detail": "{ values: Record<string, unknown>; saved?: boolean }"
+    },
+    {
+      "name": "pdx-submit-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The form's `source` refused the save.",
+      "detail": "{ error: unknown }"
+    }
+  ],
+  "roles": [
+    "group"
+  ],
+  "attributes": [
+    {
+      "name": "autocomplete",
+      "fieldName": "autocomplete",
+      "description": "HTML autocomplete attribute for the generated form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'off'"
+    },
+    {
+      "name": "formclass",
+      "fieldName": "formClass",
+      "description": "CSS class applied to the generated form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showactions",
+      "fieldName": "showActions",
+      "description": "Show default submit/reset buttons. Override via slot=\"actions\".",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "actions",
+      "description": "Replaces the default actions (the `pdx-form-actions` shown when `showActions`). Not rendered in the wizard layout, which has its own navigation."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "form",
+      "description": "The inner `pdx-form`."
+    },
+    {
+      "name": "content",
+      "description": "The box the generated fields go in."
+    },
+    {
+      "name": "fields",
+      "description": "The fields outside any section."
+    },
+    {
+      "name": "section",
+      "description": "A section's `<fieldset>`, outside the wizard layout."
+    },
+    {
+      "name": "wizard",
+      "description": "The `pdx-wizard` of the wizard layout; its panels are its `panel` parts."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ import type { FieldDefinition } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { findRecord } from '../shared/find-record';
 import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
-import '../form-template/pdx-form-template'; // rendered by this component, and registered by nobody else
+import '../form-template/pdx-form-template.pdx'; // rendered by this component, and registered by nobody else
 
 /**
  * A form generated from field definitions or a form schema, so the same JSON that drives a data grid

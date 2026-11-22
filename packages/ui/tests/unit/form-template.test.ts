@@ -1,7 +1,7 @@
 // pdx-form-template — self-contained control registration + per-type input semantics.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-template/pdx-form-template';
+import '../../src/form-template/pdx-form-template.pdx';
 
 async function mountForm(schema: unknown): Promise<HTMLElement & { schema: unknown; showActions: boolean }> {
     const el = document.createElement('pdx-form-template') as HTMLElement & { schema: unknown; showActions: boolean };

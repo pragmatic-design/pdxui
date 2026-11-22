@@ -30,6 +30,7 @@ const PORTED: Record<string, string> = {
     'pdx-form': 'src/form/pdx-form.pdx',
     'pdx-form-actions': 'src/form-actions/pdx-form-actions.pdx',
     'pdx-form-field': 'src/form-field/pdx-form-field.pdx',
+    'pdx-form-template': 'src/form-template/pdx-form-template.pdx',
     'pdx-input': 'src/input/pdx-input.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',

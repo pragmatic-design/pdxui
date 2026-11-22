@@ -54,7 +54,7 @@ import './inline-edit/pdx-inline-edit';
 
 // Tier 1C: Forms
 import './form/pdx-form.pdx';
-import './form-template/pdx-form-template';
+import './form-template/pdx-form-template.pdx';
 import './form-section/pdx-form-section';
 import './form-actions/pdx-form-actions.pdx';
 import './form-field/pdx-form-field.pdx';

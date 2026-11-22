@@ -84,11 +84,6 @@
       "types": "./dist/form-section/pdx-form-section.d.ts",
       "import": "./dist/form-section/pdx-form-section.js"
     },
-    "./form-template": {
-      "development": "./src/form-template/pdx-form-template.ts",
-      "types": "./dist/form-template/pdx-form-template.d.ts",
-      "import": "./dist/form-template/pdx-form-template.js"
-    },
     "./password-input": {
       "development": "./src/password-input/pdx-password-input.ts",
       "types": "./dist/password-input/pdx-password-input.d.ts",
@@ -659,6 +654,11 @@
       "types": "./dist/field-list/pdx-field-list.d.ts",
       "import": "./dist/field-list/pdx-field-list.js"
     },
+    "./form-template": {
+      "development": "./src/form-template/pdx-form-template.pdx",
+      "types": "./dist/form-template/pdx-form-template.d.ts",
+      "import": "./dist/form-template/pdx-form-template.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -666,12 +666,14 @@
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
     "dist/field-list/field-list-strings.js",
+    "dist/form-template/form-template-strings.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
     "src/field-list/field-list-strings.ts",
+    "src/form-template/form-template-strings.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],
