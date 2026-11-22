@@ -655,7 +655,7 @@
       "import": "./dist/search-input/pdx-search-input.js"
     },
     "./textarea": {
-      "development": "./src/textarea/pdx-textarea.ts",
+      "development": "./src/textarea/pdx-textarea.pdx",
       "types": "./dist/textarea/pdx-textarea.d.ts",
       "import": "./dist/textarea/pdx-textarea.js"
     },

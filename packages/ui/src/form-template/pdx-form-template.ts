@@ -21,7 +21,7 @@ import '../form-actions/pdx-form-actions.pdx';
 import '../field-group/pdx-field-group';
 import '../field-list/pdx-field-list.pdx';
 import '../input/pdx-input.pdx';
-import '../textarea/pdx-textarea';
+import '../textarea/pdx-textarea.pdx';
 import '../password-input/pdx-password-input.pdx';
 import '../search-input/pdx-search-input.pdx';
 import '../masked-input/pdx-masked-input';

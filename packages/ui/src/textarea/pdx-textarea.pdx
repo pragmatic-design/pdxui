@@ -1,0 +1,227 @@
+<template>
+  <div class="pdx-input-wrap pdx-textarea-wrap" data-part="root" @click="onWrapClick" style="height:auto;min-height:auto">
+    <textarea class="pdx-input" data-part="input" :ref="textareaEl"
+      ::value="value"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :readonly="readonly"
+      :required="required"
+      :rows="rows"
+      :maxlength="maxlength > 0 ? maxlength : null"
+      :name="name"
+      :aria-label="ariaLabel || null"
+      :aria-invalid="error ? 'true' : null"
+      :aria-required="required ? 'true' : null"
+      :aria-busy="loading ? 'true' : null"
+      :style="'resize:' + getResize() + ';width:100%'"
+      @input="onInput"
+      @focus="onFocus"
+      @blur="onBlur"></textarea>
+  </div>
+  @if (showCount || wordCount) {
+    <div class="pdx-textarea-footer" data-part="footer">
+      @if (wordCount) {
+        <span class="pdx-input-count" data-part="word-count">{{ wordCountText() }}</span>
+      } @else {
+        <span></span>
+      }
+      @if (showCount) {
+        <span class="pdx-input-count" data-part="count">{{ charCountText() }}</span>
+      }
+    </div>
+  }
+</template>
+
+<script>
+/**
+ * A multi-line text input with auto-resize, a character or word count and validation states.
+ *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<textarea>`, the textbox a form submits.
+ * @csspart footer - The row under the frame that holds the counts, with `show-count` or `word-count`.
+ * @csspart count - The character count, with `show-count`.
+ * @csspart word-count - The word count, with `word-count`.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set.
+ * @cssstate over-limit - The text is longer than `maxlength`; the character count shows it.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
+ */
+// pdx-textarea — Multi-line input with auto-resize, char/word count, sizes, states.
+// Uses .pdx-input-wrap pattern for consistency with pdx-input.
+import { onNextFrame } from '@pdxui/core';
+import { dispatchCommit } from '../shared/commit-change';
+
+// Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur, is the
+// inner textarea's native `change`, which bubbles to the host. The inner <textarea> submits — it
+// carries `name` and the value verbatim. The host submits nothing of its own, or it would send it a
+// second time (#135): its form value is null; the model is still the form's, for a reset.
+@model value: string = '' { form: () => null };
+/** The textbox received focus. */
+@event 'pdx-focus': void;
+/** The textbox lost focus. */
+@event 'pdx-blur': void;
+// The visual states, on the host as custom states (#132), as pdx-input's: the frame carries no
+// state class of its own.
+@state invalid = !!error;
+@state success = !!success;
+@state warning = !!warning;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state loading = !!loading;
+@state over-limit = isOverCount();
+@part root, input, footer, count, word-count;
+// The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+@prop placeholder: string = '';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop required: boolean = false;
+@prop rows: number = 3;
+@prop minRows: number = 0;
+@prop maxRows: number = 0;
+@prop maxlength: number = 0;
+@prop showCount: boolean = false;
+@prop wordCount: boolean = false;
+@prop resize: string = 'vertical';
+@prop error: boolean = false;
+@prop success: boolean = false;
+@prop warning: boolean = false;
+@prop name: string = '';
+@prop ariaLabel: string = '';
+/** Show loading state */
+@prop loading: boolean = false;
+
+// Imperative API: focus/blur/clear
+@expose focus, blur, clear, selectText;
+
+let textareaEl = $signal(null);
+let liveValue = $signal((value as string) || '');
+// Line height in px — measured once for autoresize calculations
+let lineHeight = 0;
+
+// A native reset puts a field back to its default value, which a property binding never sets: the
+// default is the value the component mounted with, so the field's own reset and the host's model agree.
+const mounted = value;
+onNextFrame(() => {
+  if (textareaEl) textareaEl.defaultValue = mounted === null || mounted === undefined ? '' : String(mounted);
+});
+
+function getResize(): string {
+  // Auto-resize mode disables manual resize handle
+  if (minRows || maxRows) return 'none';
+  return (resize as string) || 'vertical';
+}
+
+function autoResize(ta: HTMLTextAreaElement) {
+  const min = minRows as number;
+  const max = maxRows as number;
+  if (!min && !max) return;
+
+  if (!lineHeight) {
+    const cs = getComputedStyle(ta);
+    lineHeight = parseFloat(cs.lineHeight) || parseFloat(cs.fontSize) * 1.5;
+  }
+
+  // Reset to measure real scrollHeight
+  ta.style.height = 'auto';
+  let target = ta.scrollHeight;
+
+  if (min && lineHeight) {
+    const minH = min * lineHeight;
+    if (target < minH) target = minH;
+  }
+  if (max && lineHeight) {
+    const maxH = max * lineHeight;
+    if (target > maxH) {
+      target = maxH;
+      ta.style.overflowY = 'auto';
+    } else {
+      ta.style.overflowY = 'hidden';
+    }
+  } else {
+    ta.style.overflowY = 'hidden';
+  }
+
+  ta.style.height = target + 'px';
+}
+
+// The model is the field's, two-way (`::value`); this follows the text and resizes.
+function onInput(e: Event) {
+  const ta = e.target as HTMLTextAreaElement;
+  liveValue = ta.value;
+  autoResize(ta);
+}
+
+function onFocus() { pdxFocus(); }
+function onBlur() { pdxBlur(); }
+
+function onWrapClick(e: Event) {
+  const target = e.target as HTMLElement;
+  if (target.tagName === 'TEXTAREA') return;
+  textareaEl?.focus();
+}
+
+$effect(() => {
+  const propVal = value as string;
+  // '' is a legitimate reset: a truthy guard would ignore it and leave the char/word count
+  // stale while the DOM empties.
+  if (propVal != null) liveValue = propVal;
+
+  // Initial auto-resize — the signals are read here, the textarea in the frame, where it
+  // exists (read here, it is null and the first resize never runs).
+  if (minRows || maxRows) {
+    requestAnimationFrame(() => {
+      const ta = textareaEl;
+      if (ta) autoResize(ta);
+    });
+  }
+});
+
+// Plain functions, read where they are bound, as the TypeScript version read them: a $derived each
+// would be a computed made at every mount.
+function charCountText(): string {
+  const len = (liveValue as string).length;
+  const max = maxlength as number;
+  if (max > 0) return len + '/' + max;
+  return '' + len;
+}
+
+function wordCountText(): string {
+  const text = (liveValue as string).trim();
+  if (!text) return '0 words';
+  const count = text.split(/\s+/).length;
+  return count + (count === 1 ? ' word' : ' words');
+}
+
+function isOverCount(): boolean {
+  const max = maxlength as number;
+  if (max <= 0) return false;
+  return (liveValue as string).length > max;
+}
+
+function focus() { textareaEl?.focus(); }
+function blur() { textareaEl?.blur(); }
+// A commit no typing produced: the model's write, then the native change a commit makes.
+function clear() {
+  liveValue = '';
+  const ta = textareaEl as HTMLTextAreaElement | null;
+  if (ta) ta.value = '';
+  value = '';
+  dispatchCommit(ta);
+}
+/** Select the whole text, so the next keystroke replaces it. Does not focus first. */
+function selectText() { textareaEl?.select(); }
+</script>

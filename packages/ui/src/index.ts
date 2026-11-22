@@ -27,7 +27,7 @@ import './flag/pdx-flag.pdx';
 import './password-input/pdx-password-input.pdx';
 import './search-input/pdx-search-input.pdx';
 import './number-input/pdx-number-input';
-import './textarea/pdx-textarea';
+import './textarea/pdx-textarea.pdx';
 import './input-group/pdx-input-group.pdx';
 import './masked-input/pdx-masked-input';
 import './otp-input/pdx-otp-input';

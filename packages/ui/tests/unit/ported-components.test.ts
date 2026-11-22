@@ -40,6 +40,7 @@ const PORTED: Record<string, string> = {
     'pdx-radio-group': 'src/radio-group/pdx-radio-group.pdx',
     'pdx-search-input': 'src/search-input/pdx-search-input.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
+    'pdx-textarea': 'src/textarea/pdx-textarea.pdx',
 };
 
 const manifest = read('custom-elements.json') as { modules: Module[] };
