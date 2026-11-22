@@ -13473,7 +13473,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/field-list/pdx-field-list.ts",
+      "path": "src/field-list/pdx-field-list.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -13509,7 +13509,7 @@
               "name": "form",
               "description": "Form instance. If not provided, uses form context.",
               "type": {
-                "text": "Form<any> | null"
+                "text": "import('@pdxui/core').Form<any> | null"
               },
               "default": "null"
             },
@@ -13733,7 +13733,7 @@
           "name": "pdx-field-list",
           "declaration": {
             "name": "PdxFieldList",
-            "module": "src/field-list/pdx-field-list.ts"
+            "module": "src/field-list/pdx-field-list.pdx"
           }
         }
       ]

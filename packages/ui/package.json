@@ -144,11 +144,6 @@
       "types": "./dist/field-group/pdx-field-group.d.ts",
       "import": "./dist/field-group/pdx-field-group.js"
     },
-    "./field-list": {
-      "development": "./src/field-list/pdx-field-list.ts",
-      "types": "./dist/field-list/pdx-field-list.d.ts",
-      "import": "./dist/field-list/pdx-field-list.js"
-    },
     "./card": {
       "development": "./src/card/pdx-card.ts",
       "types": "./dist/card/pdx-card.d.ts",
@@ -659,17 +654,24 @@
       "types": "./dist/form/pdx-form.d.ts",
       "import": "./dist/form/pdx-form.js"
     },
+    "./field-list": {
+      "development": "./src/field-list/pdx-field-list.pdx",
+      "types": "./dist/field-list/pdx-field-list.d.ts",
+      "import": "./dist/field-list/pdx-field-list.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
     "dist/index.js",
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
+    "dist/field-list/field-list-strings.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
+    "src/field-list/field-list-strings.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],

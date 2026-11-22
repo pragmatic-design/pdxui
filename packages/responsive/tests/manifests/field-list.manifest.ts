@@ -2,7 +2,7 @@
  * MANIFEST — pdx-field-list
  *
  * A dynamic list of fields bound to a form (rows added and removed, each one an item of an array
- * field). Source inspected: packages/ui/src/field-list/pdx-field-list.ts.
+ * field). Source inspected: packages/ui/src/field-list/pdx-field-list.pdx.
  * CSS: packages/design/src/components/form.css, the "pdx-field-list" block (lines 135-249).
  *
  * ── DETERMINISM: why the certified scenario is the EMPTY STATE plus the Add button ──

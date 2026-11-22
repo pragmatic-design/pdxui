@@ -60,7 +60,7 @@ import './form-actions/pdx-form-actions.pdx';
 import './form-field/pdx-form-field.pdx';
 import './fieldset/pdx-fieldset';
 import './field-group/pdx-field-group';
-import './field-list/pdx-field-list';
+import './field-list/pdx-field-list.pdx';
 import './wizard/pdx-wizard';
 
 // Tier 1D: Navigation
