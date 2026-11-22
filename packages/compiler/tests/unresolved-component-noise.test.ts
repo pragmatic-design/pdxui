@@ -11,10 +11,12 @@
 //   · another @pdxui package defines it. `pdx-router-outlet` is `define()`d by @pdxui/router,
 //     which the app imports itself.
 //
-// A third case looks like a gap and is not: `pdx-toggle-group` is `component()`-declared inside
-// `pdx-toggle.ts`, a second component in one file. CONTRIBUTING.md names this failure first among
-// the silent ones; a warning that fires wrongly makes it unreadable, which is the same as switching
-// it off.
+// A third case looked like a gap and was not: `pdx-toggle-group` was `component()`-declared inside
+// `pdx-toggle.ts`, a second component in one file. Since #1210 it has a .pdx and an export of its own,
+// and resolves like any other tag; the generator's reading of a file with two components is held in
+// packages/ui's manifest-covers-every-component.test.ts. CONTRIBUTING.md names this failure first
+// among the silent ones; a warning that fires wrongly makes it unreadable, which is the same as
+// switching it off.
 //
 // This asserts BOTH halves. A fix that silences everything would be worse than the noise.
 
@@ -49,13 +51,12 @@ describe('PDX_UNRESOLVED_COMPONENT tells the real gaps from the false ones', () 
             'pdx-router-outlet is defined by @pdxui/router').toBe(true);
     });
 
-    it('finds a second component declared in the same file as another', () => {
-        // `pdx-toggle-group` is `component()`-declared inside `pdx-toggle.ts`. `gen-manifest.mjs`
-        // reads every component() in a file, so the manifest lists it and it resolves to its
-        // sibling's export: one module, two tags.
-        expect(r.knownWithoutImport('pdx-toggle-group'), 'declared by component() in pdx-toggle.ts').toBe(true);
-        expect(r.resolve('pdx-toggle-group')?.importPath, 'shares its sibling module export')
-            .toBe('@pdxui/ui/toggle');
+    it('finds pdx-toggle-group, once a second component of pdx-toggle.ts, at its own export', () => {
+        // It shared its sibling's export while both were one module; moved to .pdx (#1210) it has its
+        // own, and `@pdxui/ui/toggle` imports it, so the toggle's entry still registers both.
+        expect(r.knownWithoutImport('pdx-toggle-group'), 'documented in the manifest').toBe(true);
+        expect(r.resolve('pdx-toggle-group')?.importPath, 'its own export').toBe('@pdxui/ui/toggle-group');
+        expect(r.resolve('pdx-toggle')?.importPath, 'the control: the toggle keeps its export').toBe('@pdxui/ui/toggle');
     });
 
     it('STILL flags a tag that exists nowhere — the half that must not be lost', () => {
