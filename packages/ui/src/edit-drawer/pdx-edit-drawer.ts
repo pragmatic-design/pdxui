@@ -11,7 +11,7 @@ import { uiString } from '../shared/i18n';
 // Self-contained: ensure the composed custom elements are registered when this entry is imported
 // directly (e.g. @pdxui/ui/edit-drawer), not only via the @pdxui/ui barrel.
 import '../drawer/pdx-drawer';
-import '../form-template/pdx-form-template';
+import '../form-template/pdx-form-template.pdx';
 // This component's styles live in drawer.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/drawer';

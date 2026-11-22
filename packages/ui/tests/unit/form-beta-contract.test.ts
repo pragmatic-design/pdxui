@@ -5,7 +5,7 @@
 // request that brings its component over.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 const root = join(__dirname, '..', '..');
@@ -81,7 +81,9 @@ const DONE: Row[] = [
 ];
 
 describe('pdx-form-template', () => {
-    const source = readFileSync(join(root, 'src', 'form-template', 'pdx-form-template.ts'), 'utf8');
+    // The component and the modules beside it that build its fields (#1210): a stepper in any of them is its own.
+    const folder = join(root, 'src', 'form-template');
+    const source = readdirSync(folder).filter((f) => /\.(pdx|ts)$/.test(f)).map((f) => readFileSync(join(folder, f), 'utf8')).join('\n');
 
     it('builds no stepper of its own: its wizard layout is pdx-wizard', () => {
         expect(source).not.toMatch(/['"]tablist['"]/);

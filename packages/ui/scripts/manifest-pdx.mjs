@@ -11,6 +11,38 @@ import {
     scanExportedShapes, declaredFunction, functionParameters, assembleModule,
 } from './manifest-shared.mjs';
 
+/**
+ * The TypeScript modules beside a component that its script imports, and those they import in turn,
+ * each as code with its comments blanked (#1210). A component that builds its DOM from script keeps
+ * the builder beside it — pdx-form-template's fields, in form-template-fields.ts — and the roles that
+ * builder sets are the component's: it renders them. Only `./` imports, the component's own folder; a
+ * `.pdx` import is an @internal view, read by `internalViews`.
+ */
+function besideModules(script, file, readSource) {
+    const dir = file.replace(/[\\/][^\\/]*$/, '');
+    const seen = new Set();
+    const out = [];
+    const visit = (source) => {
+        const sf = ts.createSourceFile('m.ts', source, ts.ScriptTarget.Latest, true);
+        for (const st of sf.statements) {
+            if (!ts.isImportDeclaration(st) || !ts.isStringLiteral(st.moduleSpecifier)) continue;
+            const spec = st.moduleSpecifier.text;
+            // Match: `./name` or `./name.ts`, in this folder. Groups: [1]=the name
+            const m = /^\.\/([\w.-]+?)(?:\.ts)?$/.exec(spec);
+            if (!m || spec.endsWith('.pdx')) continue;
+            const path = `${dir}/${m[1]}.ts`;
+            if (seen.has(path)) continue;
+            seen.add(path);
+            const text = readSource(path);
+            if (text === null) continue;
+            out.push(withoutComments(ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true)));
+            visit(text);
+        }
+    };
+    visit(script);
+    return out;
+}
+
 /** The library's tag prefix: `select.pdx` and `pdx-select.pdx` register `<pdx-select>`. */
 const PREFIX = 'pdx';
 
@@ -128,7 +160,7 @@ export function analyzePdxFile(file, text, categories) {
         }])),
         emitted: new Map(),
         emittedNames: [],
-        roles: scanRoles([template, withoutComments(body), ...viewRoles].join('\n')),
+        roles: scanRoles([template, withoutComments(body), ...viewRoles, ...besideModules(d.script, file, readSource)].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,

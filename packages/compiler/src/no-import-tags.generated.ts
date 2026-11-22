@@ -58,7 +58,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-form-actions',
     'pdx-form-field',
     'pdx-form-section',
-    'pdx-form-template',
     'pdx-grid',
     'pdx-icon',
     'pdx-image',

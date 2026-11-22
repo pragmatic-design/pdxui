@@ -49,3 +49,24 @@ describe('the roles an @internal view draws', () => {
         expect(roles).toEqual(expect.arrayContaining(['grid', 'rowgroup', 'row']));
     });
 });
+
+describe('the roles a module beside the component draws (#1210)', () => {
+    // pdx-form-template builds its fields in form-template-fields.ts, which sets role="group" on a group:
+    // the role is rendered by the component, wherever its builder lives.
+    it('are its own, through the modules that module imports in turn', () => {
+        write('x/pdx-x.pdx', '<template><div></div></template>\n<script>\nimport { build } from \'./x-build\';\nbuild();\n</script>');
+        write('x/x-build.ts', "import { row } from './x-row';\nexport function build() { const el = document.createElement('div'); el.setAttribute('role', 'group'); row(el); }\n");
+        write('x/x-row.ts', "export function row(el: HTMLElement) { el.setAttribute('role', 'row'); }\n");
+        const file = join(root, 'x/pdx-x.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect(mod.declarations[0].roles).toEqual(['group', 'row']);
+    });
+
+    it('the control: a package import is not read, nor a role only in a comment of the module', () => {
+        write('x/pdx-x.pdx', '<template><div></div></template>\n<script>\nimport { signal } from \'@pdxui/core\';\nimport { build } from \'./x-build\';\nbuild(signal);\n</script>');
+        write('x/x-build.ts', "// it once set role=\"note\" here\nexport function build(_s: unknown) {}\n");
+        const file = join(root, 'x/pdx-x.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect(mod.declarations[0].roles ?? []).toEqual([]);
+    });
+});

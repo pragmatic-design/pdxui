@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-template/pdx-form-template';
+import '../../src/form-template/pdx-form-template.pdx';
 
 const CITIES = [
     { label: 'Roma', value: 'rm' },
