@@ -150,7 +150,8 @@ export { errorBoundary } from './renderer/error-boundary';
 
 // Typed snippets (#489): what `@render` compiles to, and what a component draws a parent's snippet with
 export type { SlotFunction } from './renderer/slot';
-export { renderSnippet, declaredSnippet } from './renderer/snippet';
+export { declaredSnippet } from './renderer/snippet';
+export { renderSnippet } from './renderer/render-snippet';
 
 // Helpers
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';
