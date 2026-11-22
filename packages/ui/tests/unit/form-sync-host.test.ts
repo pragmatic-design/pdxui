@@ -10,7 +10,7 @@ import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import * as core from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/radio-group/pdx-radio-group';

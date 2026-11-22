@@ -1,0 +1,163 @@
+<template>
+  <form :class="wrapperClass()" data-part="root" novalidate :autocomplete="autocomplete" @submit="onSubmit" @reset="onReset"><slot></slot></form>
+</template>
+
+<script>
+/**
+ * A form that provides its Form to the controls and form fields inside it and validates them, with
+ * save modes and DataSource integration.
+ *
+ * @cssstate dirty - A value differs from the one the form started from (or was last reset to).
+ * @cssstate valid - The form's `valid()`: no field has an error among the validations run so far.
+ * @cssstate invalid - Its last submit was refused, and an error is still there.
+ * @cssstate submitting - A submit is running (`form.handleSubmit`).
+ *
+ * @csspart root - The native `<form>`.
+ */
+// Wraps <form novalidate>, provides its Form to children through context, and handles submit and
+// scroll-to-first-error. Children (<pdx-form-field>, custom inputs) inject the form with useForm().
+// The form prop is required: create it with createForm() or the @form rune.
+import { provideForm, useFormCoordinator, onDestroy, DEV } from '@pdxui/core';
+import { findRecord } from '../shared/find-record';
+// This component's styles travel with it, so an app ships the CSS of what it renders and no more.
+import '@pdxui/design/components/form';
+
+// Declared (#138): they stay on the host, which the parent listens on.
+/** A submit passed validation: the values, and `saved` when a `source` stored them. */
+@event 'pdx-submit': { values: Record<string, unknown>; saved?: boolean };
+/** The `source` refused the save. */
+@event 'pdx-submit-error': { error: unknown };
+// What its form is (#293), which an agent's page card reads.
+@state dirty = !!form?.dirty();
+@state valid = !!form?.valid();
+@state invalid = refused && !form?.valid();
+@state submitting = !!form?.submitting();
+@part root;
+/** The Form instance (from createForm()). Required. */
+@prop form: Record<string, unknown> | null = null;
+/** Optional name for nested form registration with parent coordinator. */
+@prop name: string = '';
+/** HTML autocomplete attribute. */
+@prop autocomplete: string = 'off';
+/** Scroll to first error field on failed validation. */
+@prop scrollToError: boolean = true;
+/** CSS class for the inner <form> element. */
+@prop formClass: string = '';
+/** DataSource for auto-load/save. When set, submit saves via DS. */
+@prop source: Record<string, unknown> | null = null;
+/** Record ID to load from the DataSource. */
+@prop recordId: string = '';
+
+@host el;
+
+if (DEV && !form) console.warn('<pdx-form> requires a "form" prop (from createForm()).');
+
+// The coordinator a host provides, looked up in the effect below rather than once here: set up before
+// its host, the form would never find it and never register. Kept once found.
+let parentCoordinator;
+const formName = name;
+let providedForm = null;
+let registeredForm = null;
+
+// `form` is read reactively: schema-driven parents (pdx-form-template) dispose the old Form and swap in
+// a new one when the schema changes, and the context and the coordinator follow it, so injecting
+// children always see the live form.
+$effect(() => {
+  const f = form;
+  if (!f) return;
+  if (f !== providedForm) {
+    provideForm(f, el);
+    providedForm = f;
+  }
+  parentCoordinator ??= useFormCoordinator(el);
+  if (parentCoordinator && formName && f !== registeredForm) {
+    parentCoordinator.register(formName, f);
+    registeredForm = f;
+  }
+});
+
+// A refused submit makes the form invalid while it has an error; a passing submit, or a reset, clears
+// it. Its fields are touched from then on, so an error that comes back is shown.
+let refused = $signal(false);
+
+function scrollToFirstError() {
+  if (!scrollToError) return;
+  requestAnimationFrame(() => {
+    // The first control in error: a field marks it aria-invalid (A2). A field in error is a state of its
+    // host since #293, no class on its wrapper.
+    const errorEl = el.querySelector('[aria-invalid="true"]');
+    if (errorEl) {
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // The control itself, or the first input of a group marked in error (a radio group).
+      const input = errorEl.matches('input, textarea, select, [tabindex]')
+        ? errorEl
+        : errorEl.querySelector('input, textarea, select');
+      input?.focus();
+    }
+  });
+}
+
+// DataSource auto-load: when source and recordId are set, load the record into the form. The effect is
+// always registered, not only if source is there at setup: set after the mount, it must still load.
+$effect(() => {
+  const f = form;
+  const s = source;
+  const id = recordId;
+  if (!f || !s || !id) return;
+  // Read to subscribe: getById does not, and a record that arrives later must still load.
+  s.data();
+  // The id as written, then as a number, on the source's own key — `(r.id ?? r.Id) === id` would never
+  // find `{ id: 1 }` for `record-id="1"`.
+  const record = findRecord(s, id);
+  if (record && !f.dirty()) f.reset(record);
+});
+
+function onSubmit(e) {
+  e.preventDefault();
+  const f = form;
+  if (!f) return;
+  // Touch all fields to show errors, then validate.
+  f.validate().then((isValid) => {
+    refused = !isValid;
+    if (!isValid) {
+      scrollToFirstError();
+      return;
+    }
+    const values = f.getValues();
+    const s = source;
+    if (s) {
+      // DataSource auto-save: update the record and sync.
+      s.update(values);
+      s.sync().then(() => {
+        pdxSubmit({ values, saved: true });
+      }).catch((err) => {
+        pdxSubmitError({ error: err });
+      });
+    } else {
+      // Standard submit: the parent handles the event.
+      pdxSubmit({ values });
+    }
+  });
+}
+
+function onReset(e) {
+  e.preventDefault();
+  if (!form) return;
+  refused = false;
+  // Each control shows its field through its model binding, `::value="f.x"` (#128, #613).
+  form.reset();
+}
+
+function wrapperClass() {
+  return formClass ? 'pdx-form ' + formClass : 'pdx-form';
+}
+
+// Destroyed (not frozen by keepAlive, which does not run onDestroy): leave the coordinator, or its
+// dirty/valid/submitting and submitAll keep counting a form that is off the page.
+onDestroy(() => {
+  if (parentCoordinator && formName && registeredForm) {
+    parentCoordinator.unregister(formName);
+    registeredForm = null;
+  }
+});
+</script>

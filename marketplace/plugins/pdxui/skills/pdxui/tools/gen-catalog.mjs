@@ -191,7 +191,8 @@ const pageLink = (c) => `[\`<${c.tag}>\`](../../pdxui-${c.area}/references/${c.t
 function dataSourceUse(c) {
   const dir = join(UISRC, c.tag.replace(/^pdx-/, ''));
   if (c.tag === 'pdx-data-source' || !existsSync(dir)) return null;
-  const src = readdirSync(dir).filter(f => f.endsWith('.ts')).map(f => readFileSync(join(dir, f), 'utf8')).join('\n');
+  // A component's sources are its .ts and, moved to .pdx (#1210), its .pdx.
+  const src = readdirSync(dir).filter(f => f.endsWith('.ts') || f.endsWith('.pdx')).map(f => readFileSync(join(dir, f), 'utf8')).join('\n');
   if (!/\bDataSource\b/.test(src)) return null;
   const ways = [];
   if (c.props.some(p => p.name === 'source')) ways.push('bind one to `:source`');

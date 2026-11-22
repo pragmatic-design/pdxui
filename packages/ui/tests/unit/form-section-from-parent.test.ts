@@ -10,7 +10,7 @@ import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
-import '../../src/form/pdx-form';
+import '../../src/form/pdx-form.pdx';
 import '../../src/input/pdx-input.pdx';
 
 function compiled(filename: string, source: string): string {
