@@ -1,0 +1,543 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxNumberInput",
+  "tagName": "pdx-number-input",
+  "category": "Specialized Inputs",
+  "order": 19,
+  "description": "A number input the user steps by a step, or on the digit before the caret, with a sign toggle\nand locale formatting.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-Infinity",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "Infinity",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "step"
+    },
+    {
+      "kind": "field",
+      "name": "precision",
+      "description": "Decimal places to round/format to (-1 = derive from step).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "precision"
+    },
+    {
+      "kind": "field",
+      "name": "trimZeros",
+      "description": "Show only the decimals the value has, up to `precision`: 29.5 at `precision=\"3\"` is\n\"29.5\", not \"29.500\". The value is still rounded to `precision`, and what the field\nemits does not change.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "trimzeros"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "controls",
+      "description": "'both'=−left +right, 'right'=stacked on right, 'none'=hidden",
+      "type": {
+        "text": "'both' | 'right' | 'none'"
+      },
+      "default": "'both'",
+      "attribute": "controls"
+    },
+    {
+      "kind": "field",
+      "name": "stepMode",
+      "description": "What the arrow keys and the wheel step. `fixed`: one `step`. `caret`: the digit\nbefore the caret — `12|3` ↑ is 133, `1.2|5` ↑ is 1.35 — and the caret stays on that digit.\n`auto`, the default: `caret` with `controls=\"none\"`, `fixed` with steppers shown.",
+      "type": {
+        "text": "'auto' | 'fixed' | 'caret'"
+      },
+      "default": "'auto'",
+      "attribute": "stepmode"
+    },
+    {
+      "kind": "field",
+      "name": "allowWheel",
+      "description": "Allow the mouse wheel to change the value when focused.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "allowwheel"
+    },
+    {
+      "kind": "field",
+      "name": "allowNegative",
+      "description": "Allow negative values (adds a sign toggle).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "allownegative"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale for formatting and for reading a typed value. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "currency",
+      "description": "ISO currency code for currency formatting (e.g. EUR).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "currency"
+    },
+    {
+      "kind": "field",
+      "name": "colorBySign",
+      "description": "Color the number green (positive) / red (negative)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "colorbysign"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
+      "type": {
+        "text": "number | null"
+      },
+      "default": "null",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "selectText",
+      "parameters": [],
+      "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox lost focus."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: number | null }"
+    }
+  ],
+  "roles": [
+    "spinbutton"
+  ],
+  "attributes": [
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-Infinity"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "Infinity"
+    },
+    {
+      "name": "step",
+      "fieldName": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "precision",
+      "fieldName": "precision",
+      "description": "Decimal places to round/format to (-1 = derive from step).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "trimzeros",
+      "fieldName": "trimZeros",
+      "description": "Show only the decimals the value has, up to `precision`: 29.5 at `precision=\"3\"` is\n\"29.5\", not \"29.500\". The value is still rounded to `precision`, and what the field\nemits does not change.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "controls",
+      "fieldName": "controls",
+      "description": "'both'=−left +right, 'right'=stacked on right, 'none'=hidden",
+      "type": {
+        "text": "'both' | 'right' | 'none'"
+      },
+      "default": "'both'"
+    },
+    {
+      "name": "stepmode",
+      "fieldName": "stepMode",
+      "description": "What the arrow keys and the wheel step. `fixed`: one `step`. `caret`: the digit\nbefore the caret — `12|3` ↑ is 133, `1.2|5` ↑ is 1.35 — and the caret stays on that digit.\n`auto`, the default: `caret` with `controls=\"none\"`, `fixed` with steppers shown.",
+      "type": {
+        "text": "'auto' | 'fixed' | 'caret'"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "allowwheel",
+      "fieldName": "allowWheel",
+      "description": "Allow the mouse wheel to change the value when focused.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "allownegative",
+      "fieldName": "allowNegative",
+      "description": "Allow negative values (adds a sign toggle).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale for formatting and for reading a typed value. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "currency",
+      "fieldName": "currency",
+      "description": "ISO currency code for currency formatting (e.g. EUR).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "colorbysign",
+      "fieldName": "colorBySign",
+      "description": "Color the number green (positive) / red (negative)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
+      "type": {
+        "text": "number | null"
+      },
+      "default": "null"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The group: the field and its stepper buttons."
+    },
+    {
+      "name": "field",
+      "description": "The frame around the text: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<input>` that shows the formatted number."
+    },
+    {
+      "name": "decrement",
+      "description": "The button that steps down."
+    },
+    {
+      "name": "increment",
+      "description": "The button that steps up."
+    },
+    {
+      "name": "sign",
+      "description": "The sign button, with `allow-negative`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set."
+    },
+    {
+      "name": "negative",
+      "description": "With `color-by-sign`, the number is below zero."
+    },
+    {
+      "name": "positive",
+      "description": "With `color-by-sign`, the number is above zero."
+    }
+  ]
+}

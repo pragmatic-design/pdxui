@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 
 type NumberInput = HTMLElement & { value: number | null; allowNegative?: boolean };
 

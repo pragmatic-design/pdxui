@@ -17,7 +17,7 @@ import '../../src/textarea/pdx-textarea.pdx';
 import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/masked-input/pdx-masked-input.pdx';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/checkbox/pdx-checkbox.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/radio/pdx-radio.pdx';

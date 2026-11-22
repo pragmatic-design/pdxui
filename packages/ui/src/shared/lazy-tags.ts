@@ -10,7 +10,7 @@
 
 const LOADERS = {
     'pdx-input': () => import('../input/pdx-input.pdx'),
-    'pdx-number-input': () => import('../number-input/pdx-number-input'),
+    'pdx-number-input': () => import('../number-input/pdx-number-input.pdx'),
     'pdx-select': () => import('../select/pdx-select'),
     'pdx-date-picker': () => import('../date-picker/pdx-date-picker'),
     'pdx-form-field': () => import('../form-field/pdx-form-field.pdx'),

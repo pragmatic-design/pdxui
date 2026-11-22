@@ -8,7 +8,7 @@ import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/textarea/pdx-textarea.pdx';
 import '../../src/masked-input/pdx-masked-input.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/otp-input/pdx-otp-input';
 import '../../src/label/pdx-label';
 import '../../src/form-field/pdx-form-field.pdx';

@@ -48,7 +48,7 @@ import '../form-field/pdx-form-field.pdx';
 // The controls of TYPE_TAG, rendered by this component and registered by nobody else: an app's compiler
 // imports the tags its templates name, and these are built from script (#293).
 import '../input/pdx-input.pdx';
-import '../number-input/pdx-number-input';
+import '../number-input/pdx-number-input.pdx';
 import '../textarea/pdx-textarea.pdx';
 import '../select/pdx-select';
 import '../checkbox/pdx-checkbox.pdx';

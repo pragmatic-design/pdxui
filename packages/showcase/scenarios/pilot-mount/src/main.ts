@@ -16,7 +16,7 @@
 import '../../../../ui/src/button/pdx-button.pdx';
 import '../../../../ui/src/select/pdx-select';
 import '../../../../ui/src/input/pdx-input.pdx';
-import '../../../../ui/src/number-input/pdx-number-input';
+import '../../../../ui/src/number-input/pdx-number-input.pdx';
 import '../../../../ui/src/date-picker/pdx-date-picker';
 import { buildFilterPopoverContent, type FilterConditionState, type FilterFieldInfo } from '../../../../ui/src/shared/filter-popover';
 

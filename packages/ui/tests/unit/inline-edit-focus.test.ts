@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
 import '../../src/inline-edit/pdx-inline-edit';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 
 type InlineEdit = HTMLElement & { value: unknown };
 
