@@ -231,7 +231,8 @@ export function projectScriptMapped(
             // A name the script declares itself is that declaration (#999), typed where it is written:
             // the compiler's analyzer says which names are the part's own.
             partSignals ??= new Set(analyzeScript(s, 'projection.pdx').signals.filter((sig) => sig.part).map((sig) => sig.name));
-            const list = /^\s+([\w\s,]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            // A hyphenated name (#1299) is listed too: it is no identifier, has no signal, and is skipped below.
+            const list = /^\s+([\w\s,-]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             for (const name of list ? list[1].split(',').map((n) => n.trim()).filter(Boolean) : []) {
                 if (!partSignals.has(name)) continue;
                 emitters.push((partCounts?.get(name) ?? 0) > 1 ? `var ${name}: HTMLElement[];` : `var ${name}: HTMLElement | null;`);

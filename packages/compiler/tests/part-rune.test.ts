@@ -97,6 +97,34 @@ describe('@part(external): a part the script writes outside the template (#1284)
     });
 });
 
+describe('a @part with a hyphenated name (#1299)', () => {
+    const template = '<div data-part="root"><span data-part="word-count">3</span></div>';
+
+    it('is declared, with no diagnostic, and listed in the descriptor', () => {
+        const all = [...analyzeScript('@part root, word-count;', 'test.pdx').warnings,
+            ...validate(analyzeScript('@part root, word-count;', 'test.pdx'), parseTemplate(template), 'test.pdx')];
+        expect(all.filter(w => w.severity === 'error').map(w => w.code)).toEqual([]);
+        const { code } = compile(pdx(template, '@part root, word-count;'), 'test.pdx');
+        expect(code).toContain(`parts: ['root', 'word-count'],`);
+    });
+
+    it('is a styling name only: no signal and no ref, the script cannot name it', () => {
+        const { code } = compile(pdx(template, '@part root, word-count;\nfunction f() { root?.focus(); }'), 'test.pdx');
+        expect(code).not.toMatch(/word-count = signal|__word|ctx\.word/);
+        expect(markup(code).join('')).toContain('data-part="word-count"');
+        // The control: the identifier beside it keeps its ref.
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+    });
+
+    it('the control: an undeclared hyphenated data-part is still PDX_PART_UNDECLARED', () => {
+        expect(codes(template, '@part root;', 'PDX_PART_UNDECLARED').map(w => w.message)).toEqual(["data-part 'word-count' names no part the script declares."]);
+    });
+
+    it('@part(external) takes one too', () => {
+        expect(analyzeScript("@part(external) row-head;\nfunction m(el) { el.dataset.part = 'row-head'; }", 'test.pdx').externalParts).toEqual(['row-head']);
+    });
+});
+
 describe('@part compiles into a ref and the descriptor', () => {
     // A part's ref is for what reads it (#1268): these read it.
     it('the element is the part\'s ref, and keeps its data-part', () => {

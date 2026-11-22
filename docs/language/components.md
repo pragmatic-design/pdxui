@@ -404,8 +404,9 @@ beta (#132)
 ### Syntax
 
 ```ebnf
-PartDecl      ::= "@part" ( "(external)" )? S Identifier ( S? "," S? Identifier )* End
-PartAttribute ::= 'data-part="' Identifier '"'
+PartDecl      ::= "@part" ( "(external)" )? S PartName ( S? "," S? PartName )* End
+PartName      ::= [A-Za-z_$] [A-Za-z0-9_$-]*
+PartAttribute ::= 'data-part="' PartName '"'
 ```
 
 ### Semantics

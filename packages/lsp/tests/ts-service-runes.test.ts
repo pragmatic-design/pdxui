@@ -104,6 +104,11 @@ describe('the rune declarations', () => {
         expect(diagnose(`${script}panel;\n`)).toEqual([expect.stringMatching(/Cannot find name 'panel'/)]);
     });
 
+    it('a @part with a hyphenated name is no code and declares no name (#1299)', () => {
+        const script = '@part root, word-count;\nfunction f() { root?.focus(); }\nf;\n';
+        expect(diagnose(script, '<div data-part="root"><span data-part="word-count"></span></div>')).toEqual([]);
+    });
+
     it('a @part the template renders more than once is the array of its elements (#988)', () => {
         const script = '@part option, search;\nlet items = $signal([1]);\nlet a = $signal(true);\nfunction f() { option.forEach((o) => o.focus()); search?.focus(); }\nf;\n';
         const template = '@for (items as it; track it) { <li data-part="option">{{ it }}</li> }<li data-part="option">+</li>'

@@ -536,8 +536,9 @@ alpha
 #### Syntax
 
 ```ebnf
-PartDecl      ::= "@part" ( "(external)" )? S Identifier ( S? "," S? Identifier )* S? ";"?
-PartAttribute ::= 'data-part="' Identifier '"'
+PartDecl      ::= "@part" ( "(external)" )? S PartName ( S? "," S? PartName )* S? ";"?
+PartName      ::= [A-Za-z_$] [A-Za-z0-9_$-]*
+PartAttribute ::= 'data-part="' PartName '"'
 ```
 
 The analyzer's form: `@part trigger, popup;`, and `data-part="popup"` on the element.
@@ -583,6 +584,9 @@ element or `null`.
   fill it. The compiler reads the writes instead, a literal `setAttribute('data-part', 'panel')` or
   `.dataset.part = 'panel'`, outside comments: with none, `PDX_PART_EXTERNAL_UNWRITTEN`; a
   `data-part="panel"` in the template contradicts the declaration, `PDX_PART_EXTERNAL_DRAWN`.
+- A part's name may have a hyphen, `@part word-count;` (#1299): a styling name, `[data-part="word-count"]`,
+  which the script cannot name, as it is no identifier. It has no ref, and keeps its `data-part`, its
+  descriptor entry, its manifest entry and its diagnostics.
 
 #### Examples
 
