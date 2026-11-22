@@ -25,7 +25,7 @@ import '../textarea/pdx-textarea.pdx';
 import '../password-input/pdx-password-input.pdx';
 import '../search-input/pdx-search-input.pdx';
 import '../masked-input/pdx-masked-input.pdx';
-import '../number-input/pdx-number-input';
+import '../number-input/pdx-number-input.pdx';
 import '../date-picker/pdx-date-picker';
 import '../select/pdx-select';
 import '../autocomplete/pdx-autocomplete';

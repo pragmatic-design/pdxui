@@ -15,7 +15,7 @@ import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
 import '../../src/input/pdx-input.pdx';
 import '../../src/textarea/pdx-textarea.pdx';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/masked-input/pdx-masked-input.pdx';

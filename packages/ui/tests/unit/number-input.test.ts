@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { required } from '@pdxui/core';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/inline-edit/pdx-inline-edit';
 
 type NumberInput = HTMLElement & { value: number | null };
@@ -30,7 +30,8 @@ async function mountNumber(attrs: Record<string, string> = {}): Promise<{ el: Nu
     for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
     document.body.appendChild(el);
     const input = await until(() => el.querySelector('input'), 'the inner input');
-    await until(() => (input.onkeydown ? input : null), 'the input handlers');
+    // The field's handlers are its template's, bound at render (#1210): the inner input, found above,
+    // already listens. The TypeScript version set them in onMount, as `onkeydown`, which was waited for.
     return { el, input };
 }
 

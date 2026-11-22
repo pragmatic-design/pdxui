@@ -5,7 +5,7 @@
 // as 25 in one component and as 2.5 in another.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { resolveLocale } from '../../src/shared/locale';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/date-picker/pdx-date-picker';
 
 type NumberInput = HTMLElement & { value: number };
@@ -37,7 +37,8 @@ function mountIn(lang: string | null, tag: string, attrs: Record<string, string>
 
 async function typeAndCommit(el: HTMLElement, text: string): Promise<HTMLInputElement> {
     const input = await until(() => el.querySelector('input'), 'the inner input');
-    await until(() => (input.onkeydown ? input : null), 'the input handlers');
+    // The field's handlers are its template's, bound at render (#1210): the inner input, found above,
+    // already listens. The TypeScript version set them in onMount, as `onkeydown`, which was waited for.
     input.value = text;
     input.dispatchEvent(new Event('input', { bubbles: true }));
     input.dispatchEvent(new FocusEvent('blur'));
@@ -122,7 +123,8 @@ describe('pdx-number-input free mode: the step follows the digit under the curso
     async function stepAt(lang: string, value: string, cursor: number): Promise<number> {
         const el = mountIn(lang, 'pdx-number-input', { controls: 'none', step: '0.1', value }) as NumberInput;
         const input = await until(() => el.querySelector('input'), 'the inner input');
-        await until(() => (input.onkeydown ? input : null), 'the input handlers');
+        // The field's handlers are its template's, bound at render (#1210): the inner input, found above,
+        // already listens. The TypeScript version set them in onMount, as `onkeydown`, which was waited for.
         await frames(2);
         input.setSelectionRange(cursor, cursor);
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));

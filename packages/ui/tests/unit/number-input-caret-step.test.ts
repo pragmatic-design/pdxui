@@ -8,7 +8,7 @@
 // (999 → 1,099).
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/number-input/pdx-number-input';
+import '../../src/number-input/pdx-number-input.pdx';
 
 type NumberInput = HTMLElement & { value: number | null };
 
@@ -27,7 +27,8 @@ async function mount(attrs: Record<string, string>): Promise<{ el: NumberInput; 
     for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
     document.body.appendChild(el);
     const input = await until(() => el.querySelector('input'), 'the inner input');
-    await until(() => (input.onkeydown ? input : null), 'the input handlers');
+    // The field's handlers are its template's, bound at render (#1210): the inner input, found above,
+    // already listens. The TypeScript version set them in onMount, as `onkeydown`, which was waited for.
     await until(() => (input.value !== '' ? input : null), 'the displayed value');
     return { el, input };
 }

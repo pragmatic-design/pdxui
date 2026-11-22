@@ -69,11 +69,6 @@
       "types": "./dist/form-template/pdx-form-template.d.ts",
       "import": "./dist/form-template/pdx-form-template.js"
     },
-    "./number-input": {
-      "development": "./src/number-input/pdx-number-input.ts",
-      "types": "./dist/number-input/pdx-number-input.d.ts",
-      "import": "./dist/number-input/pdx-number-input.js"
-    },
     "./otp-input": {
       "development": "./src/otp-input/pdx-otp-input.ts",
       "types": "./dist/otp-input/pdx-otp-input.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/toggle/pdx-toggle.pdx",
       "types": "./dist/toggle/pdx-toggle.d.ts",
       "import": "./dist/toggle/pdx-toggle.js"
+    },
+    "./number-input": {
+      "development": "./src/number-input/pdx-number-input.pdx",
+      "types": "./dist/number-input/pdx-number-input.d.ts",
+      "import": "./dist/number-input/pdx-number-input.js"
     },
     "./package.json": "./package.json"
   },

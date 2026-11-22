@@ -20945,7 +20945,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/number-input/pdx-number-input.ts",
+      "path": "src/number-input/pdx-number-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -21497,7 +21497,7 @@
           "name": "pdx-number-input",
           "declaration": {
             "name": "PdxNumberInput",
-            "module": "src/number-input/pdx-number-input.ts"
+            "module": "src/number-input/pdx-number-input.pdx"
           }
         }
       ]

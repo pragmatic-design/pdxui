@@ -17,7 +17,7 @@ import { uiString, format } from '../shared/i18n';
 import '@pdxui/design/components/json-editor';
 import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
 import '../input/pdx-input.pdx'; // rendered by this component, and registered by nobody else
-import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
+import '../number-input/pdx-number-input.pdx'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else
 import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
 import '../tag-input/pdx-tag-input.pdx'; // rendered by this component, and registered by nobody else
