@@ -948,7 +948,7 @@ class InlineGen {
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
         if (this.ctx.ssr) return { code: `${g.lines.join('')}return ${g.tree.serverLiteral(this.imports)};`, tags: g.tags };
-        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate).join('')}${g.lines.join('')}return ${this.blockResult()};`, tags: g.tags };
+        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix).join('')}${g.lines.join('')}return ${this.blockResult()};`, tags: g.tags };
     }
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
@@ -1286,7 +1286,7 @@ class InlineGen {
         }
         // On the server (#160) the render returns its markup as html``, with no builder or walk.
         const ret = this.ctx.ssr ? this.tree.serverLiteral(this.imports) : this.blockResult();
-        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate);
+        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix);
         // One keyed selector per signal a @for compares its key with (#117), owned by the render.
         const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
         if (selectors.length > 0) this.imports.add('selector');

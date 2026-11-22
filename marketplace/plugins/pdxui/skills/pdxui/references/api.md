@@ -5495,7 +5495,7 @@ Usage:
 ```ts
 import { staticBlock } from '@pdxui/core';
 
-function staticBlock(build: (frag: DocumentFragment, doc: Document) => void): () => DocumentFragment
+function staticBlock(build: (frag: DocumentFragment, doc: Document) => void, imported = false): () => DocumentFragment
 ```
 
 The static markup of one block of a compiled template — the root, an `@if` branch, an `@for` row —
@@ -5506,10 +5506,11 @@ The markup is built on the first call, not at import (#93), into a `<template>`'
 document has no custom-element registry and loads nothing, so no component constructor runs and no
 image is fetched while it is built.
 
-A block that holds a component is copied with `importNode`, which brings the copy into the page and
-upgrades its components before the bindings set their properties, as `createElement` did. A block
-that holds none has nothing to upgrade: it is copied with `cloneNode`, and adopted by the page when
-it is inserted, as `html```'s copies are (#1282).
+Each call clones it, and the page adopts the copy when it is inserted, as `html```'s copies are: a
+component in it is upgraded then, and a property a binding set before is taken over by a PDX
+component at its upgrade (#1296). `imported` copies with `importNode` instead, which upgrades the
+components in the copy before the bindings run, as `createElement` did: the compiler asks for it when
+the block holds an element that is not PDX's, whose definition may not take over such a property.
 
 ### `staticMarkup`
 

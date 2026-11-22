@@ -57,15 +57,41 @@ describe('staticBlock', () => {
         }
     });
 
-    it('the control: a block with a custom element is imported, which upgrades it before the bindings', () => {
-        class StaticBlockNested extends HTMLElement {}
+    it('a block with a component is cloned too, and the component upgraded once it is inserted (#1296)', () => {
+        // importNode of a block holding pdx-form mounted pdx-form-template 1.83x its TypeScript version;
+        // cloned, 0.48x. A PDX component takes over a property set before its upgrade.
+        class StaticBlockNested extends HTMLElement {
+            seen: unknown = 'constructor';
+            connectedCallback() { this.seen = Object.prototype.hasOwnProperty.call(this, 'value') ? 'kept' : 'lost'; }
+        }
         customElements.define('static-block-nested', StaticBlockNested);
         const block = staticBlock(staticMarkup('<div><static-block-nested></static-block-nested></div>'));
         const importNode = vi.spyOn(document, 'importNode');
         try {
             const frag = block();
+            expect(importNode).not.toHaveBeenCalled();
+            const nested = frag.firstChild!.firstChild as HTMLElement & { value?: unknown };
+            // A binding writes before the insertion, on an element not upgraded yet.
+            nested.value = 42;
+            document.body.appendChild(frag);
+            const upgraded = document.body.querySelector('static-block-nested')!;
+            expect(upgraded).toBeInstanceOf(StaticBlockNested);
+            expect((upgraded as HTMLElement & { value?: unknown }).value).toBe(42);
+            upgraded.parentElement!.remove();
+        } finally {
+            importNode.mockRestore();
+        }
+    });
+
+    it('the control: a block the compiler marks as holding a third-party element is imported, upgraded before the bindings', () => {
+        class StaticBlockForeign extends HTMLElement {}
+        customElements.define('static-block-foreign', StaticBlockForeign);
+        const block = staticBlock(staticMarkup('<div><static-block-foreign></static-block-foreign></div>'), true);
+        const importNode = vi.spyOn(document, 'importNode');
+        try {
+            const frag = block();
             expect(importNode).toHaveBeenCalledTimes(1);
-            expect(frag.firstChild!.firstChild).toBeInstanceOf(StaticBlockNested);
+            expect(frag.firstChild!.firstChild).toBeInstanceOf(StaticBlockForeign);
         } finally {
             importNode.mockRestore();
         }
@@ -90,10 +116,15 @@ describe('staticBlock', () => {
         expect([frag.lastChild!.nodeType, frag.lastChild!.nodeValue]).toEqual([8, ' note ']);
     });
 
-    it('a component in the markup is the defined component in the copy', () => {
+    it('a component in the markup is the defined component once the copy is inserted', () => {
         class StaticBlockProbe extends HTMLElement {}
         customElements.define('static-block-probe', StaticBlockProbe);
         const block = staticBlock((frag, d) => { frag.appendChild(d.createElement('static-block-probe')); });
-        expect(block().firstChild).toBeInstanceOf(StaticBlockProbe);
+        const frag = block();
+        const probe = frag.firstChild as Element;
+        document.body.appendChild(frag);
+        expect(document.body.lastElementChild).toBeInstanceOf(StaticBlockProbe);
+        expect(document.body.lastElementChild).toBe(document.body.querySelector('static-block-probe'));
+        (document.body.querySelector('static-block-probe') ?? probe).remove();
     });
 });
