@@ -424,7 +424,15 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // 1.02× alone with its wiring module (3,513 against 3,461 B). The whole JavaScript grows while html``
 // stays for the components not yet moved: CI's line read 479.7 KB before the field's $derived, which
 // adds a few bytes more, so the whole kilobyte is kept.
-const BUDGET_KB = { entry: 43.5, js: 480.0, css: 67, blocking: 102.6 };
+// js 480.0 → 481.0 (the same standing OK for #1210's batches, at its +1 KB): pdx-masked-input and
+// pdx-tag-input move to .pdx, each lighter alone (0.75× with its mask module, 0.93×). pdx-tag-input is
+// the first of the showcase's components to render a snippet with `@render` and its chips with a keyed
+// `@for`, whose runtime the showcase did not carry before: its chunk +613 B, masked-input's +127 B, the
+// whole +1.0 KB. That runtime is a module of its own, core's renderer/render-snippet.ts: in
+// renderer/snippet.ts, beside the `declaredSnippet` most components read, it went into the chunk that
+// loads before the first paint (blocking 102.5 → 102.7). The built dist: blocking 102.5 KB (unchanged),
+// entry 43.5 KB, js 480.3 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 481.0, css: 67, blocking: 102.6 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

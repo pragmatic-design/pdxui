@@ -14,7 +14,7 @@ import '../../src/carousel/pdx-carousel';
 import '../../src/field-list/pdx-field-list.pdx';
 import '../../src/file-upload/pdx-file-upload';
 import '../../src/mention/pdx-mention';
-import '../../src/tag-input/pdx-tag-input';
+import '../../src/tag-input/pdx-tag-input.pdx';
 
 type Scope = Record<string, unknown>;
 type Args = unknown[];

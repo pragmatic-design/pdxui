@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/masked-input/pdx-masked-input';
+import '../../src/masked-input/pdx-masked-input.pdx';
 
 type Masked = HTMLElement & { value: string; getFormatted(): string; isValid(): boolean };
 
@@ -149,6 +149,20 @@ describe('pdx-masked-input — a pending frame does not undo a later write', () 
 
         await tick(40);
         expect(input.value, 'the first frame overwrote the second keystroke').toBe('12/25');
+    });
+
+    // A keystroke the mask rejects leaves the formatted text as it was: the field must read it back in
+    // the same event, not a frame later, or the rejected character shows until the frame lands.
+    it('a rejected keystroke is gone from the field in the same event', async () => {
+        const { el, input } = await mountMask('phone');
+        await type(input, '5');
+        expect(input.value).toBe('(5');
+
+        input.value = '(5a';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        expect(input.value, 'the letter stays in the field until the next frame').toBe('(5');
+        expect(el.getFormatted()).toBe('(5');
+        expect(el.value).toBe('5');
     });
 
     it('the exposed clear() survives a pending frame', async () => {

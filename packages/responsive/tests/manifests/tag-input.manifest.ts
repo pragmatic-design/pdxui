@@ -2,7 +2,7 @@
  * MANIFEST — pdx-tag-input
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/tag-input/pdx-tag-input.ts
+ *  - source: packages/ui/src/tag-input/pdx-tag-input.pdx
  *      the HOST <pdx-tag-input> (CSS host: display:block) → render: an inner
  *        <div class="pdx-tag-input pdx-input-wrap" data-part="root"  ← sized by the host's size (#627)
  *             role="group" :aria-label="label || 'Tag input'" :aria-busy @click=onWrapClick>

@@ -1,0 +1,462 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTagInput",
+  "tagName": "pdx-tag-input",
+  "category": "Specialized Inputs",
+  "order": 26,
+  "description": "A text field where the user enters several tags, shown as chips, with paste support and\nduplicates prevented.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "maxTags",
+      "description": "Maximum number of tags allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxtags"
+    },
+    {
+      "kind": "field",
+      "name": "maxLength",
+      "description": "Maximum length of a single tag.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxlength"
+    },
+    {
+      "kind": "field",
+      "name": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "string"
+      },
+      "default": "','",
+      "attribute": "separator"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "allowDuplicates",
+      "description": "Allow the same tag more than once.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "allowduplicates"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The tags. A form submits one entry per tag under the name, and resets it (#135).",
+      "type": {
+        "text": "string[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "method",
+      "name": "addTag",
+      "parameters": [
+        {
+          "name": "raw",
+          "type": {
+            "text": "string"
+          }
+        }
+      ],
+      "description": "Add one tag, trimmed. Returns false and adds nothing when validation refuses it: a duplicate, one over `max`, or one off `pattern`."
+    },
+    {
+      "kind": "method",
+      "name": "removeTag",
+      "parameters": [
+        {
+          "name": "index",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Remove the tag at this index and emit `pdx-remove`; an index outside the list does nothing."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "getTags",
+      "parameters": [],
+      "description": "A copy of the current tags — mutating it changes nothing."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "tags": "$event.detail.value",
+    "value": "$event.detail.value"
+  },
+  "alphaRename": {
+    "pdx-input": "draft-change"
+  },
+  "events": [
+    {
+      "name": "draft-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The text typed into the field, before it becomes a tag.",
+      "detail": "{ value: string }"
+    },
+    {
+      "name": "pdx-add",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A tag was added.",
+      "detail": "{ tag: string; tags: string[] }"
+    },
+    {
+      "name": "pdx-remove",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A tag was removed.",
+      "detail": "{ tag: string; index: number; tags: string[] }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string[] }"
+    }
+  ],
+  "roles": [
+    "group",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "maxtags",
+      "fieldName": "maxTags",
+      "description": "Maximum number of tags allowed.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxlength",
+      "fieldName": "maxLength",
+      "description": "Maximum length of a single tag.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "separator",
+      "fieldName": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "string"
+      },
+      "default": "','"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "allowduplicates",
+      "fieldName": "allowDuplicates",
+      "description": "Allow the same tag more than once.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "tag",
+      "description": "Renders one tag: a snippet `tag(tag, index)`.",
+      "signature": "(tag: string, index: number)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, `role=\"group\"`: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`."
+    },
+    {
+      "name": "tag",
+      "description": "One tag, a chip."
+    },
+    {
+      "name": "remove",
+      "description": "A tag's remove button, while neither `disabled` nor `readonly`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set; the text box is aria-invalid."
+    },
+    {
+      "name": "success",
+      "description": "`success` is set."
+    },
+    {
+      "name": "warning",
+      "description": "`warning` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set; the group is aria-busy."
+    }
+  ]
+}

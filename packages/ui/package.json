@@ -74,11 +74,6 @@
       "types": "./dist/number-input/pdx-number-input.d.ts",
       "import": "./dist/number-input/pdx-number-input.js"
     },
-    "./masked-input": {
-      "development": "./src/masked-input/pdx-masked-input.ts",
-      "types": "./dist/masked-input/pdx-masked-input.d.ts",
-      "import": "./dist/masked-input/pdx-masked-input.js"
-    },
     "./otp-input": {
       "development": "./src/otp-input/pdx-otp-input.ts",
       "types": "./dist/otp-input/pdx-otp-input.d.ts",
@@ -193,11 +188,6 @@
       "development": "./src/color-picker/pdx-color-picker.ts",
       "types": "./dist/color-picker/pdx-color-picker.d.ts",
       "import": "./dist/color-picker/pdx-color-picker.js"
-    },
-    "./tag-input": {
-      "development": "./src/tag-input/pdx-tag-input.ts",
-      "types": "./dist/tag-input/pdx-tag-input.d.ts",
-      "import": "./dist/tag-input/pdx-tag-input.js"
     },
     "./file-upload": {
       "development": "./src/file-upload/pdx-file-upload.ts",
@@ -658,6 +648,16 @@
       "development": "./src/textarea/pdx-textarea.pdx",
       "types": "./dist/textarea/pdx-textarea.d.ts",
       "import": "./dist/textarea/pdx-textarea.js"
+    },
+    "./masked-input": {
+      "development": "./src/masked-input/pdx-masked-input.pdx",
+      "types": "./dist/masked-input/pdx-masked-input.d.ts",
+      "import": "./dist/masked-input/pdx-masked-input.js"
+    },
+    "./tag-input": {
+      "development": "./src/tag-input/pdx-tag-input.pdx",
+      "types": "./dist/tag-input/pdx-tag-input.d.ts",
+      "import": "./dist/tag-input/pdx-tag-input.js"
     },
     "./package.json": "./package.json"
   },
