@@ -20,7 +20,7 @@ import '../input/pdx-input.pdx'; // rendered by this component, and registered b
 import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else
 import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
-import '../tag-input/pdx-tag-input'; // rendered by this component, and registered by nobody else
+import '../tag-input/pdx-tag-input.pdx'; // rendered by this component, and registered by nobody else
 
 type Ctrl = { el: HTMLElement; read: () => unknown };
 /**

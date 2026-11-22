@@ -34,12 +34,14 @@ const PORTED: Record<string, string> = {
     'pdx-input': 'src/input/pdx-input.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
+    'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',
     'pdx-password-input': 'src/password-input/pdx-password-input.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',
     'pdx-radio': 'src/radio/pdx-radio.pdx',
     'pdx-radio-group': 'src/radio-group/pdx-radio-group.pdx',
     'pdx-search-input': 'src/search-input/pdx-search-input.pdx',
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
+    'pdx-tag-input': 'src/tag-input/pdx-tag-input.pdx',
     'pdx-textarea': 'src/textarea/pdx-textarea.pdx',
 };
 

@@ -19119,7 +19119,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/masked-input/pdx-masked-input.ts",
+      "path": "src/masked-input/pdx-masked-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -19426,7 +19426,7 @@
           "name": "pdx-masked-input",
           "declaration": {
             "name": "PdxMaskedInput",
-            "module": "src/masked-input/pdx-masked-input.ts"
+            "module": "src/masked-input/pdx-masked-input.pdx"
           }
         }
       ]
@@ -30355,7 +30355,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tag-input/pdx-tag-input.ts",
+      "path": "src/tag-input/pdx-tag-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -30826,7 +30826,7 @@
           "name": "pdx-tag-input",
           "declaration": {
             "name": "PdxTagInput",
-            "module": "src/tag-input/pdx-tag-input.ts"
+            "module": "src/tag-input/pdx-tag-input.pdx"
           }
         }
       ]

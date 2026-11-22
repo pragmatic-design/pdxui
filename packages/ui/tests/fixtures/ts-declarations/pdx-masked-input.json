@@ -1,0 +1,298 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxMaskedInput",
+  "tagName": "pdx-masked-input",
+  "category": "Specialized Inputs",
+  "order": 22,
+  "description": "An input that formats what the user types to a pattern, a built-in preset such as phone, card or\ndate, or a custom one.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "mask",
+      "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "mask"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "placeholderChar",
+      "description": "Character shown for unfilled positions",
+      "type": {
+        "text": "string"
+      },
+      "default": "'_'",
+      "attribute": "placeholderchar"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The value. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "selectText",
+      "parameters": [],
+      "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
+    },
+    {
+      "kind": "method",
+      "name": "getFormatted",
+      "parameters": [],
+      "description": "The value as shown, with the mask's literals: `(555) 123-4567` for `5551234567`."
+    },
+    {
+      "kind": "method",
+      "name": "isValid",
+      "parameters": [],
+      "description": "False while a complete date or time preset value is out of range."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value",
+    "formatted": "$event.currentTarget.getFormatted()",
+    "valid": "$event.currentTarget.isValid()"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The textbox lost focus."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "mask",
+      "fieldName": "mask",
+      "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "placeholderchar",
+      "fieldName": "placeholderChar",
+      "description": "Character shown for unfilled positions",
+      "type": {
+        "text": "string"
+      },
+      "default": "'_'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The value. A form submits it, and an empty entry when it is empty, as a text input does (#135).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<input>` that shows the masked text."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set, or a complete date or time preset value is out of range."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ]
+}

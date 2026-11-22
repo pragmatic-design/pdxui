@@ -1,0 +1,261 @@
+<template>
+  <div class="pdx-tag-input pdx-input-wrap" data-part="root"
+    role="group"
+    :aria-label="label || uiString('tag-input', 'label')"
+    :aria-busy="loading ? 'true' : null"
+    @click="onWrapClick">
+    @for (tags as t, i; track i) {
+      <span class="pdx-chip pdx-chip-sm" data-part="tag">
+        @render tag?.(t, i) @else { <span>{{ t }}</span> }
+        @if (!disabled && !readonly) {
+          <button class="pdx-chip-remove" data-part="remove"
+            :aria-label="format(uiString('tag-input', 'remove'), { tag: t })"
+            @click="onRemoveClick($event, i)">×</button>
+        }
+      </span>
+    }
+    @if (!disabled && !readonly && !isAtLimit()) {
+      <input class="pdx-tag-input-field" data-part="input" :ref="inputEl"
+        type="text"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+        ::value="inputValue"
+        :placeholder="tags.length === 0 ? placeholder : ''"
+        :disabled="disabled"
+        :readonly="readonly"
+        :aria-label="label || uiString('tag-input', 'add')"
+        :aria-invalid="error ? 'true' : null"
+        @input="onInput"
+        @keydown="onKeydown"
+        @paste="onPaste" />
+    }
+  </div>
+  <span class="pdx-sr-only" role="status" aria-live="polite">{{ announcement }}</span>
+</template>
+
+<script>
+/**
+ * A text field where the user enters several tags, shown as chips, with paste support and
+ * duplicates prevented.
+ *
+ * @slot tag - Renders one tag: a snippet `tag(tag, index)`.
+ *
+ * @csspart root - The frame, `role="group"`: border, background and the states' colours.
+ * @csspart input - The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`.
+ * @csspart tag - One tag, a chip.
+ * @csspart remove - A tag's remove button, while neither `disabled` nor `readonly`.
+ *
+ * @cssstate invalid - `error` is set; the text box is aria-invalid.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set; the group is aria-busy.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail tags $event.detail.value
+ * @alphadetail value $event.detail.value
+ * @alpharename pdx-input draft-change
+ */
+// pdx-tag-input — Multi-tag input with chip rendering, paste support, keyboard nav.
+// Uses .pdx-input-wrap for consistent border/focus and .pdx-chip for tag rendering.
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/tag-input';
+// The tags are drawn with .pdx-chip, which chip.css owns.
+import '@pdxui/design/components/chip';
+
+// The tags (#481). Adding one, removing one and clear() write them, and the write dispatches
+// `value-change`. The text being typed is not the value: it is announced with `draft-change`.
+/** The tags. A form submits one entry per tag under the name, and resets it (#135). */
+@model value: string[] = [] { form };
+/** The text typed into the field, before it becomes a tag. */
+@event 'draft-change': { value: string };
+/** A tag was added. */
+@event 'pdx-add': { tag: string; tags: string[] };
+/** A tag was removed. */
+@event 'pdx-remove': { tag: string; index: number; tags: string[] };
+// The visual states, on the host as custom states (#132), as pdx-input's: the frame is the host's
+// child `.pdx-input-wrap`, which inputs.css draws from them. It carries no state class of its own.
+@state invalid = !!error;
+@state success = !!success;
+@state warning = !!warning;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state loading = !!loading;
+// pdx-ignore PDX_PART_NAME_TAKEN: `tag` is the theme's part on each chip; the script's `tag` is the snippet
+@part root, input, tag, remove;
+// The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+@prop placeholder: string = '';
+@prop maxTags: number = 0;
+@prop maxLength: number = 0;
+@prop separator: string = ',';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop allowDuplicates: boolean = false;
+@prop name: string = '';
+@prop label: string = '';
+@prop error: boolean = false;
+@prop success: boolean = false;
+@prop warning: boolean = false;
+/** Show loading state */
+@prop loading: boolean = false;
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+@slot tag?: (tag: string, index: number);
+
+// The host is the one submitter, the tags as JSON, under its name (#133). A hidden input carrying
+// the name would send them a second time, comma-joined.
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear (clear/addTag/removeTag/getTags already exposed)
+@expose addTag, removeTag, clear, getTags, focus, blur;
+
+let inputEl = $signal(null);
+let tags = $signal<string[]>([]);
+let inputValue = $signal('');
+// "{tag} added" / "{tag} removed", politely: a tag does not come and go in silence.
+let announcement = $signal('');
+
+// Sync external value prop into internal tags
+$effect(() => {
+  const v = value;
+  if (Array.isArray(v)) tags = v.slice();
+});
+
+function isAtLimit(): boolean {
+  const max = maxTags as number;
+  return max > 0 && tags.length >= max;
+}
+
+function validate(text: string): boolean {
+  if (!text) return false;
+  const max = maxLength as number;
+  if (max > 0 && text.length > max) return false;
+  if (isAtLimit()) return false;
+  if (!allowDuplicates && tags.includes(text)) return false;
+  return true;
+}
+
+/** Add one tag, trimmed. Returns false and adds nothing when validation refuses it: a duplicate, one over `max`, or one off `pattern`. */
+function addTag(raw: string): boolean {
+  const added = raw.trim();
+  if (!validate(added)) return false;
+  const next = tags.concat(added);
+  tags = next;
+  value = next;
+  announcement = format(uiString('tag-input', 'added'), { tag: added });
+  pdxAdd({ tag: added, tags: next });
+  return true;
+}
+
+function addMultiple(raw: string) {
+  const sep = separator as string || ',';
+  let changed = false;
+  for (const part of raw.split(sep)) {
+    if (addTag(part)) changed = true;
+  }
+  // value-change already dispatched per add; no extra one needed
+  return changed;
+}
+
+/** Remove the tag at this index and emit `pdx-remove`; an index outside the list does nothing. */
+function removeTag(index: number) {
+  const current = tags as string[];
+  if (index < 0 || index >= current.length) return;
+  const removed = current[index];
+  const next = current.filter((_, i) => i !== index);
+  tags = next;
+  value = next;
+  announcement = format(uiString('tag-input', 'removed'), { tag: removed });
+  pdxRemove({ tag: removed, index, tags: next });
+}
+
+function clear() {
+  tags = [];
+  inputValue = '';
+  value = [];
+}
+
+/** A copy of the current tags — mutating it changes nothing. */
+function getTags(): string[] {
+  return tags.slice();
+}
+
+function commitInput() {
+  const val = inputValue as string;
+  if (!val.trim()) return;
+  const sep = separator as string || ',';
+  if (val.includes(sep)) {
+    addMultiple(val);
+  } else {
+    addTag(val);
+  }
+  inputValue = '';
+}
+
+function onKeydown(e: KeyboardEvent) {
+  if (disabled || readonly) return;
+  const sep = separator as string || ',';
+
+  if (e.key === 'Enter' || e.key === 'Tab' || e.key === sep) {
+    if ((inputValue as string).trim()) {
+      e.preventDefault();
+      commitInput();
+    }
+  } else if (e.key === 'Backspace') {
+    if (!inputValue && tags.length > 0) {
+      removeTag(tags.length - 1);
+    }
+  } else if (e.key === 'Escape') {
+    inputValue = '';
+    (e.target as HTMLInputElement).value = '';
+  }
+}
+
+// The text is the field's, two-way (`::value`); this splits on the separator and announces the draft.
+function onInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value;
+  const sep = separator as string || ',';
+  // Auto-split if separator typed (caught before keydown for IME/mobile)
+  if (val.includes(sep)) {
+    addMultiple(val);
+    inputValue = '';
+    (e.target as HTMLInputElement).value = '';
+  } else {
+    draftChange({ value: val });
+  }
+}
+
+function onPaste(e: ClipboardEvent) {
+  if (disabled || readonly) return;
+  const text = e.clipboardData?.getData('text') || '';
+  if (!text) return;
+  e.preventDefault();
+  addMultiple(text);
+  inputValue = '';
+  const input = e.target as HTMLInputElement;
+  if (input) input.value = '';
+}
+
+function onRemoveClick(e: Event, index: number) {
+  e.stopPropagation();
+  if (disabled || readonly) return;
+  removeTag(index);
+}
+
+function onWrapClick(e: Event) {
+  const target = e.target as HTMLElement;
+  if (target.tagName === 'INPUT' || target.tagName === 'BUTTON') return;
+  inputEl?.focus();
+}
+
+const FOCUSABLE = 'input, textarea, [tabindex]:not([tabindex="-1"]), button';
+function focus() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector(FOCUSABLE) as HTMLElement | null)?.blur(); }
+</script>

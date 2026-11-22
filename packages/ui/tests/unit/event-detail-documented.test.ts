@@ -95,10 +95,12 @@ describe('an event with a detail says what is in it', () => {
     it('found the emits to check', () => {
         // The control: a scan that finds nothing makes the next assertion pass by default. Named emits,
         // not a count: a count falls each time a batch of #125 removes alpha emits, and a threshold
-        // lowered to follow it guards less every time.
+        // lowered to follow it guards less every time. The names are emits still written in TypeScript:
+        // a component moved to .pdx (#1210) declares each event's detail with its `@event` type, so it
+        // leaves the scan, and its name leaves this list.
         expect(checks).toEqual(expect.arrayContaining([
-            'pdx-tag-input pdx-add', 'pdx-tag-input pdx-remove', 'pdx-select pdx-search', 'pdx-calendar pdx-navigate',
-            'pdx-autocomplete query-change', 'pdx-tag-input draft-change', 'pdx-bottom-sheet pdx-detent-change',
+            'pdx-tree pdx-expand', 'pdx-splitter pdx-resize', 'pdx-select pdx-search', 'pdx-calendar pdx-navigate',
+            'pdx-autocomplete query-change', 'pdx-file-upload pdx-upload', 'pdx-bottom-sheet pdx-detent-change',
         ]));
     });
 

@@ -30,7 +30,7 @@ import '../../src/dialog/pdx-dialog';
 import '../../src/drawer/pdx-drawer';
 import '../../src/popover/pdx-popover';
 import '../../src/slider/pdx-slider';
-import '../../src/tag-input/pdx-tag-input';
+import '../../src/tag-input/pdx-tag-input.pdx';
 
 interface Case {
     /** component string: [component, key] */
