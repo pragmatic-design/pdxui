@@ -438,7 +438,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // they are the first to use while html`` stays for the others; Rollup rearranges three shared modules
 // (form-registry, own-prop, selector: net +224 B), every other chunk −351 B. The whole +0.9 KB. The
 // built dist: entry 43.5 KB, blocking 102.5 KB (unchanged), js 481.2 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 482.0, css: 67, blocking: 102.6 };
+// js 482.0 → 483.0 (the same standing OK, for a core fix #1210's next move waits on): a component mounts
+// untracked by the effect around it (#1309). CI read js 481.8 → 482.1 KB on the same trees, twice, and
+// blocking 102.5 → 102.6. The local build of both, chunk by chunk, reads the opposite: the entry +17 B,
+// the whole −98 B. The difference between the two builds is not explained; it is recorded on #1287 with
+// the measurements, and this budget follows CI's line, which is the one that gates.
+const BUDGET_KB = { entry: 43.5, js: 483.0, css: 67, blocking: 102.6 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
