@@ -10,7 +10,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/dropdown-menu/pdx-dropdown-menu';
 import '../../src/menu/pdx-menu';
 import '../../src/context-menu/pdx-context-menu';
-import '../../src/split-button/pdx-split-button';
+import '../../src/split-button/pdx-split-button.pdx';
 import '../../src/menubar/pdx-menubar';
 
 const items = () => [

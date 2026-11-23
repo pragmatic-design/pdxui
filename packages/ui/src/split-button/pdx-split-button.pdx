@@ -1,0 +1,358 @@
+<template></template>
+
+<script>
+/**
+ * A primary action button with a dropdown arrow that opens the secondary actions.
+ */
+// pdx-split-button — Button with primary action + dropdown arrow for secondary actions.
+// Left side: primary action (click). Right side: chevron that opens a dropdown menu.
+// Reuses menu rendering pattern from pdx-dropdown-menu.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
+import { focusGroup, onDestroy, onNextFrame, untracked } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+import type { MenuItem } from '../menu/pdx-menu';
+import { sanitizeSVG } from '../shared/sanitize';
+import { uiString } from '../shared/i18n';
+import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/split-button';
+// Its menu items are `.pdx-menu-item`, drawn by menu.css — 25.6px tall instead of 32 without it.
+import '@pdxui/design/components/menu';
+
+/**
+ * The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent
+ * never writes it, so it is not a model, and `::open` on it is an error.
+ */
+@event 'open-change': { value: boolean };
+/** The primary button was pressed. */
+@event 'pdx-click': Record<string, never>;
+/** An entry of the menu was chosen. */
+@event 'pdx-select': { key: string; item: MenuItem };
+// On the host as custom states (#132, #288): `open` while the menu shows, `loading` while the
+// primary action is pending (its button is `aria-busy` then, A4).
+@state open = opened;
+@state loading = !!loading;
+// The button group, its primary button and the arrow that opens the menu; the menu (on <body>
+// while open), an entry and a separator. Every element is built by the script (#1284).
+@part(external) root, primary, trigger, menu, item, separator;
+/** Primary button label */
+@prop label: string = '';
+/** Primary button icon name */
+@prop(icon) icon: string = '';
+/** Dropdown menu items */
+@prop items: unknown[] = [];
+/** Variant: primary, secondary, outline, ghost, danger */
+@prop variant: string = 'primary';
+/** Size: xs, sm, md, lg */
+@prop size: string = 'sm';
+/** Loading state (spinner on primary) */
+@prop loading: boolean = false;
+/** Disable entire button */
+@prop disabled: boolean = false;
+/** Accessible name for the dropdown trigger (chevron has no visible text). Empty: the
+ *  split-button.menu component string, «More actions» in English. */
+@prop menuLabel: string = '';
+@host el;
+
+// The overlay verbs (#288), which it had none of.
+@expose show, close, toggle, isOpen;
+
+let opened = $signal(false);
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(opened);
+let built = false;
+let panelEl: HTMLElement | null = null;
+let primaryEl: HTMLButtonElement | null = null;
+let arrowEl: HTMLButtonElement | null = null;
+let outsideHandler: ((e: MouseEvent) => void) | null = null;
+let escHandler: ((e: KeyboardEvent) => void) | null = null;
+let focusDispose: Dispose | null = null;
+let scrollHandler: (() => void) | null = null;
+// Cleared on destroy: an update a frame away does not run on a destroyed button.
+let alive = true;
+
+/** `pdx-icon` the first time the button or an item names an icon: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+}
+
+/** The arrow's name: menuLabel, else split-button.menu. */
+function menuName(): string {
+  return (menuLabel as string) || uiString('split-button', 'menu');
+}
+$effect(() => {
+  const n = menuName();
+  if (arrowEl) arrowEl.setAttribute('aria-label', n);
+});
+
+function buildMenuItems(list: MenuItem[], container: HTMLElement): void {
+  container.innerHTML = '';
+  for (const it of list) {
+    warnMisshapenMenuItem('pdx-split-button', it);
+    if (it.type === 'separator') {
+      const sep = document.createElement('hr');
+      sep.className = 'pdx-menu-sep';
+      sep.dataset.part = 'separator';
+      container.appendChild(sep);
+      continue;
+    }
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pdx-menu-item';
+    btn.dataset.part = 'item';
+    if (it.danger) btn.classList.add('pdx-menu-danger');
+    btn.setAttribute('role', 'menuitem');
+    btn.setAttribute('data-menu-key', it.key);
+    btn.disabled = !!it.disabled;
+    if (it.lang) btn.lang = it.lang;
+
+    if (it.icon) {
+      if (it.icon.startsWith('<')) {
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'pdx-menu-icon';
+        iconSpan.innerHTML = sanitizeSVG(it.icon);
+        btn.appendChild(iconSpan);
+      } else {
+        loadIcon();
+        const iconEl = document.createElement('pdx-icon');
+        iconEl.className = 'pdx-menu-icon';
+        iconEl.setAttribute('name', it.icon);
+        iconEl.setAttribute('size', '16');
+        btn.appendChild(iconEl);
+      }
+    }
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'pdx-menu-item-label';
+    labelSpan.textContent = it.label;
+    btn.appendChild(labelSpan);
+
+    if (it.shortcut) {
+      const sc = document.createElement('span');
+      sc.className = 'pdx-menu-shortcut';
+      sc.textContent = it.shortcut;
+      btn.appendChild(sc);
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (it.disabled) return;
+      pdxSelect({ key: it.key, item: it });
+      close();
+    });
+
+    container.appendChild(btn);
+  }
+}
+
+function positionPanel(): void {
+  if (!panelEl) return;
+  const btnRect = el.getBoundingClientRect();
+  const panelRect = panelEl.getBoundingClientRect();
+  let finalLeft = btnRect.left;
+  let finalTop = btnRect.bottom + 2;
+
+  if (finalLeft + panelRect.width > window.innerWidth) finalLeft = window.innerWidth - panelRect.width - 4;
+  if (finalTop + panelRect.height > window.innerHeight) finalTop = btnRect.top - panelRect.height - 2;
+
+  panelEl.style.left = finalLeft + 'px';
+  panelEl.style.top = finalTop + 'px';
+}
+
+/** The one place the open state changes, and the arrow's aria-expanded with it, so open()
+ *  and close() never leave the attribute at its build-time 'false': a screen reader would
+ *  hear an open menu as closed. */
+function setOpen(v: boolean): void {
+  opened = v;
+  arrowEl?.setAttribute('aria-expanded', String(v));
+  openChange({ value: v });
+}
+
+/** The element that had the focus when the menu opened: it gets it back on close. */
+let returnFocus: HTMLElement | null = null;
+
+// Opens the menu.
+function show(): void {
+  if (untracked(() => opened) || !panelEl || !arrowEl) return;
+  // What had the focus now — an invoker that is not the arrow (`command="--show"`), or the
+  // arrow itself — and the arrow when nothing had it.
+  const before = document.activeElement;
+  returnFocus = before instanceof HTMLElement && before !== document.body ? before : null;
+  setOpen(true);
+
+  if (!panelEl.isConnected) document.body.appendChild(panelEl);
+
+  buildMenuItems(untracked(() => items) as MenuItem[], panelEl);
+
+  panelEl.style.display = '';
+  panelEl.style.position = 'fixed';
+  panelEl.style.zIndex = '1000';
+  panelEl.style.minWidth = '160px';
+
+  // Position below the split button
+  const btnRect = el.getBoundingClientRect();
+  panelEl.style.visibility = 'hidden';
+  panelEl.style.left = btnRect.left + 'px';
+  panelEl.style.top = (btnRect.bottom + 2) + 'px';
+
+  requestAnimationFrame(() => {
+    if (!panelEl) return;
+    positionPanel();
+    panelEl.style.visibility = '';
+
+    const first = panelEl.querySelector('[role="menuitem"]:not(:disabled)') as HTMLElement;
+    if (first) first.focus();
+
+    if (focusDispose) focusDispose();
+    focusDispose = focusGroup(panelEl, {
+      orientation: 'vertical', wrap: true,
+      selector: '[role="menuitem"]:not(:disabled)',
+    });
+  });
+
+  // Reposition on scroll/resize
+  scrollHandler = () => positionPanel();
+  window.addEventListener('scroll', scrollHandler, { capture: true, passive: true });
+  window.addEventListener('resize', scrollHandler, { passive: true });
+
+  // Attached now, not after a timer: the menu opens on a click, whose mousedown has already
+  // been dispatched, and a mousedown inside the split button is ignored anyway. A timer
+  // outlived a split button left open when its test file ended, and fired with no
+  // document (#382).
+  outsideHandler = (ev: MouseEvent) => {
+    if (el.contains(ev.target as Node) || panelEl?.contains(ev.target as Node)) return;
+    close();
+  };
+  document.addEventListener('mousedown', outsideHandler);
+
+  escHandler = (ev: KeyboardEvent) => {
+    if (ev.key === 'Escape') { ev.preventDefault(); close(); }
+  };
+  document.addEventListener('keydown', escHandler, true);
+}
+
+// Closes the menu.
+function close(): void {
+  if (!untracked(() => opened)) return;
+  setOpen(false);
+  if (panelEl) { panelEl.style.display = 'none'; panelEl.remove(); }
+  if (outsideHandler) { document.removeEventListener('mousedown', outsideHandler); outsideHandler = null; }
+  if (escHandler) { document.removeEventListener('keydown', escHandler, true); escHandler = null; }
+  if (scrollHandler) { window.removeEventListener('scroll', scrollHandler, true); window.removeEventListener('resize', scrollHandler); scrollHandler = null; }
+  if (focusDispose) { focusDispose(); focusDispose = null; }
+  (returnFocus?.isConnected ? returnFocus : arrowEl)?.focus();
+  returnFocus = null;
+}
+
+// Toggles the menu open/closed.
+function toggle(): void {
+  untracked(() => opened) ? close() : show();
+}
+
+// ─── Build ───────────────────────────────────────────
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  const labelText = label as string;
+  const iconName = icon as string;
+  const variantName = variant as string;
+  const sizeName = size as string;
+  const isLoading = loading as boolean;
+  const isDisabled = disabled as boolean;
+
+  el.classList.add('pdx-split-button');
+
+  const group = document.createElement('div');
+  group.className = 'pdx-split-button-group';
+  group.dataset.part = 'root';
+
+  // Primary button
+  primaryEl = document.createElement('button');
+  primaryEl.type = 'button';
+  primaryEl.className = `pdx-${variantName} pdx-split-primary`;
+  primaryEl.dataset.part = 'primary';
+  if (sizeName) primaryEl.setAttribute('size', sizeName);
+
+  if (iconName) {
+    loadIcon();
+    const iconEl = document.createElement('pdx-icon');
+    iconEl.setAttribute('name', iconName);
+    iconEl.setAttribute('size', sizeName === 'xs' ? '14' : '16');
+    primaryEl.appendChild(iconEl);
+  }
+
+  if (labelText) {
+    primaryEl.appendChild(document.createTextNode(iconName ? ' ' + labelText : labelText));
+  }
+
+  primaryEl.disabled = isDisabled || isLoading;
+  if (isLoading) primaryEl.setAttribute('aria-busy', 'true');
+  // Read when pressed, not when built: the values the build saw were frozen in
+  // here, so a button that started loading stayed silent once it had loaded.
+  primaryEl.addEventListener('click', () => {
+    if (disabled || loading) return;
+    pdxClick({});
+  });
+
+  group.appendChild(primaryEl);
+
+  // Arrow/dropdown button
+  arrowEl = document.createElement('button');
+  arrowEl.type = 'button';
+  arrowEl.className = `pdx-${variantName} pdx-split-arrow`;
+  arrowEl.dataset.part = 'trigger';
+  if (sizeName) arrowEl.setAttribute('size', sizeName);
+  arrowEl.setAttribute('aria-haspopup', 'menu');
+  arrowEl.setAttribute('aria-expanded', 'false');
+  // Chevron-only trigger: needs an accessible name (WCAG 4.1.2 / axe button-name).
+  arrowEl.setAttribute('aria-label', menuName());
+  arrowEl.innerHTML = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+  arrowEl.disabled = isDisabled;
+  arrowEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (disabled) return;
+    toggle();
+  });
+
+  group.appendChild(arrowEl);
+  el.appendChild(group);
+
+  // Dropdown panel — NOT attached to the body while closed: that left an orphan
+  // panel per instance, polluting document-wide selectors and leaking DOM.
+  // Attached in show(), removed in close()/onDestroy.
+  panelEl = document.createElement('div');
+  panelEl.className = 'pdx-split-button-panel pdx-menu';
+  panelEl.dataset.part = 'menu';
+  panelEl.setAttribute('role', 'menu');
+  panelEl.style.display = 'none';
+  built = true;
+});
+
+// Update on prop changes
+$effect(() => {
+  const isLoading = loading as boolean;
+  const isDisabled = disabled as boolean;
+  void label; void icon; void variant; void size;
+  if (!built) return;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (primaryEl) {
+      primaryEl.disabled = isDisabled || isLoading;
+      // A4: busy while its action is pending, and not otherwise.
+      if (isLoading) primaryEl.setAttribute('aria-busy', 'true');
+      else primaryEl.removeAttribute('aria-busy');
+    }
+    if (arrowEl) arrowEl.disabled = isDisabled;
+  });
+});
+
+// Teardown on DESTROY only, not in an effect reading `disabled`: toggling it would re-run it and
+// remove the panel for good (the build never runs again).
+onDestroy(() => {
+  alive = false;
+  close();
+  if (panelEl) { panelEl.remove(); panelEl = null; }
+});
+</script>

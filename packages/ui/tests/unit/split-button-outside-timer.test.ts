@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/split-button/pdx-split-button';
+import '../../src/split-button/pdx-split-button.pdx';
 
 const items = [{ label: 'Edit', onClick() {} }];
 

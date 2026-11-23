@@ -5,7 +5,7 @@
 // screen reader would announce an open menu as closed.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/split-button/pdx-split-button';
+import '../../src/split-button/pdx-split-button.pdx';
 
 async function mountSplit(): Promise<{ el: HTMLElement; arrow: HTMLButtonElement }> {
     document.body.innerHTML = `<pdx-split-button label="Save" items='[{"key":"draft","label":"Draft"},{"key":"copy","label":"Copy"}]'></pdx-split-button>`;

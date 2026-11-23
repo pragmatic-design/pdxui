@@ -78,7 +78,7 @@ import './page-header/pdx-page-header';
 import './toolbar/pdx-toolbar';
 import './pagination/pdx-pagination';
 import './fab/pdx-fab';
-import './split-button/pdx-split-button';
+import './split-button/pdx-split-button.pdx';
 
 // Tier 1E: Layout
 import './app-layout/pdx-app-layout';
