@@ -16026,7 +16026,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/image/pdx-image.ts",
+      "path": "src/image/pdx-image.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -16437,7 +16437,7 @@
           "name": "pdx-image",
           "declaration": {
             "name": "PdxImage",
-            "module": "src/image/pdx-image.ts"
+            "module": "src/image/pdx-image.pdx"
           }
         }
       ]

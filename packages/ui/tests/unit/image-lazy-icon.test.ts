@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/image/pdx-image';
+import '../../src/image/pdx-image.pdx';
 
 async function mount(): Promise<HTMLElement> {
     const el = document.createElement('pdx-image');
