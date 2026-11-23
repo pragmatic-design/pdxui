@@ -1,0 +1,412 @@
+<template>
+  <div class="pdx-file-upload" data-part="root">
+    <div class="pdx-file-dropzone" data-part="dropzone"
+      role="button" tabindex="0"
+      :aria-disabled="disabled ? 'true' : null"
+      @click="onDropzoneClick"
+      @keydown="onDropzoneKeydown"
+      @dragover="onDragOver"
+      @dragleave="onDragLeave"
+      @drop="onDrop">
+      <span class="pdx-file-dropzone-icon" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </span>
+      <span class="pdx-file-dropzone-label">{{ label || uiString('file-upload', 'drop') }}</span>
+      @if (hint) {
+        <span class="pdx-file-dropzone-hint">{{ hint }}</span>
+      }
+    </div>
+    <input type="file"
+      hidden
+      :accept="accept"
+      :multiple="multiple"
+      form="pdx-file-upload-no-submit"
+      @change="onInputChange" />
+    <div class="pdx-file-rejections" role="status">
+      @for (rejections as r, i; track i) {
+        <div class="pdx-file-error">{{ rejectionText(r) }}</div>
+      }
+    </div>
+    @if (entries.length > 0) {
+      <div class="pdx-file-list" data-part="list" role="list" :aria-busy="busy ? 'true' : null">
+        @for (entries as entry, i; track entry.id) {
+          <div :class="'pdx-file-item pdx-file-' + entry.status" data-part="file"
+            role="listitem" tabindex="0"
+            @keydown="onFileKeydown($event, i)">
+            @render file?.(entry.file, entry.status, entry.progress) @else {
+              @if (entry.preview) {
+                <div class="pdx-file-thumb"><img :src="entry.preview" alt="" /></div>
+              } @else {
+                <div class="pdx-file-icon"><pdx-icon name="file" size="sm"></pdx-icon></div>
+              }
+              <div class="pdx-file-info">
+                <span class="pdx-file-name">{{ entry.file.name }}</span>
+                <span class="pdx-file-size">{{ formatSize(entry.file.size) }}</span>
+                @if (entry.error) {
+                  <span class="pdx-file-error">{{ entry.error }}</span>
+                }
+              </div>
+              @if (entry.status === 'uploading') {
+                <div class="pdx-file-progress" data-part="progress"
+                  role="progressbar"
+                  :aria-valuenow="entry.progress"
+                  aria-valuemin="0" aria-valuemax="100">
+                  <div :style="'width:' + entry.progress + '%'"></div>
+                </div>
+              }
+              @if (entry.status === 'success') {
+                <span class="pdx-file-status"><pdx-icon name="check" size="sm"></pdx-icon></span>
+              }
+            }
+            <button class="pdx-file-remove" data-part="remove" :aria-label="removeName(entry)"
+              :disabled="disabled"
+              @click="removeFile(i)">×</button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * Drag-and-drop file upload with validation, image preview and size and count limits.
+ *
+ * @slot file - Renders one file in the list: a snippet `file(file, status, progress)`.
+ *
+ * @csspart root - The frame: the drop zone, the refusals and the list.
+ * @csspart dropzone - The `role="button"` area a file is dropped on, or clicked to browse.
+ * @csspart list - The `role="list"` of the files it holds; busy while one uploads.
+ * @csspart file - A file of the list.
+ * @csspart remove - A file's remove button.
+ * @csspart progress - A file's `role="progressbar"`, while it uploads.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate dragover - A drag is over the drop zone.
+ */
+// pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
+// Supports accept filter, size/count limits, image thumbnails, progress tracking.
+//
+// The drop zone is a button named by what it shows, its label and its hint: an aria-label of the
+// label alone did not hold the hint shown with it (WCAG 2.5.3). Its icon is aria-hidden.
+import { generatedId, onDestroy } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/file-upload';
+
+// The files it holds (#482): adding, removing or clearing writes it, and the write dispatches
+// `value-change`; a value set from outside replaces the list. A form submits every file it holds —
+// a dropped one too, which the inner input never had — and a reset empties it (#135). With no file,
+// the entry a native file input sends: an empty file with no name.
+@model value: File[] = [] { form: () => (value as File[]).length > 0 ? value : new File([], '', { type: 'application/octet-stream' }) };
+@event 'pdx-error': { file: File; error: string };
+@event 'pdx-select': { files: File[] };
+@event 'pdx-remove': { file: File; index: number };
+@event 'pdx-upload': { file: File };
+@event 'pdx-progress': { file: File; percent: number };
+@event 'pdx-success': { file: File; response: unknown };
+// The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
+// draws the same size on native markup. `md` is the base look, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the dropzone's size. */
+  size: { md: '.pdx-file-upload-md', sm: '.pdx-file-upload-sm', lg: '.pdx-file-upload-lg' } = md;
+}
+@state disabled = !!disabled;
+@state dragover = dragging;
+// pdx-ignore PDX_PART_NAME_TAKEN: `file` is the theme's part on each row; the script's `file` is the snippet
+@part root, dropzone, list, file, remove, progress;
+@prop accept: string = '';
+@prop multiple: boolean = false;
+@prop maxSize: number = 0;
+@prop maxFiles: number = 0;
+@prop disabled: boolean = false;
+/** The dropzone's text and name. Empty: the file-upload.drop component string. */
+@prop label: string = '';
+@prop name: string = '';
+@prop auto: boolean = false;
+@prop action: string = '';
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+@slot file?: (file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number);
+
+// The host is the one submitter (#135): its name goes on the host, where the form reads it, and
+// the inner input is kept out of the form, or a picked file would go twice.
+@host el { :name="name || null" }
+
+@expose addFiles, removeFile, uploadAll, clear;
+
+/**
+ * A file as the list holds it. An entry is never changed in place: a change is a new entry with
+ * the same `id`, which the list's row keeps and reads.
+ */
+interface FileEntry {
+  file: File;
+  id: string;
+  status: 'pending' | 'uploading' | 'success' | 'error';
+  progress: number;
+  error?: string;
+  preview?: string;
+}
+
+/** A file the upload refused, shown under the zone until the next selection. */
+interface Rejection { name: string; reason: string }
+
+let entries = $signal<FileEntry[]>([]);
+let dragging = $signal(false);
+let rejections = $signal<Rejection[]>([]);
+// Busy while a file uploads (A4).
+const busy = $derived((entries as FileEntry[]).some((entry) => entry.status === 'uploading'));
+const hint = $derived(hintOf(maxSize as number, accept as string));
+/** The running upload of each entry, by its id: aborted on remove, clear and destroy. */
+const uploads = new Map<string, XMLHttpRequest>();
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function matchAccept(f: File, types: string): boolean {
+  if (!types) return true;
+  return types.split(',').map(s => s.trim()).some(pattern => {
+    if (pattern.startsWith('.')) return f.name.toLowerCase().endsWith(pattern.toLowerCase());
+    if (pattern.endsWith('/*')) return f.type.startsWith(pattern.slice(0, -1));
+    return f.type === pattern;
+  });
+}
+
+function validateFile(f: File, types: string, max: number): string | null {
+  if (max > 0 && f.size > max) return format(uiString('file-upload', 'tooLarge'), { size: formatSize(max) });
+  if (types && !matchAccept(f, types)) return uiString('file-upload', 'notAccepted');
+  return null;
+}
+
+/**
+ * The accepted types as a reader names them. The attribute is for the browser — «.csv,text/csv» —
+ * and a MIME type is a machine's name for a format: the reader knows the extension. With extensions
+ * in `accept`, the hint lists them in capitals, once each, and leaves the MIME types out; with none,
+ * there is nothing better to say, and the attribute is shown as written.
+ */
+function acceptHint(types: string): string {
+  const extensions = types.split(',').map(s => s.trim()).filter(s => s.startsWith('.') && s.length > 1)
+    .map(s => s.slice(1).toUpperCase());
+  return extensions.length ? [...new Set(extensions)].join(', ') : types;
+}
+
+function hintOf(max: number, types: string): string {
+  const shown: string[] = [];
+  if (max > 0) shown.push(format(uiString('file-upload', 'maxSize'), { size: formatSize(max) }));
+  if (types) shown.push(acceptHint(types));
+  return shown.join(', ');
+}
+
+/** The entry with this id, replaced by itself with `patch` applied. */
+function patchEntry(id: string, patch: Partial<FileEntry>): void {
+  entries = entries.peek().map((e) => (e.id === id ? { ...e, ...patch } : e));
+}
+
+/** A file as the list holds it, its thumbnail read in the background for an image. */
+function makeEntry(f: File): FileEntry {
+  const entry: FileEntry = { file: f, id: generatedId('fu'), status: 'pending', progress: 0 };
+  if (f.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = () => patchEntry(entry.id, { preview: reader.result as string });
+    reader.readAsDataURL(f);
+  }
+  return entry;
+}
+
+// The last list THIS component wrote to `value`: a value equal to it is its own reflection
+// coming back, not a new list from outside.
+let reflected: File[] | null = null;
+/** The model is the files the list holds: written after every change the user makes. */
+function writeValue(): void {
+  reflected = entries.peek().map((e) => e.file);
+  value = reflected;
+}
+
+// A list set from outside: the files it names, each keeping its entry (and its upload) when it
+// is one the list already holds.
+$effect(() => {
+  const v = value as unknown;
+  if (v === reflected) return;
+  const files = Array.isArray(v) ? (v as File[]) : [];
+  const held = new Map(entries.peek().map((e) => [e.file, e]));
+  entries = files.map((f) => held.get(f) ?? makeEntry(f));
+});
+
+function abortUpload(id: string): void {
+  uploads.get(id)?.abort();
+  uploads.delete(id);
+}
+
+/** Put files through the checks a drop goes through: each refusal emits `pdx-error` and is shown in the list. */
+function addFiles(files: FileList | File[]) {
+  if (disabled) return;
+  const types = accept as string;
+  const max = maxSize as number;
+  const most = maxFiles as number;
+  const added: File[] = [];
+  // Every refused file is emitted AND shown, a wrong type, an oversize file and a file over
+  // max-files alike: none of them vanishes without a word.
+  const refused: Rejection[] = [];
+  const reject = (f: File, error: string) => {
+    refused.push({ name: f.name, reason: error });
+    pdxError({ file: f, error });
+  };
+
+  for (const f of Array.from(files)) {
+    // The loop appends each accepted file to `entries`, so that count is the whole
+    // count: adding `added.length` to it counted every file twice, and 3 kept 2.
+    if (most > 0 && entries.peek().length >= most) {
+      reject(f, format(uiString('file-upload', 'tooMany'), { n: most }));
+      continue;
+    }
+    const err = validateFile(f, types, max);
+    if (err) {
+      reject(f, err);
+      continue;
+    }
+    added.push(f);
+    entries = [...entries.peek(), makeEntry(f)];
+  }
+  rejections = refused;
+
+  if (added.length > 0) {
+    writeValue();
+    pdxSelect({ files: added });
+    if (auto && action) uploadAll();
+  }
+}
+
+/** Remove the file at this index, aborting its upload when one is running, and move focus off the row it deletes. */
+function removeFile(index: number) {
+  if (disabled) return;
+  const held = entries.peek();
+  if (index < 0 || index >= held.length) return;
+  const entry = held[index];
+  // Focus was in the removed row (its ×, or the row itself for Delete): it goes to the next
+  // file's ×, else the previous one's, else the drop zone, never to <body>.
+  const row = el.querySelectorAll('.pdx-file-item')[index];
+  const hadFocus = !!row && row.contains(document.activeElement);
+  abortUpload(entry.id);
+  pdxRemove({ file: entry.file, index });
+  entries = held.filter((_, i) => i !== index);
+  writeValue();
+  if (hadFocus) {
+    requestAnimationFrame(() => {
+      const buttons = el.querySelectorAll<HTMLElement>('.pdx-file-remove');
+      const next = buttons[Math.min(index, buttons.length - 1)];
+      (next ?? el.querySelector<HTMLElement>('.pdx-file-dropzone'))?.focus();
+    });
+  }
+}
+
+function uploadEntry(entry: FileEntry) {
+  const actionUrl = action as string;
+  if (!actionUrl) return;
+  const id = entry.id;
+  const xhr = new XMLHttpRequest();
+  uploads.set(id, xhr);
+  patchEntry(id, { status: 'uploading' });
+  pdxUpload({ file: entry.file });
+
+  xhr.upload.onprogress = (e) => {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      patchEntry(id, { progress: percent });
+      pdxProgress({ file: entry.file, percent });
+    }
+  };
+  xhr.onload = () => {
+    uploads.delete(id);
+    if (xhr.status >= 200 && xhr.status < 300) {
+      patchEntry(id, { status: 'success', progress: 100 });
+      let response: unknown;
+      try { response = JSON.parse(xhr.responseText); } catch { response = xhr.responseText; }
+      pdxSuccess({ file: entry.file, response });
+    } else {
+      const error = format(uiString('file-upload', 'uploadFailed'), { status: xhr.status });
+      patchEntry(id, { status: 'error', error });
+      pdxError({ file: entry.file, error });
+    }
+  };
+  xhr.onerror = () => {
+    uploads.delete(id);
+    const error = uiString('file-upload', 'networkError');
+    patchEntry(id, { status: 'error', error });
+    pdxError({ file: entry.file, error });
+  };
+  const formData = new FormData();
+  formData.append(name as string || 'file', entry.file);
+  xhr.open('POST', actionUrl);
+  xhr.send(formData);
+}
+
+/** Start uploading every file still pending; those uploading, done or failed are left alone. */
+function uploadAll() {
+  for (const entry of entries.peek()) {
+    if (entry.status === 'pending') uploadEntry(entry);
+  }
+}
+
+// Empties the list, aborting the uploads still running.
+function clear() {
+  for (const id of [...uploads.keys()]) abortUpload(id);
+  const had = entries.peek().length > 0;
+  entries = [];
+  if (had) writeValue();
+}
+
+function onDropzoneClick() {
+  if (disabled) return;
+  const input = el.querySelector('input[type="file"]') as HTMLInputElement;
+  if (input) input.click();
+}
+
+function onDropzoneKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    onDropzoneClick();
+  }
+}
+
+function onDragOver(e: DragEvent) {
+  e.preventDefault();
+  if (!disabled) dragging = true;
+}
+
+function onDragLeave() { dragging = false; }
+
+function onDrop(e: DragEvent) {
+  e.preventDefault();
+  dragging = false;
+  if (e.dataTransfer?.files) addFiles(e.dataTransfer.files);
+}
+
+function onInputChange(e: Event) {
+  const input = e.target as HTMLInputElement;
+  if (input.files) addFiles(input.files);
+  input.value = '';
+}
+
+function onFileKeydown(e: KeyboardEvent, index: number) {
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    e.preventDefault();
+    removeFile(index);
+  }
+}
+
+/** A remove button's name: "Remove {file name}". */
+function removeName(entry: FileEntry): string {
+  return format(uiString('file-upload', 'remove'), { name: entry.file.name });
+}
+function rejectionText(r: Rejection): string {
+  return format(uiString('file-upload', 'rejected'), { name: r.name, reason: r.reason });
+}
+
+// Abort every upload on destroy.
+onDestroy(() => {
+  for (const id of [...uploads.keys()]) abortUpload(id);
+});
+</script>

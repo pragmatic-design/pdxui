@@ -25,7 +25,7 @@ Drag-and-drop or browse to upload.
 | `uploadAll()` | Start uploading every file still pending; those uploading, done or failed are left alone. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-error` → `detail: { file, error }` — Fired when an error occurs.; `pdx-progress` → `detail: { file, percent }` — Fired on `pdx-progress`.; `pdx-remove` → `detail: { file, index }` — Fired when an item is removed.; `pdx-select` → `detail: { files }` — Fired when an item is selected.; `pdx-success` → `detail: { file, response }` — Fired on `pdx-success`.; `pdx-upload` → `detail: { file }` — Fired on `pdx-upload`.; `value-change` → `detail: { value: File[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-error` → `detail: { file: File; error: string }` — Fired when an error occurs.; `pdx-progress` → `detail: { file: File; percent: number }` — Fired on `pdx-progress`.; `pdx-remove` → `detail: { file: File; index: number }` — Fired when an item is removed.; `pdx-select` → `detail: { files: File[] }` — Fired when an item is selected.; `pdx-success` → `detail: { file: File; response: unknown }` — Fired on `pdx-success`.; `pdx-upload` → `detail: { file: File }` — Fired on `pdx-upload`.; `value-change` → `detail: { value: File[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `button` · `list` · `listitem` · `progressbar` · `status`
 

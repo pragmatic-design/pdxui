@@ -18,7 +18,7 @@ import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/calendar/pdx-calendar';
 import '../../src/color-picker/pdx-color-picker.pdx';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };

@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 
 async function hintFor(accept: string): Promise<string> {
     const el = document.createElement('pdx-file-upload');

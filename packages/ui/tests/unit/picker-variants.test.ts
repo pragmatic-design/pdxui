@@ -9,7 +9,7 @@ import '../../src/tree-select/pdx-tree-select';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/color-picker/pdx-color-picker.pdx';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 
 /** Each picker, the size it is mounted with, and the class it used to put on its own elements. */
 const PICKERS: [tag: string, size: string, oldClass: string][] = [

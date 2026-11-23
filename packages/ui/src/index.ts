@@ -36,7 +36,7 @@ import './checkbox-group/pdx-checkbox-group.pdx';
 import './tag-input/pdx-tag-input.pdx';
 import './localized-input/pdx-localized-input.pdx';
 import './color-picker/pdx-color-picker.pdx';
-import './file-upload/pdx-file-upload';
+import './file-upload/pdx-file-upload.pdx';
 import './slider/pdx-slider.pdx';
 import './rating/pdx-rating.pdx';
 import './signature-pad/pdx-signature-pad.pdx';
