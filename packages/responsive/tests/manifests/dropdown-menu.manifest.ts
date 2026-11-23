@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-dropdown-menu (tier 1A, button trigger + portaled floating menu)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/dropdown-menu/pdx-dropdown-menu.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/dropdown-menu/pdx-dropdown-menu.pdx)
  * and the CSS (packages/design/src/components/menu.css).
  *
  * ── DOM structure (built imperatively in an rAF inside ctx.track, NOT in the render) ──

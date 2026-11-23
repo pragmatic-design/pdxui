@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/dropdown-menu/pdx-dropdown-menu';
+import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 
 const ITEMS = [{ key: 'profile', label: 'Profile' }, { key: 'settings', label: 'Settings' }, { key: 'out', label: 'Sign out' }];
 

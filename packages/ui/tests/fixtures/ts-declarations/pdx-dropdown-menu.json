@@ -1,0 +1,235 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDropdownMenu",
+  "tagName": "pdx-dropdown-menu",
+  "category": "Navigation",
+  "order": 60,
+  "description": "A button that opens a floating menu built from an `items` array, navigable from the keyboard and\nclosed by an outside click or Escape.",
+  "generics": [
+    "T extends { key?: string; label?: string; type?: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'outline'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'sm'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "icon",
+      "description": "Icon to display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "icon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom-start'",
+      "attribute": "placement"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "minWidth",
+      "description": "Minimum width of the menu panel.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "minwidth"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent\nnever writes it, so it is not a model, and `::open` on it is an error.",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An entry was chosen: the menu's own event, re-dispatched on this element.",
+      "detail": "{ key: string; item: MenuItem }"
+    },
+    {
+      "name": "pdx-check",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A checkbox or radio entry changed: the menu's own event, re-dispatched on this element.",
+      "detail": "{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }"
+    }
+  ],
+  "roles": [
+    "button"
+  ],
+  "attributes": [
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'outline'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'sm'"
+    },
+    {
+      "name": "icon",
+      "fieldName": "icon",
+      "description": "Icon to display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "placement",
+      "fieldName": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom-start'"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "minwidth",
+      "fieldName": "minWidth",
+      "description": "Minimum width of the menu panel.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    }
+  ],
+  "slots": [
+    {
+      "name": "trigger",
+      "description": "The menu button, when it is not this component's own: an avatar, a chip. The element\nplaced here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click,\nArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close.\n`label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it."
+    },
+    {
+      "name": "item",
+      "description": "Renders one menu entry: a snippet `item(item)`.",
+      "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "trigger",
+      "description": "The element reached as `[data-part=\"trigger\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    }
+  ]
+}

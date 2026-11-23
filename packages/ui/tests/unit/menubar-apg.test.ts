@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/menubar/pdx-menubar';
-import '../../src/dropdown-menu/pdx-dropdown-menu';
+import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menu/pdx-menu';
 
 const FILE_ITEMS = [

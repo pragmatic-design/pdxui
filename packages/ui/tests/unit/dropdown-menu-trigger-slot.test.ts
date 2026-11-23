@@ -6,7 +6,7 @@
 // it is given, and without it the button is the component's own.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/dropdown-menu/pdx-dropdown-menu';
+import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menu/pdx-menu';
 
 const ITEMS = [

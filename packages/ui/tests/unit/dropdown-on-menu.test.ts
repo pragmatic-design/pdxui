@@ -16,7 +16,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/menu/pdx-menu';
-import '../../src/dropdown-menu/pdx-dropdown-menu';
+import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 
 const SVG = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle></svg>';
 
@@ -43,7 +43,9 @@ describe('pdx-menu, for the dropdown', () => {
         const icon = el.querySelector('pdx-icon.pdx-menu-icon');
         expect(icon, 'the name was drawn as text').not.toBeNull();
         expect(icon!.getAttribute('name')).toBe('copy');
-        await tick(100);
+        // Its registration, not a fixed wait: the import is its module's first load in this graph,
+        // and how long that takes is the transform's. The deadline only names the failure.
+        await Promise.race([customElements.whenDefined('pdx-icon'), tick(2000)]);
         expect(customElements.get('pdx-icon'), 'pdx-icon is never registered').toBeDefined();
     });
 

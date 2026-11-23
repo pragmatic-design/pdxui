@@ -71,7 +71,7 @@ import './bottom-nav/pdx-bottom-nav';
 import './nav-menu/pdx-nav-menu';
 import './menubar/pdx-menubar';
 import './menu/pdx-menu';
-import './dropdown-menu/pdx-dropdown-menu';
+import './dropdown-menu/pdx-dropdown-menu.pdx';
 import './context-menu/pdx-context-menu';
 import './breadcrumb/pdx-breadcrumb';
 import './page-header/pdx-page-header';

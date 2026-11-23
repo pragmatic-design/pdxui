@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/menu/pdx-menu';
-import '../../src/dropdown-menu/pdx-dropdown-menu';
+import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menubar/pdx-menubar';
 
 const items = () => [

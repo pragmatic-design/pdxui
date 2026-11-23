@@ -111,8 +111,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // alone), for the same reason. 341.7 after pdx-list, pdx-empty-state and pdx-statistic (measured
     // here: 341.6; 0.90×, 0.90× and 0.81× alone), for the same reason. 342.0 after pdx-split-button
     // (measured here: 341.9; 0.88× alone), for the same reason. 342.3 after pdx-image (measured here:
-    // 342.2; 0.92× alone), for the same reason.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 342.3 },
+    // 342.2; 0.92× alone), for the same reason. 342.5 after pdx-dropdown-menu (measured here: 342.4;
+    // 0.89× alone), for the same reason.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 342.5 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.

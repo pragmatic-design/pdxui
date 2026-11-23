@@ -1,0 +1,376 @@
+<template><slot name="trigger"></slot></template>
+
+<script>
+/**
+ * A button that opens a floating menu built from an `items` array, navigable from the keyboard and
+ * closed by an outside click or Escape.
+ *
+ * @slot trigger - The menu button, when it is not this component's own: an avatar, a chip. The element
+ *   placed here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click,
+ *   ArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close.
+ *   `label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it.
+ * @slot item - Renders one menu entry: a snippet `item(item)`.
+ */
+// pdx-dropdown-menu — Button trigger that opens a floating menu.
+//
+// The LIST is pdx-menu's. This component owns what a menu BUTTON is: the trigger, where
+// the menu opens, opening and closing it, and where the focus goes. It builds no copy of the menu
+// of its own — items, submenus, keys: two copies drift apart.
+//
+// The trigger slot only: the menu itself is built on <body> when it opens.
+import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
+import '../menu/pdx-menu';
+import { generatedId, onDestroy, onNextFrame } from '@pdxui/core';
+import type { SlotFunction } from '@pdxui/core';
+import type { MenuItem } from '../menu/pdx-menu';
+import { sanitizeSVG } from '../shared/sanitize';
+import { anchorControl } from '../shared/anchor-control';
+import { uiString, uiAttr } from '../shared/i18n';
+import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
+import { onPressOutside } from '../shared/press-outside';
+
+/**
+ * The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent
+ * never writes it, so it is not a model, and `::open` on it is an error.
+ */
+@event 'open-change': { value: boolean };
+/** An entry was chosen: the menu's own event, re-dispatched on this element. */
+@event 'pdx-select': { key: string; item: MenuItem };
+/** A checkbox or radio entry changed: the menu's own event, re-dispatched on this element. */
+@event 'pdx-check': { key: string; checked: boolean; radioGroup?: string; item: MenuItem };
+// On the host as a custom state (#132, #288).
+@state open = opened;
+// The built-in menu button, built by the script (#1284). A `trigger` slot's element is the
+// author's, and the menu is pdx-menu's, with its own parts.
+@part(external) trigger;
+// The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
+@generic T extends { key?: string; label?: string; type?: string };
+@prop items: T[] = [];
+@prop label: string = '';
+@prop variant: string = 'outline';
+@prop size: string = 'sm';
+@prop(icon) icon: string = '';
+@prop placement: string = 'bottom-start';
+@prop disabled: boolean = false;
+@prop minWidth: number = 200;
+@slot trigger;
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+// pdx-menu's, which draws it: an entry or a submenu's, less what the menu draws itself.
+@slot item?: (item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>);
+@host el;
+
+// The overlay verbs (#288): `open()` is `show()`, and the alpha handle `__dropdownMenu` is gone.
+@expose show, close, toggle, isOpen;
+
+/** The pdx-menu this component opens: its props and its API, as the dropdown uses them. */
+interface MenuHost extends HTMLElement {
+  items: MenuItem[];
+  open: boolean;
+  minWidth: number;
+  menuId: string;
+  menuClass: string;
+  renderItem: SlotFunction | null;
+  closeSubmenu(): void;
+}
+
+let opened = $signal(false);
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(opened);
+const menuId = generatedId('pdx-dropdown-menu');
+/** The parent's item snippet, read when the menu is built: one set after mount is the one drawn. pdx-menu's `renderItem` takes the scope. */
+function getItemSlot(): SlotFunction | null {
+  const snippet = item;
+  if (typeof snippet !== 'function') return null;
+  return (scope) => snippet(scope.item as never) ?? document.createDocumentFragment();
+}
+let triggerEl: HTMLElement | null = null;
+/** True when the trigger is the author's (the `trigger` slot), not the button built here. */
+let slotted = false;
+let menuEl: MenuHost | null = null;
+let scrollHandler: (() => void) | null = null;
+/** Removes the press-outside listener, added when the menu opens (#427). */
+let outsideDispose: (() => void) | null = null;
+let escHandler: ((e: KeyboardEvent) => void) | null = null;
+/** The element that had the focus when the menu opened: it gets it back on close. */
+let returnFocus: HTMLElement | null = null;
+let built = false;
+// Cleared on destroy: an update a frame away does not run on a destroyed dropdown.
+let alive = true;
+
+function isNativeButton(node: HTMLElement | null): node is HTMLButtonElement {
+  return node instanceof HTMLButtonElement;
+}
+
+// ─── The menu ────────────────────────────────────────
+/**
+ * A menu element for ONE opening: built in openMenu(), removed in close(). Not in the document
+ * while closed, so N dropdowns on a page leave no N panels on <body>; and a new one each
+ * time, because a component taken out of the document is destroyed and remounts from its
+ * props anyway (`PdxElement.disconnectedCallback`).
+ */
+function buildMenu(): MenuHost {
+  const menu = document.createElement('pdx-menu') as MenuHost;
+  // The PANEL is the element that is role="menu" — the id, the min-width
+  // and `.pdx-dropdown-menu-panel` are on it; this host only places it.
+  menu.menuClass = 'pdx-dropdown-menu-panel';
+  menu.menuId = menuId;
+  menu.minWidth = minWidth as number;
+  menu.renderItem = getItemSlot();
+  menu.items = items as unknown as MenuItem[];
+  // Its events, as this element's: the menu lives on <body>, where a listener on the
+  // dropdown would never hear them.
+  menu.addEventListener('pdx-select', (e) => {
+    e.stopPropagation();
+    const d = (e as CustomEvent<{ key: string; item: MenuItem }>).detail;
+    pdxSelect({ key: d.key, item: d.item });
+  });
+  menu.addEventListener('pdx-check', (e) => {
+    e.stopPropagation();
+    const d = (e as CustomEvent<{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }>).detail;
+    pdxCheck({ key: d.key, checked: d.checked, radioGroup: d.radioGroup, item: d.item });
+  });
+  // A chosen entry, and Escape inside it: the menu closes itself and says so with
+  // `open-change` `{ value: false }` (#288); the dropdown takes it away.
+  menu.addEventListener('open-change', (e) => {
+    if (!(e as CustomEvent<{ value: boolean }>).detail.value) close();
+  });
+  return menu;
+}
+
+// ─── Open / Close ────────────────────────────────────
+/** `focus`: the item that takes focus — the first, or the last (ArrowUp on the trigger). */
+function openMenu(focus: 'first' | 'last' = 'first'): void {
+  if (opened.peek() || !triggerEl) return;
+  // Where the focus goes back on close: what had it now — an invoker that is not the trigger
+  // (`command="--show"`), or the trigger itself — and the trigger when nothing had it.
+  const before = document.activeElement;
+  returnFocus = before instanceof HTMLElement && before !== document.body ? before : null;
+  menuEl = buildMenu();
+  opened = true;
+  openChange({ value: true });
+  triggerEl.setAttribute('aria-expanded', 'true');
+  // Only while open: the menu leaves the document when it closes.
+  triggerEl.setAttribute('aria-controls', menuId);
+
+  menuEl.open = true;
+  // Hidden until it is placed with its real size, two frames on: placed now, it has none,
+  // and an `end` placement would put it off the screen for those frames.
+  menuEl.style.visibility = 'hidden';
+  document.body.appendChild(menuEl);
+  positionMenu();
+
+  scrollHandler = () => positionMenu();
+  window.addEventListener('scroll', scrollHandler, { capture: true, passive: true });
+  window.addEventListener('resize', scrollHandler, { passive: true });
+
+  // pdx-menu puts the focus on its first item when it opens; the last is ours to ask for.
+  // Two frames: the menu builds in one and focuses in the next.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    // Placed again now that the list is drawn: measured at append, it had no size yet.
+    positionMenu();
+    if (menuEl) menuEl.style.visibility = '';
+    const enabled = menuEl?.querySelectorAll<HTMLElement>(':scope > [role="menu"] > .pdx-menu-item:not([disabled])');
+    // A reader who already moved to another entry keeps their place: pulled back, the
+    // ArrowRight they pressed on a submenu's entry would land on another one. The
+    // first entry is where pdx-menu's own opening puts the focus, so it is not a move; a
+    // submenu is drawn on <body>, so being in one is.
+    const active = document.activeElement;
+    const moved = !!active && active !== enabled?.[0]
+      && (!!menuEl?.contains(active) || !!active.closest?.('[data-submenu-key]'));
+    if (moved) return;
+    const target = enabled?.[focus === 'last' ? enabled.length - 1 : 0];
+    if (target && opened.peek()) target.focus();
+  }));
+
+  // Click-outside
+  outsideDispose = onPressOutside({
+    inside: (t) => !!(triggerEl?.contains(t) || menuEl?.contains(t) || (t as Element).closest?.('[data-submenu-key]')),
+    outside: () => close(),
+  });
+
+  // Escape closes. Tab closes too (APG menu button) and is NOT prevented: close() puts focus
+  // back on the trigger first, so the browser's Tab moves on from the menu button. Escape
+  // inside an open SUBMENU is the submenu's: it closes that one and stays in the menu.
+  escHandler = (e: KeyboardEvent) => {
+    const inSubmenu = (e.target as Element | null)?.closest?.('[data-submenu-key]');
+    if (e.key === 'Escape' && !inSubmenu) { e.preventDefault(); e.stopPropagation(); close(); }
+    else if (e.key === 'Tab') close();
+  };
+  document.addEventListener('keydown', escHandler, true);
+}
+
+// Closes the menu.
+function close(): void {
+  if (!opened.peek()) return;
+  opened = false;
+
+  if (triggerEl) { triggerEl.setAttribute('aria-expanded', 'false'); triggerEl.removeAttribute('aria-controls'); }
+  if (menuEl) { menuEl.closeSubmenu?.(); menuEl.remove(); menuEl = null; }
+  outsideDispose?.(); outsideDispose = null;
+  if (escHandler) { document.removeEventListener('keydown', escHandler, true); escHandler = null; }
+  if (scrollHandler) { window.removeEventListener('scroll', scrollHandler, true); window.removeEventListener('resize', scrollHandler); scrollHandler = null; }
+  (returnFocus?.isConnected ? returnFocus : triggerEl)?.focus();
+  returnFocus = null;
+  openChange({ value: false });
+}
+
+// Toggles the menu open/closed.
+function toggle(): void {
+  if (isDisabled()) return;
+  opened.peek() ? close() : openMenu();
+}
+
+// Opens the menu, focus on its first entry.
+function show(): void { openMenu('first'); }
+
+function positionMenu(): void {
+  if (!triggerEl || !menuEl) return;
+  const tRect = triggerEl.getBoundingClientRect();
+  const where = placement as string;
+  menuEl.style.position = 'fixed';
+  menuEl.style.zIndex = '1000';
+
+  // Measured hidden, and left as it was: still hidden while the opening places it.
+  const shown = menuEl.style.visibility;
+  menuEl.style.visibility = 'hidden';
+  const mRect = menuEl.getBoundingClientRect();
+  menuEl.style.visibility = shown;
+
+  let top = 0, left = 0;
+  if (where.startsWith('bottom')) {
+    top = tRect.bottom + 4;
+    left = where.includes('end') ? tRect.right - mRect.width : tRect.left;
+  } else if (where.startsWith('top')) {
+    top = tRect.top - mRect.height - 4;
+    left = where.includes('end') ? tRect.right - mRect.width : tRect.left;
+  }
+  if (top + mRect.height > window.innerHeight - 8 && where.startsWith('bottom')) top = tRect.top - mRect.height - 4;
+  if (top < 8 && where.startsWith('top')) top = tRect.bottom + 4;
+  if (left + mRect.width > window.innerWidth - 8) left = window.innerWidth - mRect.width - 8;
+  if (left < 8) left = 8;
+
+  menuEl.style.top = top + 'px';
+  menuEl.style.left = left + 'px';
+}
+
+function isDisabled(): boolean {
+  return (disabled as boolean) || (triggerEl as HTMLButtonElement | null)?.disabled === true;
+}
+
+/** An author's element made into the menu button: a tab stop and a role when it has none. */
+function adoptTrigger(node: HTMLElement, isOff: boolean): void {
+  if (!isNativeButton(node)) {
+    if (!node.hasAttribute('role')) node.setAttribute('role', 'button');
+    if (!node.hasAttribute('tabindex')) node.tabIndex = 0;
+  }
+  setTriggerDisabled(node, isOff);
+}
+
+function setTriggerDisabled(node: HTMLElement, isOff: boolean): void {
+  if (isNativeButton(node)) { node.disabled = isOff; return; }
+  if (isOff) node.setAttribute('aria-disabled', 'true');
+  else node.removeAttribute('aria-disabled');
+}
+
+function updateTriggerLabel(labelText: string, iconProp: string): void {
+  if (!triggerEl) return;
+  triggerEl.innerHTML = '';
+  // Icon: raw HTML (starts with '<') or an icon NAME → pdx-icon, loaded the first time one
+  // is named: a dropdown with a text trigger never pays for the icon set.
+  if (iconProp) {
+    if (iconProp.startsWith('<')) {
+      const span = document.createElement('span');
+      span.className = 'pdx-menu-trigger-icon';
+      span.innerHTML = sanitizeSVG(iconProp);
+      triggerEl.appendChild(span);
+    } else {
+      if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+      const ic = document.createElement('pdx-icon');
+      ic.setAttribute('name', iconProp);
+      ic.setAttribute('size', '16');
+      triggerEl.appendChild(ic);
+    }
+  }
+  if (labelText) {
+    triggerEl.appendChild(document.createTextNode(' ' + labelText + ' '));
+  } else if (iconProp) {
+    uiAttr(triggerEl, 'aria-label', () => uiString('dropdown-menu', 'label'));
+  }
+  // Chevron
+  const chev = document.createElement('span');
+  chev.className = 'pdx-dropdown-chevron';
+  chev.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+  triggerEl.appendChild(chev);
+}
+
+// ─── Build once, then follow the props ───────────────
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  const isOff = disabled as boolean;
+  // The author's trigger, projected where the render's <slot> was. Without one the
+  // empty <slot> goes, so the default dropdown's DOM is the button alone, as before.
+  const authored = el.querySelector<HTMLElement>(':scope > [slot="trigger"]');
+  el.querySelector(':scope > slot[name="trigger"]')?.remove();
+  if (authored) {
+    slotted = true;
+    triggerEl = anchorControl(authored);
+    adoptTrigger(triggerEl, isOff);
+  } else {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.part = 'trigger';
+    button.className = `pdx-${variant as string}`;
+    if (size) button.setAttribute('size', size as string);
+    if (isOff) button.disabled = true;
+    triggerEl = button;
+    updateTriggerLabel(label as string, icon as string);
+    el.appendChild(button);
+  }
+  triggerEl.setAttribute('aria-haspopup', 'menu');
+  triggerEl.setAttribute('aria-expanded', 'false');
+  triggerEl.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+  triggerEl.addEventListener('keydown', (e) => {
+    if (opened.peek() || isDisabled()) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); openMenu('first'); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); openMenu('last'); }
+    // A native button turns Enter and Space into a click; anything else does not.
+    else if (!isNativeButton(triggerEl) && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault(); openMenu('first');
+    }
+  });
+  built = true;
+});
+
+$effect(() => {
+  const list = items as unknown as MenuItem[];
+  const labelText = label as string;
+  const iconProp = icon as string;
+  const isOff = disabled as boolean;
+  const width = minWidth as number;
+  // A mis-shaped item is said when the items ARRIVE, not when the menu first opens: the
+  // list is built on open, and a menu nobody opens would never warn.
+  // Once per item object, shared with pdx-menu, so the opening does not say it again.
+  for (const it of list) warnMisshapenMenuItem('pdx-dropdown-menu', it);
+  if (!built) return;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (triggerEl && slotted) {
+      setTriggerDisabled(triggerEl, isOff);
+    } else if (triggerEl) {
+      (triggerEl as HTMLButtonElement).disabled = isOff;
+      updateTriggerLabel(labelText, iconProp);
+    }
+    if (menuEl) {
+      menuEl.minWidth = width;
+      menuEl.items = list;
+    }
+  });
+});
+
+// Teardown on DESTROY only: an effect that read a prop would run this on the prop's change and
+// leave the menu dead.
+onDestroy(() => {
+  alive = false;
+  close();
+});
+</script>

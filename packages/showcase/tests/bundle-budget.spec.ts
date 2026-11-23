@@ -443,7 +443,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocking 102.5 → 102.6. The local build of both, chunk by chunk, reads the opposite: the entry +17 B,
 // the whole −98 B. The difference between the two builds is not explained; it is recorded on #1287 with
 // the measurements, and this budget follows CI's line, which is the one that gates.
-const BUDGET_KB = { entry: 43.5, js: 483.0, css: 67, blocking: 102.6 };
+// blocking 102.6 → 102.9 (owner's OK, 2026-11-23): pdx-dropdown-menu moves to .pdx (#1210). The shell's
+// avatar menu ships it before the first paint. It is lighter alone (2,743 against 3,067 B, 0.89×), but its
+// chunk grows +193 B gzip: the compiled form imports six more names from core's chunk (defineComponent,
+// staticBlock, staticMarkup, onNextFrame, slotProjection, exposeOnElement), and its setup is longer than
+// the TypeScript one by its prop aliases and emitters. No core runtime the first paint did not carry
+// comes in. Main and this branch built the same day: blocking 102.58 → 102.77 KB; a tenth kept for CI's line.
+const BUDGET_KB = { entry: 43.5, js: 483.0, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

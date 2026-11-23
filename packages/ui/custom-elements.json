@@ -11828,7 +11828,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/dropdown-menu/pdx-dropdown-menu.ts",
+      "path": "src/dropdown-menu/pdx-dropdown-menu.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -12050,10 +12050,6 @@
               "name": "item",
               "description": "Renders one menu entry: a snippet `item(item)`.",
               "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
-            },
-            {
-              "name": "",
-              "description": "The content placed inside the element."
             }
           ],
           "cssParts": [
@@ -12076,7 +12072,7 @@
           "name": "pdx-dropdown-menu",
           "declaration": {
             "name": "PdxDropdownMenu",
-            "module": "src/dropdown-menu/pdx-dropdown-menu.ts"
+            "module": "src/dropdown-menu/pdx-dropdown-menu.pdx"
           }
         }
       ]
