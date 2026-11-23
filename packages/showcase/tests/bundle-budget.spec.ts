@@ -459,7 +459,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 483.9 → 484.1 (the same standing OK for #1210's batches): pdx-menu moves to .pdx, 0.83× alone
 // (3,559 against 4,266 B). The whole +0.2 KB while html`` stays for the components not moved yet; the
 // built dist: js 484.0 KB locally, entry and blocking unchanged.
-const BUDGET_KB = { entry: 43.6, js: 484.1, css: 67, blocking: 102.9 };
+// js 484.1 → 484.7 (the same standing OK for #1210's batches): pdx-data-grid moves to .pdx, 0.77× alone
+// (5,471 against 7,133 B; its once-per-module helpers, 645 B, in grid-shell.ts). The whole +0.6 KB while
+// html`` stays for the components not moved yet; the built dist: js 484.6 KB locally, entry and blocking
+// unchanged. Why the whole grows while the module shrinks is recorded on #1287.
+const BUDGET_KB = { entry: 43.6, js: 484.7, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
