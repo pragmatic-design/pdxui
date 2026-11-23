@@ -1,0 +1,141 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A placeholder for an empty data view: an icon, a title and a description, with an optional action
+ * button.
+ *
+ * @csspart icon - The icon above the title.
+ * @csspart title - The title, `role="heading"`.
+ * @csspart description - The description under the title.
+ * @csspart action - The action button, when `actionLabel` is set.
+ */
+// pdx-empty-state — Placeholder for empty data views.
+// Shows icon + title + description + optional action button.
+// Used inside List, Table, DataGrid when data is empty.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
+import { onNextFrame, onDestroy } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/empty-state';
+import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// Its default icon, once per page (a module beside it).
+import './empty-state-icons';
+
+/** The action button was pressed. */
+@event 'pdx-action': void;
+// Every element is built by the script, a frame after mount (#1284).
+@part(external) icon, title, description, action;
+/** Icon name */
+@prop(icon) icon: string = 'inbox';
+/** Title text. Empty: the empty-state.title component string, «No data». */
+@prop title: string = '';
+/** Description text */
+@prop description: string = '';
+/** Action button label (empty = no button) */
+@prop actionLabel: string = '';
+/** Icon size */
+@prop iconSize: number = 48;
+/** The title's heading level (1-6). Default 3: an empty state usually sits in a section
+ *  whose own heading is level 2. */
+@prop headingLevel: number = 3;
+@host el;
+
+let built = false;
+// Cleared on destroy: an update a frame away does not run on a destroyed state, as `ctx.frame` did not.
+let alive = true;
+// What the build appends to the host, next to the author's children. Core counts what
+// arrives there after mount as authored, so it is removed on destroy: left in place, a move
+// would put it back as children and the next mount would build a second copy beside it.
+const owned: Element[] = [];
+function own(node: Element): void { owned.push(node); el.appendChild(node); }
+// The elements an update writes to, kept from the build: found by a selector, the icon was not
+// (`.pdx-empty-state-icon pdx-icon` looked inside the icon), and a new `icon` was never drawn.
+let iconEl: HTMLElement | null = null;
+let titleEl: HTMLElement | null = null;
+let descEl: HTMLElement | null = null;
+let btnEl: HTMLElement | null = null;
+onDestroy(() => {
+  alive = false;
+  for (const node of owned.splice(0)) node.remove();
+});
+
+function levelOf(): string {
+  return String(Math.min(6, Math.max(1, Math.round(Number(headingLevel) || 3))));
+}
+
+// A frame after mount: a setup a move destroyed does not build again.
+// The host carries no class (#291): empty-state.css lays it out from the tag.
+onNextFrame(() => {
+  const iconName = icon as string;
+  const titleText = (title as string) || uiString('empty-state', 'title');
+  const descText = description as string;
+  const actionText = actionLabel as string;
+
+  // Icon
+  if (iconName) {
+    iconEl = document.createElement('pdx-icon');
+    iconEl.className = 'pdx-empty-state-icon';
+    iconEl.setAttribute('data-part', 'icon');
+    iconEl.setAttribute('name', iconName);
+    iconEl.setAttribute('size', String(iconSize as number));
+    own(iconEl);
+  }
+
+  // Title. A heading: as plain text, a screen reader moving by headings would
+  // skip the one message the view has. A role, not an h*, so the
+  // theme's type styles and the page's own heading margins do not apply to it.
+  titleEl = document.createElement('div');
+  titleEl.className = 'pdx-empty-state-title';
+  titleEl.setAttribute('data-part', 'title');
+  titleEl.setAttribute('role', 'heading');
+  titleEl.setAttribute('aria-level', levelOf());
+  titleEl.textContent = titleText;
+  own(titleEl);
+
+  // Description
+  if (descText) {
+    descEl = document.createElement('div');
+    descEl.className = 'pdx-empty-state-desc';
+    descEl.setAttribute('data-part', 'description');
+    descEl.textContent = descText;
+    own(descEl);
+  }
+
+  // Action button
+  if (actionText) {
+    btnEl = document.createElement('button');
+    btnEl.className = 'pdx-primary pdx-empty-state-action';
+    btnEl.setAttribute('data-part', 'action');
+    btnEl.setAttribute('size', 'sm');
+    btnEl.textContent = actionText;
+    btnEl.addEventListener('click', () => pdxAction());
+    own(btnEl);
+  }
+
+  // Slot for custom content
+  // (children passed by user are already in the element)
+  built = true;
+});
+
+// Update on prop changes — the icon and the action label too, or they would stay inert after the mount.
+$effect(() => {
+  const iconName = icon as string;
+  // Read in the effect, so a locale loaded later reaches it too.
+  const titleText = (title as string) || uiString('empty-state', 'title');
+  const descText = description as string;
+  const actionText = actionLabel as string;
+  void iconSize;
+  const level = levelOf();
+  if (!built) return;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (titleEl) { titleEl.textContent = titleText; titleEl.setAttribute('aria-level', level); }
+    if (descEl) descEl.textContent = descText;
+    if (iconEl && iconName) iconEl.setAttribute('name', iconName);
+    if (btnEl && actionText) btnEl.textContent = actionText;
+  });
+});
+</script>

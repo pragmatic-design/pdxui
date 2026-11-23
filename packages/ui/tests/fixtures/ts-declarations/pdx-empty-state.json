@@ -1,0 +1,164 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxEmptyState",
+  "tagName": "pdx-empty-state",
+  "category": "Data Display",
+  "order": 86,
+  "description": "A placeholder for an empty data view: an icon, a title and a description, with an optional action\nbutton.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "icon",
+      "description": "Icon name",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'",
+      "attribute": "icon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "Title text. Empty: the empty-state.title component string, «No data».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Description text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "actionLabel",
+      "description": "Action button label (empty = no button)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "actionlabel"
+    },
+    {
+      "kind": "field",
+      "name": "iconSize",
+      "description": "Icon size",
+      "type": {
+        "text": "number"
+      },
+      "default": "48",
+      "attribute": "iconsize"
+    },
+    {
+      "kind": "field",
+      "name": "headingLevel",
+      "description": "The title's heading level (1-6). Default 3: an empty state usually sits in a section\nwhose own heading is level 2.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3",
+      "attribute": "headinglevel"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-action",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The action button was pressed."
+    }
+  ],
+  "roles": [
+    "heading"
+  ],
+  "attributes": [
+    {
+      "name": "icon",
+      "fieldName": "icon",
+      "description": "Icon name",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'"
+    },
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "Title text. Empty: the empty-state.title component string, «No data».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Description text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "actionlabel",
+      "fieldName": "actionLabel",
+      "description": "Action button label (empty = no button)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "iconsize",
+      "fieldName": "iconSize",
+      "description": "Icon size",
+      "type": {
+        "text": "number"
+      },
+      "default": "48"
+    },
+    {
+      "name": "headinglevel",
+      "fieldName": "headingLevel",
+      "description": "The title's heading level (1-6). Default 3: an empty state usually sits in a section\nwhose own heading is level 2.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "icon",
+      "description": "The icon above the title."
+    },
+    {
+      "name": "title",
+      "description": "The title, `role=\"heading\"`."
+    },
+    {
+      "name": "description",
+      "description": "The description under the title."
+    },
+    {
+      "name": "action",
+      "description": "The action button, when `actionLabel` is set."
+    }
+  ]
+}
