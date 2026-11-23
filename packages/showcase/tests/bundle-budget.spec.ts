@@ -449,7 +449,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // staticBlock, staticMarkup, onNextFrame, slotProjection, exposeOnElement), and its setup is longer than
 // the TypeScript one by its prop aliases and emitters. No core runtime the first paint did not carry
 // comes in. Main and this branch built the same day: blocking 102.58 → 102.77 KB; a tenth kept for CI's line.
-const BUDGET_KB = { entry: 43.5, js: 483.0, css: 67, blocking: 102.9 };
+// js 483.0 → 483.9 (the same standing OK for #1210's batches, within its +1 KB): pdx-file-upload moves to
+// .pdx, 1.08× alone. Its chunk +760 B gzip: a compiled template where the TypeScript one was an html``
+// string, and html`` stays for the components not moved yet. pdx-tag-input and it both render a snippet
+// with `@render`, so core's render-snippet leaves tag-input's chunk for one of its own (+377 B, tag-input
+// −195 B). The whole +1.1 KB; the built dist: js 483.8 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 483.9, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
