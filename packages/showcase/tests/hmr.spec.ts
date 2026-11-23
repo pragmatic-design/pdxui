@@ -50,6 +50,11 @@ async function openSites(page: Page): Promise<void> {
     await expect(page.locator('[data-test="sites"]')).toBeVisible();
     // Let the HMR client connect: an update sent before it does is not received.
     await page.waitForFunction(() => document.querySelector('[data-test="grid"]') !== null);
+    // Let the page finish loading (#1294): after the grid mounts it still asks for the modules it loads
+    // when idle, and the dev server compiles each on its one thread. A save in that window waited for
+    // those compiles: the first save after the server started measured ~450 ms of "server", a later one
+    // ~10 ms. What is measured is an edit, not the page's own loading.
+    await page.waitForLoadState('networkidle');
 }
 
 /**
@@ -71,8 +76,11 @@ function markHmr(page: Page, file: string): HmrMarks {
     page.on('websocket', (ws) => ws.on('framereceived', (frame) => {
         if (!marks.update && typeof frame.payload === 'string' && frame.payload.includes('"type":"update"')) marks.update = Date.now();
     }));
-    page.on('request', (r) => { if (!marks.request && isModule(r.url())) marks.request = Date.now(); });
-    page.on('response', (r) => { if (!marks.response && isModule(r.url())) marks.response = Date.now(); });
+    // The page's own load asks for the module with a `t=` too once an earlier test updated it, so a
+    // request counts only after the update that causes it, and a response only after that request
+    // (#1294: a later run read "request -678 ms").
+    page.on('request', (r) => { if (marks.update && !marks.request && isModule(r.url())) marks.request = Date.now(); });
+    page.on('response', (r) => { if (marks.request && !marks.response && isModule(r.url())) marks.response = Date.now(); });
     return marks;
 }
 
