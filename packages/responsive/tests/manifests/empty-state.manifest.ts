@@ -2,7 +2,7 @@
  * MANIFEST — pdx-empty-state
  *
  * Contracts written by inspecting the source and the CSS:
- *  - packages/ui/src/empty-state/pdx-empty-state.ts → a container with an icon, a title, a description and an action
+ *  - packages/ui/src/empty-state/pdx-empty-state.pdx → a container with an icon, a title, a description and an action
  *  - packages/design/src/components/empty-state.css  (the .pdx-empty-state* block)
  *
  * DOM structure (host vs inner):

@@ -12324,7 +12324,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/empty-state/pdx-empty-state.ts",
+      "path": "src/empty-state/pdx-empty-state.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -12497,7 +12497,7 @@
           "name": "pdx-empty-state",
           "declaration": {
             "name": "PdxEmptyState",
-            "module": "src/empty-state/pdx-empty-state.ts"
+            "module": "src/empty-state/pdx-empty-state.pdx"
           }
         }
       ]

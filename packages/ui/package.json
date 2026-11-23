@@ -294,11 +294,6 @@
       "types": "./dist/block-ui/pdx-block-ui.d.ts",
       "import": "./dist/block-ui/pdx-block-ui.js"
     },
-    "./empty-state": {
-      "development": "./src/empty-state/pdx-empty-state.ts",
-      "types": "./dist/empty-state/pdx-empty-state.d.ts",
-      "import": "./dist/empty-state/pdx-empty-state.js"
-    },
     "./statistic": {
       "development": "./src/statistic/pdx-statistic.ts",
       "types": "./dist/statistic/pdx-statistic.d.ts",
@@ -664,12 +659,18 @@
       "types": "./dist/list/pdx-list.d.ts",
       "import": "./dist/list/pdx-list.js"
     },
+    "./empty-state": {
+      "development": "./src/empty-state/pdx-empty-state.pdx",
+      "types": "./dist/empty-state/pdx-empty-state.d.ts",
+      "import": "./dist/empty-state/pdx-empty-state.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
     "dist/index.js",
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
+    "dist/empty-state/empty-state-icons.js",
     "dist/field-list/field-list-strings.js",
     "dist/inline-edit/inline-edit-strings.js",
     "dist/search-input/search-input-icons.js",
@@ -678,6 +679,7 @@
     "src/index.ts",
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
+    "src/empty-state/empty-state-icons.ts",
     "src/field-list/field-list-strings.ts",
     "src/inline-edit/inline-edit-strings.ts",
     "src/search-input/search-input-icons.ts",

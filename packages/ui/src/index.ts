@@ -101,7 +101,7 @@ import './scheduler/pdx-scheduler.pdx';
 import './description-list/pdx-description-list';
 import './timeline/pdx-timeline';
 import './statistic/pdx-statistic';
-import './empty-state/pdx-empty-state';
+import './empty-state/pdx-empty-state.pdx';
 import './image/pdx-image';
 import './carousel/pdx-carousel';
 import './infinite-scroll/pdx-infinite-scroll.pdx';
