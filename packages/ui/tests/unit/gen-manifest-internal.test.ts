@@ -33,9 +33,11 @@ describe('a .pdx that is neither public nor internal', () => {
         expect(undeclaredPdxFiles(root)).toEqual([]);
     });
 
+    // A whole-library build: ~1.3 s alone, 5.1 s in a pre-push beside the other suites (#1313).
+    // The same ceiling as the one in manifest-component-tokens.test.ts (#539); it is no speed check.
     it('the library has none, and its manifest builds', () => {
         expect(() => buildManifest()).not.toThrow();
-    });
+    }, 60_000);
 });
 
 describe('the roles an @internal view draws', () => {
