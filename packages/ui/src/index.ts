@@ -51,7 +51,7 @@ import './mention/pdx-mention';
 import './cascader/pdx-cascader';
 import './tree/pdx-tree';
 import './tree-select/pdx-tree-select';
-import './inline-edit/pdx-inline-edit';
+import './inline-edit/pdx-inline-edit.pdx';
 
 // Tier 1C: Forms
 import './form/pdx-form.pdx';

@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
-import '../../src/inline-edit/pdx-inline-edit';
+import '../../src/inline-edit/pdx-inline-edit.pdx';
 
 describe('pdx-inline-edit', () => {
     beforeEach(cleanup);

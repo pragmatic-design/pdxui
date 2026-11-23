@@ -219,11 +219,6 @@
       "types": "./dist/tree-select/pdx-tree-select.d.ts",
       "import": "./dist/tree-select/pdx-tree-select.js"
     },
-    "./inline-edit": {
-      "development": "./src/inline-edit/pdx-inline-edit.ts",
-      "types": "./dist/inline-edit/pdx-inline-edit.d.ts",
-      "import": "./dist/inline-edit/pdx-inline-edit.js"
-    },
     "./wizard": {
       "development": "./src/wizard/pdx-wizard.ts",
       "types": "./dist/wizard/pdx-wizard.d.ts",
@@ -664,6 +659,11 @@
       "types": "./dist/number-input/pdx-number-input.d.ts",
       "import": "./dist/number-input/pdx-number-input.js"
     },
+    "./inline-edit": {
+      "development": "./src/inline-edit/pdx-inline-edit.pdx",
+      "types": "./dist/inline-edit/pdx-inline-edit.d.ts",
+      "import": "./dist/inline-edit/pdx-inline-edit.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -671,6 +671,7 @@
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
     "dist/field-list/field-list-strings.js",
+    "dist/inline-edit/inline-edit-strings.js",
     "dist/search-input/search-input-icons.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
@@ -678,6 +679,7 @@
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
     "src/field-list/field-list-strings.ts",
+    "src/inline-edit/inline-edit-strings.ts",
     "src/search-input/search-input-icons.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"

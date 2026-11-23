@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { required } from '@pdxui/core';
 import '../../src/number-input/pdx-number-input.pdx';
-import '../../src/inline-edit/pdx-inline-edit';
+import '../../src/inline-edit/pdx-inline-edit.pdx';
 
 type NumberInput = HTMLElement & { value: number | null };
 

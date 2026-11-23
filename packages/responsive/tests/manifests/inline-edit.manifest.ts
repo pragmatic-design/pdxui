@@ -4,7 +4,7 @@
  * Edit in place: in display mode it shows the formatted value (clickable), and in edit mode it
  * replaces the display with the editor for the type (here type="text" → an <input>).
  *
- * SOURCE: packages/ui/src/inline-edit/pdx-inline-edit.ts
+ * SOURCE: packages/ui/src/inline-edit/pdx-inline-edit.pdx
  * CSS:      packages/design/src/components/inline-edit.css
  *
  * ── DOM structure (built in a requestAnimationFrame, then filled by ctx.track) ──
