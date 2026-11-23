@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-file-upload (dropzone + file list)
  *
- * Contracts written by inspecting the source (packages/ui/src/file-upload/pdx-file-upload.ts)
+ * Contracts written by inspecting the source (packages/ui/src/file-upload/pdx-file-upload.pdx)
  * and the CSS (packages/design/src/components/file-upload.css).
  *
  * ── DOM structure (light DOM) ──

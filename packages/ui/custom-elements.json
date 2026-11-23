@@ -14038,7 +14038,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/file-upload/pdx-file-upload.ts",
+      "path": "src/file-upload/pdx-file-upload.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -14219,20 +14219,12 @@
           ],
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: File[] }"
-            },
-            {
               "name": "pdx-error",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when an error occurs.",
-              "detail": "{ file, error }"
+              "detail": "{ file: File; error: string }"
             },
             {
               "name": "pdx-select",
@@ -14240,7 +14232,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when an item is selected.",
-              "detail": "{ files }"
+              "detail": "{ files: File[] }"
             },
             {
               "name": "pdx-remove",
@@ -14248,7 +14240,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when an item is removed.",
-              "detail": "{ file, index }"
+              "detail": "{ file: File; index: number }"
             },
             {
               "name": "pdx-upload",
@@ -14256,7 +14248,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-upload`.",
-              "detail": "{ file }"
+              "detail": "{ file: File }"
             },
             {
               "name": "pdx-progress",
@@ -14264,7 +14256,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-progress`.",
-              "detail": "{ file, percent }"
+              "detail": "{ file: File; percent: number }"
             },
             {
               "name": "pdx-success",
@@ -14272,7 +14264,15 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-success`.",
-              "detail": "{ file, response }"
+              "detail": "{ file: File; response: unknown }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: File[] }"
             }
           ],
           "roles": [
@@ -14433,7 +14433,7 @@
           "name": "pdx-file-upload",
           "declaration": {
             "name": "PdxFileUpload",
-            "module": "src/file-upload/pdx-file-upload.ts"
+            "module": "src/file-upload/pdx-file-upload.pdx"
           }
         }
       ]

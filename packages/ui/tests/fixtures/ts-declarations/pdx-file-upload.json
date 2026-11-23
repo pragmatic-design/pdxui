@@ -1,0 +1,386 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFileUpload",
+  "tagName": "pdx-file-upload",
+  "category": "Specialized Inputs",
+  "order": 29,
+  "description": "Drag-and-drop file upload with validation, image preview and size and count limits.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "accept",
+      "description": "Accepted file types (the input accept attribute).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "accept"
+    },
+    {
+      "kind": "field",
+      "name": "multiple",
+      "description": "Allow selecting more than one.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "multiple"
+    },
+    {
+      "kind": "field",
+      "name": "maxSize",
+      "description": "Maximum file size in bytes.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxsize"
+    },
+    {
+      "kind": "field",
+      "name": "maxFiles",
+      "description": "Maximum number of files.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxfiles"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The dropzone's text and name. Empty: the file-upload.drop component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "auto",
+      "description": "Upload immediately on selection.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "auto"
+    },
+    {
+      "kind": "field",
+      "name": "action",
+      "description": "URL to upload files to.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "action"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the dropzone's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "File[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "method",
+      "name": "addFiles",
+      "parameters": [
+        {
+          "name": "files",
+          "type": {
+            "text": "FileList | File[]"
+          }
+        }
+      ],
+      "description": "Put files through the checks a drop goes through: each refusal emits `pdx-error` and is shown in the list."
+    },
+    {
+      "kind": "method",
+      "name": "removeFile",
+      "parameters": [
+        {
+          "name": "index",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Remove the file at this index, aborting its upload when one is running, and move focus off the row it deletes."
+    },
+    {
+      "kind": "method",
+      "name": "uploadAll",
+      "parameters": [],
+      "description": "Start uploading every file still pending; those uploading, done or failed are left alone."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-file-upload-md",
+        "sm": ".pdx-file-upload-sm",
+        "lg": ".pdx-file-upload-lg"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when an error occurs.",
+      "detail": "{ file: File; error: string }"
+    },
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when an item is selected.",
+      "detail": "{ files: File[] }"
+    },
+    {
+      "name": "pdx-remove",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when an item is removed.",
+      "detail": "{ file: File; index: number }"
+    },
+    {
+      "name": "pdx-upload",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-upload`.",
+      "detail": "{ file: File }"
+    },
+    {
+      "name": "pdx-progress",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-progress`.",
+      "detail": "{ file: File; percent: number }"
+    },
+    {
+      "name": "pdx-success",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-success`.",
+      "detail": "{ file: File; response: unknown }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: File[] }"
+    }
+  ],
+  "roles": [
+    "button",
+    "list",
+    "listitem",
+    "progressbar",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "accept",
+      "fieldName": "accept",
+      "description": "Accepted file types (the input accept attribute).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "multiple",
+      "fieldName": "multiple",
+      "description": "Allow selecting more than one.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "maxsize",
+      "fieldName": "maxSize",
+      "description": "Maximum file size in bytes.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxfiles",
+      "fieldName": "maxFiles",
+      "description": "Maximum number of files.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The dropzone's text and name. Empty: the file-upload.drop component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "auto",
+      "fieldName": "auto",
+      "description": "Upload immediately on selection.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "action",
+      "fieldName": "action",
+      "description": "URL to upload files to.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the dropzone's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "file",
+      "description": "Renders one file in the list: a snippet `file(file, status, progress)`.",
+      "signature": "(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: the drop zone, the refusals and the list."
+    },
+    {
+      "name": "dropzone",
+      "description": "The `role=\"button\"` area a file is dropped on, or clicked to browse."
+    },
+    {
+      "name": "list",
+      "description": "The `role=\"list\"` of the files it holds; busy while one uploads."
+    },
+    {
+      "name": "file",
+      "description": "A file of the list."
+    },
+    {
+      "name": "remove",
+      "description": "A file's remove button."
+    },
+    {
+      "name": "progress",
+      "description": "A file's `role=\"progressbar\"`, while it uploads."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "dragover",
+      "description": "A drag is over the drop zone."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-file-upload-bg-dragover"
+    },
+    {
+      "name": "--pdx-file-upload-border-color-dragover"
+    }
+  ]
+}

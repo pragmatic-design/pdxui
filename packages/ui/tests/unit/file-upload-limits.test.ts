@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 
 type Upload = HTMLElement & { addFiles(files: File[]): void; removeFile(i: number): void };
 

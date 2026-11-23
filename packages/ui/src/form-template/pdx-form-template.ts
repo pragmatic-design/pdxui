@@ -39,7 +39,7 @@ import '../segmented/pdx-segmented.pdx';
 import '../slider/pdx-slider.pdx';
 import '../rating/pdx-rating.pdx';
 import '../color-picker/pdx-color-picker.pdx';
-import '../file-upload/pdx-file-upload';
+import '../file-upload/pdx-file-upload.pdx';
 import '../tag-input/pdx-tag-input.pdx';
 import '../otp-input/pdx-otp-input';
 import '../wizard/pdx-wizard';

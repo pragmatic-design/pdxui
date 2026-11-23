@@ -12,7 +12,7 @@ import { createForm } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
 import '../../src/carousel/pdx-carousel';
 import '../../src/field-list/pdx-field-list.pdx';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 import '../../src/mention/pdx-mention';
 import '../../src/tag-input/pdx-tag-input.pdx';
 

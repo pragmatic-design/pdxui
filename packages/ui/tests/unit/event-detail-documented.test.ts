@@ -100,7 +100,7 @@ describe('an event with a detail says what is in it', () => {
         // leaves the scan, and its name leaves this list.
         expect(checks).toEqual(expect.arrayContaining([
             'pdx-tree pdx-expand', 'pdx-splitter pdx-resize', 'pdx-select pdx-search', 'pdx-calendar pdx-navigate',
-            'pdx-autocomplete query-change', 'pdx-file-upload pdx-upload', 'pdx-bottom-sheet pdx-detent-change',
+            'pdx-autocomplete query-change', 'pdx-bottom-sheet pdx-detent-change',
         ]));
     });
 

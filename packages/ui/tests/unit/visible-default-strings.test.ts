@@ -26,7 +26,7 @@ import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/badge/pdx-badge.pdx';
 import '../../src/select/pdx-select';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/file-upload/pdx-file-upload';
+import '../../src/file-upload/pdx-file-upload.pdx';
 import '../../src/inline-edit/pdx-inline-edit.pdx';
 import '../../src/field-list/pdx-field-list.pdx';
 
