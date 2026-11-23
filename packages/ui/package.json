@@ -309,11 +309,6 @@
       "types": "./dist/description-list/pdx-description-list.d.ts",
       "import": "./dist/description-list/pdx-description-list.js"
     },
-    "./list": {
-      "development": "./src/list/pdx-list.ts",
-      "types": "./dist/list/pdx-list.d.ts",
-      "import": "./dist/list/pdx-list.js"
-    },
     "./splitter": {
       "development": "./src/splitter/pdx-splitter.ts",
       "types": "./dist/splitter/pdx-splitter.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/sortable-list/pdx-sortable-list.pdx",
       "types": "./dist/sortable-list/pdx-sortable-list.d.ts",
       "import": "./dist/sortable-list/pdx-sortable-list.js"
+    },
+    "./list": {
+      "development": "./src/list/pdx-list.pdx",
+      "types": "./dist/list/pdx-list.d.ts",
+      "import": "./dist/list/pdx-list.js"
     },
     "./package.json": "./package.json"
   },

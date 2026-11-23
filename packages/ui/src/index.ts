@@ -94,7 +94,7 @@ import './aspect-ratio/pdx-aspect-ratio';
 import './block-ui/pdx-block-ui';
 
 // Tier 1F: Data Display
-import './list/pdx-list';
+import './list/pdx-list.pdx';
 import './sortable-list/pdx-sortable-list.pdx';
 import './kanban/pdx-kanban.pdx';
 import './scheduler/pdx-scheduler.pdx';

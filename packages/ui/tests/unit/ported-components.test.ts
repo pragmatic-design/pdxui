@@ -36,6 +36,7 @@ const PORTED: Record<string, string> = {
     'pdx-inline-edit': 'src/inline-edit/pdx-inline-edit.pdx',
     'pdx-infinite-scroll': 'src/infinite-scroll/pdx-infinite-scroll.pdx',
     'pdx-sortable-list': 'src/sortable-list/pdx-sortable-list.pdx',
+    'pdx-list': 'src/list/pdx-list.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',

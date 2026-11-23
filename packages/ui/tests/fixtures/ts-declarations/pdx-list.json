@@ -1,0 +1,282 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxList",
+  "tagName": "pdx-list",
+  "category": "Data Display",
+  "order": 79,
+  "description": "A list bound to data, an array or a DataSource, with custom item templates, a loading overlay\nand an empty state.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "The data source to render from.",
+      "type": {
+        "text": "import('@pdxui/core').DataSource<T> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "description": "Item field used as a unique key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "dividers",
+      "description": "Shows dividers between items.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "dividers"
+    },
+    {
+      "kind": "field",
+      "name": "clickable",
+      "description": "Whether items are clickable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clickable"
+    },
+    {
+      "kind": "field",
+      "name": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "bordered"
+    },
+    {
+      "kind": "field",
+      "name": "emptyTitle",
+      "description": "The empty state's title. Empty: the list.empty component string, «No items».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "emptytitle"
+    },
+    {
+      "kind": "field",
+      "name": "emptyDescription",
+      "description": "Description shown when the list is empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "emptydescription"
+    },
+    {
+      "kind": "field",
+      "name": "emptyIcon",
+      "description": "Icon shown in the empty state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'",
+      "attribute": "emptyicon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabelledby",
+      "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabelledby"
+    },
+    {
+      "kind": "method",
+      "name": "refresh",
+      "parameters": [],
+      "description": "Reloads its data."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-click",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An item was activated, by a click or Enter/Space, in a `clickable` list: the item, its index, and its `id-field`.",
+      "detail": "{ item: T; index: number; id: unknown }"
+    }
+  ],
+  "roles": [
+    "list",
+    "listitem"
+  ],
+  "attributes": [
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "description": "Item field used as a unique key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "dividers",
+      "fieldName": "dividers",
+      "description": "Shows dividers between items.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "clickable",
+      "fieldName": "clickable",
+      "description": "Whether items are clickable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "bordered",
+      "fieldName": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "emptytitle",
+      "fieldName": "emptyTitle",
+      "description": "The empty state's title. Empty: the list.empty component string, «No items».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "emptydescription",
+      "fieldName": "emptyDescription",
+      "description": "Description shown when the list is empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "emptyicon",
+      "fieldName": "emptyIcon",
+      "description": "Icon shown in the empty state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabelledby",
+      "fieldName": "ariaLabelledby",
+      "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one item: a snippet `item(item, index)`.",
+      "signature": "(item: T, index: number)"
+    },
+    {
+      "name": "empty",
+      "description": "Shown when the list has no items: a snippet `empty()`.",
+      "signature": "()"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "list",
+      "description": "The `role=\"list\"` container of the items."
+    },
+    {
+      "name": "item",
+      "description": "An item's row, `role=\"listitem\"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3)."
+    },
+    {
+      "name": "empty",
+      "description": "The empty state."
+    },
+    {
+      "name": "overlay",
+      "description": "The loading overlay, drawn while the source loads."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "bordered",
+      "description": "`bordered` is set (the default): the list is framed."
+    },
+    {
+      "name": "dividers",
+      "description": "`dividers` is set: a rule between items."
+    },
+    {
+      "name": "loading",
+      "description": "Its source is pending: the host is `aria-busy` too (A4)."
+    },
+    {
+      "name": "empty",
+      "description": "It has no items, and is not loading."
+    }
+  ],
+  "x-pdx-context": {
+    "injects": [
+      {
+        "token": "DataSourceContext",
+        "optional": true
+      }
+    ]
+  }
+}

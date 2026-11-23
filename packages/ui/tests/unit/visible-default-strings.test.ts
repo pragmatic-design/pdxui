@@ -16,7 +16,7 @@ import '../../src/overlay/pdx-overlay-outlet';
 import '../../src/alert-dialog/pdx-alert-dialog';
 import '../../src/command/pdx-command';
 import '../../src/empty-state/pdx-empty-state';
-import '../../src/list/pdx-list';
+import '../../src/list/pdx-list.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/edit-drawer/pdx-edit-drawer';
 import '../../src/field-group/pdx-field-group';

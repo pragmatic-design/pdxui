@@ -24,7 +24,7 @@ Data-driven list with custom rows.
 |---|---|
 | `refresh()` | Reloads its data. |
 
-**Events:** `pdx-click` → `detail: { item, index, id }` — Fired on `pdx-click`.
+**Events:** `pdx-click` → `detail: { item: T; index: number; id: unknown }` — An item was activated, by a click or Enter/Space, in a `clickable` list: the item, its index, and its `id-field`.
 
 **Renders:** roles `list` · `listitem`
 
