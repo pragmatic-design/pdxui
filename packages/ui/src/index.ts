@@ -90,7 +90,7 @@ import './splitter/pdx-splitter';
 import './scroll-area/pdx-scroll-area';
 import './scroll-spy/pdx-scroll-spy';
 import './affix/pdx-affix';
-import './aspect-ratio/pdx-aspect-ratio';
+import './aspect-ratio/pdx-aspect-ratio.pdx';
 import './block-ui/pdx-block-ui';
 
 // Tier 1F: Data Display

@@ -1,0 +1,38 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAspectRatio",
+  "tagName": "pdx-aspect-ratio",
+  "category": "Layout",
+  "order": 77,
+  "description": "Keeps its content at a fixed aspect ratio, using the native CSS aspect-ratio.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "ratio",
+      "description": "Aspect ratio as \"width/height\" string (e.g. \"16/9\", \"4/3\", \"1/1\") or number",
+      "type": {
+        "text": "string"
+      },
+      "default": "'16/9'",
+      "attribute": "ratio"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "ratio",
+      "fieldName": "ratio",
+      "description": "Aspect ratio as \"width/height\" string (e.g. \"16/9\", \"4/3\", \"1/1\") or number",
+      "type": {
+        "text": "string"
+      },
+      "default": "'16/9'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ]
+}

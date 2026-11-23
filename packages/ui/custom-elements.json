@@ -1312,7 +1312,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/aspect-ratio/pdx-aspect-ratio.ts",
+      "path": "src/aspect-ratio/pdx-aspect-ratio.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -1359,7 +1359,7 @@
           "name": "pdx-aspect-ratio",
           "declaration": {
             "name": "PdxAspectRatio",
-            "module": "src/aspect-ratio/pdx-aspect-ratio.ts"
+            "module": "src/aspect-ratio/pdx-aspect-ratio.pdx"
           }
         }
       ]

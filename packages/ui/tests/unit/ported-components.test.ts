@@ -46,6 +46,7 @@ const PORTED: Record<string, string> = {
     'pdx-dropdown-menu': 'src/dropdown-menu/pdx-dropdown-menu.pdx',
     'pdx-file-upload': 'src/file-upload/pdx-file-upload.pdx',
     'pdx-menu': 'src/menu/pdx-menu.pdx',
+    'pdx-aspect-ratio': 'src/aspect-ratio/pdx-aspect-ratio.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',

@@ -1,0 +1,25 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * Keeps its content at a fixed aspect ratio, using the native CSS aspect-ratio.
+ */
+// pdx-aspect-ratio — Maintains a fixed aspect ratio on its content.
+// Uses native CSS aspect-ratio. Content fills the container.
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/aspect-ratio';
+
+/** Aspect ratio as "width/height" string (e.g. "16/9", "4/3", "1/1") or number */
+@prop ratio: string = '16/9';
+@host el;
+
+// The host carries no class (#290): aspect-ratio.css draws the box on the tag. Its ratio is
+// written a frame later, as the TypeScript version wrote it.
+$effect(() => {
+  const value = ratio as string;
+  requestAnimationFrame(() => {
+    el.style.aspectRatio = value;
+  });
+});
+</script>

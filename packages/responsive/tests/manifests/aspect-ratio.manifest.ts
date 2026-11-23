@@ -2,7 +2,7 @@
  * MANIFEST — pdx-aspect-ratio
  *
  * Contracts DERIVED by inspecting the source and the CSS:
- *   - Source: packages/ui/src/aspect-ratio/pdx-aspect-ratio.ts
+ *   - Source: packages/ui/src/aspect-ratio/pdx-aspect-ratio.pdx
  *       · the HOST <pdx-aspect-ratio> gets the class `pdx-aspect-ratio` plus an inline
  *         style.aspectRatio = ratio (default '16/9'), settato in requestAnimationFrame.
  *       · the content is projected through <slot> as a direct child (CSS: `> *`).
