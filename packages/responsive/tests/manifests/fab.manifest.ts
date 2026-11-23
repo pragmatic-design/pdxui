@@ -2,7 +2,7 @@
  * MANIFEST — pdx-fab (Floating Action Button + Speed Dial)
  *
  * Contracts DERIVED by inspecting the source and the CSS:
- *   - Source: packages/ui/src/fab/pdx-fab.ts
+ *   - Source: packages/ui/src/fab/pdx-fab.pdx
  *       · the HOST <pdx-fab> gets the container class `pdx-fab-container`, and its `position` attribute places it (#630)
  *         (position:fixed, z-index:90). It is NOT the button.
  *       · the round button is an INNER <button class="pdx-fab" data-part="root">, sized and coloured by the host's size and variant (#630)

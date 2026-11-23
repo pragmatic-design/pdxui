@@ -12952,7 +12952,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/fab/pdx-fab.ts",
+      "path": "src/fab/pdx-fab.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -13311,7 +13311,7 @@
           "name": "pdx-fab",
           "declaration": {
             "name": "PdxFab",
-            "module": "src/fab/pdx-fab.ts"
+            "module": "src/fab/pdx-fab.pdx"
           }
         }
       ]

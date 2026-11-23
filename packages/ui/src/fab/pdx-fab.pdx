@@ -1,0 +1,400 @@
+<template></template>
+
+<script>
+/**
+ * A floating action button that can open a speed dial of actions, in four directions and four layouts.
+ */
+// pdx-fab — Floating Action Button with advanced Speed Dial.
+// Supports: direction (up/down/left/right), type (linear/circle/semi-circle/quarter-circle),
+// tooltip labels, mask overlay, trigger (click/hover), animation stagger.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
+import { onDestroy, onNextFrame, untracked } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import type { FabAction } from './fab-types';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/fab';
+import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+// Its default icon, once per page (a module beside it).
+import './fab-icons';
+
+/**
+ * The speed dial opened (`true`) or closed (`false`): its open state, read-only (#288). The
+ * parent never writes it, so it is not a model, and `::open` on it is an error.
+ */
+@event 'open-change': { value: boolean };
+/** The button was pressed, on a FAB with no speed dial. */
+@event 'pdx-click': Record<string, never>;
+/** An action of the speed dial was chosen. */
+@event 'pdx-select': { key: string; action: FabAction };
+// On the host as a custom state (#132, #288): fab.css draws the open dial, the turned icon and the
+// mask from it.
+@state open = opened;
+// The main button, the speed dial, an action, its label and the mask. Built by the script (#1284).
+@part(external) root, menu, item, label, mask;
+// The axes fab.css keys by (#630), reflected on the host; a variant and a size map the class that
+// draws the same button on native markup. The position places the host itself.
+@variants {
+  /** primary (the default), secondary or danger. */
+  variant: { primary: '.pdx-fab-primary', secondary: '.pdx-fab-secondary', danger: '.pdx-fab-danger' } = primary;
+  /** sm, md (the default) or lg. */
+  size: { md: '.pdx-fab-md', sm: '.pdx-fab-sm', lg: '.pdx-fab-lg' } = md;
+  /** bottom-right (the default), bottom-left, top-right or top-left. */
+  position: { bottom-right, bottom-left, top-right, top-left } = bottom-right;
+}
+/** Main button icon name */
+@prop(icon) icon: string = 'plus';
+/** Main button label (screen reader). Empty: the fab.label component string, «Actions». */
+@prop label: string = '';
+/** Speed dial actions */
+@prop actions: unknown[] = [];
+/** Speed dial direction: up (default), down, left, right */
+@prop direction: string = 'up';
+/** Speed dial layout: linear (default), circle, semi-circle, quarter-circle */
+@prop type: string = 'linear';
+/** Show tooltip labels next to actions */
+@prop showTooltip: boolean = true;
+/** Show mask overlay when open */
+@prop mask: boolean = false;
+/** Trigger mode: click (default), hover */
+@prop trigger: string = 'click';
+@host el;
+
+// The overlay verbs (#288): `open()` is `show()`.
+@expose show, close, toggle, isOpen;
+
+let opened = $signal(false);
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(opened);
+let maskEl: HTMLElement | null = null;
+let hoverCloseTimer: number | null = null;
+// Cleared on destroy: a frame or a timer that comes after it does nothing.
+let alive = true;
+
+// Position circular actions relative to FAB button center
+function positionCircularActions(dir: string, layoutType: string): void {
+  const fabBtn = el.querySelector('.pdx-fab') as HTMLElement;
+  const dial = el.querySelector('.pdx-fab-dial') as HTMLElement;
+  if (!fabBtn || !dial) return;
+
+  const btnEls = Array.from(dial.querySelectorAll('.pdx-fab-action-wrap')) as HTMLElement[];
+  if (!btnEls.length) return;
+
+  const count = btnEls.length;
+  const radius = 70;
+  const btnSize = 40; // action button size
+  const fabSize = fabBtn.offsetWidth || 56;
+
+  // Angles in degrees (0 = right, 90 = down, -90 = up, 180 = left)
+  let startAngle: number;
+  let endAngle: number;
+
+  if (layoutType === 'semi-circle') {
+    // Full 180° arc centered on the direction
+    if (dir === 'up') { startAngle = -180; endAngle = 0; }
+    else if (dir === 'down') { startAngle = 0; endAngle = 180; }
+    else if (dir === 'left') { startAngle = 90; endAngle = 270; }
+    else { startAngle = -90; endAngle = 90; } // right
+  } else if (layoutType === 'quarter-circle') {
+    // 90° arc — one quadrant of the Cartesian plane centered on FAB
+    // Supports compound directions: up-left, up-right, down-left, down-right
+    // Fallback: up→up-left, down→down-right, left→down-left, right→up-right
+    if (dir === 'up-left' || dir === 'up') { startAngle = -180; endAngle = -90; }
+    else if (dir === 'up-right' || dir === 'right') { startAngle = -90; endAngle = 0; }
+    else if (dir === 'down-right' || dir === 'down') { startAngle = 0; endAngle = 90; }
+    else { startAngle = 90; endAngle = 180; } // down-left / left
+  } else {
+    // Full circle — evenly spaced
+    startAngle = 0; endAngle = 360;
+  }
+
+  const totalAngle = endAngle - startAngle;
+  const angleStep = count > 1
+    ? totalAngle / (layoutType === 'circle' ? count : count - 1)
+    : 0;
+
+  // Position dial overlay centered on FAB
+  dial.style.position = 'absolute';
+  dial.style.left = '0';
+  dial.style.top = '0';
+  dial.style.right = '0';
+  dial.style.bottom = '0';
+  dial.style.display = 'block';
+  dial.style.pointerEvents = 'none';
+
+  // Get FAB position within container
+  const containerRect = el.getBoundingClientRect();
+  const fabRect = fabBtn.getBoundingClientRect();
+  const fabCenterX = fabRect.left - containerRect.left + fabSize / 2;
+  const fabCenterY = fabRect.top - containerRect.top + fabSize / 2;
+
+  for (let idx = 0; idx < btnEls.length; idx++) {
+    const angleDeg = startAngle + angleStep * idx;
+    const angleRad = angleDeg * (Math.PI / 180);
+    const posX = fabCenterX + Math.cos(angleRad) * radius - btnSize / 2;
+    const posY = fabCenterY + Math.sin(angleRad) * radius - btnSize / 2;
+    btnEls[idx].style.position = 'absolute';
+    btnEls[idx].style.left = posX + 'px';
+    btnEls[idx].style.top = posY + 'px';
+  }
+}
+
+/** The main button's name: label, else fab.label. It names the menu too. */
+function fabName(): string {
+  return (label as string) || uiString('fab', 'label');
+}
+
+// ─── Keyboard ───────────────────────────────
+// A closed dial is inert: its actions are shrunk and transparent but would still be tab
+// stops, so Shift+Tab from the FAB would land on an action nobody can see. Inert is set at once, not in
+// the frame that animates the dial, so a Tab that closes it moves on from the FAB.
+let fabEl: HTMLButtonElement | null = null;
+let dialEl: HTMLElement | null = null;
+
+function setOpen(v: boolean): void {
+  const was = untracked(() => opened);
+  opened = v;
+  dialEl?.toggleAttribute('inert', !v);
+  // Announced once, on a change: a hover's leave timer or a close() may repeat it.
+  if (v !== was) openChange({ value: v });
+}
+
+/** The actions nearest the FAB first. A linear dial going up or left sits before the FAB in
+ *  the DOM, so its nearest action is the last one. */
+function outward(): HTMLElement[] {
+  const all = dialEl ? Array.from(dialEl.querySelectorAll<HTMLElement>('.pdx-fab-action')) : [];
+  const dir = untracked(() => direction) as string;
+  const before = (untracked(() => type) as string) === 'linear' && (dir === 'up' || dir === 'left');
+  return before ? all.reverse() : all;
+}
+
+/** [the arrow that moves away from the FAB, the one that comes back]. */
+function axisKeys(): [string, string] {
+  const dir = (untracked(() => direction) as string).split('-')[0];
+  if (dir === 'down') return ['ArrowDown', 'ArrowUp'];
+  if (dir === 'left') return ['ArrowLeft', 'ArrowRight'];
+  if (dir === 'right') return ['ArrowRight', 'ArrowLeft'];
+  return ['ArrowUp', 'ArrowDown'];
+}
+
+function openFromKeyboard(): void {
+  setOpen(true);
+  outward()[0]?.focus();
+}
+
+/** Close; if focus was on an action, it goes back to the FAB (first, before the dial turns inert). */
+function closeToFab(): void {
+  if (dialEl?.contains(document.activeElement)) fabEl?.focus();
+  setOpen(false);
+}
+
+function onFabKeydown(e: KeyboardEvent): void {
+  if (e.key === 'Enter' || e.key === ' ') {
+    // Enter and Space are the button's click, cancelled here so it runs once: the
+    // keyboard path moves focus into the dial, and a pointer click does not.
+    e.preventDefault();
+    if (untracked(() => opened)) closeToFab();
+    else openFromKeyboard();
+  } else if (e.key === axisKeys()[0]) {
+    e.preventDefault();
+    if (untracked(() => opened)) outward()[0]?.focus();
+    else openFromKeyboard();
+  }
+}
+
+function onDialKeydown(e: KeyboardEvent): void {
+  const all = outward();
+  const at = all.indexOf(document.activeElement as HTMLElement);
+  const [away, back] = axisKeys();
+  let next = -1;
+  if (e.key === away) next = (at + 1) % all.length;
+  else if (e.key === back) next = (at - 1 + all.length) % all.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = all.length - 1;
+  else if (e.key === 'Tab') { closeToFab(); return; }   // not prevented: the Tab moves on from the FAB
+  if (next < 0 || !all.length) return;
+  e.preventDefault();
+  all[next].focus();
+}
+
+// The overlay verbs: show, close and toggle.
+function show(): void { setOpen(true); }
+function close(): void { closeToFab(); }
+function toggle(): void { if (untracked(() => opened)) closeToFab(); else setOpen(true); }
+
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  const iconName = icon as string;
+  const list = actions as FabAction[];
+  const sizeName = size as string;
+  const dir = direction as string;
+  const layoutType = type as string;
+  const tooltips = showTooltip as boolean;
+  const useMask = mask as boolean;
+  const triggerMode = trigger as string;
+
+  el.classList.add('pdx-fab-container');
+
+  // Direction class for linear layout
+  el.classList.add('pdx-fab-dir-' + dir);
+
+  // Mask overlay
+  if (useMask) {
+    maskEl = document.createElement('div');
+    maskEl.className = 'pdx-fab-mask';
+    maskEl.dataset.part = 'mask';
+    el.appendChild(maskEl);
+  }
+
+  // Speed dial actions
+  if (list.length) {
+    const dial = document.createElement('div');
+    dial.className = 'pdx-fab-dial pdx-fab-dial-' + layoutType;
+    dial.setAttribute('role', 'menu');
+    dial.dataset.part = 'menu';
+    dial.setAttribute('aria-label', fabName());
+    dial.toggleAttribute('inert', !untracked(() => opened));
+    dial.addEventListener('keydown', onDialKeydown);
+    dialEl = dial;
+
+    for (let idx = 0; idx < list.length; idx++) {
+      const action = list[idx];
+      const wrap = document.createElement('div');
+      wrap.className = 'pdx-fab-action-wrap';
+      wrap.style.transitionDelay = (idx * 30) + 'ms';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pdx-fab-action';
+      btn.setAttribute('aria-label', action.label);
+      btn.setAttribute('role', 'menuitem');
+      btn.dataset.part = 'item';
+
+      const ic = document.createElement('pdx-icon');
+      ic.setAttribute('name', action.icon);
+      ic.setAttribute('size', '18');
+      btn.appendChild(ic);
+
+      btn.addEventListener('click', () => {
+        pdxSelect({ key: action.key, action });
+        closeToFab();
+      });
+
+      wrap.appendChild(btn);
+
+      // Tooltip label
+      if (tooltips && action.label) {
+        const tip = document.createElement('span');
+        tip.className = 'pdx-fab-tooltip';
+        tip.dataset.part = 'label';
+        tip.textContent = action.label;
+        wrap.appendChild(tip);
+      }
+
+      dial.appendChild(wrap);
+    }
+
+    el.appendChild(dial);
+  }
+
+  // Main FAB button
+  const fab = document.createElement('button');
+  fab.type = 'button';
+  fab.className = 'pdx-fab';
+  fab.setAttribute('data-part', 'root');
+  fab.setAttribute('aria-label', fabName());
+  fab.setAttribute('aria-haspopup', list.length ? 'menu' : 'false');
+  fab.setAttribute('aria-expanded', 'false');
+
+  const ic = document.createElement('pdx-icon');
+  ic.className = 'pdx-fab-icon';
+  ic.setAttribute('name', iconName);
+  ic.setAttribute('size', sizeName === 'lg' ? '28' : sizeName === 'sm' ? '18' : '24');
+  fab.appendChild(ic);
+
+  fab.addEventListener('click', () => {
+    if (list.length) {
+      setOpen(!untracked(() => opened));
+    } else {
+      pdxClick({});
+    }
+  });
+  // Only a speed dial takes over Enter/Space: a plain FAB keeps its native click.
+  if (list.length) fab.addEventListener('keydown', onFabKeydown);
+  fabEl = fab;
+
+  // Hover trigger. The keyboard opens it the same way as a click-triggered one.
+  if (triggerMode === 'hover' && list.length) {
+    el.addEventListener('mouseenter', () => {
+      if (hoverCloseTimer) { clearTimeout(hoverCloseTimer); hoverCloseTimer = null; }
+      setOpen(true);
+    });
+    el.addEventListener('mouseleave', () => {
+      hoverCloseTimer = window.setTimeout(() => { if (alive) setOpen(false); }, 200);
+    });
+  }
+
+  el.appendChild(fab);
+});
+
+// Click-outside and Escape handlers
+let outsideHandler: ((e: MouseEvent) => void) | null = null;
+let escHandler: ((e: KeyboardEvent) => void) | null = null;
+
+// The main button's name, and the dial's, follow `label` and the locale.
+// The dial's visibility follows the open state: inert, aria-expanded, the circular layout the first
+// time it opens, and the listeners that close it.
+let circularPositioned = false;
+$effect(() => {
+  const name = fabName();
+  el.querySelector('.pdx-fab')?.setAttribute('aria-label', name);
+  el.querySelector('.pdx-fab-dial')?.setAttribute('aria-label', name);
+  const nowOpen = opened;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    // The open look — the dial, the turned icon, the mask — is fab.css's, from the host's
+    // `:state(open)` (#288); the component sets no class for it.
+    const dial = el.querySelector('.pdx-fab-dial');
+    if (dial) dial.toggleAttribute('inert', !nowOpen);
+
+    // Position circular actions when first opened
+    const lt = untracked(() => type) as string;
+    if (nowOpen && !circularPositioned && lt !== 'linear') {
+      circularPositioned = true;
+      positionCircularActions(untracked(() => direction) as string, lt);
+    }
+
+    const mainFab = el.querySelector('.pdx-fab');
+    if (mainFab) mainFab.setAttribute('aria-expanded', String(nowOpen));
+
+    // Click-outside to close
+    if (nowOpen) {
+      if (!outsideHandler) {
+        outsideHandler = (ev: MouseEvent) => {
+          if (!el.contains(ev.target as Node)) setOpen(false);
+        };
+        setTimeout(() => { if (alive && outsideHandler) document.addEventListener('mousedown', outsideHandler); }, 10);
+      }
+      if (!escHandler) {
+        escHandler = (ev: KeyboardEvent) => {
+          if (ev.key === 'Escape') closeToFab();
+        };
+        document.addEventListener('keydown', escHandler);
+      }
+    } else {
+      if (outsideHandler) { document.removeEventListener('mousedown', outsideHandler); outsideHandler = null; }
+      if (escHandler) { document.removeEventListener('keydown', escHandler); escHandler = null; }
+    }
+  });
+});
+
+// Teardown on destroy: the branch that removes the listeners never runs if the component is
+// unmounted while the dial is open.
+onDestroy(() => {
+  alive = false;
+  if (hoverCloseTimer) { clearTimeout(hoverCloseTimer); hoverCloseTimer = null; }
+  if (outsideHandler) { document.removeEventListener('mousedown', outsideHandler); outsideHandler = null; }
+  if (escHandler) { document.removeEventListener('keydown', escHandler); escHandler = null; }
+});
+</script>
