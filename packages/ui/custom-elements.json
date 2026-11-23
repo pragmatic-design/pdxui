@@ -24811,7 +24811,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/row/pdx-row.ts",
+      "path": "src/row/pdx-row.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -24934,7 +24934,7 @@
           "name": "pdx-row",
           "declaration": {
             "name": "PdxRow",
-            "module": "src/row/pdx-row.ts"
+            "module": "src/row/pdx-row.pdx"
           }
         }
       ]

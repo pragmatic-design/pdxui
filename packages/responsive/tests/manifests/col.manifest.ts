@@ -22,7 +22,7 @@
  *       · No event is emitted. No keydown handler. No role and no aria → it is pure presentational layout
  *         (keyboard 'none', no ARIA to assert).
  *
- *   - Source, row: packages/ui/src/row/pdx-row.ts
+ *   - Source, row: packages/ui/src/row/pdx-row.pdx
  *       · render() = <slot></slot> (light DOM, the direct children are the columns).
  *       · In an rAF (the `_built` gate) the host gets (no class, #290) display:flex, flex-wrap,
  *         gap = the gutter, plus the CSS vars --pdx-row-cols (12 by default) and --pdx-row-gutter (the resolved gutter)
