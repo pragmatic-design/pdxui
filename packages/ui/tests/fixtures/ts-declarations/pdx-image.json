@@ -1,0 +1,402 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxImage",
+  "tagName": "pdx-image",
+  "category": "Data Display",
+  "order": 87,
+  "description": "An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source\nbehind authentication.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "src",
+      "description": "Image URL",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "src"
+    },
+    {
+      "kind": "field",
+      "name": "alt",
+      "description": "Alt text for accessibility",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "alt"
+    },
+    {
+      "kind": "field",
+      "name": "width",
+      "description": "CSS width",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "width"
+    },
+    {
+      "kind": "field",
+      "name": "height",
+      "description": "CSS height",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "height"
+    },
+    {
+      "kind": "field",
+      "name": "fit",
+      "description": "object-fit: cover | contain | fill | none | scale-down",
+      "type": {
+        "text": "string"
+      },
+      "default": "'cover'",
+      "attribute": "fit"
+    },
+    {
+      "kind": "field",
+      "name": "lazy",
+      "description": "Enable IntersectionObserver lazy loading",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "lazy"
+    },
+    {
+      "kind": "field",
+      "name": "fallback",
+      "description": "Fallback image URL on error",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "fallback"
+    },
+    {
+      "kind": "field",
+      "name": "fallbackIcon",
+      "description": "Icon name shown on error (pragmatic-icons)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'image-off'",
+      "attribute": "fallbackicon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder style: blur | skeleton | none",
+      "type": {
+        "text": "string"
+      },
+      "default": "'skeleton'",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "ratio",
+      "description": "Aspect ratio e.g. '16/9', '1/1'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "ratio"
+    },
+    {
+      "kind": "field",
+      "name": "rounded",
+      "description": "Circular border-radius",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "rounded"
+    },
+    {
+      "kind": "field",
+      "name": "radius",
+      "description": "Custom border-radius value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "radius"
+    },
+    {
+      "kind": "field",
+      "name": "zoomable",
+      "description": "Click to zoom (scale toggle)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "zoomable"
+    },
+    {
+      "kind": "field",
+      "name": "lightbox",
+      "description": "Click opens fullscreen lightbox overlay",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "lightbox"
+    },
+    {
+      "kind": "field",
+      "name": "caption",
+      "description": "Caption text below image",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "caption"
+    },
+    {
+      "kind": "field",
+      "name": "authSrc",
+      "description": "URL requiring authentication (fetched via fetch + objectURL)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "authsrc"
+    },
+    {
+      "kind": "field",
+      "name": "authProvider",
+      "description": "Function returning HTTP headers for auth requests",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "fetchFn",
+      "description": "Custom fetch function: (url: string) => Promise<Blob>",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-load",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The image arrived and is drawn.",
+      "detail": "Record<string, never>"
+    },
+    {
+      "name": "pdx-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The source failed, or the authenticated fetch did.",
+      "detail": "Record<string, never>"
+    },
+    {
+      "name": "pdx-zoom",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A zoomable image was zoomed in or out.",
+      "detail": "{ zoomed: boolean }"
+    }
+  ],
+  "roles": [
+    "button",
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "src",
+      "fieldName": "src",
+      "description": "Image URL",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "alt",
+      "fieldName": "alt",
+      "description": "Alt text for accessibility",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "width",
+      "fieldName": "width",
+      "description": "CSS width",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "height",
+      "fieldName": "height",
+      "description": "CSS height",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "fit",
+      "fieldName": "fit",
+      "description": "object-fit: cover | contain | fill | none | scale-down",
+      "type": {
+        "text": "string"
+      },
+      "default": "'cover'"
+    },
+    {
+      "name": "lazy",
+      "fieldName": "lazy",
+      "description": "Enable IntersectionObserver lazy loading",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "fallback",
+      "fieldName": "fallback",
+      "description": "Fallback image URL on error",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "fallbackicon",
+      "fieldName": "fallbackIcon",
+      "description": "Icon name shown on error (pragmatic-icons)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'image-off'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder style: blur | skeleton | none",
+      "type": {
+        "text": "string"
+      },
+      "default": "'skeleton'"
+    },
+    {
+      "name": "ratio",
+      "fieldName": "ratio",
+      "description": "Aspect ratio e.g. '16/9', '1/1'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "rounded",
+      "fieldName": "rounded",
+      "description": "Circular border-radius",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "radius",
+      "fieldName": "radius",
+      "description": "Custom border-radius value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "zoomable",
+      "fieldName": "zoomable",
+      "description": "Click to zoom (scale toggle)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "lightbox",
+      "fieldName": "lightbox",
+      "description": "Click opens fullscreen lightbox overlay",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "caption",
+      "fieldName": "caption",
+      "description": "Caption text below image",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "authsrc",
+      "fieldName": "authSrc",
+      "description": "URL requiring authentication (fetched via fetch + objectURL)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "frame",
+      "description": "The box the image is drawn in, and the zoom or lightbox trigger."
+    },
+    {
+      "name": "image",
+      "description": "The `<img>`."
+    },
+    {
+      "name": "placeholder",
+      "description": "The skeleton shown until the image arrives."
+    },
+    {
+      "name": "fallback",
+      "description": "The icon shown when the source fails and no fallback image is set."
+    },
+    {
+      "name": "caption",
+      "description": "The caption under the image."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "Its source has not arrived yet: the image is not drawn."
+    },
+    {
+      "name": "zoomed",
+      "description": "A zoomable image is zoomed in."
+    },
+    {
+      "name": "broken",
+      "description": "Its source failed: the fallback shows in its place."
+    }
+  ]
+}

@@ -2,7 +2,7 @@
  * MANIFEST — pdx-image
  *
  * Contracts DERIVED by inspecting the source and the CSS:
- *   - Source: packages/ui/src/image/pdx-image.ts
+ *   - Source: packages/ui/src/image/pdx-image.pdx
  *       · component('pdx-image', ...). The relevant props: src, alt, width, height, fit,
  *         lazy (default TRUE), placeholder (default 'skeleton'), ratio, rounded, radius,
  *         fallback, fallbackIcon, zoomable, lightbox, caption, authSrc, ...

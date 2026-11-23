@@ -1,0 +1,429 @@
+<template></template>
+
+<script>
+/**
+ * An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source
+ * behind authentication.
+ *
+ * @cssstate loading - Its source has not arrived yet: the image is not drawn.
+ * @cssstate zoomed - A zoomable image is zoomed in.
+ * @cssstate broken - Its source failed: the fallback shows in its place.
+ * @csspart frame - The box the image is drawn in, and the zoom or lightbox trigger.
+ * @csspart image - The `<img>`.
+ * @csspart placeholder - The skeleton shown until the image arrives.
+ * @csspart fallback - The icon shown when the source fails and no fallback image is set.
+ * @csspart caption - The caption under the image.
+ */
+// pdx-image — Rich image component with lazy loading, fallback, zoom, lightbox,
+// and authenticated image loading via fetch + objectURL.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
+import { onDestroy, onNextFrame, focusTrap, untracked } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+import { uiString, format, uiAttr } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/image';
+
+/** The image arrived and is drawn. */
+@event 'pdx-load': Record<string, never>;
+/** The source failed, or the authenticated fetch did. */
+@event 'pdx-error': Record<string, never>;
+/** A zoomable image was zoomed in or out. */
+@event 'pdx-zoom': { zoomed: boolean };
+@state loading = isLoading;
+@state zoomed = isZoomed;
+@state broken = isBroken;
+// Every element is built by the script, a frame after mount (#1284).
+@part(external) frame, image, placeholder, fallback, caption;
+/** Image URL */
+@prop src: string = '';
+/** Alt text for accessibility */
+@prop alt: string = '';
+/** CSS width */
+@prop width: string = 'auto';
+/** CSS height */
+@prop height: string = 'auto';
+/** object-fit: cover | contain | fill | none | scale-down */
+@prop fit: string = 'cover';
+/** Enable IntersectionObserver lazy loading */
+@prop lazy: boolean = true;
+/** Fallback image URL on error */
+@prop fallback: string = '';
+/** Icon name shown on error (pragmatic-icons) */
+@prop(icon) fallbackIcon: string = 'image-off';
+/** Placeholder style: blur | skeleton | none */
+@prop placeholder: string = 'skeleton';
+/** Aspect ratio e.g. '16/9', '1/1' */
+@prop ratio: string = '';
+/** Circular border-radius */
+@prop rounded: boolean = false;
+/** Custom border-radius value */
+@prop radius: string = '';
+/** Click to zoom (scale toggle) */
+@prop zoomable: boolean = false;
+/** Click opens fullscreen lightbox overlay */
+@prop lightbox: boolean = false;
+/** Caption text below image */
+@prop caption: string = '';
+/** URL requiring authentication (fetched via fetch + objectURL) */
+@prop authSrc: string = '';
+/** Function returning HTTP headers for auth requests */
+@prop authProvider: Record<string, unknown> | null = null;
+/** Custom fetch function: (url: string) => Promise<Blob> */
+@prop fetchFn: Record<string, unknown> | null = null;
+@host el;
+
+let isLoading = $signal(false);
+let isZoomed = $signal(false);
+let isBroken = $signal(false);
+let built = false;
+// Cleared on destroy: a frame or a fetch that lands after it touches nothing.
+let alive = true;
+let imgEl: HTMLImageElement | null = null;
+let wrapperEl: HTMLDivElement | null = null;
+let observer: IntersectionObserver | null = null;
+let objectUrl: string | null = null;
+let loaded = false;
+let errored = false;
+
+/** `pdx-icon` the first time an image fails and its fallback icon shows: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+}
+
+function revokeObjectUrl(): void {
+  if (objectUrl) {
+    URL.revokeObjectURL(objectUrl);
+    objectUrl = null;
+  }
+}
+
+function showFallback(): void {
+  if (!wrapperEl) return;
+  errored = true;
+  isLoading = false;
+  isBroken = true;
+
+  // Remove skeleton if present
+  const skeleton = wrapperEl.querySelector('.pdx-img-skeleton');
+  if (skeleton) skeleton.remove();
+
+  // Remove existing img
+  if (imgEl) {
+    imgEl.style.display = 'none';
+  }
+
+  const fallbackSrc = untracked(() => fallback) as string;
+  if (fallbackSrc) {
+    // Use fallback image URL
+    const fbImg = document.createElement('img');
+    fbImg.className = 'pdx-img';
+    fbImg.setAttribute('data-part', 'image');
+    fbImg.src = fallbackSrc;
+    fbImg.alt = untracked(() => alt) as string;
+    fbImg.style.objectFit = untracked(() => fit) as string;
+    wrapperEl.appendChild(fbImg);
+    return;
+  }
+
+  // Show fallback icon
+  const fbDiv = document.createElement('div');
+  fbDiv.className = 'pdx-img-fallback';
+  fbDiv.setAttribute('data-part', 'fallback');
+  loadIcon();
+  const iconEl = document.createElement('pdx-icon');
+  iconEl.setAttribute('name', untracked(() => fallbackIcon) as string);
+  iconEl.setAttribute('size', '32');
+  fbDiv.appendChild(iconEl);
+  wrapperEl.appendChild(fbDiv);
+}
+
+function onImageLoad(): void {
+  if (!imgEl) return;
+  loaded = true;
+  isLoading = false;
+
+  // Remove skeleton
+  const skeleton = wrapperEl?.querySelector('.pdx-img-skeleton');
+  if (skeleton) skeleton.remove();
+
+  pdxLoad({});
+}
+
+function onImageError(): void {
+  showFallback();
+  pdxError({});
+}
+
+function loadAuthImage(url: string): void {
+  const fetchFnProp = untracked(() => fetchFn) as unknown as ((u: string) => Promise<Blob>) | null;
+  const authProviderProp = untracked(() => authProvider) as unknown as (() => Record<string, string>) | null;
+
+  const doFetch = fetchFnProp
+    ? fetchFnProp(url)
+    : fetch(url, { headers: authProviderProp ? authProviderProp() : {} }).then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.blob();
+    });
+
+  doFetch.then(blob => {
+    if (!alive) return;
+    revokeObjectUrl();
+    objectUrl = URL.createObjectURL(blob);
+    if (imgEl) {
+      imgEl.src = objectUrl;
+      // onload handler will do the rest
+    }
+  }).catch(() => {
+    if (!alive) return;
+    showFallback();
+    pdxError({});
+  });
+}
+
+function loadImage(): void {
+  const auth = untracked(() => authSrc) as string;
+  const fetchFnProp = untracked(() => fetchFn);
+  const url = untracked(() => src) as string;
+
+  if (fetchFnProp || auth) {
+    loadAuthImage(auth || url);
+  } else if (url && imgEl) {
+    imgEl.src = url;
+  }
+}
+
+function setupLazy(): void {
+  observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      loadImage();
+      observer?.disconnect();
+      observer = null;
+    }
+  }, { rootMargin: '200px' });
+  observer.observe(el);
+}
+
+function toggleZoom(): void {
+  if (!imgEl || !loaded) return;
+  const next = !untracked(() => isZoomed);
+  isZoomed = next;
+  wrapperEl?.setAttribute('aria-pressed', String(next));
+  pdxZoom({ zoomed: next });
+}
+
+/** What the image is called in its trigger's and dialog's names: the alt, else "image". */
+function imageName(): string {
+  return (untracked(() => alt) as string) || uiString('image', 'image');
+}
+
+/**
+ * The zoom/lightbox trigger is the wrapper, made a button: an <img> with tabindex -1 and a
+ * click handler on the wrapper would leave nothing to focus and nothing for Enter to do.
+ * A role, not a <button> element, so the wrapper's layout is untouched.
+ */
+function makeTrigger(wrapper: HTMLElement, asLightbox: boolean): void {
+  wrapper.setAttribute('role', 'button');
+  wrapper.tabIndex = 0;
+  uiAttr(wrapper, 'aria-label', () => format(uiString('image', asLightbox ? 'view' : 'zoom'), { alt: imageName() }));
+  if (!asLightbox) wrapper.setAttribute('aria-pressed', 'false');
+  wrapper.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    handleClick();
+  });
+}
+
+// The lightbox's close, reachable from the destroy: as a local closure, unmounting with
+// the lightbox open would leave an overlay in the body and an orphan keydown on the
+// document.
+let lightboxClose: (() => void) | null = null;
+
+function openLightbox(): void {
+  const imgSrc = imgEl?.src || '';
+  if (!imgSrc) return;
+
+  // A modal dialog, with a role, a name and a close button: focus moves into it rather
+  // than staying on the page behind it, and does not land on the page host after Escape.
+  const captionText = untracked(() => caption) as string;
+  const overlay = document.createElement('div');
+  overlay.className = 'pdx-img-lightbox';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', captionText || imageName());
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'pdx-img-lightbox-close';
+  uiAttr(closeBtn, 'aria-label', () => uiString('image', 'close'));
+  closeBtn.textContent = '×';
+  overlay.appendChild(closeBtn);
+
+  const img = document.createElement('img');
+  img.src = imgSrc;
+  img.alt = untracked(() => alt) as string;
+  overlay.appendChild(img);
+
+  if (captionText) {
+    const cap = document.createElement('div');
+    cap.className = 'pdx-img-lightbox-caption';
+    cap.textContent = captionText;
+    overlay.appendChild(cap);
+  }
+
+  const opener = wrapperEl;
+  let trapDispose: Dispose | null = null;
+
+  function closeLightbox(): void {
+    const focusWasInside = overlay.contains(document.activeElement);
+    trapDispose?.(); trapDispose = null;
+    overlay.remove();
+    document.removeEventListener('keydown', onEsc);
+    lightboxClose = null;
+    if (focusWasInside && opener?.isConnected) opener.focus();
+  }
+
+  function onEsc(e: KeyboardEvent): void {
+    if (e.key === 'Escape') closeLightbox();
+  }
+
+  overlay.addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', onEsc);
+  document.body.appendChild(overlay);
+  // Focus goes in and stays: the same trap pdx-dialog uses. It returns focus itself only
+  // when the opener is what had it; closeLightbox does that, from a pointer click too.
+  trapDispose = focusTrap(overlay, { restoreFocus: false, escapeDeactivates: false });
+  closeBtn.focus();
+  lightboxClose = closeLightbox;
+}
+
+function handleClick(): void {
+  if (untracked(() => lightbox)) {
+    openLightbox();
+  } else if (untracked(() => zoomable)) {
+    toggleZoom();
+  }
+}
+
+// A frame after mount: a setup a move destroyed does not build again.
+// The host carries no class (#291): image.css draws it from the tag.
+onNextFrame(() => {
+  const w = width as string;
+  const h = height as string;
+  const r = ratio as string;
+  const radiusProp = radius as string;
+  const asLightbox = lightbox as boolean;
+  const captionText = caption as string;
+  isLoading = true;
+  el.style.width = w;
+  el.style.height = h === 'auto' && r ? 'auto' : h;
+
+  // Wrapper
+  wrapperEl = document.createElement('div');
+  wrapperEl.className = 'pdx-img-wrapper';
+  wrapperEl.setAttribute('data-part', 'frame');
+  if (r) wrapperEl.style.aspectRatio = r;
+  if (rounded) wrapperEl.classList.add('pdx-img-rounded');
+  if (radiusProp) wrapperEl.style.borderRadius = radiusProp;
+
+  // Skeleton placeholder
+  if (placeholder === 'skeleton') {
+    const skel = document.createElement('div');
+    skel.className = 'pdx-img-skeleton';
+    skel.setAttribute('data-part', 'placeholder');
+    wrapperEl.appendChild(skel);
+  }
+
+  // Image element
+  imgEl = document.createElement('img');
+  imgEl.className = 'pdx-img';
+  imgEl.setAttribute('data-part', 'image');
+  imgEl.alt = alt as string;
+  imgEl.style.objectFit = fit as string;
+  imgEl.draggable = false;
+
+  imgEl.addEventListener('load', onImageLoad);
+  imgEl.addEventListener('error', onImageError);
+  wrapperEl.appendChild(imgEl);
+
+  // Click handler for zoom / lightbox
+  if (zoomable || asLightbox) {
+    wrapperEl.style.cursor = asLightbox ? 'pointer' : 'zoom-in';
+    wrapperEl.addEventListener('click', handleClick);
+    makeTrigger(wrapperEl, asLightbox);
+  }
+
+  el.appendChild(wrapperEl);
+
+  // Caption
+  if (captionText) {
+    const capEl = document.createElement('div');
+    capEl.className = 'pdx-img-caption';
+    capEl.setAttribute('data-part', 'caption');
+    capEl.textContent = captionText;
+    el.appendChild(capEl);
+  }
+
+  // Load image (lazy or immediate)
+  if (lazy) {
+    setupLazy();
+  } else {
+    loadImage();
+  }
+  built = true;
+});
+
+// Update on prop changes: what the update writes, and nothing it does not.
+$effect(() => {
+  const url = src as string;
+  const altText = alt as string;
+  const w = width as string;
+  const h = height as string;
+  const fitValue = fit as string;
+  const r = ratio as string;
+  const isRounded = rounded as boolean;
+  const radiusProp = radius as string;
+  const asLightbox = lightbox as boolean;
+  const captionText = caption as string;
+  if (!built) return;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (imgEl) {
+      imgEl.alt = altText;
+      imgEl.style.objectFit = fitValue;
+    }
+    if (wrapperEl) {
+      if (wrapperEl.getAttribute('role') === 'button') {
+        uiAttr(wrapperEl, 'aria-label', () => format(uiString('image', asLightbox ? 'view' : 'zoom'), { alt: altText || uiString('image', 'image') }));
+      }
+      if (r) wrapperEl.style.aspectRatio = r;
+      if (isRounded) wrapperEl.classList.add('pdx-img-rounded');
+      else wrapperEl.classList.remove('pdx-img-rounded');
+      if (radiusProp) wrapperEl.style.borderRadius = radiusProp;
+    }
+    el.style.width = w;
+    el.style.height = h === 'auto' && r ? 'auto' : h;
+
+    // Update caption
+    const capEl = el.querySelector('.pdx-img-caption');
+    if (capEl) capEl.textContent = captionText;
+
+    // Reload if src changed
+    if (!errored && url && imgEl && imgEl.src !== url && !objectUrl) {
+      loaded = false;
+      isLoading = true;
+      loadImage();
+    }
+  });
+});
+
+// Cleanup on destroy: the observer, the object URL, and a lightbox left open.
+onDestroy(() => {
+  alive = false;
+  if (observer) { observer.disconnect(); observer = null; }
+  revokeObjectUrl();
+  lightboxClose?.();
+  lightboxClose = null;
+});
+</script>

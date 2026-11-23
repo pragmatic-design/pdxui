@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/image/pdx-image';
+import '../../src/image/pdx-image.pdx';
 
 const SRC = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22/%3E';
 

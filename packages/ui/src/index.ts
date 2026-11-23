@@ -102,7 +102,7 @@ import './description-list/pdx-description-list';
 import './timeline/pdx-timeline';
 import './statistic/pdx-statistic.pdx';
 import './empty-state/pdx-empty-state.pdx';
-import './image/pdx-image';
+import './image/pdx-image.pdx';
 import './carousel/pdx-carousel';
 import './infinite-scroll/pdx-infinite-scroll.pdx';
 import './relative-time/pdx-relative-time';
