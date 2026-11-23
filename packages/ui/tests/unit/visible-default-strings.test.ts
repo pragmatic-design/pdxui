@@ -21,7 +21,7 @@ import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/edit-drawer/pdx-edit-drawer';
 import '../../src/field-group/pdx-field-group';
 import '../../src/data-grid/pdx-data-grid';
-import '../../src/infinite-scroll/pdx-infinite-scroll';
+import '../../src/infinite-scroll/pdx-infinite-scroll.pdx';
 import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/badge/pdx-badge.pdx';
 import '../../src/select/pdx-select';

@@ -364,11 +364,6 @@
       "types": "./dist/timeline/pdx-timeline.d.ts",
       "import": "./dist/timeline/pdx-timeline.js"
     },
-    "./infinite-scroll": {
-      "development": "./src/infinite-scroll/pdx-infinite-scroll.ts",
-      "types": "./dist/infinite-scroll/pdx-infinite-scroll.d.ts",
-      "import": "./dist/infinite-scroll/pdx-infinite-scroll.js"
-    },
     "./image": {
       "development": "./src/image/pdx-image.ts",
       "types": "./dist/image/pdx-image.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/inline-edit/pdx-inline-edit.pdx",
       "types": "./dist/inline-edit/pdx-inline-edit.d.ts",
       "import": "./dist/inline-edit/pdx-inline-edit.js"
+    },
+    "./infinite-scroll": {
+      "development": "./src/infinite-scroll/pdx-infinite-scroll.pdx",
+      "types": "./dist/infinite-scroll/pdx-infinite-scroll.d.ts",
+      "import": "./dist/infinite-scroll/pdx-infinite-scroll.js"
     },
     "./package.json": "./package.json"
   },

@@ -2,7 +2,7 @@
  * MANIFEST — pdx-infinite-scroll (Tier 5B — data/utility container)
  *
  * Contracts written by inspecting:
- *  - source: packages/ui/src/infinite-scroll/pdx-infinite-scroll.ts
+ *  - source: packages/ui/src/infinite-scroll/pdx-infinite-scroll.pdx
  *      Light DOM, render: <slot></slot>. The content (the items) is slotted as direct
  *      children of the host <pdx-infinite-scroll>. On ctx.track's FIRST run, inside a
  *      requestAnimationFrame, the setup builds the internal structure ONCE (_built):
@@ -86,7 +86,7 @@
  * REAL BUGS found in the source (NOT fixed here — only written down):
  *
  *  [B1] Accessibility — `aria-busy` is never set while loading. FIXED in #292: the host is aria-busy="true" while loading, and has no aria-busy otherwise (data-a-beta-contract.spec.ts).
- *       packages/ui/src/infinite-scroll/pdx-infinite-scroll.ts:154-159
+ *       packages/ui/src/infinite-scroll/pdx-infinite-scroll.pdx, its `@host` binding
  *       When isCurrentlyLoading() turns true, the setup only shows the loading element
  *       (display=''). It NEVER sets aria-busy="true" on a container (the host, or the results
  *       region) for the duration of the load, and never removes it afterwards. WAI-ARIA: a
@@ -100,7 +100,7 @@
  *         see above: the spinner is animated); written down here.
  *
  *  [B2] (minor) Accessibility — the sentinel is `aria-hidden="true"` on an empty, non-focusable div.
- *       packages/ui/src/infinite-scroll/pdx-infinite-scroll.ts:96
+ *       packages/ui/src/infinite-scroll/pdx-infinite-scroll.pdx, where the sentinel is built
  *       Harmless (the div has no content and no focusable descendant), so it is NOT a defect
  *       axe reports; noted for completeness only. No fix needed.
  * ─────────────────────────────────────────────────────────────────────────────

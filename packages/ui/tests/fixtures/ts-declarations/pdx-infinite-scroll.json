@@ -1,0 +1,191 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxInfiniteScroll",
+  "tagName": "pdx-infinite-scroll",
+  "category": "Data Display",
+  "order": 89,
+  "description": "Loads more data as the user scrolls to the bottom, paging a DataSource or firing\n`pdx-load-more` for manual control.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource instance for auto-paging",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "threshold",
+      "description": "Pixels from bottom to trigger load",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "threshold"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disable loading more",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "External loading state override",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "endMessage",
+      "description": "Message when all data loaded. Empty: the infinite-scroll.end component string, «No more data».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "endmessage"
+    },
+    {
+      "kind": "field",
+      "name": "loadingMessage",
+      "description": "Loading indicator text. Empty: the infinite-scroll.loading component string, «Loading...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "loadingmessage"
+    },
+    {
+      "kind": "field",
+      "name": "showEndMessage",
+      "description": "Show end message when all data loaded",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showendmessage"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-load-more",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The sentinel came into view and more can be loaded: after the source's own `loadMore()`, if it has one.",
+      "detail": "{}"
+    }
+  ],
+  "roles": [
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "threshold",
+      "fieldName": "threshold",
+      "description": "Pixels from bottom to trigger load",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disable loading more",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "External loading state override",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "endmessage",
+      "fieldName": "endMessage",
+      "description": "Message when all data loaded. Empty: the infinite-scroll.end component string, «No more data».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loadingmessage",
+      "fieldName": "loadingMessage",
+      "description": "Loading indicator text. Empty: the infinite-scroll.loading component string, «Loading...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showendmessage",
+      "fieldName": "showEndMessage",
+      "description": "Show end message when all data loaded",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "sentinel",
+      "description": "The invisible line whose coming into view loads more."
+    },
+    {
+      "name": "loading",
+      "description": "The «loading» status, with its spinner; it says something only while loading."
+    },
+    {
+      "name": "end",
+      "description": "The «no more data» status; it says something only at the end of the source."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "The source is pending, or `loading` is set: the host is `aria-busy` too (A4)."
+    },
+    {
+      "name": "ended",
+      "description": "The source has nothing more to load."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set: nothing more is loaded."
+    }
+  ],
+  "x-pdx-context": {
+    "injects": [
+      {
+        "token": "DataSourceContext",
+        "optional": true
+      }
+    ]
+  }
+}

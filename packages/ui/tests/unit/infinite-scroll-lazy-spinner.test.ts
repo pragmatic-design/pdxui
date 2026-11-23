@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/infinite-scroll/pdx-infinite-scroll';
+import '../../src/infinite-scroll/pdx-infinite-scroll.pdx';
 
 async function mount(loading: boolean): Promise<HTMLElement> {
     const el = document.createElement('pdx-infinite-scroll');
