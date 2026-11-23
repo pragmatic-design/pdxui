@@ -229,11 +229,6 @@
       "types": "./dist/menu/pdx-menu.d.ts",
       "import": "./dist/menu/pdx-menu.js"
     },
-    "./dropdown-menu": {
-      "development": "./src/dropdown-menu/pdx-dropdown-menu.ts",
-      "types": "./dist/dropdown-menu/pdx-dropdown-menu.d.ts",
-      "import": "./dist/dropdown-menu/pdx-dropdown-menu.js"
-    },
     "./menubar": {
       "development": "./src/menubar/pdx-menubar.ts",
       "types": "./dist/menubar/pdx-menubar.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/navbar/pdx-navbar.pdx",
       "types": "./dist/navbar/pdx-navbar.d.ts",
       "import": "./dist/navbar/pdx-navbar.js"
+    },
+    "./dropdown-menu": {
+      "development": "./src/dropdown-menu/pdx-dropdown-menu.pdx",
+      "types": "./dist/dropdown-menu/pdx-dropdown-menu.d.ts",
+      "import": "./dist/dropdown-menu/pdx-dropdown-menu.js"
     },
     "./package.json": "./package.json"
   },
