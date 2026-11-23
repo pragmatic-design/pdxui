@@ -104,7 +104,7 @@ import './statistic/pdx-statistic';
 import './empty-state/pdx-empty-state';
 import './image/pdx-image';
 import './carousel/pdx-carousel';
-import './infinite-scroll/pdx-infinite-scroll';
+import './infinite-scroll/pdx-infinite-scroll.pdx';
 import './relative-time/pdx-relative-time';
 // Tier 2: Overlay + Containers
 import './tooltip/pdx-tooltip';

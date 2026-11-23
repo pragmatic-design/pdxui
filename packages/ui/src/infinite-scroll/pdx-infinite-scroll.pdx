@@ -1,0 +1,196 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * Loads more data as the user scrolls to the bottom, paging a DataSource or firing
+ * `pdx-load-more` for manual control.
+ *
+ * @csspart sentinel - The invisible line whose coming into view loads more.
+ * @csspart loading - The «loading» status, with its spinner; it says something only while loading.
+ * @csspart end - The «no more data» status; it says something only at the end of the source.
+ * @cssstate loading - The source is pending, or `loading` is set: the host is `aria-busy` too (A4).
+ * @cssstate ended - The source has nothing more to load.
+ * @cssstate disabled - `disabled` is set: nothing more is loaded.
+ */
+// pdx-infinite-scroll — Loads more data as user scrolls to the bottom.
+// Uses IntersectionObserver on a sentinel element for efficient detection.
+// After each load completes, re-checks if sentinel is still visible to continue loading.
+import { onNextFrame, onDestroy } from '@pdxui/core';
+import type { DataSource } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
+import { uiString } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/infinite-scroll';
+// `pdx-spinner` is imported where the loading status draws it (`paint`), as `pdx-list` does: it draws
+// from a stylesheet of its own (#821), and a static import put that stylesheet in the first wave of
+// every page with an infinite scroll, where the route waited for it (#963, #969).
+
+/** The sentinel came into view and more can be loaded: after the source's own `loadMore()`, if it has one. */
+@event 'pdx-load-more': {};
+// Its conditions are states of the host (#292).
+@state loading = loadingNow;
+@state ended = atEnd;
+@state disabled = !!disabled;
+// Every element is built by the script, a frame after mount (#1284).
+@part(external) sentinel, loading, end;
+/** DataSource instance for auto-paging */
+@prop source: Record<string, unknown> | null = null;
+/** Pixels from bottom to trigger load */
+@prop threshold: number = 200;
+/** Disable loading more */
+@prop disabled: boolean = false;
+/** External loading state override */
+@prop loading: boolean = false;
+/** Message when all data loaded. Empty: the infinite-scroll.end component string, «No more data». */
+@prop endMessage: string = '';
+/** Loading indicator text. Empty: the infinite-scroll.loading component string, «Loading...». */
+@prop loadingMessage: string = '';
+/** Show end message when all data loaded */
+@prop showEndMessage: boolean = true;
+
+// The nearest `<pdx-data-source>`, when `source` is not set.
+@inject injectedDS from DataSourceContext = null;
+
+// The region is aria-busy while it loads, and not otherwise (A4, #292).
+@host el { :aria-busy="loadingNow ? 'true' : null" }
+
+let sentinelEl: HTMLElement | null = null;
+let loadingEl: HTMLElement | null = null;
+let endEl: HTMLElement | null = null;
+let observer: IntersectionObserver | null = null;
+let sentinelVisible = false;
+let wasLoading = false;
+let domReady = $signal(false);
+
+function resolveDS(): DataSource<unknown> | null {
+  return (source as DataSource<unknown> | null) || (injectedDS as DataSource<unknown> | null);
+}
+
+function isAtEnd(): boolean {
+  const ds = resolveDS();
+  if (!ds) return false;
+  return !ds.hasMore();
+}
+
+function isCurrentlyLoading(): boolean {
+  if (loading) return true;
+  const ds = resolveDS();
+  return ds ? ds.isLoading() : false;
+}
+
+const loadingNow = $derived(isCurrentlyLoading());
+const atEnd = $derived(isAtEnd());
+
+function loadMore(): void {
+  if (disabled || isCurrentlyLoading() || isAtEnd()) return;
+  const ds = resolveDS();
+  if (ds) ds.loadMore();
+  pdxLoadMore({});
+}
+
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  sentinelEl = document.createElement('div');
+  sentinelEl.className = 'pdx-infinite-scroll-sentinel';
+  sentinelEl.dataset.part = 'sentinel';
+  sentinelEl.setAttribute('aria-hidden', 'true');
+  el.appendChild(sentinelEl);
+
+  // The two statuses are always there, so a screen reader hears what is written
+  // into them; each holds text only while it has something to say (A4).
+  loadingEl = document.createElement('div');
+  loadingEl.className = 'pdx-infinite-scroll-loading';
+  loadingEl.dataset.part = 'loading';
+  loadingEl.setAttribute('role', 'status');
+  loadingEl.setAttribute('aria-live', 'polite');
+  loadingEl.style.display = 'none';
+  el.appendChild(loadingEl);
+
+  endEl = document.createElement('div');
+  endEl.className = 'pdx-infinite-scroll-end';
+  endEl.dataset.part = 'end';
+  endEl.setAttribute('role', 'status');
+  endEl.style.display = 'none';
+  el.appendChild(endEl);
+
+  // Find nearest scrollable ancestor
+  let scrollRoot: Element | null = null;
+  let parent = el.parentElement;
+  while (parent) {
+    const style = getComputedStyle(parent);
+    const overflow = style.overflowY || style.overflow;
+    if (overflow === 'auto' || overflow === 'scroll') {
+      scrollRoot = parent;
+      break;
+    }
+    parent = parent.parentElement;
+  }
+
+  observer = new IntersectionObserver((entries) => {
+    sentinelVisible = entries[0].isIntersecting;
+    if (sentinelVisible) loadMore();
+  }, {
+    root: scrollRoot,
+    rootMargin: '0px 0px ' + (threshold as number) + 'px 0px',
+  });
+  observer.observe(sentinelEl);
+  domReady = true;
+});
+
+$effect(() => {
+  // Read in the effect, so a locale loaded later reaches them too.
+  const endMsg = (endMessage as string) || uiString('infinite-scroll', 'end');
+  const loadMsg = (loadingMessage as string) || uiString('infinite-scroll', 'loading');
+  const showEnd = showEndMessage as boolean;
+  const isLoading = loadingNow;
+  const end = atEnd;
+  // Also subscribe to the DataSource's data, so a page that lands repaints.
+  void resolveDS()?.data();
+  if (!domReady) {
+    wasLoading = isLoading;
+    return;
+  }
+  // After loading completes: if sentinel is still visible, load more
+  if (wasLoading && !isLoading && sentinelVisible && !end) requestAnimationFrame(() => loadMore());
+  wasLoading = isLoading;
+  paint(isLoading, end, showEnd, loadMsg, endMsg);
+});
+
+/**
+ * The loading status holds its spinner and text only while loading, the end status its text only at
+ * the end: a status with nothing to say is empty, not hidden text a screen reader may still reach.
+ */
+function paint(isLoading: boolean, end: boolean, showEnd: boolean, loadMsg: string, endMsg: string): void {
+  if (loadingEl) {
+    loadingEl.style.display = isLoading ? '' : 'none';
+    if (isLoading && !loadingEl.firstChild) {
+      // The element upgrades when its module lands.
+      if (!customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
+      const spinner = document.createElement('pdx-spinner');
+      spinner.setAttribute('size', 'sm');
+      const text = document.createElement('span');
+      text.className = 'pdx-infinite-scroll-text';
+      loadingEl.append(spinner, text);
+    }
+    if (!isLoading) loadingEl.replaceChildren();
+    const text = loadingEl.querySelector('.pdx-infinite-scroll-text');
+    if (text) text.textContent = loadMsg;
+  }
+  if (endEl) {
+    const show = end && showEnd;
+    endEl.style.display = show ? '' : 'none';
+    endEl.textContent = show ? endMsg : '';
+  }
+}
+
+// The built elements sit on the host next to the author's children, and core counts what arrives
+// there after mount as authored: left in place, a move would put them back as children and the next
+// mount would build a second set beside them.
+onDestroy(() => {
+  observer?.disconnect();
+  observer = null;
+  for (const node of [sentinelEl, loadingEl, endEl]) node?.remove();
+  sentinelEl = loadingEl = endEl = null;
+});
+</script>

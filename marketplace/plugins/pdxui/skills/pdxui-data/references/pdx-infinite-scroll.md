@@ -14,7 +14,7 @@ Load more as you scroll.
 | `loadingMessage` | `loadingmessage` | string | `''` | Loading indicator text. Empty: the infinite-scroll.loading component string, «Loading...». |
 | `showEndMessage` | `showendmessage` | boolean | `true` | Show end message when all data loaded |
 
-**Events:** `pdx-load-more` → `detail: {}` — Fired on `pdx-load-more`.
+**Events:** `pdx-load-more` → `detail: {}` — The sentinel came into view and more can be loaded: after the source's own `loadMore()`, if it has one.
 
 **Renders:** roles `status`
 

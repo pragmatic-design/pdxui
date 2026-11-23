@@ -16444,7 +16444,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/infinite-scroll/pdx-infinite-scroll.ts",
+      "path": "src/infinite-scroll/pdx-infinite-scroll.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -16531,7 +16531,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-load-more`.",
+              "description": "The sentinel came into view and more can be loaded: after the source's own `loadMore()`, if it has one.",
               "detail": "{}"
             }
           ],
@@ -16644,7 +16644,7 @@
           "name": "pdx-infinite-scroll",
           "declaration": {
             "name": "PdxInfiniteScroll",
-            "module": "src/infinite-scroll/pdx-infinite-scroll.ts"
+            "module": "src/infinite-scroll/pdx-infinite-scroll.pdx"
           }
         }
       ]

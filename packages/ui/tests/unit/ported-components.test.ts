@@ -34,6 +34,7 @@ const PORTED: Record<string, string> = {
     'pdx-form-field': 'src/form-field/pdx-form-field.pdx',
     'pdx-input': 'src/input/pdx-input.pdx',
     'pdx-inline-edit': 'src/inline-edit/pdx-inline-edit.pdx',
+    'pdx-infinite-scroll': 'src/infinite-scroll/pdx-infinite-scroll.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',
