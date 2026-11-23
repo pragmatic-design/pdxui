@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/dialog/pdx-dialog';
-import '../../src/sidebar/pdx-sidebar';
+import '../../src/sidebar/pdx-sidebar.pdx';
 
 describe('pdx-dialog\'s size', () => {
     beforeEach(cleanup);
