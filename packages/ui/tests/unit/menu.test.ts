@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/menu/pdx-menu';
+import '../../src/menu/pdx-menu.pdx';
 
 const BASIC_ITEMS = [
     { key: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },

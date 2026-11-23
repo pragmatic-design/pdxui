@@ -219,11 +219,6 @@
       "types": "./dist/wizard/pdx-wizard.d.ts",
       "import": "./dist/wizard/pdx-wizard.js"
     },
-    "./menu": {
-      "development": "./src/menu/pdx-menu.ts",
-      "types": "./dist/menu/pdx-menu.d.ts",
-      "import": "./dist/menu/pdx-menu.js"
-    },
     "./menubar": {
       "development": "./src/menubar/pdx-menubar.ts",
       "types": "./dist/menubar/pdx-menubar.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/file-upload/pdx-file-upload.pdx",
       "types": "./dist/file-upload/pdx-file-upload.d.ts",
       "import": "./dist/file-upload/pdx-file-upload.js"
+    },
+    "./menu": {
+      "development": "./src/menu/pdx-menu.pdx",
+      "types": "./dist/menu/pdx-menu.d.ts",
+      "import": "./dist/menu/pdx-menu.js"
     },
     "./package.json": "./package.json"
   },

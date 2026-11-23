@@ -74,7 +74,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-masked-input',
     'pdx-masonry',
     'pdx-mention',
-    'pdx-menu',
     'pdx-menubar',
     'pdx-nav-menu',
     'pdx-navbar',

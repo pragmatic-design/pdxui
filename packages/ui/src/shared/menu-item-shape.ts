@@ -4,7 +4,7 @@
 // a .pdx script is not type-checked. Dev builds only, once per item object.
 
 import { DEV } from '@pdxui/core';
-import type { MenuItem } from '../menu/pdx-menu';
+import type { MenuItem } from '../menu/menu-types';
 import { isDevEnv } from './dev-env';
 
 const warned = new WeakSet<object>();

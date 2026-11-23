@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-menu (tier 2, a standalone data-driven menu — NOT a dropdown)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/menu/pdx-menu.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/menu/pdx-menu.pdx)
  * and the CSS (packages/design/src/components/menu.css → .pdx-menu / .pdx-menu-item).
  *
  * ── WHAT IT IS (verified) ──

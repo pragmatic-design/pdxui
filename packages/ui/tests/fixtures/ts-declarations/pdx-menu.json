@@ -1,0 +1,227 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxMenu",
+  "tagName": "pdx-menu",
+  "category": "Navigation",
+  "order": 59,
+  "description": "A menu drawn in place from a list of items, with checkbox and radio items, submenus and keyboard\nnavigation, shown while it is open.",
+  "generics": [
+    "T extends { key?: string; label?: string; type?: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "Menu items (data-driven)",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "minWidth",
+      "description": "Minimum width",
+      "type": {
+        "text": "number"
+      },
+      "default": "180",
+      "attribute": "minwidth"
+    },
+    {
+      "kind": "field",
+      "name": "menuId",
+      "description": "The id of the element that is `role=\"menu\"`, for a trigger's `aria-controls`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "menuid"
+    },
+    {
+      "kind": "field",
+      "name": "menuClass",
+      "description": "Classes added to the element that is `role=\"menu\"`: the dropdown's panel is that element,\nand `.pdx-dropdown-menu-panel` is what apps and the certification select it by.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "menuclass"
+    },
+    {
+      "kind": "field",
+      "name": "renderItem",
+      "description": "Draws one entry, as the `item` slot does: `({ item, key, type }) => Node`. For a menu built\nfrom script — `pdx-dropdown-menu` hands its own `item` slot on through it.",
+      "type": {
+        "text": "((...args: unknown[]) => unknown) | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the submenu and the menu."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    },
+    {
+      "kind": "method",
+      "name": "closeSubmenu",
+      "parameters": [],
+      "description": "Close only the open submenu, leaving the menu itself open."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when an item is selected.",
+      "detail": "{ key: string; item: MenuItem }"
+    },
+    {
+      "name": "pdx-check",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-check`.",
+      "detail": "{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }"
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "menu",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "presentation",
+    "separator"
+  ],
+  "attributes": [
+    {
+      "name": "minwidth",
+      "fieldName": "minWidth",
+      "description": "Minimum width",
+      "type": {
+        "text": "number"
+      },
+      "default": "180"
+    },
+    {
+      "name": "menuid",
+      "fieldName": "menuId",
+      "description": "The id of the element that is `role=\"menu\"`, for a trigger's `aria-controls`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "menuclass",
+      "fieldName": "menuClass",
+      "description": "Classes added to the element that is `role=\"menu\"`: the dropdown's panel is that element,\nand `.pdx-dropdown-menu-panel` is what apps and the certification select it by.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "MenuItem",
+      "fields": [
+        "key: string",
+        "label: string",
+        "type?: 'item' | 'checkbox' | 'radio' | 'separator' | 'label' | 'submenu'",
+        "icon?: string",
+        "shortcut?: string",
+        "disabled?: boolean",
+        "danger?: boolean",
+        "checked?: boolean",
+        "radioGroup?: string",
+        "children?: MenuItem[]",
+        "className?: string",
+        "lang?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one menu entry: a snippet `item(item)`.",
+      "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "item",
+      "description": "The element reached as `[data-part=\"item\"]`."
+    },
+    {
+      "name": "separator",
+      "description": "The element reached as `[data-part=\"separator\"]`."
+    },
+    {
+      "name": "label",
+      "description": "The element reached as `[data-part=\"label\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    }
+  ]
+}

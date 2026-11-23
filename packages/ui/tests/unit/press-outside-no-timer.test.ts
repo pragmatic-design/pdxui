@@ -8,7 +8,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
-import '../../src/menu/pdx-menu';
+import '../../src/menu/pdx-menu.pdx';
 import '../../src/context-menu/pdx-context-menu';
 import '../../src/menubar/pdx-menubar';
 import '../../src/inline-edit/pdx-inline-edit.pdx';

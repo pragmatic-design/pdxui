@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/menu/pdx-menu';
+import '../../src/menu/pdx-menu.pdx';
 
 type Item = { key: string; label: string; type?: string; radioGroup?: string; checked?: boolean; disabled?: boolean; children?: Item[] };
 

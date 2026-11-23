@@ -19,10 +19,10 @@
 //
 // The trigger slot only: the menu itself is built on <body> when it opens.
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
-import '../menu/pdx-menu';
+import '../menu/pdx-menu.pdx';
 import { generatedId, onDestroy, onNextFrame } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
-import type { MenuItem } from '../menu/pdx-menu';
+import type { MenuItem } from '../menu/menu-types';
 import { sanitizeSVG } from '../shared/sanitize';
 import { anchorControl } from '../shared/anchor-control';
 import { uiString, uiAttr } from '../shared/i18n';
