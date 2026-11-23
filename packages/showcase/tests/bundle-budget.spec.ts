@@ -456,7 +456,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // −195 B). The whole +1.1 KB; the built dist: js 483.8 KB locally.
 // entry 43.5 → 43.6 (owner's OK, 2026-11-23): with pdx-file-upload the entry chunk is +17 B gzip
 // (44,582 → 44,599 B), which crosses the tenth it rounds to (43.54 → 43.55 KB).
-const BUDGET_KB = { entry: 43.6, js: 483.9, css: 67, blocking: 102.9 };
+// js 483.9 → 484.1 (the same standing OK for #1210's batches): pdx-menu moves to .pdx, 0.83× alone
+// (3,559 against 4,266 B). The whole +0.2 KB while html`` stays for the components not moved yet; the
+// built dist: js 484.0 KB locally, entry and blocking unchanged.
+const BUDGET_KB = { entry: 43.6, js: 484.1, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
