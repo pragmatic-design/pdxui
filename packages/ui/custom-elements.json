@@ -18427,7 +18427,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/list/pdx-list.ts",
+      "path": "src/list/pdx-list.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -18563,8 +18563,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-click`.",
-              "detail": "{ item, index, id }"
+              "description": "An item was activated, by a click or Enter/Space, in a `clickable` list: the item, its index, and its `id-field`.",
+              "detail": "{ item: T; index: number; id: unknown }"
             }
           ],
           "roles": [
@@ -18718,7 +18718,7 @@
           "name": "pdx-list",
           "declaration": {
             "name": "PdxList",
-            "module": "src/list/pdx-list.ts"
+            "module": "src/list/pdx-list.pdx"
           }
         }
       ]

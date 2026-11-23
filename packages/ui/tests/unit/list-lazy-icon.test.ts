@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/list/pdx-list';
+import '../../src/list/pdx-list.pdx';
 
 async function mount(items: unknown[]): Promise<HTMLElement> {
     const el = document.createElement('pdx-list');

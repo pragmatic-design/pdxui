@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { signal } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/list/pdx-list';
+import '../../src/list/pdx-list.pdx';
 
 async function mount(props: Record<string, unknown>): Promise<HTMLElement> {
     const el = document.createElement('pdx-list');

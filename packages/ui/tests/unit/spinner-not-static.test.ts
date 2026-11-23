@@ -52,7 +52,7 @@ function staticClosure(entry: string): Set<string> {
 
 describe('a component that draws a spinner only while loading', () => {
     it.each([
-        ['pdx-list', 'list/pdx-list.ts'],
+        ['pdx-list', 'list/pdx-list.pdx'],
         ['pdx-data-grid', 'data-grid/pdx-data-grid.ts'],
         ['pdx-infinite-scroll', 'infinite-scroll/pdx-infinite-scroll.pdx'],
         ['pdx-block-ui', 'block-ui/pdx-block-ui.ts'],
@@ -64,7 +64,7 @@ describe('a component that draws a spinner only while loading', () => {
         // `pdx-spinner` imports its own stylesheet and `@pdxui/core`; a module that imports the spinner
         // statically is the one the rows above say none of them is.
         expect(staticClosure(join(SRC, 'spinner', 'pdx-spinner.pdx')).has(SPINNER)).toBe(true);
-        expect(staticClosure(join(SRC, 'list', 'pdx-list.ts')).size, 'the walk followed nothing').toBeGreaterThan(1);
+        expect(staticClosure(join(SRC, 'list', 'pdx-list.pdx')).size, 'the walk followed nothing').toBeGreaterThan(1);
         // The barrel imports the spinner statically, by its `.pdx` name (#1210): the walk follows a
         // component written in `.pdx` as it follows a `.ts` one, or the rows above say nothing.
         expect(staticClosure(join(SRC, 'index.ts')).has(SPINNER), 'the walk does not follow a .pdx import').toBe(true);

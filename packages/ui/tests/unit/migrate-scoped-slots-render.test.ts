@@ -9,7 +9,7 @@ import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import { scopedSlotParent, scopedSlotOutlet, scriptSnippetInterpolation } from '../../../compiler/src/language/scoped-slots';
 import type { LanguageChangeContext } from '../../../compiler/src/language/changes';
 import { cleanup, tick } from './helpers';
-import '../../src/list/pdx-list';
+import '../../src/list/pdx-list.pdx';
 
 type Fix = (text: string, context?: LanguageChangeContext) => string;
 const fixWith = (change: { fix: unknown }) => change.fix as Fix;

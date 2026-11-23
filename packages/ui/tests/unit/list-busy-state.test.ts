@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { signal } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/list/pdx-list';
+import '../../src/list/pdx-list.pdx';
 
 /** The two members of a DataSource the list reads, with loading under the test's control. */
 function fakeSource(loading: boolean) {

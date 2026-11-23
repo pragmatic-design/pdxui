@@ -303,7 +303,7 @@ test('and the components that chunk imports, which is the same wave', () => {
     const modules = preloadedModules();
     // The route's chunk imports these statically, so the browser would ask for them in the wave
     // after the route's own. Named here, they come with it. `pdx-list`, the dashboard's queue.
-    for (const name of ['list/pdx-list.ts']) {
+    for (const name of ['list/pdx-list.pdx']) {
         expect(modules.some((source) => source.endsWith(`ui/src/${name}`)),
             `${name} is a static import of the landing chunk and is not preloaded`).toBe(true);
     }

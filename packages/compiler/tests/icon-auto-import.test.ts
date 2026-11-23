@@ -51,6 +51,10 @@ describe('the icons a template names are imported', () => {
         expect(iconImports(compiled('<pdx-image src="a.png" fallback-icon="user"></pdx-image>').code)).toEqual(['user']);
     });
 
+    it('so is one of a component written in .pdx, its prop declared @prop(icon) (#1317): <pdx-list empty-icon="trash">', () => {
+        expect(iconImports(compiled('<pdx-list empty-icon="trash"></pdx-list>').code)).toEqual(['trash']);
+    });
+
     it('a bound name imports nothing and raises nothing: it loads on demand', () => {
         const { code, warnings } = compiled('<pdx-icon :name="x"></pdx-icon><pdx-fab :icon="x"></pdx-fab>');
         expect(iconImports(code)).toEqual([]);
