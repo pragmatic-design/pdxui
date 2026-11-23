@@ -454,11 +454,6 @@
       "types": "./dist/relation-picker/pdx-relation-picker.d.ts",
       "import": "./dist/relation-picker/pdx-relation-picker.js"
     },
-    "./sortable-list": {
-      "development": "./src/sortable-list/pdx-sortable-list.ts",
-      "types": "./dist/sortable-list/pdx-sortable-list.d.ts",
-      "import": "./dist/sortable-list/pdx-sortable-list.js"
-    },
     "./icons/*": {
       "development": "./src/icon/pragmatic/*.ts",
       "types": "./dist/icon/pragmatic/*.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/infinite-scroll/pdx-infinite-scroll.pdx",
       "types": "./dist/infinite-scroll/pdx-infinite-scroll.d.ts",
       "import": "./dist/infinite-scroll/pdx-infinite-scroll.js"
+    },
+    "./sortable-list": {
+      "development": "./src/sortable-list/pdx-sortable-list.pdx",
+      "types": "./dist/sortable-list/pdx-sortable-list.d.ts",
+      "import": "./dist/sortable-list/pdx-sortable-list.js"
     },
     "./package.json": "./package.json"
   },

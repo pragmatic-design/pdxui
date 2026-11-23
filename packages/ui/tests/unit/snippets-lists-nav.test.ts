@@ -17,7 +17,7 @@ import '../../src/description-list/pdx-description-list';
 import '../../src/list/pdx-list';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/pagination/pdx-pagination';
-import '../../src/sortable-list/pdx-sortable-list';
+import '../../src/sortable-list/pdx-sortable-list.pdx';
 import '../../src/timeline/pdx-timeline';
 import '../../src/tree/pdx-tree';
 

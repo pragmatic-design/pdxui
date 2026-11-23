@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-sortable-list
  *
- * Written against the source (packages/ui/src/sortable-list/pdx-sortable-list.ts) and the CSS
+ * Written against the source (packages/ui/src/sortable-list/pdx-sortable-list.pdx) and the CSS
  * (packages/design/src/components/sortable-list.css).
  *
  * DOM, host vs inner:

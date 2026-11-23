@@ -1,0 +1,174 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSortableList",
+  "tagName": "pdx-sortable-list",
+  "category": "Data Display",
+  "order": 80,
+  "description": "A list the user can put in another order, by dragging a row's handle or from the keyboard alone.\n\nIt emits `pdx-reorder` with the indices and never writes to `items`: the application applies the\nmove, so the array it owns stays the one source of truth.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "description": "How a row is identified. Empty: the row's index.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "What a row shows without an `item` slot, and what names its handle either way.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "handle",
+      "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "handle"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "axis",
+      "description": "vertical (the default) or horizontal.",
+      "type": {
+        "text": "'vertical' | 'horizontal'"
+      },
+      "default": "'vertical'",
+      "attribute": "axis"
+    }
+  ],
+  "variants": [
+    {
+      "name": "axis",
+      "values": [
+        "vertical",
+        "horizontal"
+      ],
+      "default": "vertical"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-reorder",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A row was dropped at another position: `from` and `to` are indices into `items`, `id` the row's `id-field`. The list is not changed: the application moves the item.",
+      "detail": "{ from: number; to: number; id: unknown }"
+    }
+  ],
+  "roles": [
+    "list"
+  ],
+  "attributes": [
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "description": "How a row is identified. Empty: the row's index.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "What a row shows without an `item` slot, and what names its handle either way.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "handle",
+      "fieldName": "handle",
+      "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "axis",
+      "fieldName": "axis",
+      "description": "vertical (the default) or horizontal.",
+      "type": {
+        "text": "'vertical' | 'horizontal'"
+      },
+      "default": "'vertical'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one row's content: a snippet `item(item, index)`. Without it the row shows\nthe item's `label-field`.",
+      "signature": "(item: T, index: number)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "list",
+      "description": "The `role=\"list\"` `<ul>`, framed."
+    },
+    {
+      "name": "item",
+      "description": "A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`."
+    },
+    {
+      "name": "handle",
+      "description": "A row's handle, the button the pointer grabs and the keyboard moves."
+    },
+    {
+      "name": "body",
+      "description": "A row's content."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set: nothing can be moved, and the handles are `aria-disabled`."
+    }
+  ]
+}

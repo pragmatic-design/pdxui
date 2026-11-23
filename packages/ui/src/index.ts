@@ -95,7 +95,7 @@ import './block-ui/pdx-block-ui';
 
 // Tier 1F: Data Display
 import './list/pdx-list';
-import './sortable-list/pdx-sortable-list';
+import './sortable-list/pdx-sortable-list.pdx';
 import './kanban/pdx-kanban.pdx';
 import './scheduler/pdx-scheduler.pdx';
 import './description-list/pdx-description-list';

@@ -28559,7 +28559,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/sortable-list/pdx-sortable-list.ts",
+      "path": "src/sortable-list/pdx-sortable-list.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -28649,8 +28649,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-reorder`.",
-              "detail": "{ from, to, id }"
+              "description": "A row was dropped at another position: `from` and `to` are indices into `items`, `id` the row's `id-field`. The list is not changed: the application moves the item.",
+              "detail": "{ from: number; to: number; id: unknown }"
             }
           ],
           "roles": [
@@ -28742,7 +28742,7 @@
           "name": "pdx-sortable-list",
           "declaration": {
             "name": "PdxSortableList",
-            "module": "src/sortable-list/pdx-sortable-list.ts"
+            "module": "src/sortable-list/pdx-sortable-list.pdx"
           }
         }
       ]

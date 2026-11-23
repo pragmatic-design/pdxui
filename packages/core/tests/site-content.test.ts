@@ -415,7 +415,7 @@ describe('the pages name the mechanism they describe', () => {
 
     // The claim above has to stay true of the code: the attribute must not come back.
     it('no source in core or ui sets aria-grabbed', () => {
-        for (const file of ['core/src/component/drag.ts', 'ui/src/sortable-list/pdx-sortable-list.ts']) {
+        for (const file of ['core/src/component/drag.ts', 'ui/src/sortable-list/pdx-sortable-list.pdx']) {
             const source = readFileSync(join(ROOT, ...file.split('/')), 'utf8');
             expect(source.includes("setAttribute('aria-grabbed'"), `${file} sets aria-grabbed again`)
                 .toBe(false);
