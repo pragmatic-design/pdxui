@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/navbar/pdx-navbar';
+import '../../src/navbar/pdx-navbar.pdx';
 
 async function mount(props: Record<string, unknown>): Promise<HTMLElement> {
     const el = document.createElement('pdx-navbar');

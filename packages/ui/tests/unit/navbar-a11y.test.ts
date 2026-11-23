@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/navbar/pdx-navbar';
+import '../../src/navbar/pdx-navbar.pdx';
 
 const ITEMS = [
     { key: 'home', label: 'Home', href: '#', active: true },

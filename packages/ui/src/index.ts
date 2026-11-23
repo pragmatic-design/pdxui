@@ -65,7 +65,7 @@ import './field-list/pdx-field-list.pdx';
 import './wizard/pdx-wizard';
 
 // Tier 1D: Navigation
-import './navbar/pdx-navbar';
+import './navbar/pdx-navbar.pdx';
 import './sidebar/pdx-sidebar';
 import './bottom-nav/pdx-bottom-nav';
 import './nav-menu/pdx-nav-menu';

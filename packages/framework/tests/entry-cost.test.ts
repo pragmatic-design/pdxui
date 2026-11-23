@@ -126,8 +126,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (CI's line: 332.1). 332.4 after pdx-inline-edit (CI's line: 332.3). 332.6 after
     // pdx-infinite-scroll and pdx-sortable-list (measured here: 332.5). 332.8 after pdx-list,
     // pdx-empty-state and pdx-statistic (measured here: 332.7). 333.1 after pdx-split-button (measured
-    // here: 333.0). 333.3 after pdx-image (measured here: 333.2).
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 333.3 },
+    // here: 333.0). 333.3 after pdx-image (measured here: 333.2). 333.5 after pdx-navbar (measured
+    // here: 333.4).
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 333.5 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
