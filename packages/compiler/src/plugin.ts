@@ -46,6 +46,7 @@ import { writeRouteTypes } from './route-types';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
 import { importedInternals, checkInternalUses, viewParts, type ReadComponent } from './internal-components';
+import { importedPartWrites } from './imported-part-writes';
 import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
@@ -982,6 +983,8 @@ export function compile(
             enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf,
             requiredSlotsOf: options?.requiredSlotsOf,
             viewParts: partsOfViews,
+            // An external part written by a module the script imports is written (#1338).
+            importedPartWrites: importedPartWrites(scriptContent, filename, options?.readComponent),
             eventHeardAbove: heard ? (event) => heard(event, ownTag) : undefined,
         }));
         // An @action offered to agents that no control of the template runs (#502, decision 31).

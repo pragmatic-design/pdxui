@@ -588,8 +588,12 @@ element or `null`.
   on elements it builds, or on the page's own it marks, as `pdx-wizard` marks each step panel. It is
   in the descriptor and the manifest with the others, and has no ref: no rendered element would ever
   fill it. The compiler reads the writes instead, a literal `setAttribute('data-part', 'panel')` or
-  `.dataset.part = 'panel'`, outside comments: with none, `PDX_PART_EXTERNAL_UNWRITTEN`; a
-  `data-part="panel"` in the template contradicts the declaration, `PDX_PART_EXTERNAL_DRAWN`.
+  `.dataset.part = 'panel'`, outside comments, in the script or in a module the script imports by a
+  relative path, at any depth (#1338): a component that builds its DOM in modules of its own writes its
+  parts there, as `pdx-data-grid`'s `grid-body.ts` writes `row`. With none, `PDX_PART_EXTERNAL_UNWRITTEN`.
+  Where the compiler reads no files (`pdx check`, the editor), a script that imports a relative module
+  is not judged. A `data-part="panel"` in the template contradicts the declaration,
+  `PDX_PART_EXTERNAL_DRAWN`.
 - A part's name may have a hyphen, `@part word-count;` (#1299): a styling name, `[data-part="word-count"]`,
   which the script cannot name, as it is no identifier. It has no ref, and keeps its `data-part`, its
   descriptor entry, its manifest entry and its diagnostics.

@@ -460,7 +460,8 @@ the template can render at the same time:
 - `@part(external) panel;` (#1284) is a part the template does not draw: the script writes it with a
   literal `setAttribute('data-part', 'panel')` or `.dataset.part = 'panel'`, on elements it builds or
   on the page's own. It is in the manifest like the others, and has no ref. Written by nothing in the
-  script: `PDX_PART_EXTERNAL_UNWRITTEN`; drawn by the template: `PDX_PART_EXTERNAL_DRAWN`.
+  script, nor in a module it imports by a relative path (#1338): `PDX_PART_EXTERNAL_UNWRITTEN`; drawn by
+  the template: `PDX_PART_EXTERNAL_DRAWN`.
 - `:part=` and the HTML `part` attribute are not this: `part` is the shadow-parts attribute.
 
 ### Examples
