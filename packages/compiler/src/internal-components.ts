@@ -37,6 +37,14 @@ const RELATIVE_PDX = /^\.{1,2}\/[^'"]+\.pdx$/;
  * Linear in the script's length: each statement is read up to its first quote.
  */
 function relativePdxImports(script: string): string[] {
+    return relativeImports(script).filter((spec) => RELATIVE_PDX.test(spec));
+}
+
+/**
+ * Every relative specifier a script imports statically, `.pdx` or not: `import './x'`,
+ * `import { a } from '../y.ts'`, across lines. A dynamic `import()` is not one. Linear, as above.
+ */
+export function relativeImports(script: string): string[] {
     const out: string[] = [];
     // The next quote of each kind at or after a position. The statements come in order, so a quote found
     // past one is reused for the next: no search starts again from each line (many quote-less lines).
@@ -55,7 +63,7 @@ function relativePdxImports(script: string): string[] {
         const close = script.indexOf(script[quote], quote + 1);
         if (close < 0) continue;
         const spec = script.slice(quote + 1, close);
-        if (RELATIVE_PDX.test(spec)) out.push(spec);
+        if (/^\.{1,2}\//.test(spec)) out.push(spec);
     }
     return out;
 }

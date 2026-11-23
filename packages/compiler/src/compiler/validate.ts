@@ -258,6 +258,11 @@ export interface ValidateOptions {
      */
     viewParts?: ReadonlyMap<string, string>;
     /**
+     * Whether a module the script imports writes an `@part(external)` (#1338): `importedPartWrites`.
+     * Without it, only the script's own writes count.
+     */
+    importedPartWrites?: (name: string) => boolean;
+    /**
      * Whether the project listens to one of this component's events above it — the resolver's
      * `eventHeardAbove`, bound to the component's tag. With it, an `@event(bubbles)` nothing hears
      * above the component is PDX_EVENT_BUBBLES_UNUSED (#138); without it, the marker is not checked.
@@ -590,8 +595,9 @@ export function validate(
         // Match: the name as a whole identifier, not a member (`x.grid`) — strings and comments masked.
         scriptReads: (name) => new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`).test(setupCode),
         external: analysis.externalParts,
-        // The same code with its strings kept: an external part is written as one (#1284).
-        scriptWrites: (name) => writesPart(scriptWithStrings, name),
+        // The same code with its strings kept: an external part is written as one (#1284), here or in
+        // a module the script imports (#1338).
+        scriptWrites: (name) => writesPart(scriptWithStrings, name) || !!options?.importedPartWrites?.(name),
     }));
 
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──

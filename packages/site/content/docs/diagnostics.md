@@ -1210,9 +1210,9 @@ write:
 
 ### PDX_PART_EXTERNAL_UNWRITTEN
 
-*error* — An `@part(external)` part that the script writes on no element: no `setAttribute('data-part', 'x')`, no `.dataset.part = 'x'` (#1284).
+*error* — An `@part(external)` part written on no element: no `setAttribute('data-part', 'x')`, no `.dataset.part = 'x'`, in the script (#1284) nor in a module it imports by a relative path (#1338).
 
-An external part is one the template does not draw: the script writes it on the elements it builds, or on the page's own it marks. The compiler cannot follow those elements, so it reads the writes instead: with none, the manifest lists a part no element carries, which is what `PDX_PART_MISSING` says of a template's part.
+An external part is one the template does not draw: the script writes it on the elements it builds, or on the page's own it marks, itself or in a module it imports by a relative path. The compiler cannot follow those elements, so it reads the writes instead: with none, the manifest lists a part no element carries, which is what `PDX_PART_MISSING` says of a template's part. Where it reads no files (`pdx check`, the editor), a script that imports a relative module is not judged.
 
 **Fix.** Write it on the element it names, `el.setAttribute('data-part', 'x')` or `el.dataset.part = 'x'`, with the name as a literal, or remove `x` from `@part`.
 
