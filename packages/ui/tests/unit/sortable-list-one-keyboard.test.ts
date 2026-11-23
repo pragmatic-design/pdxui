@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SOURCE = join(dirname(fileURLToPath(import.meta.url)),
-    '../../src/sortable-list/pdx-sortable-list.ts');
+    '../../src/sortable-list/pdx-sortable-list.pdx');
 
 describe('the component and the composable are one implementation', () => {
     const src = readFileSync(SOURCE, 'utf8');
@@ -21,7 +21,8 @@ describe('the component and the composable are one implementation', () => {
     it('read the component, not an empty file', () => {
         // Without this the assertions below pass on a path that has moved.
         expect(src.length).toBeGreaterThan(1000);
-        expect(src, 'this is not the component').toContain("component('pdx-sortable-list'");
+        // Written in .pdx (#1210): the component is the file that declares its event.
+        expect(src, 'this is not the component').toContain("@event 'pdx-reorder'");
     });
 
     it('the component handles no keys of its own', () => {

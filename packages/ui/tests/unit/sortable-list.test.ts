@@ -14,7 +14,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/sortable-list/pdx-sortable-list';
+import '../../src/sortable-list/pdx-sortable-list.pdx';
 
 const ROWS = [
     { id: 'a', label: 'Alpha' },

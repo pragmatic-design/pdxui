@@ -14,7 +14,7 @@ move, so the array it owns stays the one source of truth.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `axis` | `axis` | 'vertical' \| 'horizontal' | `'vertical'` | vertical (the default) or horizontal. |
 
-**Events:** `pdx-reorder` → `detail: { from, to, id }` — Fired on `pdx-reorder`.
+**Events:** `pdx-reorder` → `detail: { from: number; to: number; id: unknown }` — A row was dropped at another position: `from` and `to` are indices into `items`, `id` the row's `id-field`. The list is not changed: the application moves the item.
 
 **Renders:** roles `list`
 
