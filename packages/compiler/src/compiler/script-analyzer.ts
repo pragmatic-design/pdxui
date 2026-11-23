@@ -22,7 +22,7 @@ import {
 } from './script-analyzer-helpers';
 import { readLoaderOptions } from './loader-options';
 import { readModelOptions, attributeReadingIsAmbiguous, ATTRIBUTE_READINGS } from './model-options';
-import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
+import { maskNonCode, skipNonCode, findClosing, splitAtDepthZero } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
 import { destructuredNames } from './destructured-names';
@@ -574,10 +574,13 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // Types only: the editor infers each from the props that use it. Nothing is generated. A list
         // with an entry that does not start with a name matches nothing here, and is
         // PDX_UNKNOWN_DECLARATION below.
-        // Match: `@generic` and the list, up to its `;`. Groups: [1]=the list as written
-        const genericDecl = trimmed.match(/^@generic\s([^;]*)/);
+        // Match: `@generic` and what follows. The list ends at its first `;` outside braces: a
+        // constraint's object type separates its members with `;` too.
+        // Groups: [1]=the list and the rest of the statement
+        const genericDecl = trimmed.match(/^@generic\s([\s\S]*)/);
         if (genericDecl) {
-            const entries = splitAtTopLevelCommas(genericDecl[1].trim()).map(g => g.trim());
+            const list = splitAtDepthZero(genericDecl[1], ';')[0];
+            const entries = splitAtTopLevelCommas(list.trim()).map(g => g.trim());
             if (entries.length > 0 && entries.every(g => /^[A-Za-z_$][\w$]*(?:\s|$)/.test(g))) {
                 generics.push(...entries);
                 continue;

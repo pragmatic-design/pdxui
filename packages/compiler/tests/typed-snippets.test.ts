@@ -83,6 +83,12 @@ describe('@generic (#490)', () => {
         expect((warnings ?? []).filter((w) => w.code === 'PDX_UNKNOWN_DECLARATION')).toEqual([]);
     });
 
+    it('keeps a constraint whose object type has several members, each ending in `;`', () => {
+        const { generics, warnings } = analyzeScript('@generic T extends { key?: string; label?: string; type?: string }, K;\n@prop items: T[] = [];', 'menu.pdx');
+        expect(generics).toEqual(['T extends { key?: string; label?: string; type?: string }', 'K']);
+        expect((warnings ?? []).filter((w) => w.code === 'PDX_UNKNOWN_DECLARATION')).toEqual([]);
+    });
+
     it('generates nothing in the module: it is for the editor', () => {
         const { code, warnings } = compile(child('@generic T;\n@prop items: T[] = [];\n@slot row: (item: T);', '<p>@render row(items[0])</p>'), 'list.pdx');
         expect(warnings.filter((w) => w.severity === 'error')).toEqual([]);
