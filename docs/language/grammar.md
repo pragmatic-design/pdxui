@@ -17,6 +17,7 @@ grammar. CSS is CSS: `CssText` is read by the browser's grammar, plus the extens
 ```ebnf
 Identifier     ::= [A-Za-z_$] [A-Za-z0-9_$]*
 Word           ::= [A-Za-z0-9_]+
+VariantWord    ::= [A-Za-z0-9_-]+                                                                     (a variant's value: `bottom-right`, #1324)
 KebabName      ::= [a-z] [a-z0-9]* ( "-" [a-z0-9]+ )*
 StringLiteral  ::= "'" [^']* "'" | '"' [^"]* '"'
 Number         ::= "-"? [0-9]+ ( "." [0-9]+ )?
@@ -84,8 +85,8 @@ ExposeDecl     ::= "@expose" S Identifier ( S? "," S? Identifier )* End
 ProvideDecl    ::= "@provide" S Identifier S? "=" S? Expression End                                  (β #139: Identifier is a token — landed #496)
 InjectDecl     ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? End         (β #139 — landed #496)
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                                    (β #153)
-VariantAxis    ::= Identifier S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? Word )? S? ";"
-VariantValue   ::= Word ( S? ":" S? StringLiteral )?                                                (β #986: every value of an axis names its native selector, or none does)
+VariantAxis    ::= Identifier S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? VariantWord )? S? ";"
+VariantValue   ::= VariantWord ( S? ":" S? StringLiteral )?                                         (β #986: every value of an axis names its native selector, or none does)
 TagDecl        ::= "@tag" S StringLiteral End
 InternalDecl   ::= "@internal" End                                                                  (β #1102: rendered only from its own folder)
 ```
