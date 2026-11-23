@@ -29370,7 +29370,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/statistic/pdx-statistic.ts",
+      "path": "src/statistic/pdx-statistic.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -29721,7 +29721,7 @@
           "name": "pdx-statistic",
           "declaration": {
             "name": "PdxStatistic",
-            "module": "src/statistic/pdx-statistic.ts"
+            "module": "src/statistic/pdx-statistic.pdx"
           }
         }
       ]

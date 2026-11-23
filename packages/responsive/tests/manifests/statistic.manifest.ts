@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-statistic
  *
- * Contracts written by inspecting the source (packages/ui/src/statistic/pdx-statistic.ts)
+ * Contracts written by inspecting the source (packages/ui/src/statistic/pdx-statistic.pdx)
  * and the CSS (packages/design/src/components/statistic.css).
  *
  * DOM structure (host vs inner):

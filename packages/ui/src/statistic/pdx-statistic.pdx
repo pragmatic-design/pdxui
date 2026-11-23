@@ -1,0 +1,225 @@
+<template></template>
+
+<script>
+/**
+ * Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.
+ *
+ * @csspart icon - The icon beside the title.
+ * @csspart title - The label above the value.
+ * @csspart value - The number, between its prefix and suffix.
+ * @csspart trend - The trend line: its arrow and text.
+ * @csspart description - The description below the value.
+ * @csspart compare - The comparison with a previous value.
+ *
+ * @cssstate loading - `loading` is set: skeletons in place of the value, and the host `aria-busy`.
+ */
+// pdx-statistic — Display numeric KPI values with labels, trends, icons.
+// Useful for dashboard cards, analytics summaries, stat panels.
+//
+// Its DOM is built by the script a frame after each change, as the TypeScript version built it: a
+// `<pdx-icon>` in a template is imported with the component, and the statistic loads it only when it
+// has an icon to draw; a `@defer` around it put core's deferred-block runtime in every entry (#1287).
+import { onDestroy } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/statistic';
+
+// The axis statistic.css keys by (#632), reflected on the host and drawn from it; the host is the
+// element the old `.pdx-statistic-sm`/`-lg` classes went on, so no native class is kept.
+@variants {
+  /** sm, md (the default) or lg. */
+  size: { md, sm, lg } = md;
+}
+// On the host as a custom state (#132, #291), in place of the classes it set on itself; the host is
+// `aria-busy` only while it holds (A4).
+@state loading = !!loading;
+// Every element is built by the script (#1284).
+@part(external) icon, title, value, trend, description, compare;
+/** Label text above the value */
+@prop title: string = '';
+/** Main display value */
+@prop value: string = '0';
+/** Text/symbol before value (e.g. '$') */
+@prop prefix: string = '';
+/** Text/symbol after value (e.g. '%') */
+@prop suffix: string = '';
+/** Icon name (left of title) */
+@prop(icon) icon: string = '';
+/** Trend direction: 'up' | 'down' | 'flat' | '' */
+@prop trend: string = '';
+/** Trend text e.g. '+12.5%' */
+@prop trendValue: string = '';
+/** Auto-color trend (green up, red down) */
+@prop trendColor: boolean = true;
+/** Show skeleton placeholder */
+@prop loading: boolean = false;
+/** Decimal places for formatting (-1 = no format) */
+@prop precision: number = -1;
+/** Thousands separator */
+@prop groupSeparator: string = ',';
+/** Comparison/previous value (shown muted below main value) */
+@prop compareValue: string = '';
+/** Compare label (e.g. "vs last month") */
+@prop compareLabel: string = '';
+/** Description text below value */
+@prop description: string = '';
+@host el { :aria-busy="loading ? 'true' : null" }
+
+/** `pdx-icon` the first time the statistic has an icon or a trend to draw: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+}
+
+function formatValue(val: string, prec: number, sep: string): string {
+  if (prec < 0) return val;
+  const num = parseFloat(val);
+  if (isNaN(num)) return val;
+  const fixed = num.toFixed(prec);
+  const [intPart, decPart] = fixed.split('.');
+  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+  return decPart ? grouped + '.' + decPart : grouped;
+}
+
+function getTrendIcon(t: string): string {
+  if (t === 'up') return 'trending-up';
+  if (t === 'down') return 'trending-down';
+  if (t === 'flat') return 'minus';
+  return '';
+}
+
+/** What a render draws, read where the effect subscribes to it. */
+interface View {
+  isLoading: boolean; titleText: string; valueText: string; prefixText: string; suffixText: string;
+  iconName: string; trendDir: string; trendVal: string; autoColor: boolean; sizeName: string;
+  prec: number; sep: string; compareVal: string; compareLbl: string; descText: string;
+}
+
+function render(v: View): void {
+  el.innerHTML = '';
+
+  if (v.isLoading) {
+    // Skeleton placeholders
+    const skelTitle = document.createElement('div');
+    skelTitle.className = 'pdx-statistic-skeleton pdx-statistic-skeleton-title';
+    el.appendChild(skelTitle);
+    const skelValue = document.createElement('div');
+    skelValue.className = 'pdx-statistic-skeleton pdx-statistic-skeleton-value';
+    el.appendChild(skelValue);
+    const skelTrend = document.createElement('div');
+    skelTrend.className = 'pdx-statistic-skeleton pdx-statistic-skeleton-trend';
+    el.appendChild(skelTrend);
+    return;
+  }
+
+  // Icon (optional)
+  if (v.iconName) {
+    loadIcon();
+    const iconEl = document.createElement('pdx-icon');
+    iconEl.className = 'pdx-statistic-icon';
+    iconEl.setAttribute('data-part', 'icon');
+    iconEl.setAttribute('name', v.iconName);
+    iconEl.setAttribute('size', v.sizeName === 'sm' ? '20' : v.sizeName === 'lg' ? '32' : '24');
+    iconEl.setAttribute('aria-hidden', 'true');   // decorative: the title says it
+    el.appendChild(iconEl);
+  }
+
+  // Title
+  if (v.titleText) {
+    const titleEl = document.createElement('div');
+    titleEl.className = 'pdx-statistic-title';
+    titleEl.setAttribute('data-part', 'title');
+    titleEl.textContent = v.titleText;
+    el.appendChild(titleEl);
+  }
+
+  // Value wrap: prefix + value + suffix
+  const valueWrap = document.createElement('div');
+  valueWrap.className = 'pdx-statistic-value-wrap';
+
+  if (v.prefixText) {
+    const preEl = document.createElement('span');
+    preEl.className = 'pdx-statistic-prefix';
+    preEl.textContent = v.prefixText;
+    valueWrap.appendChild(preEl);
+  }
+
+  const valEl = document.createElement('span');
+  valEl.className = 'pdx-statistic-value';
+  valEl.setAttribute('data-part', 'value');
+  valEl.textContent = formatValue(v.valueText, v.prec, v.sep);
+  valueWrap.appendChild(valEl);
+
+  if (v.suffixText) {
+    const sufEl = document.createElement('span');
+    sufEl.className = 'pdx-statistic-suffix';
+    sufEl.textContent = v.suffixText;
+    valueWrap.appendChild(sufEl);
+  }
+
+  el.appendChild(valueWrap);
+
+  // Trend line (optional)
+  if (v.trendDir || v.trendVal) {
+    const trendEl = document.createElement('div');
+    let trendClass = 'pdx-statistic-trend';
+    if (v.autoColor && v.trendDir === 'up') trendClass += ' pdx-statistic-trend-up';
+    else if (v.autoColor && v.trendDir === 'down') trendClass += ' pdx-statistic-trend-down';
+    else if (v.trendDir === 'flat') trendClass += ' pdx-statistic-trend-flat';
+    trendEl.className = trendClass;
+    trendEl.setAttribute('data-part', 'trend');
+
+    const trendIconName = getTrendIcon(v.trendDir);
+    if (trendIconName) {
+      loadIcon();
+      const trendIcon = document.createElement('pdx-icon');
+      trendIcon.setAttribute('name', trendIconName);
+      trendIcon.setAttribute('size', '14');
+      // The sign is in the text (+12.5%): the arrow would be read as well.
+      trendIcon.setAttribute('aria-hidden', 'true');
+      trendEl.appendChild(trendIcon);
+    }
+
+    if (v.trendVal) {
+      const trendText = document.createElement('span');
+      trendText.textContent = v.trendVal;
+      trendEl.appendChild(trendText);
+    }
+
+    el.appendChild(trendEl);
+  }
+
+  // Description
+  if (v.descText) {
+    const descEl = document.createElement('div');
+    descEl.className = 'pdx-statistic-desc';
+    descEl.setAttribute('data-part', 'description');
+    descEl.textContent = v.descText;
+    el.appendChild(descEl);
+  }
+
+  // Compare value
+  if (v.compareVal) {
+    const cmpEl = document.createElement('div');
+    cmpEl.className = 'pdx-statistic-compare';
+    cmpEl.setAttribute('data-part', 'compare');
+    cmpEl.textContent = (v.compareLbl ? v.compareLbl + ' ' : '') + formatValue(v.compareVal, v.prec, v.sep);
+    el.appendChild(cmpEl);
+  }
+}
+
+// Cleared on destroy: a render a frame away does not draw into a destroyed statistic.
+let alive = true;
+onDestroy(() => { alive = false; });
+
+// Read every prop to subscribe, then draw a frame later, as the TypeScript version did.
+$effect(() => {
+  const v: View = {
+    isLoading: loading as boolean, titleText: title as string, valueText: value as string,
+    prefixText: prefix as string, suffixText: suffix as string, iconName: icon as string,
+    trendDir: trend as string, trendVal: trendValue as string, autoColor: trendColor as boolean,
+    sizeName: size as string, prec: precision as number, sep: groupSeparator as string,
+    compareVal: compareValue as string, compareLbl: compareLabel as string, descText: description as string,
+  };
+  requestAnimationFrame(() => { if (alive) render(v); });
+});
+</script>

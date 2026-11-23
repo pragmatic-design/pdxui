@@ -13,7 +13,7 @@ import '../../src/slider/pdx-slider.pdx';
 import '../../src/label/pdx-label';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/scroll-area/pdx-scroll-area';
-import '../../src/statistic/pdx-statistic';
+import '../../src/statistic/pdx-statistic.pdx';
 import '../../src/splitter/pdx-splitter';
 import '../../src/relative-time/pdx-relative-time';
 

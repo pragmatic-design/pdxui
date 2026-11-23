@@ -38,6 +38,7 @@ const PORTED: Record<string, string> = {
     'pdx-sortable-list': 'src/sortable-list/pdx-sortable-list.pdx',
     'pdx-list': 'src/list/pdx-list.pdx',
     'pdx-empty-state': 'src/empty-state/pdx-empty-state.pdx',
+    'pdx-statistic': 'src/statistic/pdx-statistic.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',
