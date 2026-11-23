@@ -284,11 +284,6 @@
       "types": "./dist/app-layout/pdx-app-layout.d.ts",
       "import": "./dist/app-layout/pdx-app-layout.js"
     },
-    "./aspect-ratio": {
-      "development": "./src/aspect-ratio/pdx-aspect-ratio.ts",
-      "types": "./dist/aspect-ratio/pdx-aspect-ratio.d.ts",
-      "import": "./dist/aspect-ratio/pdx-aspect-ratio.js"
-    },
     "./masonry": {
       "development": "./src/masonry/pdx-masonry.ts",
       "types": "./dist/masonry/pdx-masonry.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/menu/pdx-menu.pdx",
       "types": "./dist/menu/pdx-menu.d.ts",
       "import": "./dist/menu/pdx-menu.js"
+    },
+    "./aspect-ratio": {
+      "development": "./src/aspect-ratio/pdx-aspect-ratio.pdx",
+      "types": "./dist/aspect-ratio/pdx-aspect-ratio.d.ts",
+      "import": "./dist/aspect-ratio/pdx-aspect-ratio.js"
     },
     "./package.json": "./package.json"
   },
