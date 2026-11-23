@@ -124,7 +124,7 @@ import './command/pdx-command';
 import './select/pdx-select';
 import './autocomplete/pdx-autocomplete';
 import './data-source/pdx-data-source';
-import './data-grid/pdx-data-grid';
+import './data-grid/pdx-data-grid.pdx';
 import './filter-builder/pdx-filter-builder';
 import './auto-form/pdx-auto-form';
 // CRUD primitives (compose data-grid + form-template + drawer)

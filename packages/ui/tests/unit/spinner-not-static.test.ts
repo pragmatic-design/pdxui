@@ -53,7 +53,7 @@ function staticClosure(entry: string): Set<string> {
 describe('a component that draws a spinner only while loading', () => {
     it.each([
         ['pdx-list', 'list/pdx-list.pdx'],
-        ['pdx-data-grid', 'data-grid/pdx-data-grid.ts'],
+        ['pdx-data-grid', 'data-grid/pdx-data-grid.pdx'],
         ['pdx-infinite-scroll', 'infinite-scroll/pdx-infinite-scroll.pdx'],
         ['pdx-block-ui', 'block-ui/pdx-block-ui.ts'],
     ])('%s does not load pdx-spinner statically', (_tag, file) => {

@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup } from './helpers';
 
 vi.stubGlobal('requestIdleCallback', () => 0);
-await import('../../src/data-grid/pdx-data-grid');
+await import('../../src/data-grid/pdx-data-grid.pdx');
 
 type Grid = HTMLElement & { columns: unknown; data: unknown; editable: boolean; whenReady(): Promise<void> };
 

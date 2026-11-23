@@ -16,7 +16,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 interface Row extends Record<string, unknown> { id: number; name: string; city: string }
 

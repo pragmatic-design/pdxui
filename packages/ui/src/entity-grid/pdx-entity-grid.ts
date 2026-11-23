@@ -10,7 +10,7 @@ import type { BulkAction } from '../bulk-actions/pdx-bulk-actions';
 import { uiString, format } from '../shared/i18n';
 // Self-contained: register every composed custom element when this entry is imported directly
 // (e.g. @pdxui/ui/entity-grid), not only via the @pdxui/ui barrel.
-import '../data-grid/pdx-data-grid';
+import '../data-grid/pdx-data-grid.pdx';
 import '../bulk-actions/pdx-bulk-actions';
 import '../edit-drawer/pdx-edit-drawer';
 import '../alert-dialog/pdx-alert-dialog';

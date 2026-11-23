@@ -6,7 +6,7 @@
 
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 afterEach(() => { vi.restoreAllMocks(); cleanup(); });
 

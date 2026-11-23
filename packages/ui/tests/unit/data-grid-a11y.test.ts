@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 import '../../src/pagination/pdx-pagination';
 
 type Grid = HTMLElement & Record<string, unknown>;

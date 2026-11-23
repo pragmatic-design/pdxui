@@ -5,7 +5,7 @@
 // .pdx's doc comments go through the same TypeScript JSDoc reading as a component()'s.
 
 import ts from 'typescript';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -103,6 +103,22 @@ export function modelEventName(name) {
 }
 
 // ─── Scans over markup and code ─────────────────────────────────────
+
+/**
+ * The non-component `.ts` files beside a component: where a component that grew split its logic
+ * (pdx-data-grid emits `pdx-selection-change` from grid-selection.ts, not from its own module). Read
+ * for a TypeScript component and a `.pdx` one alike (#1210): moved to `.pdx`, a component keeps the
+ * roles its helpers draw.
+ */
+export function helperFiles(file) {
+    const dir = dirname(file);
+    // analyzeFile is handed its text, and a test may hand it a path that exists nowhere
+    // (gen-manifest-eol.test.ts): no directory, no helpers.
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir)
+        .filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts') && !/^pdx-/.test(f))
+        .map(f => join(dir, f));
+}
 
 /**
  * The ARIA roles a component renders — what a test or a measuring script targets. Read from

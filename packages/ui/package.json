@@ -334,11 +334,6 @@
       "types": "./dist/relative-time/pdx-relative-time.d.ts",
       "import": "./dist/relative-time/pdx-relative-time.js"
     },
-    "./data-grid": {
-      "development": "./src/data-grid/pdx-data-grid.ts",
-      "types": "./dist/data-grid/pdx-data-grid.d.ts",
-      "import": "./dist/data-grid/pdx-data-grid.js"
-    },
     "./bulk-actions": {
       "development": "./src/bulk-actions/pdx-bulk-actions.ts",
       "types": "./dist/bulk-actions/pdx-bulk-actions.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/menu/pdx-menu.pdx",
       "types": "./dist/menu/pdx-menu.d.ts",
       "import": "./dist/menu/pdx-menu.js"
+    },
+    "./data-grid": {
+      "development": "./src/data-grid/pdx-data-grid.pdx",
+      "types": "./dist/data-grid/pdx-data-grid.d.ts",
+      "import": "./dist/data-grid/pdx-data-grid.js"
     },
     "./package.json": "./package.json"
   },

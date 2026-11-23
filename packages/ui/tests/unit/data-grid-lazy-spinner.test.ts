@@ -10,7 +10,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource, type DataResponse } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 type Grid = HTMLElement & Record<string, unknown>;
 const COLS = [{ field: 'name', header: 'Name' }];

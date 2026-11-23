@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/filter-builder/pdx-filter-builder';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 const FIELDS = [
     { field: 'name', label: 'Name', type: 'string', operators: ['contains', 'eq'] },

@@ -1,0 +1,867 @@
+<template></template>
+
+<script>
+/**
+ * A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be
+ * replaced with slot templates.
+ *
+ * @slot cell - Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes.
+ * @slot header - Draws a column's header: `header(column)`; a column it draws nothing for keeps its title.
+ * @slot detail - Draws an expanded row's detail: `detail(row)`.
+ * @slot editCell - Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit.
+ * @slot filter - Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input.
+ * @slot filterPopover - Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover.
+ * @slot toolbarStart - Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`.
+ * @slot toolbarEnd - Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`.
+ * @slot empty - Draws the empty state in place of the grid's icon and title: `empty()`.
+ *
+ * @cssstate striped - `striped`: every other row is tinted.
+ * @cssstate hover - `hover`: a row under the pointer is highlighted.
+ * @cssstate row-clickable - `row-clickable`: the rows open something, and take a pointer.
+ * @cssstate compact - `compact`: tighter cells.
+ * @cssstate sticky-header - `sticky-header`: the header stays while the body scrolls.
+ * @cssstate fill-height - `fill-height`: the grid fills its parent's height and only its body scrolls.
+ * @cssstate loading - The source is pending; the grid is `aria-busy` meanwhile.
+ * @cssstate empty - The source has settled with no row; the empty status says so.
+ * @cssstate editing - A cell or a row is being edited.
+ *
+ * @csspart toolbar - The toolbar, with `show-toolbar`.
+ * @csspart group-bar - The group bar, with `show-group-bar`.
+ * @csspart grid - The scroll area that is the `role="grid"`: header, filter row, body, summary.
+ * @csspart header - The header row group.
+ * @csspart column-header - A column's header cell.
+ * @csspart filter-row - The inline filter row, with `filter-mode="row"`.
+ * @csspart body - The rows' group.
+ * @csspart row - A data row.
+ * @csspart cell - A data cell.
+ * @csspart summary - The summary row, when a column declares an aggregate.
+ * @csspart footer - The footer and its pager; above the grid too with `pagination-position`.
+ * @csspart empty - The empty status, while the source has settled with no row.
+ * @csspart loading - The loading overlay, while the source is pending.
+ *
+ * @capability sortable - A column declared `sortable` sorts on its header; the header carries `aria-sort`.
+ * @capability filterable - The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`).
+ * @capability selectable - Rows are checked, one or many, with `selection="single"` or `"multiple"`.
+ * @capability editable - Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`.
+ */
+// pdx-data-grid — Enterprise data grid component.
+// Architecture: shell component that delegates to focused sub-modules.
+// DataSource is mandatory — arrays are auto-wrapped.
+//
+// Sub-modules:
+//   grid-context.ts  — shared context + applyColSize
+//   grid-header.ts   — header row, sort carets, resize handles
+//   grid-body.ts     — row rendering, cell formatting
+//   grid-delegate.ts — the body's events, one listener per type for every row
+//   grid-filter.ts   — inline filter row
+//   grid-selection.ts — checkbox, select-all, range
+//   grid-footer.ts   — pdx-pagination integration
+//
+// Its DOM is built by the script, a frame after mount and again when a prop it is built from
+// changes, as the TypeScript version built it.
+import { useDataGrid, isDataSource, createDataSource, effect, onDestroy, onMount } from '@pdxui/core';
+import type { DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
+import type { GridContext, AnyColumn } from './grid-context';
+import { buildHeader } from './grid-header';
+import { renderRows } from './grid-body';
+import { bindBody } from './grid-delegate';
+import { buildFilterRow } from './grid-filter';
+import { toggleSelect, selectAll, clearSelection as clearSelectionOf, setSelection } from './grid-selection';
+import { renderGroupedRows } from './grid-grouping';
+import { setupVirtualScroll } from './grid-virtual';
+import type { VirtualScrollState } from './grid-virtual';
+import { buildFooter, updateFooter } from './grid-footer';
+import { buildSummaryRow, hasSummary } from './grid-summary';
+import { buildToolbar, updateToolbar, openAddFilterPopover } from './grid-toolbar';
+import { openColumnMenu as openColumnMenuOf, closeColumnMenu as closeColumnMenuOf } from './grid-column-menu';
+import { openFilterPopover as openFilterPopoverOf, closeFilterPopover as closeFilterPopoverOf } from './grid-filter-popover';
+import { buildGroupBar, updateGroupBar } from './grid-group-bar';
+import { toggleRowDetail as toggleRowDetailFn } from './grid-detail';
+import { addRow as addRowFn, deleteRow as deleteRowFn, openEditDialog, startRowEdit as startRowEditFn, commitBatch as commitBatchOf, revertBatch as revertBatchOf, setupGridKeyboard } from './grid-edit';
+import { applyGridAria, applyRoving, setupGridNav } from './grid-a11y';
+import { trackInputModality } from './grid-input-modality';
+import { t, gridStringsChanged } from './grid-i18n'; // also registers the default strings
+import { scrollbarWidth, warnRowHeightIgnored, drawn, defineEmptyIcon } from './grid-shell';
+// Runtime sub-components created via document.createElement (toolbar/filter/edit/footer).
+// Imported here so the data-grid self-registers its dependencies in any consumer,
+// regardless of whether the host template references these tags statically.
+import '../button/pdx-button.pdx';
+// The editors, the filter controls and the edit dialog are created only when someone edits or
+// filters: they load then (shared/lazy-tags.ts), or when the browser is idle in a grid that can.
+import { prefetchTags } from '../shared/lazy-tags';
+import '../pagination/pdx-pagination';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/data-grid';
+// `pdx-spinner` is imported where the loading overlay SHOWS (`showLoading`), as `pdx-list` does: it
+// draws from a stylesheet of its own (#821), and a static import put that stylesheet in the first wave
+// of every page with a grid, where the route waited for it (#963, #969).
+
+// What the grid's sub-modules emit through `gc.emit`, each with its detail (#1210).
+@event 'pdx-ready';
+@event 'pdx-row-click': { row: Record<string, unknown>; index: number; id: unknown };
+@event 'pdx-row-reorder': { from: number; to: number; fromId: unknown; toId: unknown };
+@event 'pdx-row-collapse': { id: unknown };
+@event 'pdx-row-expand': { id: unknown };
+@event 'pdx-cell-edit-start': { rowId: unknown; field: string; value: unknown };
+@event 'pdx-cell-edit-end': { rowId: unknown; field: string; oldValue: unknown; newValue: unknown };
+@event 'pdx-cell-edit-cancel': { rowId: unknown; field: string };
+@event 'pdx-row-edit-start': { rowId: unknown; row: Record<string, unknown> };
+@event 'pdx-row-edit-end': { rowId: unknown; values: Record<string, unknown> };
+@event 'pdx-row-edit-cancel': { rowId: unknown };
+@event 'pdx-batch-commit': { count: number };
+@event 'pdx-batch-revert': {};
+@event 'pdx-row-delete': { rowId: unknown; row: Record<string, unknown> };
+@event 'pdx-selection-change': { selected: unknown[]; count: number };
+@event 'pdx-grid-export': { rows: number; columns: number; format: 'csv' | 'xlsx' };
+// Its looks and its conditions are states of the host (#132): the design CSS selects them; the
+// wrapper inside carries no class for them. A look changes the grid's style without rebuilding it.
+@state striped = !!striped;
+@state hover = !!hover;
+@state row-clickable = !!rowClickable;
+@state compact = !!compact;
+@state sticky-header = !!stickyHeader;
+@state fill-height = !!fillHeight;
+@state loading = pending;
+@state empty = isEmpty;
+@state editing = isEditing;
+// Every element is built by the grid's sub-modules (#1284).
+@part(external) toolbar, group-bar, grid, header, column-header, filter-row, body, row, cell, summary, footer, empty, loading;
+// The row a snippet receives is the app's, an element of `data` (#651) or of `source` (#853): the
+// editor infers `T`.
+@generic T;
+// `source` and `data` are typed with the row, `T`, which the editor infers from them (#651, #853).
+@prop source: import('@pdxui/core').DataSource<T> | null = null;
+@prop columns: unknown[] | null = null;
+@prop data: T[] = null;
+@prop striped: boolean = false;
+@prop hover: boolean = true;
+/**
+ * The rows open something: a click on a row is handled (`pdx-row-click`), so the row takes
+ * a pointer, so a page does not write its own `.pdx-dg-row { cursor: pointer }`, reaching into
+ * this component's internal class. Enter on a row is unchanged: it edits a cell in an
+ * editable grid and does nothing otherwise, so give a keyboard reader a way in of its own
+ * (an `actions()` column).
+ */
+@prop rowClickable: boolean = false;
+@prop compact: boolean = false;
+@prop stickyHeader: boolean = true;
+@prop selection: string = 'none';
+/**
+ * A class for the whole row: a string, or `(row, index) => string`. Marks a row invalid,
+ * new, stale — what `cellClass` could only do one column at a time.
+ *
+ * Declared `String` because an ATTRIBUTE is one (`row-class="compact"`), and `PropType` is
+ * a single constructor. A function assigned as a JS property arrives untouched: `coerce`
+ * returns a non-string value as it is (`component.ts:448`).
+ */
+@prop rowClass: string = '';
+@prop idField: string = 'id';
+@prop stateKey: string = '';
+/** The empty state's text. Unset, it is the grid string `empty.title`. */
+@prop emptyTitle: string = '';
+@prop(icon) emptyIcon: string = 'inbox';
+@prop showFooter: boolean = true;
+@prop filterable: boolean = false;
+@prop filterMode: string = 'none';
+@prop showToolbar: boolean = false;
+/** A search field at the toolbar's right: the term is looked for in the columns marked `searchable`. */
+@prop search: boolean = false;
+@prop showGroupBar: boolean = false;
+@prop paginationPosition: string = 'bottom';
+/** The rows-per-page choices the footer's pager offers; empty, it offers none. */
+@prop pageSizes: unknown[] = [];
+@prop expandable: boolean = false;
+@prop rowReorder: boolean = false;
+@prop groupBy: unknown[] | null = null;
+@prop virtualScroll: boolean = false;
+/** Row height in px for virtual scrolling (42 when unset); ignored otherwise. */
+@prop rowHeight: number = 0;
+/** Caps the grid height in px; the body scrolls beyond it. 0 = no cap (a virtual grid uses 400). */
+@prop maxHeight: number = 0;
+/** Fill the parent's height (flex) instead of growing with content. The page no longer
+ *  scrolls — only the grid body scrolls (virtualized). Pair with virtual-scroll for large sets. */
+@prop fillHeight: boolean = false;
+@prop editable: boolean = false;
+@prop editMode: string = 'cell';
+/** The grid's accessible name (its aria-label). */
+@prop label: string = '';
+// A parent's `@snippet` sets these (#597): one `cell` and one `header` for every column, rather
+// than a slot per column, since a snippet's name is an identifier and `cell:price` is not one.
+// The value is passed because the row does not hold it for a computed column, nor for a batch
+// edit not yet saved. #673: the grid's other templates, with their context as arguments. `form` is
+// the grid's edit form, which only a row edit has: a cell edit passes null.
+@slot cell?: (row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown);
+@slot header?: (column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown });
+@slot detail?: (row: T);
+@slot editCell?: (row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown, form: import('@pdxui/core').Form<Record<string, unknown>> | null);
+@slot filter?: (column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown });
+@slot filterPopover?: (column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, apply: () => void, clear: () => void);
+@slot toolbarStart?: (grid: import('@pdxui/core').DataGrid<Record<string, unknown>>);
+@slot toolbarEnd?: (grid: import('@pdxui/core').DataGrid<Record<string, unknown>>);
+@slot empty?: ();
+// The sub-modules talk to the grid through events on its host (#133).
+@host el { @__select-all="onSelectAll" @__toggle-select="onToggleSelect" @__group-toggle="onGroupToggle" @__toggle-detail="onToggleDetail" }
+
+// Expose the imperative API flattened on the host element: e.g.
+// document.querySelector('pdx-data-grid').openColumnMenu(...) / .getSelectedIds().
+@expose grid, whenReady, openColumnMenu, closeColumnMenu, openFilterPopover, closeFilterPopover, openAddFilter, clearAllFilters, toggleRowDetail, startEdit, cancelEdit, addRow, deleteRow, clearSelection, getSelectedIds, setSelectedIds, applyState, commitBatch, revertBatch;
+
+// The host's conditions, written by refreshA11y.
+let pending = $signal(false);
+let isEmpty = $signal(false);
+let isEditing = $signal(false);
+// The grid the build made: `el.grid`.
+let builtGrid = $signal<GridContext['grid']>(null);
+/** Read-only, via a ref: `el.grid`. */
+const grid = $derived(builtGrid);
+
+let rootEl: HTMLElement | null = null;
+/** The role="grid" element (the scroll area), once the build has put it in the page. */
+let gridEl: HTMLElement | null = null;
+let headerEl: HTMLElement | null = null;
+let bodyEl: HTMLElement | null = null;
+let footerEl: HTMLElement | null = null;
+let footerTopEl: HTMLElement | null = null;
+let summaryEl: HTMLElement | null = null;
+let scrollEl: HTMLElement | null = null;
+let toolbarEl: HTMLElement | null = null;
+let groupBarEl: HTMLElement | null = null;
+let loadingEl: HTMLElement | null = null;
+let emptyEl: HTMLElement | null = null;
+// Cleared on destroy: a build a frame away does not run on a destroyed grid.
+let alive = true;
+
+/** `pdx-icon` the first time the empty state shows: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+}
+
+/**
+ * Show or hide the loading overlay; the first time it is still shown a frame later, load
+ * `pdx-spinner`. A grid over `data` reads it through a promise, so it is loading for a microtask
+ * as it mounts: an overlay never painted has no spinner to draw, and a grid at rest would have
+ * fetched the spinner and its stylesheet every time.
+ */
+function showLoading(isLoading: boolean): void {
+  if (!loadingEl) return;
+  loadingEl.style.display = isLoading ? '' : 'none';
+  if (!isLoading || customElements.get('pdx-spinner')) return;
+  // Its element is in the overlay already; it upgrades when its module lands. The source is
+  // asked, not the overlay: the grid writes the overlay in a frame of its own, which may come
+  // after this one.
+  requestAnimationFrame(() => {
+    if (gc.grid?.isLoading.peek() && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
+  });
+}
+
+/**
+ * Show or hide the empty state; the first time it shows its icon, load `pdx-icon`. It is a
+ * `role="status"`, which carries its text only while it has something to say (A4): its content
+ * is put in when it shows and taken out when it hides.
+ */
+function showEmpty(show: boolean): void {
+  if (!emptyEl) return;
+  emptyEl.style.display = show ? '' : 'none';
+  if (!show) { emptyEl.replaceChildren(); return; }
+  if (!emptyEl.hasChildNodes()) fillEmptyState(emptyEl);
+  if (emptyEl.querySelector('pdx-icon')) loadIcon();
+}
+let gridEffect: Dispose | null = null;
+let virtualState: VirtualScrollState | null = null;
+let cachedDS: DataSource<Record<string, unknown>> | null = null;
+let cachedDataRef: unknown = undefined;
+
+// Resolve filter mode: toolbar active → always 'toolbar' (never inline row)
+function resolveFilterMode(): string {
+  if (showToolbar) return 'toolbar';
+  const mode = filterMode as string;
+  if (mode && mode !== 'none') return mode;
+  return filterable ? 'row' : 'none';
+}
+
+// ─── Shared context for sub-modules ──────────
+/** The parent's snippets, by name (#597): the element's declared slot properties. */
+function snippets(): Record<string, unknown> {
+  return { cell, header, detail, editCell, filter, filterPopover, toolbarStart, toolbarEnd, empty };
+}
+/**
+ * The parent's snippet for `name` (#597), when it gave one. The alpha scoped slots (`col:{field}`,
+ * `header:{field}`, …) are not read (#492).
+ */
+const snippetOf = (name: 'cell' | 'header' | 'detail' | 'editCell' | 'filter' | 'filterPopover' | 'toolbarStart' | 'toolbarEnd' | 'empty') => {
+  const fn = snippets()[name];
+  return typeof fn === 'function' ? fn as (...args: unknown[]) => Node | null | undefined : null;
+};
+/** The element's own emit: the sub-modules name the event, as a TypeScript component's `ctx.emit` did. */
+const host = el as unknown as { emit(name: string, detail?: unknown): boolean };
+const gc: GridContext = {
+  grid: null,
+  customCell: (row, col, value) => drawn(snippetOf('cell')?.(row, col.def, value)) ?? null,
+  customHeader: (col) => drawn(snippetOf('header')?.(col.def)) ?? null,
+  customDetail: (row) => drawn(snippetOf('detail')?.(row)) ?? null,
+  customEditCell: (row, col, value) => drawn(snippetOf('editCell')?.(row, col.def, value, gc.editForm)) ?? null,
+  customFilter: (col) => drawn(snippetOf('filter')?.(col.def)) ?? null,
+  customFilterPopover: (col) => {
+    const snippet = snippetOf('filterPopover');
+    if (!snippet) return null;
+    return (apply, clear) => drawn(snippet(col.def, apply, clear)) ?? null;
+  },
+  customToolbar: (side) => drawn(snippetOf(side === 'start' ? 'toolbarStart' : 'toolbarEnd')?.(gc.grid)) ?? null,
+  customEmpty: () => drawn(snippetOf('empty')?.()) ?? null,
+  getSelectionMode: () => (selection as string) || 'none',
+  getRowClass: (row: Record<string, unknown>, index: number) => {
+    const rc = rowClass as unknown as string | ((r: Record<string, unknown>, i: number) => string) | undefined;
+    if (!rc) return '';
+    return (typeof rc === 'function' ? rc(row, index) : rc) || '';
+  },
+  getIdField: () => (idField as string) || 'id',
+  selectedIds: new Set(),
+  emit: (name, detail) => host.emit(name, detail),
+  getHeaderEl: () => headerEl,
+  getBodyEl: () => bodyEl,
+  hasFilterRow: () => resolveFilterMode() === 'row',
+  hasToolbar: () => !!showToolbar,
+  hasSearch: () => !!search,
+  pageSizes: () => (pageSizes as number[] | null) ?? [],
+  filterMode: () => resolveFilterMode(),
+  popoverFilters: {},
+  inlineFilterValues: {},
+  inlineFilterOps: {},
+  isExpandable: () => !!expandable,
+  isRowReorder: () => !!rowReorder,
+  expandedRows: new Set(),
+  collapsedGroups: new Set(),
+  editMode: () => editable ? (editMode as string) || 'cell' : 'none',
+  editingCell: null,
+  editingRowId: null,
+  editForm: null,
+  batchChanges: new Map(),
+  getLabel: () => (label as string) || '',
+  nav: null,
+  navFocused: false,
+  afterRender: () => refreshA11y(),
+  forceUpdate: () => {
+    requestAnimationFrame(() => {
+      if (!alive || !gc.grid) return;
+      const cols = gc.grid.columns.peek();
+      const rows = gc.grid.rows.peek();
+      if (headerEl) {
+        const parent = headerEl.parentElement;
+        if (parent) {
+          const newHeader = buildHeader(gc, cols);
+          parent.replaceChild(newHeader, headerEl);
+          headerEl = newHeader;
+        }
+      }
+      if (bodyEl && !virtualState) {
+        renderRows(gc, bodyEl, rows, cols);
+      }
+      if (virtualState) virtualState.update();
+      rebuildSummary(cols);
+      if (toolbarEl) updateToolbar(gc, toolbarEl);
+      refreshA11y();
+    });
+  },
+};
+
+/**
+ * Counts, indices, selection state and the roving tab stop, after any render; and the
+ * conditions the host shows: pending (A4: the grid is `aria-busy` while its source is, and not
+ * once it has settled), empty, editing.
+ */
+function refreshA11y(): void {
+  if (!gridEl) return;
+  applyGridAria(gc, gridEl);
+  applyRoving(gc, gridEl);
+  const isPending = !!gc.grid?.isLoading.peek();
+  if (isPending) gridEl.setAttribute('aria-busy', 'true');
+  else gridEl.removeAttribute('aria-busy');
+  pending = isPending;
+  isEmpty = !isPending && (gc.grid?.rows.peek().length ?? 0) === 0;
+  isEditing = gc.editingCell != null || gc.editingRowId != null;
+}
+
+/** Rebuild (or add/remove) the summary row for the current columns + rows. */
+function rebuildSummary(cols: AnyColumn[]): void {
+  const needed = hasSummary(cols);
+  if (summaryEl) {
+    if (needed) {
+      const next = buildSummaryRow(gc, cols);
+      summaryEl.replaceWith(next);
+      summaryEl = next;
+    } else {
+      summaryEl.remove();
+      summaryEl = null;
+    }
+  } else if (needed && scrollEl && bodyEl) {
+    summaryEl = buildSummaryRow(gc, cols);
+    bodyEl.after(summaryEl); // sticky sibling directly after the body
+  }
+}
+
+/** Render body — grouped or flat depending on DataSource state. */
+function renderBody(rows: Record<string, unknown>[], cols: AnyColumn[]): void {
+  if (!bodyEl) return;
+  // Read groups from DataSource (signal)
+  const groupsFn = gc.grid?.source?.groups;
+  const groups = typeof groupsFn === 'function' ? groupsFn() : undefined;
+  if (groups && Array.isArray(groups) && groups.length > 0) {
+    bodyEl.innerHTML = '';
+    renderGroupedRows(gc, bodyEl, groups as never, cols, renderRows);
+  } else {
+    renderRows(gc, bodyEl, rows, cols);
+  }
+}
+
+// A lone modifier held for the next click draws no focus ring. Listened for once mounted: the
+// keys are the document's, and a grid written by the server (#160) has none.
+let stopModality = (): void => {};
+onMount(() => { stopModality = trackInputModality(el); });
+
+// Internal event routing (from sub-modules): the host's listeners, declared in `@host` above.
+/** A group opened or closed, or a detail row: the body is drawn again. */
+function redrawBody(): void {
+  if (bodyEl && gc.grid) {
+    renderBody(gc.grid.rows.peek(), gc.grid.columns.peek());
+    refreshA11y();
+  }
+}
+function onSelectAll(): void { selectAll(gc); }
+function onToggleSelect(e: Event): void {
+  const { id, shiftKey } = (e as CustomEvent<{ id: unknown; shiftKey: boolean }>).detail;
+  toggleSelect(gc, id, shiftKey);
+}
+function onGroupToggle(): void { redrawBody(); }
+function onToggleDetail(e: Event): void {
+  toggleRowDetailFn(gc, (e as CustomEvent<{ id: unknown }>).detail.id);
+  redrawBody();
+}
+
+// ─── DataSource resolution ───────────────────
+function resolveSource(): DataSource<Record<string, unknown>> {
+  const src = source;
+  if (src && isDataSource(src)) return src as unknown as DataSource<Record<string, unknown>>;
+  const rawDataRef = data;
+  const rawData = (rawDataRef ?? []) as Record<string, unknown>[];
+  // Rebuild the array-backed source when the `data` prop reference changes — otherwise a
+  // post-mount `data` swap would keep showing the first dataset (stale cache).
+  if (!cachedDS || cachedDataRef !== rawDataRef) {
+    cachedDS = createDataSource({ data: rawData, pageSize: 0 });
+    cachedDataRef = rawDataRef;
+  }
+  return cachedDS;
+}
+
+function resolveColumns(): ColumnDef[] {
+  const cols = columns as ColumnDef[] | null;
+  if (cols && cols.length > 0) return cols;
+  const rawData = (data ?? []) as Record<string, unknown>[];
+  if (rawData.length > 0) {
+    return Object.keys(rawData[0]).map(field => ({ field }));
+  }
+  const dsRows = gc.grid?.source?.data.peek() ?? [];
+  if (dsRows.length > 0) {
+    return Object.keys(dsRows[0]).map(field => ({ field }));
+  }
+  return [];
+}
+
+// What `whenReady()` hands out: settled by the first build, and settled once — a rebuild
+// (new columns, a new source) does not make the grid unready.
+let resolveReady: () => void = () => {};
+const ready = new Promise<void>((resolve) => { resolveReady = resolve; });
+let isReady = false;
+
+// ─── Build grid DOM ──────────────────────────
+function buildGrid(): void {
+  if (!rootEl) return;
+  rootEl.innerHTML = '';
+  gridEl = null;
+
+  const ds = resolveSource();
+  const cols = resolveColumns();
+
+  (gc.grid as { dispose?: () => void } | null)?.dispose?.();
+  gc.grid = useDataGrid({
+    source: ds,
+    columns: cols,
+    idField: gc.getIdField(),
+    stickyHeader: stickyHeader as boolean,
+    stateKey: (stateKey as string) || undefined,
+    // What a reader did to the columns, out as an event. One name per
+    // action: a consumer that wants to know a column moved should not have to diff a
+    // snapshot. `loadState` does not come through here — putting a saved view back is
+    // not something a reader did.
+    onColumnChange: (change) => {
+      const { kind, ...detail } = change;
+      gc.emit(kind === 'reorder' ? 'pdx-column-reorder'
+        : kind === 'visibility' ? 'pdx-column-visibility-change'
+        : 'pdx-column-resize', detail);
+      // And REPAINT, here rather than at each call site: wired where the change is
+      // reported, no call site can forget it, as a header drop would otherwise
+      // reorder the model and leave the screen as it was.
+      // The effect that rebuilds the header tracks `columns()` and
+      // that IS enough under happy-dom — `packages/core` asserts the computed
+      // notifies on a reorder, a hide and a `loadState`, and the ui unit row passes
+      // with this line removed. In CHROMIUM it is not: without it, dragging a column
+      // reorders the model and leaves the header where it is, and `views.spec.ts`
+      // measures it. Why the two disagree is not
+      // established — the rAF the effect schedules is the suspect.
+      gc.forceUpdate();
+    },
+  });
+  builtGrid = gc.grid;
+
+  // Apply grouping if specified
+  const grouping = groupBy as { field: string; dir?: 'asc' | 'desc'; aggregates?: { field: string; aggregate: string }[] }[] | null;
+  if (grouping && grouping.length > 0) {
+    gc.grid.source.setGroup(grouping as never);
+  }
+
+  const wrap = document.createElement('div');
+  // Its looks are states of the host, not classes here.
+  wrap.className = 'pdx-dg';
+  if (fillHeight) {
+    // Reserve the body's scrollbar gutter on the header/filter row → columns stay aligned.
+    wrap.style.setProperty('--pdx-dg-sbw', scrollbarWidth() + 'px');
+  }
+  // The editor's Tab/Enter (commit and move), only when editable.
+  if (gc.editMode() !== 'none') {
+    setupGridKeyboard(gc, wrap);
+  }
+
+  // Toolbar (above scroll area)
+  toolbarEl = null;
+  if (showToolbar) {
+    toolbarEl = buildToolbar(gc);
+    updateToolbar(gc, toolbarEl);
+    wrap.appendChild(toolbarEl);
+  }
+
+  // Group bar (below toolbar, above scroll area)
+  groupBarEl = null;
+  if (showGroupBar) {
+    groupBarEl = buildGroupBar(gc);
+    wrap.appendChild(groupBarEl);
+  }
+
+  const pagPos = (paginationPosition as string) || 'bottom';
+
+  // Pagination top
+  footerTopEl = null;
+  if (showFooter && !virtualScroll && (pagPos === 'top' || pagPos === 'both')) {
+    footerTopEl = buildFooter(gc);
+    updateFooter(gc, footerTopEl);
+    wrap.appendChild(footerTopEl);
+  }
+
+  scrollEl = document.createElement('div');
+  scrollEl.className = 'pdx-dg-scroll';
+  scrollEl.dataset.part = 'grid';
+  // The grid is the scroll area — header, filter row, body, summary: a grid owns rows, and
+  // the toolbar, the group bar and the pager beside it are not rows. The keyboard model is
+  // the grid's, for every grid.
+  scrollEl.setAttribute('role', 'grid');
+  setupGridNav(gc, scrollEl);
+
+  headerEl = buildHeader(gc, gc.grid.columns.peek());
+  scrollEl.appendChild(headerEl);
+
+  if (resolveFilterMode() === 'row') {
+    scrollEl.appendChild(buildFilterRow(gc, gc.grid.columns.peek()));
+  }
+
+  bodyEl = document.createElement('div');
+  bodyEl.className = 'pdx-dg-body';
+  bodyEl.dataset.part = 'body';
+  bodyEl.setAttribute('role', 'rowgroup');
+  // One listener per event type for every row (grid-delegate.ts).
+  bindBody(gc, bodyEl);
+
+  // Virtual scroll or normal rendering
+  virtualState?.dispose();
+  virtualState = null;
+  if (virtualScroll) {
+    const g = gc.grid;
+    virtualState = setupVirtualScroll(
+      gc, bodyEl,
+      (rowHeight as number) || 42,
+      (maxHeight as number) || 400,
+      () => g.rows.peek(),
+      () => g.columns.peek(),
+      fillHeight as boolean,
+    );
+  } else {
+    // maxHeight caps a plain grid too: the scroll element holds the header and the body,
+    // is overflow-y: auto in data-grid.css, and the header stays sticky inside it. Read
+    // only by the virtual branch, `:max-height="620"` would cap nothing.
+    const cap = maxHeight as number;
+    if (cap > 0 && !fillHeight) scrollEl.style.maxHeight = `${cap}px`;
+    if ((rowHeight as number) > 0) warnRowHeightIgnored(el);
+    renderBody(gc.grid.rows.peek(), gc.grid.columns.peek());
+  }
+  scrollEl.appendChild(bodyEl);
+
+  // Summary / total row (aggregates) — sticky bottom sibling of the body, OUTSIDE the
+  // virtualized viewport. Rendered only when ≥1 visible column declares `aggregate`.
+  summaryEl = null;
+  if (hasSummary(gc.grid.columns.peek())) {
+    summaryEl = buildSummaryRow(gc, gc.grid.columns.peek());
+    scrollEl.appendChild(summaryEl);
+  }
+
+  wrap.appendChild(scrollEl);
+
+  // Empty state
+  emptyEl = buildEmptyState();
+  const rows = gc.grid.rows.peek();
+  const isLoading = gc.grid.isLoading.peek();
+  showEmpty(rows.length === 0 && !isLoading);
+  wrap.appendChild(emptyEl);
+
+  // Loading overlay
+  loadingEl = document.createElement('div');
+  loadingEl.className = 'pdx-dg-loading';
+  loadingEl.dataset.part = 'loading';
+  loadingEl.innerHTML = '<pdx-spinner size="24"></pdx-spinner>';
+  showLoading(isLoading);
+  wrap.appendChild(loadingEl);
+
+  // Footer bottom — hide when virtual scroll (all rows visible, no pagination)
+  footerEl = null;
+  if (showFooter && !virtualScroll && (pagPos === 'bottom' || pagPos === 'both')) {
+    footerEl = buildFooter(gc);
+    updateFooter(gc, footerEl);
+    wrap.appendChild(footerEl);
+  }
+
+  gridEl = scrollEl;
+  rootEl.appendChild(wrap);
+  refreshA11y();
+
+  // Reactive effect — updates DOM when grid signals change
+  gridEffect?.();
+  const g = gc.grid;
+  gridEffect = effect(() => {
+    // The library's dictionary, as a VERSION rather than as a string: the grid writes
+    // its accessible names once, when it builds a header or a row, so a translation
+    // installed after the first render would never reach what is already on screen.
+    // An app that loads its dictionaries before the first paint does not see it; one
+    // whose locale arrives as a chunk would keep an English `aria-label` on a
+    // translated page.
+    //
+    // Read here and not through `uiAttr`, which is what the rest of @pdxui/ui
+    // uses: this grid writes a name per ROW, and a virtualised list would push
+    // thousands of entries into that registry on every scroll. One tracked read
+    // rebuilds the header and the rows, which is where the names are. The grid's own
+    // strings only: another component's arriving is no reason to rebuild (#407).
+    gridStringsChanged();
+    const newRows = g.rows();
+    const newCols = g.columns();
+    const newLoading = g.isLoading();
+    void g.total();
+    void g.page();
+    void g.totalPages();
+    void g.sortState();
+    void g.source.filter();
+    void g.source.group(); // Track group descriptors for group bar updates
+    // Read groups inside effect (tracked) — pass to rAF as snapshot
+    const groupsFn = g.source.groups;
+    const newGroups = typeof groupsFn === 'function' ? groupsFn() : undefined;
+
+    requestAnimationFrame(() => {
+      if (!alive || !bodyEl || !headerEl) return;
+
+      const parent = headerEl.parentElement;
+      if (parent) {
+        const newHeader = buildHeader(gc, newCols);
+        parent.replaceChild(newHeader, headerEl);
+        headerEl = newHeader;
+      }
+
+      // Render body. In virtual mode the virtualizer owns the DOM, but it has NO
+      // reactive subscription to the data — so when rows change (sort/filter/page)
+      // we must refresh its window explicitly, otherwise it shows stale rows.
+      if (!virtualState) {
+        if (newGroups && Array.isArray(newGroups) && newGroups.length > 0) {
+          bodyEl.innerHTML = '';
+          renderGroupedRows(gc, bodyEl, newGroups as never, newCols, renderRows);
+        } else {
+          renderRows(gc, bodyEl, newRows, newCols);
+        }
+      } else {
+        virtualState.update();
+      }
+
+      // Summary row — recompute aggregates over the current rows (sort/filter/page).
+      rebuildSummary(newCols);
+
+      showEmpty(newRows.length === 0 && !newLoading);
+      showLoading(newLoading);
+      if (footerEl) updateFooter(gc, footerEl);
+      if (footerTopEl) updateFooter(gc, footerTopEl);
+      if (toolbarEl) updateToolbar(gc, toolbarEl);
+      if (groupBarEl) updateGroupBar(gc, groupBarEl);
+      refreshA11y();
+    });
+  });
+}
+
+// ─── Empty state ─────────────────────────────
+/** The empty status, built empty: `showEmpty` fills it when it shows. */
+function buildEmptyState(): HTMLElement {
+  const node = document.createElement('div');
+  node.className = 'pdx-dg-empty';
+  node.dataset.part = 'empty';
+  // A status: "No data" is what a filter that matches nothing has to say.
+  node.setAttribute('role', 'status');
+  return node;
+}
+
+/** What the empty status says: the page's `empty` snippet or slot, or an icon and the empty title. */
+function fillEmptyState(node: HTMLElement): void {
+  const custom = gc.customEmpty();
+  if (custom) {
+    node.appendChild(custom);
+    return;
+  }
+  const icon = document.createElement('div');
+  icon.className = 'pdx-dg-empty-icon';
+  // Built with the grid and hidden while it has rows: `pdx-icon` is loaded when it SHOWS.
+  // Its default icon is in the grid's chunk: an empty grid is what a page shows while its
+  // rows load, and loaded on demand it cost a request after the route had arrived (#47).
+  defineEmptyIcon();
+  const pdxIcon = document.createElement('pdx-icon');
+  pdxIcon.setAttribute('name', (emptyIcon as string) || 'inbox');
+  pdxIcon.setAttribute('size', '40');
+  icon.appendChild(pdxIcon);
+  node.appendChild(icon);
+  const txt = document.createElement('div');
+  txt.className = 'pdx-dg-empty-text';
+  txt.textContent = (emptyTitle as string) || t('empty.title');
+  node.appendChild(txt);
+}
+
+// ─── Track prop changes ──────────────────────
+// Each prop the grid is built from rebuilds it, a frame later: a setup a move destroyed does not
+// build again.
+$effect(() => {
+  void source;
+  void columns;
+  void data;
+  void stickyHeader;
+  void selection;
+  void idField;
+  void showFooter;
+  void filterable;
+  void filterMode;
+  void showToolbar;
+  void search;
+  void showGroupBar;
+  void paginationPosition;
+  void pageSizes;
+  void expandable;
+  void groupBy;
+  void virtualScroll;
+  void fillHeight;
+  void rowHeight;
+  void maxHeight;
+  void editable;
+  void editMode;
+  void label;
+
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (!rootEl) {
+      rootEl = document.createElement('div');
+      rootEl.className = 'pdx-dg-root';
+      el.appendChild(rootEl);
+    }
+    buildGrid();
+    // A grid that edits or filters will create its editors: have them before the
+    // first double-click or filter asks, without holding up the first screen.
+    if (editable || resolveFilterMode() !== 'none') {
+      prefetchTags(['pdx-input', 'pdx-number-input', 'pdx-select', 'pdx-date-picker', 'pdx-form-field', 'pdx-dialog']);
+    }
+    if (!isReady) {
+      isReady = true;
+      resolveReady();
+      // The event is for a caller that holds the element before it is up — a page's
+      // `:ref` — when nothing is exposed on it yet but a listener can be added.
+      pdxReady();
+    }
+  });
+});
+
+/**
+ * Resolves once the grid is built and `grid`, `applyState` and the rest can be used.
+ * The build is a frame after the element connects; until then `applyState` does nothing.
+ * A caller that asks later is answered at once.
+ */
+function whenReady(): Promise<void> { return ready; }
+/** Open the column menu anchored to this element. */
+function openColumnMenu(anchorEl: HTMLElement) { openColumnMenuOf(gc, anchorEl); }
+/** Close the column menu, if one is open. */
+function closeColumnMenu() { closeColumnMenuOf(); }
+/** Open the filter popover of a column, by field, anchored to this element. An unknown field opens nothing. */
+function openFilterPopover(field: string, anchorEl: HTMLElement) {
+  const col = gc.grid?.columns.peek().find((c) => c.field === field);
+  if (col) openFilterPopoverOf(gc, col, anchorEl);
+}
+/** Close the filter popover, if one is open. */
+function closeFilterPopover() { closeFilterPopoverOf(); }
+/** Open the add-a-filter popover anchored to this element. */
+function openAddFilter(anchorEl: HTMLElement) { openAddFilterPopover(gc, anchorEl); }
+/** Drop every filter: the ones set in the popovers and the ones on the source. */
+function clearAllFilters() {
+  for (const key of Object.keys(gc.popoverFilters)) delete gc.popoverFilters[key];
+  gc.grid?.source.setFilter([]);
+}
+/** Open or close the detail row under this row id. */
+function toggleRowDetail(id: unknown) { toggleRowDetailFn(gc, id); gc.forceUpdate(); }
+// Edit API
+/** Begin an edit: one cell when a field is given, otherwise the whole row — in a dialog or inline, as `edit-mode` says. */
+function startEdit(rowId: unknown, field?: string) {
+  if (field) {
+    const row = gc.grid?.source.getById(rowId) as Record<string, unknown> | undefined;
+    if (row) { gc.editingCell = { rowId, field, originalValue: row[field] }; gc.forceUpdate(); }
+  }
+  else if (gc.editMode() === 'dialog') openEditDialog(gc, rowId);
+  else startRowEditFn(gc, rowId);
+}
+/** Abandon the edit in progress and discard what was typed. */
+function cancelEdit() { gc.editingCell = null; gc.editingRowId = null; gc.editForm?.dispose(); gc.editForm = null; gc.forceUpdate(); }
+/** Append an empty row, with a negative id until it is saved, and start editing it in dialog and row modes. */
+function addRow() { addRowFn(gc); }
+/** Delete a row by id and emit `pdx-row-delete`. It asks nothing first, and in batch mode does not sync. */
+function deleteRow(rowId: unknown) { deleteRowFn(gc, rowId); }
+/** Uncheck every selected row. */
+function clearSelection() { clearSelectionOf(gc); }
+/** The ids currently checked, as an array. */
+function getSelectedIds() { return Array.from(gc.selectedIds); }
+/** Check exactly these rows and uncheck the rest — what a partly refused bulk action leaves behind. */
+function setSelectedIds(ids: unknown[]) { setSelection(gc, ids ?? []); }
+/**
+ * Put an arrangement back — filter, sort, column order, widths, visibility, page size
+ * — and show it.
+ *
+ * `grid.loadState()` is the same thing without the repaint: an application that
+ * reaches for it gets a grid whose model has moved and whose header has not. It raises
+ * no column event either, and that is deliberate: restoring a saved view is not a
+ * reader rearranging anything.
+ */
+function applyState(state: Partial<GridState>) { gc.grid?.loadState(state); gc.forceUpdate(); }
+/** Send every change a batch edit is holding, then sync the source. */
+function commitBatch() { commitBatchOf(gc); }
+/** Throw away every change a batch edit is holding. */
+function revertBatch() { revertBatchOf(gc); }
+
+onDestroy(() => {
+  alive = false;
+  stopModality();
+  gridEffect?.();
+  virtualState?.dispose();
+  (gc.grid as { dispose?: () => void } | null)?.dispose?.();
+});
+</script>

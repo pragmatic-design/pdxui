@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describeComponent, internalViews } from '@pdxui/compiler';
 import {
     normalizeEol, PROP_DESC, readDocComment, describeProp, scanRoles, withoutComments, scanSlots,
-    scanExportedShapes, declaredFunction, functionParameters, assembleModule,
+    scanExportedShapes, declaredFunction, functionParameters, assembleModule, helperFiles,
 } from './manifest-shared.mjs';
 
 /** The library's tag prefix: `select.pdx` and `pdx-select.pdx` register `<pdx-select>`. */
@@ -115,6 +115,10 @@ export function analyzePdxFile(file, text, categories) {
     const readSource = (f) => existsSync(f) ? normalizeEol(readFileSync(f, 'utf-8')) : null;
     const viewRoles = internalViews(d.script, file, readSource).map(v => withoutHtmlComments(v.template) + '\n'
         + withoutComments(ts.createSourceFile(`${v.file}.ts`, v.script, ts.ScriptTarget.Latest, true)));
+    // And those its helper modules draw, as for a TypeScript component (#1210).
+    for (const f of helperFiles(file)) {
+        viewRoles.push(withoutComments(ts.createSourceFile(f, normalizeEol(readFileSync(f, 'utf-8')), ts.ScriptTarget.Latest, true)));
+    }
     return [assembleModule({
         file, tag, category: categories[tag] || { category: 'Other', order: 999 },
         tags, description: component.description, props,

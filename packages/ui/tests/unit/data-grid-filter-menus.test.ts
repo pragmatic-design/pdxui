@@ -6,7 +6,7 @@
 // triggers are clicked here; the keys inside the menus are pressed.
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 import '../../src/pagination/pdx-pagination';
 
 type Grid = HTMLElement & Record<string, unknown>;

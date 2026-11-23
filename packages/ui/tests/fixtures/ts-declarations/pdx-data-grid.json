@@ -1,0 +1,1106 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDataGrid",
+  "tagName": "pdx-data-grid",
+  "category": "Data-bound",
+  "order": 106,
+  "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "The data source to render from.",
+      "type": {
+        "text": "import('@pdxui/core').DataSource<T> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "columns",
+      "description": "Column definitions: field, header, width, sortable, render, etc.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "data",
+      "description": "The row data to display.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "striped",
+      "description": "Alternates row background colours.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "striped"
+    },
+    {
+      "kind": "field",
+      "name": "hover",
+      "description": "Highlights the row under the pointer.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "hover"
+    },
+    {
+      "kind": "field",
+      "name": "rowClickable",
+      "description": "The rows open something: a click on a row is handled (`pdx-row-click`), so the row takes\na pointer, so a page does not write its own `.pdx-dg-row { cursor: pointer }`, reaching into\nthis component's internal class. Enter on a row is unchanged: it edits a cell in an\neditable grid and does nothing otherwise, so give a keyboard reader a way in of its own\n(an `actions()` column).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "rowclickable"
+    },
+    {
+      "kind": "field",
+      "name": "compact",
+      "description": "Tighter row height for dense tables.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "compact"
+    },
+    {
+      "kind": "field",
+      "name": "stickyHeader",
+      "description": "Keeps the header visible while the body scrolls.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "stickyheader"
+    },
+    {
+      "kind": "field",
+      "name": "selection",
+      "description": "Row selection mode: 'none', 'single' or 'multiple'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'",
+      "attribute": "selection"
+    },
+    {
+      "kind": "field",
+      "name": "rowClass",
+      "description": "A class for the whole row: a string, or `(row, index) => string`. Marks a row invalid,\nnew, stale — what `cellClass` could only do one column at a time.\n\nDeclared `String` because an ATTRIBUTE is one (`row-class=\"compact\"`), and `PropType` is\na single constructor. A function assigned as a JS property arrives untouched: `coerce`\nreturns a non-string value as it is (`component.ts:448`).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rowclass"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "description": "The row field used as a unique key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "stateKey",
+      "description": "Persists sort/filter/column state under this key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "statekey"
+    },
+    {
+      "kind": "field",
+      "name": "emptyTitle",
+      "description": "The empty state's text. Unset, it is the grid string `empty.title`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "emptytitle"
+    },
+    {
+      "kind": "field",
+      "name": "emptyIcon",
+      "description": "Icon shown in the empty state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'",
+      "attribute": "emptyicon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "showFooter",
+      "description": "Shows the footer (aggregates / summary row).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showfooter"
+    },
+    {
+      "kind": "field",
+      "name": "filterable",
+      "description": "Enables per-column filtering.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "filterable"
+    },
+    {
+      "kind": "field",
+      "name": "filterMode",
+      "description": "How filters apply: e.g. 'menu' or 'row'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'",
+      "attribute": "filtermode"
+    },
+    {
+      "kind": "field",
+      "name": "showToolbar",
+      "description": "Shows the toolbar (search, column chooser, export).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showtoolbar"
+    },
+    {
+      "kind": "field",
+      "name": "search",
+      "description": "A search field at the toolbar's right: the term is looked for in the columns marked `searchable`.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "search"
+    },
+    {
+      "kind": "field",
+      "name": "showGroupBar",
+      "description": "Shows the drag-to-group bar.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showgroupbar"
+    },
+    {
+      "kind": "field",
+      "name": "paginationPosition",
+      "description": "Where the pager sits: 'top', 'bottom' or 'both'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom'",
+      "attribute": "paginationposition"
+    },
+    {
+      "kind": "field",
+      "name": "pageSizes",
+      "description": "The rows-per-page choices the footer's pager offers; empty, it offers none.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "expandable",
+      "description": "Allows rows to expand into a detail panel.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "expandable"
+    },
+    {
+      "kind": "field",
+      "name": "rowReorder",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "rowreorder"
+    },
+    {
+      "kind": "field",
+      "name": "groupBy",
+      "description": "Fields to group rows by.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "virtualScroll",
+      "description": "Renders only visible rows for large datasets.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "virtualscroll"
+    },
+    {
+      "kind": "field",
+      "name": "rowHeight",
+      "description": "Row height in px for virtual scrolling (42 when unset); ignored otherwise.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "rowheight"
+    },
+    {
+      "kind": "field",
+      "name": "maxHeight",
+      "description": "Caps the grid height in px; the body scrolls beyond it. 0 = no cap (a virtual grid uses 400).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxheight"
+    },
+    {
+      "kind": "field",
+      "name": "fillHeight",
+      "description": "Fill the parent's height (flex) instead of growing with content. The page no longer\nscrolls — only the grid body scrolls (virtualized). Pair with virtual-scroll for large sets.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "fillheight"
+    },
+    {
+      "kind": "field",
+      "name": "editable",
+      "description": "Enables inline cell editing.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "editable"
+    },
+    {
+      "kind": "field",
+      "name": "editMode",
+      "description": "Editing granularity: 'cell' or 'row'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'cell'",
+      "attribute": "editmode"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The grid's accessible name (its aria-label).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "grid",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.grid`."
+    },
+    {
+      "kind": "method",
+      "name": "whenReady",
+      "parameters": [],
+      "description": "Resolves once the grid is built and `grid`, `applyState` and the rest can be used.\nThe build is a frame after the element connects; until then `applyState` does nothing.\nA caller that asks later is answered at once."
+    },
+    {
+      "kind": "method",
+      "name": "openColumnMenu",
+      "parameters": [
+        {
+          "name": "anchorEl",
+          "type": {
+            "text": "HTMLElement"
+          }
+        }
+      ],
+      "description": "Open the column menu anchored to this element."
+    },
+    {
+      "kind": "method",
+      "name": "closeColumnMenu",
+      "parameters": [],
+      "description": "Close the column menu, if one is open."
+    },
+    {
+      "kind": "method",
+      "name": "openFilterPopover",
+      "parameters": [
+        {
+          "name": "field",
+          "type": {
+            "text": "string"
+          }
+        },
+        {
+          "name": "anchorEl",
+          "type": {
+            "text": "HTMLElement"
+          }
+        }
+      ],
+      "description": "Open the filter popover of a column, by field, anchored to this element. An unknown field opens nothing."
+    },
+    {
+      "kind": "method",
+      "name": "closeFilterPopover",
+      "parameters": [],
+      "description": "Close the filter popover, if one is open."
+    },
+    {
+      "kind": "method",
+      "name": "openAddFilter",
+      "parameters": [
+        {
+          "name": "anchorEl",
+          "type": {
+            "text": "HTMLElement"
+          }
+        }
+      ],
+      "description": "Open the add-a-filter popover anchored to this element."
+    },
+    {
+      "kind": "method",
+      "name": "clearAllFilters",
+      "parameters": [],
+      "description": "Drop every filter: the ones set in the popovers and the ones on the source."
+    },
+    {
+      "kind": "method",
+      "name": "toggleRowDetail",
+      "parameters": [
+        {
+          "name": "id",
+          "type": {
+            "text": "unknown"
+          }
+        }
+      ],
+      "description": "Open or close the detail row under this row id."
+    },
+    {
+      "kind": "method",
+      "name": "startEdit",
+      "parameters": [
+        {
+          "name": "rowId",
+          "type": {
+            "text": "unknown"
+          }
+        },
+        {
+          "name": "field",
+          "type": {
+            "text": "string"
+          },
+          "optional": true
+        }
+      ],
+      "description": "Begin an edit: one cell when a field is given, otherwise the whole row — in a dialog or inline, as `edit-mode` says."
+    },
+    {
+      "kind": "method",
+      "name": "cancelEdit",
+      "parameters": [],
+      "description": "Abandon the edit in progress and discard what was typed."
+    },
+    {
+      "kind": "method",
+      "name": "addRow",
+      "parameters": [],
+      "description": "Append an empty row, with a negative id until it is saved, and start editing it in dialog and row modes."
+    },
+    {
+      "kind": "method",
+      "name": "deleteRow",
+      "parameters": [
+        {
+          "name": "rowId",
+          "type": {
+            "text": "unknown"
+          }
+        }
+      ],
+      "description": "Delete a row by id and emit `pdx-row-delete`. It asks nothing first, and in batch mode does not sync."
+    },
+    {
+      "kind": "method",
+      "name": "clearSelection",
+      "parameters": [],
+      "description": "Uncheck every selected row."
+    },
+    {
+      "kind": "method",
+      "name": "getSelectedIds",
+      "parameters": [],
+      "description": "The ids currently checked, as an array."
+    },
+    {
+      "kind": "method",
+      "name": "setSelectedIds",
+      "parameters": [
+        {
+          "name": "ids",
+          "type": {
+            "text": "unknown[]"
+          }
+        }
+      ],
+      "description": "Check exactly these rows and uncheck the rest — what a partly refused bulk action leaves behind."
+    },
+    {
+      "kind": "method",
+      "name": "applyState",
+      "parameters": [
+        {
+          "name": "state",
+          "type": {
+            "text": "Partial<GridState>"
+          }
+        }
+      ],
+      "description": "Put an arrangement back — filter, sort, column order, widths, visibility, page size\n— and show it.\n\n`grid.loadState()` is the same thing without the repaint: an application that\nreaches for it gets a grid whose model has moved and whose header has not. It raises\nno column event either, and that is deliberate: restoring a saved view is not a\nreader rearranging anything."
+    },
+    {
+      "kind": "method",
+      "name": "commitBatch",
+      "parameters": [],
+      "description": "Send every change a batch edit is holding, then sync the source."
+    },
+    {
+      "kind": "method",
+      "name": "revertBatch",
+      "parameters": [],
+      "description": "Throw away every change a batch edit is holding."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-ready",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-ready`."
+    },
+    {
+      "name": "pdx-row-click",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the row is clicked.",
+      "detail": "{ row: Record<string, unknown>; index: number; id: unknown }"
+    },
+    {
+      "name": "pdx-row-reorder",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-reorder`.",
+      "detail": "{ from: number; to: number; fromId: unknown; toId: unknown }"
+    },
+    {
+      "name": "pdx-row-collapse",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-collapse`.",
+      "detail": "{ id: unknown }"
+    },
+    {
+      "name": "pdx-row-expand",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-expand`.",
+      "detail": "{ id: unknown }"
+    },
+    {
+      "name": "pdx-cell-edit-start",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-cell-edit-start`.",
+      "detail": "{ rowId: unknown; field: string; value: unknown }"
+    },
+    {
+      "name": "pdx-cell-edit-end",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-cell-edit-end`.",
+      "detail": "{ rowId: unknown; field: string; oldValue: unknown; newValue: unknown }"
+    },
+    {
+      "name": "pdx-cell-edit-cancel",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-cell-edit-cancel`.",
+      "detail": "{ rowId: unknown; field: string }"
+    },
+    {
+      "name": "pdx-row-edit-start",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-edit-start`.",
+      "detail": "{ rowId: unknown; row: Record<string, unknown> }"
+    },
+    {
+      "name": "pdx-row-edit-end",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-edit-end`.",
+      "detail": "{ rowId: unknown; values: Record<string, unknown> }"
+    },
+    {
+      "name": "pdx-row-edit-cancel",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-edit-cancel`.",
+      "detail": "{ rowId: unknown }"
+    },
+    {
+      "name": "pdx-batch-commit",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-batch-commit`.",
+      "detail": "{ count: number }"
+    },
+    {
+      "name": "pdx-batch-revert",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-batch-revert`.",
+      "detail": "{}"
+    },
+    {
+      "name": "pdx-row-delete",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-row-delete`.",
+      "detail": "{ rowId: unknown; row: Record<string, unknown> }"
+    },
+    {
+      "name": "pdx-selection-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the selection changes.",
+      "detail": "{ selected: unknown[]; count: number }"
+    },
+    {
+      "name": "pdx-grid-export",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on `pdx-grid-export`.",
+      "detail": "{ rows: number; columns: number; format: 'csv' | 'xlsx' }"
+    }
+  ],
+  "roles": [
+    "columnheader",
+    "grid",
+    "gridcell",
+    "menu",
+    "menuitem",
+    "menuitemradio",
+    "row",
+    "rowgroup",
+    "status",
+    "toolbar"
+  ],
+  "attributes": [
+    {
+      "name": "striped",
+      "fieldName": "striped",
+      "description": "Alternates row background colours.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "hover",
+      "fieldName": "hover",
+      "description": "Highlights the row under the pointer.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "rowclickable",
+      "fieldName": "rowClickable",
+      "description": "The rows open something: a click on a row is handled (`pdx-row-click`), so the row takes\na pointer, so a page does not write its own `.pdx-dg-row { cursor: pointer }`, reaching into\nthis component's internal class. Enter on a row is unchanged: it edits a cell in an\neditable grid and does nothing otherwise, so give a keyboard reader a way in of its own\n(an `actions()` column).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "compact",
+      "fieldName": "compact",
+      "description": "Tighter row height for dense tables.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "stickyheader",
+      "fieldName": "stickyHeader",
+      "description": "Keeps the header visible while the body scrolls.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "selection",
+      "fieldName": "selection",
+      "description": "Row selection mode: 'none', 'single' or 'multiple'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'"
+    },
+    {
+      "name": "rowclass",
+      "fieldName": "rowClass",
+      "description": "A class for the whole row: a string, or `(row, index) => string`. Marks a row invalid,\nnew, stale — what `cellClass` could only do one column at a time.\n\nDeclared `String` because an ATTRIBUTE is one (`row-class=\"compact\"`), and `PropType` is\na single constructor. A function assigned as a JS property arrives untouched: `coerce`\nreturns a non-string value as it is (`component.ts:448`).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "description": "The row field used as a unique key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "statekey",
+      "fieldName": "stateKey",
+      "description": "Persists sort/filter/column state under this key.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "emptytitle",
+      "fieldName": "emptyTitle",
+      "description": "The empty state's text. Unset, it is the grid string `empty.title`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "emptyicon",
+      "fieldName": "emptyIcon",
+      "description": "Icon shown in the empty state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inbox'"
+    },
+    {
+      "name": "showfooter",
+      "fieldName": "showFooter",
+      "description": "Shows the footer (aggregates / summary row).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "filterable",
+      "fieldName": "filterable",
+      "description": "Enables per-column filtering.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "filtermode",
+      "fieldName": "filterMode",
+      "description": "How filters apply: e.g. 'menu' or 'row'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'"
+    },
+    {
+      "name": "showtoolbar",
+      "fieldName": "showToolbar",
+      "description": "Shows the toolbar (search, column chooser, export).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "search",
+      "fieldName": "search",
+      "description": "A search field at the toolbar's right: the term is looked for in the columns marked `searchable`.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "showgroupbar",
+      "fieldName": "showGroupBar",
+      "description": "Shows the drag-to-group bar.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "paginationposition",
+      "fieldName": "paginationPosition",
+      "description": "Where the pager sits: 'top', 'bottom' or 'both'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom'"
+    },
+    {
+      "name": "expandable",
+      "fieldName": "expandable",
+      "description": "Allows rows to expand into a detail panel.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "rowreorder",
+      "fieldName": "rowReorder",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "virtualscroll",
+      "fieldName": "virtualScroll",
+      "description": "Renders only visible rows for large datasets.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "rowheight",
+      "fieldName": "rowHeight",
+      "description": "Row height in px for virtual scrolling (42 when unset); ignored otherwise.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "maxheight",
+      "fieldName": "maxHeight",
+      "description": "Caps the grid height in px; the body scrolls beyond it. 0 = no cap (a virtual grid uses 400).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "fillheight",
+      "fieldName": "fillHeight",
+      "description": "Fill the parent's height (flex) instead of growing with content. The page no longer\nscrolls — only the grid body scrolls (virtualized). Pair with virtual-scroll for large sets.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "editable",
+      "fieldName": "editable",
+      "description": "Enables inline cell editing.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "editmode",
+      "fieldName": "editMode",
+      "description": "Editing granularity: 'cell' or 'row'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'cell'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The grid's accessible name (its aria-label).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "GridContext",
+      "fields": [
+        "grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null",
+        "customCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown, index: number) => Node | null",
+        "customHeader: (col: AnyColumn) => Node | null",
+        "customDetail: (row: Record<string, unknown>, index: number, id: unknown) => Node | null",
+        "customEditCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown) => Node | null",
+        "customFilter: (col: AnyColumn) => Node | null",
+        "customFilterPopover: (col: AnyColumn) => ((apply: () => void, clear: () => void) => Node | null) | null",
+        "customToolbar: (side: 'start' | 'end') => Node | null",
+        "customEmpty: () => Node | null",
+        "getSelectionMode: () => string",
+        "getRowClass: (row: Record<string, unknown>, index: number) => string",
+        "getIdField: () => string",
+        "selectedIds: Set<unknown>",
+        "getHeaderEl?: () => HTMLElement | null",
+        "getBodyEl?: () => HTMLElement | null",
+        "emit: (name: string, detail: unknown) => void",
+        "hasFilterRow: () => boolean",
+        "hasToolbar: () => boolean",
+        "hasSearch: () => boolean",
+        "pageSizes: () => number[]",
+        "filterMode: () => string",
+        "forceUpdate: () => void",
+        "popoverFilters: Record<string, { op1: string; val1: string; logic: 'and' | 'or'; op2: string; val2: string }>",
+        "inlineFilterValues: Record<string, unknown>",
+        "inlineFilterOps: Record<string, string>",
+        "isExpandable: () => boolean",
+        "isRowReorder: () => boolean",
+        "expandedRows: Set<unknown>",
+        "collapsedGroups: Set<string>",
+        "editMode: () => string",
+        "editingCell: EditCellState | null",
+        "editingRowId: unknown | null",
+        "editForm: Form<Record<string, unknown>> | null",
+        "batchChanges: Map<unknown, Record<string, unknown>>",
+        "getLabel?: () => string",
+        "nav: { key: string; index: number; col: number; pending?: boolean } | null",
+        "navFocused: boolean",
+        "afterRender?: () => void"
+      ]
+    },
+    {
+      "name": "VirtualScrollState",
+      "fields": [
+        "update: () => void",
+        "dispose: () => void"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "cell",
+      "description": "Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes.",
+      "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown)"
+    },
+    {
+      "name": "header",
+      "description": "Draws a column's header: `header(column)`; a column it draws nothing for keeps its title.",
+      "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
+    },
+    {
+      "name": "detail",
+      "description": "Draws an expanded row's detail: `detail(row)`.",
+      "signature": "(row: T)"
+    },
+    {
+      "name": "editCell",
+      "description": "Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit.",
+      "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown, form: import('@pdxui/core').Form<Record<string, unknown>> | null)"
+    },
+    {
+      "name": "filter",
+      "description": "Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input.",
+      "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
+    },
+    {
+      "name": "filterPopover",
+      "description": "Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover.",
+      "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, apply: () => void, clear: () => void)"
+    },
+    {
+      "name": "toolbarStart",
+      "description": "Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`.",
+      "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
+    },
+    {
+      "name": "toolbarEnd",
+      "description": "Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`.",
+      "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
+    },
+    {
+      "name": "empty",
+      "description": "Draws the empty state in place of the grid's icon and title: `empty()`.",
+      "signature": "()"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "toolbar",
+      "description": "The toolbar, with `show-toolbar`."
+    },
+    {
+      "name": "group-bar",
+      "description": "The group bar, with `show-group-bar`."
+    },
+    {
+      "name": "grid",
+      "description": "The scroll area that is the `role=\"grid\"`: header, filter row, body, summary."
+    },
+    {
+      "name": "header",
+      "description": "The header row group."
+    },
+    {
+      "name": "column-header",
+      "description": "A column's header cell."
+    },
+    {
+      "name": "filter-row",
+      "description": "The inline filter row, with `filter-mode=\"row\"`."
+    },
+    {
+      "name": "body",
+      "description": "The rows' group."
+    },
+    {
+      "name": "row",
+      "description": "A data row."
+    },
+    {
+      "name": "cell",
+      "description": "A data cell."
+    },
+    {
+      "name": "summary",
+      "description": "The summary row, when a column declares an aggregate."
+    },
+    {
+      "name": "footer",
+      "description": "The footer and its pager; above the grid too with `pagination-position`."
+    },
+    {
+      "name": "empty",
+      "description": "The empty status, while the source has settled with no row."
+    },
+    {
+      "name": "loading",
+      "description": "The loading overlay, while the source is pending."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "striped",
+      "description": "`striped`: every other row is tinted."
+    },
+    {
+      "name": "hover",
+      "description": "`hover`: a row under the pointer is highlighted."
+    },
+    {
+      "name": "row-clickable",
+      "description": "`row-clickable`: the rows open something, and take a pointer."
+    },
+    {
+      "name": "compact",
+      "description": "`compact`: tighter cells."
+    },
+    {
+      "name": "sticky-header",
+      "description": "`sticky-header`: the header stays while the body scrolls."
+    },
+    {
+      "name": "fill-height",
+      "description": "`fill-height`: the grid fills its parent's height and only its body scrolls."
+    },
+    {
+      "name": "loading",
+      "description": "The source is pending; the grid is `aria-busy` meanwhile."
+    },
+    {
+      "name": "empty",
+      "description": "The source has settled with no row; the empty status says so."
+    },
+    {
+      "name": "editing",
+      "description": "A cell or a row is being edited."
+    }
+  ],
+  "capabilities": [
+    {
+      "name": "sortable",
+      "description": "A column declared `sortable` sorts on its header; the header carries `aria-sort`."
+    },
+    {
+      "name": "filterable",
+      "description": "The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`)."
+    },
+    {
+      "name": "selectable",
+      "description": "Rows are checked, one or many, with `selection=\"single\"` or `\"multiple\"`."
+    },
+    {
+      "name": "editable",
+      "description": "Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`."
+    }
+  ]
+}
