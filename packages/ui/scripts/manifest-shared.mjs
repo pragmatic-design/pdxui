@@ -105,6 +105,33 @@ export function modelEventName(name) {
 // ─── Scans over markup and code ─────────────────────────────────────
 
 /**
+ * The context tokens a component provides and injects (#498), read off its `provide(token, …)` and
+ * `inject(token, …)` calls. A token is an identifier that starts upper-case (`DataSourceContext`); a
+ * lower-case identifier named like one of the props is the token that prop carries, listed as `:prop`
+ * (`<pdx-provide :token>`); anything else (a key taken from a map) is not knowable here, and is left
+ * out. An inject is optional when it passes a fallback, its third argument. Read for a TypeScript
+ * component and for a `.pdx` one's script alike (#1210): a call there is a context as a declaration is.
+ */
+export function scanContexts(nodes, propNames) {
+    const provides = [];
+    const injects = [];
+    // The identifier under a cast, parentheses or `!`: `provide(token as Context<T>, …)` names `token`.
+    const bare = (e) => (ts.isAsExpression(e) || ts.isParenthesizedExpression(e) || ts.isNonNullExpression(e) ? bare(e.expression) : e);
+    const visit = (n) => {
+        if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.arguments.length > 0 && ts.isIdentifier(bare(n.arguments[0]))) {
+            const fn = n.expression.text;
+            const arg = bare(n.arguments[0]).text;
+            const token = /^[A-Z]/.test(arg) ? arg : propNames.has(arg) ? `:${arg}` : null;
+            if (token && fn === 'provide' && !provides.includes(token)) provides.push(token);
+            if (token && fn === 'inject' && !injects.some(i => i.token === token)) injects.push({ token, optional: n.arguments.length >= 3 });
+        }
+        ts.forEachChild(n, visit);
+    };
+    for (const node of nodes) visit(node);
+    return { provides, injects };
+}
+
+/**
  * The ARIA roles a component renders — what a test or a measuring script targets. Read from
  * `role="x"`, `setAttribute('role', 'x')`, and every quoted role inside a bound
  * `role="${() => cond ? 'a' : 'b'}"`, or a .pdx's `:role="cond ? 'a' : 'b'"`: pdx-select's trigger is a

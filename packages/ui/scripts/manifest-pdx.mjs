@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describeComponent, internalViews } from '@pdxui/compiler';
 import {
     normalizeEol, PROP_DESC, readDocComment, describeProp, scanRoles, withoutComments, scanSlots,
-    scanExportedShapes, declaredFunction, functionParameters, assembleModule,
+    scanExportedShapes, declaredFunction, functionParameters, assembleModule, scanContexts,
 } from './manifest-shared.mjs';
 
 /** The library's tag prefix: `select.pdx` and `pdx-select.pdx` register `<pdx-select>`. */
@@ -107,6 +107,11 @@ export function analyzePdxFile(file, text, categories) {
         const token = contextToken(i.token, propNames);
         if (token && !injects.some(x => x.token === token)) injects.push({ token, optional: i.fallback !== undefined });
     }
+    // And the script's own `provide(…)` and `inject(…)` calls, read as a TypeScript component's are
+    // (#1210): `pdx-provide` provides the token its prop carries, in an effect.
+    const called = scanContexts([body, ...a.effects.map((e, n) => ts.createSourceFile(`${file}.effect${n}.ts`, e, ts.ScriptTarget.Latest, true))], propNames);
+    for (const token of called.provides) if (!provides.includes(token)) provides.push(token);
+    for (const i of called.injects) if (!injects.some(x => x.token === i.token)) injects.push(i);
 
     // Match: an HTML comment.
     const withoutHtmlComments = (t) => t.replace(/<!--[\s\S]*?-->/g, (c) => c.replace(/[^\n]/g, ' '));

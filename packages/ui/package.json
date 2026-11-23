@@ -169,11 +169,6 @@
       "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
       "import": "./dist/error-boundary/pdx-error-boundary.js"
     },
-    "./provide": {
-      "development": "./src/provide/pdx-provide.ts",
-      "types": "./dist/provide/pdx-provide.d.ts",
-      "import": "./dist/provide/pdx-provide.js"
-    },
     "./calendar": {
       "development": "./src/calendar/pdx-calendar.ts",
       "types": "./dist/calendar/pdx-calendar.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/aspect-ratio/pdx-aspect-ratio.pdx",
       "types": "./dist/aspect-ratio/pdx-aspect-ratio.d.ts",
       "import": "./dist/aspect-ratio/pdx-aspect-ratio.js"
+    },
+    "./provide": {
+      "development": "./src/provide/pdx-provide.pdx",
+      "types": "./dist/provide/pdx-provide.d.ts",
+      "import": "./dist/provide/pdx-provide.js"
     },
     "./package.json": "./package.json"
   },

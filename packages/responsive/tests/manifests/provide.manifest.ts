@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-provide (#290)
  *
- * Contracts written by inspecting the source (packages/ui/src/provide/pdx-provide.ts):
+ * Contracts written by inspecting the source (packages/ui/src/provide/pdx-provide.pdx):
  *   - it renders `<slot></slot>` and nothing of its own: no class, no state, no part;
  *   - it provides `value` under `token` (or every entry of `values`) to the elements it wraps, through
  *     the hierarchical Context Protocol: the nearest provider wins.
