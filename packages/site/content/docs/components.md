@@ -221,6 +221,11 @@ that is absent holds its type's empty value (`''`, `0`, `false`, `[]`, `null`):
 Code written before required props existed meant "optional" by a `@prop` with no default:
 `pdx migrate` adds the `?` that keeps it so.
 
+**A prop that names an icon.** `@prop(icon) emptyIcon: string = 'inbox';` is a prop like any other,
+marked as holding an icon's name. A component published with one tells the compiler so, and a page
+that writes `<pdx-list empty-icon="trash">` gets the `trash` icon imported, as `<pdx-icon
+name="trash">` does. `icon` is the one option.
+
 **Gotcha about types.** `string`/`number`/`boolean` props reflect as HTML **attributes** (so you set
 them with `name="..."`). `Object`/`Array`/`Function` props can't live in an attribute: they're passed
 as **properties**, i.e. with the `:items="list"` binding from another PDX template. A

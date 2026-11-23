@@ -66,7 +66,7 @@ DataDecl       ::= FetchDecl | ActionDecl | FormDecl | StoreDecl
 ### Component declarations
 
 ```ebnf
-PropDecl       ::= "@prop" S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End          (β #130: `?`; no default = required)
+PropDecl       ::= "@prop" ( "(icon)" )? S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End   (β #130: `?`; no default = required; #1317: `(icon)`)
 ModelDecl      ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? ModelOptions )? End   (β #124, #135)
 ModelOptions   ::= "{" S? ModelOption ( S? "," S? ModelOption )* S? "}"                                     (#751: what the form submits; #753: the attribute's reading)
 ModelOption    ::= "form" ( S? ":" S? Expression )? | "attribute" S? ":" S? ( "string" | "number" | "boolean" | "json" )

@@ -29,8 +29,8 @@ const NAME = '[A-Za-z_$][\\w$]*';
 
 // What the line a doc comment sits above declares. Each pattern is matched at the line's first token.
 const DECLARATIONS: [DocTarget, RegExp][] = [
-    // Match: @prop label: …  /  @model value: …   Groups: [1]=the name
-    ['prop', new RegExp(`^@prop\\s+(${NAME})`)],
+    // Match: @prop label: …  /  @prop(icon) emptyIcon: … (#1317)  /  @model value: …   Groups: [1]=the name
+    ['prop', new RegExp(`^@prop(?:\\(\\s*icon\\s*\\))?\\s+(${NAME})`)],
     ['model', new RegExp(`^@model\\s+(${NAME})`)],
     // Match: @event picked: …  /  @event(bubbles) picked  /  @event(cancelable) 'before-move'  /
     // @event 'open-change': … — any options in parentheses (#1035). Groups: [1]=a bare name [2]=a quoted name

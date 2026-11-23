@@ -115,10 +115,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_PROP_TYPE_MISMATCH':
         case 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS':
         case 'PDX_MODEL_ATTRIBUTE_UNKNOWN':
-            return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`)) : undefined;
+            // `@prop(icon) name` (#1317) is found as `@prop name` is.
+            return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+${escape(name)}\\b`)) : undefined;
         // The second declaration is the one the author adds by mistake; the first was there.
         case 'PDX_DUP_PROP':
-            return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`), 1) : undefined;
+            return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+${escape(name)}\\b`), 1) : undefined;
         case 'PDX_NAME_RESERVED':
             // Match: the declaration the message names, `@prop body`, `@model track`, `@slot body` (#542).
             return name ? find(source, script, new RegExp(`@(?:prop|model|slot)\\s+${escape(name)}\\b`)) : undefined;

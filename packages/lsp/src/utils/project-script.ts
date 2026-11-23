@@ -168,10 +168,18 @@ export function projectScriptMapped(
             // `var`, not `let`: the compiler declares props before anything reads them. A `@model`
             // (#124) is a prop the script writes, so it is the same typed name: `@model` → `var   `.
             `var${' '.repeat(kw.length - 2)}`.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
+            let afterKw = m.index + 1 + kw.length;
+            // `@prop(icon) name: T` (#1317): the option is no TypeScript, so it is blanked — the name keeps its type.
+            // Match: the `(icon)` right after the keyword. Groups: none
+            const icon = kw === 'prop' ? /^\(\s*icon\s*\)/.exec(s.slice(afterKw)) : null;
+            if (icon) {
+                for (let o = 0; o < icon[0].length; o++) out[afterKw + o] = ' ';
+                afterKw += icon[0].length;
+            }
             // `@prop hint?: T` (#130): a variable takes no `?`, so it is blanked — the name keeps its type.
             // Match: the name and the `?` after it. Groups: [1]=up to the `?`
-            const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(m.index + 1 + kw.length));
-            if (optional) out[m.index + 1 + kw.length + optional[1].length] = ' ';
+            const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(afterKw));
+            if (optional) out[afterKw + optional[1].length] = ' ';
             if (kw === 'model') {
                 // `@model name: T = d { form }` (#135), `{ form: () => expr }` (#751) or
                 // `{ attribute: string }` (#753): the options are no TypeScript, so they are blanked, as

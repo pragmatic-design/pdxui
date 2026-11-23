@@ -119,6 +119,7 @@ Written at the top of `<script>`, one per line, ending in `;`.
 @prop label: string = 'Hello';     // a prop: signal + attribute sync + generated type
 @prop userId: string;              // no default: REQUIRED — a parent without user-id is PDX_PROP_REQUIRED
 @prop hint?: string;               // `?`: optional, its type's empty value ('' here) when absent
+@prop(icon) emptyIcon: string = 'inbox';  // its value names an icon: the icon a consumer writes in it is imported
 @model value: string = '';         // a prop the component writes: value = x dispatches 'value-change'
 @event changed: number;            // an emitter: changed(n) dispatches 'changed' with detail n
 @event(bubbles) closed;            // an event its ancestors hear too

@@ -386,12 +386,29 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // Tokenizer-based: handles generics (Map<K,V>), unions, function types, template literals.
         // A model (#124) is a prop the component may write, marked as such. A `@prop` with no default
         // and no `?` is required (#130), TypeScript's rule.
-        // Match: `@prop name:`, `@prop name?:` or `@model name:`. Groups: [1]=rune [2]=name [3]=`?`
-        const propPrefix = trimmed.match(/^@(prop|model)\s+(\w+)\s*(\?)?\s*:/);
+        // `@prop(icon) name: T` (#1317): a prop whose value names an icon. `icon` is the one option, and
+        // only a prop takes it: a model is the component's own value, not an icon a parent names.
+        // Match: `@prop(…)` or `@model(…)` and what the parentheses hold. Groups: [1]=rune [2]=the options
+        const propOptions = trimmed.match(/^@(prop|model)\(([^)]*)\)/);
+        if (propOptions && !(propOptions[1] === 'prop' && propOptions[2].trim() === 'icon')) {
+            warnings.push({
+                code: 'PDX_UNKNOWN_DECLARATION',
+                severity: 'error' as const,
+                message: propOptions[1] === 'prop'
+                    ? `\`${trimmed}\` is not a form of @prop: its one option is \`(icon)\`, for a prop whose value names an icon.`
+                    : `\`${trimmed}\` is not a form of @model: a model takes no option in parentheses; \`(icon)\` is a prop's.`,
+                hint: propOptions[1] === 'prop' ? 'Use: @prop(icon) name: string = \'inbox\'; — or @prop name: Type = default;' : 'Use: @model name: Type = default;',
+            });
+            continue; // Dropped, as an unrecognised declaration is: left in the body it would not parse.
+        }
+        // Match: `@prop name:`, `@prop(icon) name:`, `@prop name?:` or `@model name:`.
+        // Groups: [1]=rune [2]=`(icon)` [3]=name [4]=`?`
+        const propPrefix = trimmed.match(/^@(prop|model)(\(\s*icon\s*\))?\s+(\w+)\s*(\?)?\s*:/);
         if (propPrefix) {
             const rune = propPrefix[1];
-            const name = propPrefix[2];
-            const optional = propPrefix[3] === '?';
+            const icon = propPrefix[2] !== undefined;
+            const name = propPrefix[3];
+            const optional = propPrefix[4] === '?';
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
             // `@model name: T = d { form }` (#135): the trailing options are taken off before the type
             // and the default are read, which would otherwise swallow them. `{ form: () => expr }`
@@ -456,6 +473,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     ...(rune === 'model' ? { model: true } : {}),
                     ...(options?.form ? { form: true } : {}),
                     ...(rune === 'prop' && !optional && defaultVal === undefined ? { required: true } : {}),
+                    ...(icon ? { icon: true } : {}),
                 });
                 continue;
             }

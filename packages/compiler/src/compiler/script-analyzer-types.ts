@@ -17,6 +17,8 @@ export interface PropInfo {
     form?: true;
     /** `@prop name: T;` with no default and no `?` (#130): a parent must set it. */
     required?: true;
+    /** `@prop(icon) name: T` (#1317): its value names an icon, `iconName` in the library's manifest. */
+    icon?: true;
     /** An `@variants` axis (#986): typed as a prop, declared by the descriptor under `variants`. */
     variant?: true;
 }

@@ -40,8 +40,8 @@ function declarations(descriptor: SFCDescriptor, source: string): Declaration[] 
     if (!script || !script.content.trim()) return [];
     const lineAt = lineIndex(source);
     const found: Declaration[] = [];
-    // Match: a `@prop name` or `@model name` line. Groups: [1]=the rune [2]=the name
-    for (const m of script.content.matchAll(/^[ \t]*@(prop|model)\s+([A-Za-z_$][\w$]*)/gm)) {
+    // Match: a `@prop name`, `@prop(icon) name` (#1317) or `@model name` line. Groups: [1]=the rune [2]=the name
+    for (const m of script.content.matchAll(/^[ \t]*@(prop|model)(?:\(\s*icon\s*\))?\s+([A-Za-z_$][\w$]*)/gm)) {
         found.push({ name: m[2], kind: `@${m[1]}`, line: lineAt(script.start + m.index!) });
     }
     // Match: a `@host name` line, with or without its attributes (#750): the name is a constant of the
