@@ -110,8 +110,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 341.5 after pdx-infinite-scroll and pdx-sortable-list (measured here: 341.4; 1.00× and 0.88×
     // alone), for the same reason. 341.7 after pdx-list, pdx-empty-state and pdx-statistic (measured
     // here: 341.6; 0.90×, 0.90× and 0.81× alone), for the same reason. 342.0 after pdx-split-button
-    // (measured here: 341.9; 0.88× alone), for the same reason.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 342.0 },
+    // (measured here: 341.9; 0.88× alone), for the same reason. 342.3 after pdx-image (measured here:
+    // 342.2; 0.92× alone), for the same reason.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 342.3 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -125,8 +126,8 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (CI's line: 332.1). 332.4 after pdx-inline-edit (CI's line: 332.3). 332.6 after
     // pdx-infinite-scroll and pdx-sortable-list (measured here: 332.5). 332.8 after pdx-list,
     // pdx-empty-state and pdx-statistic (measured here: 332.7). 333.1 after pdx-split-button (measured
-    // here: 333.0).
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 333.1 },
+    // here: 333.0). 333.3 after pdx-image (measured here: 333.2).
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 333.3 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
