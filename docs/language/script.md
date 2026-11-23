@@ -454,6 +454,12 @@ the props bound on the tag (`:items="users"` gives `T = User`) and types the par
 does not type them yet: it projects the template without the components' declarations.
 That attribute is a type, not an attribute of the element, and is not written into the page.
 
+The component's `.d.ts` declares each type parameter its types name as its constraint,
+`type T = { id: string };`, `unknown` without one: the element in `HTMLElementTagNameMap` has no type
+argument (#1335). A type the script imports and the `.d.ts` names is imported there as a type, and
+re-exported when it comes from one of the component's own modules (a relative path), so the
+component's entry gives the types its interface mentions.
+
 #### Rules
 
 - With no type parameter, `@generic ;`, it raises `PDX_UNKNOWN_DECLARATION`.

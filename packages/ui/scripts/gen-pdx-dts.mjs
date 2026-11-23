@@ -9,22 +9,21 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
-import { parseSFC, parseTemplate, analyzeScript, deriveTag, generateDts, exposedMembers, dataPartCounts } from '@pdxui/compiler';
+import { parseSFC, parseTemplate, analyzeScript, deriveTag, generateDts, exposedMembers, dataPartCounts, scriptImportStatements } from '@pdxui/compiler';
 import { libraryEntries } from './library-entries.mjs';
 
 /** The library's tag prefix: `pdx-x.pdx` registers `<pdx-x>`. */
 const PREFIX = 'pdx';
 
 /**
- * Write the .d.ts of every .pdx entry of the package at `root` into `outDir`. Returns the files written,
- * relative to `outDir`.
+ * The declaration of every .pdx entry of the package at `root`: its export path (`navbar/pdx-navbar`),
+ * its source file, and the .d.ts text. A test type-checks them where they stand in `src/`.
  *
  * @param {string} root
- * @param {string} outDir
- * @returns {string[]}
+ * @returns {{ rel: string, file: string, dts: string }[]}
  */
-export function writePdxDeclarations(root, outDir) {
-    const written = [];
+export function pdxDeclarations(root) {
+    const out = [];
     for (const [rel, file] of Object.entries(libraryEntries(root))) {
         if (!file.endsWith('.pdx')) continue;
         const descriptor = parseSFC(readFileSync(file, 'utf-8'));
@@ -36,7 +35,26 @@ export function writePdxDeclarations(root, outDir) {
             slots: analysis.slots,
             // A part the template renders more than once is the array of its elements (#988).
             exposed: exposedMembers(analysis, dataPartCounts(parseTemplate(descriptor.template?.content ?? ''))),
+            // What its types name: the script's imports and its type parameters (#1335).
+            imports: scriptImportStatements(descriptor.script?.content ?? ''),
+            generics: analysis.generics,
         });
+        out.push({ rel, file, dts });
+    }
+    return out;
+}
+
+/**
+ * Write the .d.ts of every .pdx entry of the package at `root` into `outDir`. Returns the files written,
+ * relative to `outDir`.
+ *
+ * @param {string} root
+ * @param {string} outDir
+ * @returns {string[]}
+ */
+export function writePdxDeclarations(root, outDir) {
+    const written = [];
+    for (const { rel, dts } of pdxDeclarations(root)) {
         const target = join(outDir, `${rel}.d.ts`);
         mkdirSync(dirname(target), { recursive: true });
         writeFileSync(target, dts);

@@ -92,6 +92,90 @@ export interface DtsInput {
     forms?: { name: string; schemaType?: string }[];
     /** The reactive names `@expose` puts on the element (#752) — `exposedMembers(analysis)`. */
     exposed?: ExposedMember[];
+    /**
+     * The script's import statements (`analysis.userImports`): the types the declaration names are
+     * imported from where the script imports them (#1335).
+     */
+    imports?: string[];
+    /** The script's `@generic`s as written, `T extends { id: string }` (`analysis.generics`). */
+    generics?: string[];
+}
+
+/**
+ * The script's import statements, each as written, for `DtsInput.imports` (#1335). Read a line at a
+ * time, as the analyser reads imports: `@pdxui/core`'s too, whose type-only names the analysis keeps
+ * nowhere (`Form`, `DataSource`), since the compiled module imports only core's values.
+ */
+export function scriptImportStatements(script: string): string[] {
+    // Match: a one-line `import … from '…';`. Groups: none
+    return script.split('\n').map((l) => l.trim()).filter((l) => /^import\s.+\sfrom\s+(['"])[^'"]+\1;?$/.test(l));
+}
+
+/** A name a script import binds, as a type: `{ A as B }`, a default, or a namespace. */
+interface ImportedName { local: string; imported?: string; kind: 'named' | 'default' | 'namespace'; from: string }
+
+/** Every name the script's import statements bind, with the module each comes from. */
+function importedNames(statements: readonly string[]): ImportedName[] {
+    const out: ImportedName[] = [];
+    for (const statement of statements) {
+        const sf = ts.createSourceFile('import.ts', statement, ts.ScriptTarget.Latest, false);
+        for (const st of sf.statements) {
+            if (!ts.isImportDeclaration(st) || !ts.isStringLiteral(st.moduleSpecifier) || !st.importClause) continue;
+            const from = st.moduleSpecifier.text;
+            const clause = st.importClause;
+            if (clause.name) out.push({ local: clause.name.text, kind: 'default', from });
+            const bindings = clause.namedBindings;
+            if (bindings && ts.isNamespaceImport(bindings)) out.push({ local: bindings.name.text, kind: 'namespace', from });
+            if (bindings && ts.isNamedImports(bindings)) {
+                for (const el of bindings.elements) out.push({ local: el.name.text, imported: el.propertyName?.text, kind: 'named', from });
+            }
+        }
+    }
+    return out;
+}
+
+/** The identifiers `text` holds, as TypeScript's scanner reads them. */
+function identifiersIn(text: string): Set<string> {
+    const found = new Set<string>();
+    const scanner = ts.createScanner(ts.ScriptTarget.Latest, true, ts.LanguageVariant.Standard, text);
+    for (let t = scanner.scan(); t !== ts.SyntaxKind.EndOfFileToken; t = scanner.scan()) {
+        if (t === ts.SyntaxKind.Identifier) found.add(scanner.getTokenText());
+    }
+    return found;
+}
+
+/**
+ * The lines that declare what a declaration's types name (#1335): each `@generic` it names, as its
+ * constraint — inside the component a type parameter reads as what it promises, as the editor reads it
+ * (#490) — and each imported name it names, imported as a type from the module the script names. A name
+ * from one of the component's own modules (a relative path) is exported again, so the component's entry
+ * gives the types its interface mentions, as a TypeScript module exporting them did; one from a package
+ * is the package's to export.
+ */
+function declaredNames(body: string, imports: readonly string[], generics: readonly string[]): string[] {
+    // Match: `T` or `T extends X`. Groups: [1]=the name [2]=the constraint
+    const params = generics.map((g) => /^([A-Za-z_$][\w$]*)(?:\s+extends\s([\s\S]+))?$/.exec(g.trim()))
+        .filter((m): m is RegExpExecArray => m !== null);
+    const named = identifiersIn(body);
+    const aliases = params.filter((m) => named.has(m[1])).map((m) => `type ${m[1]} = ${m[2]?.trim() || 'unknown'};`);
+    // An imported name a constraint uses is named too.
+    const used = identifiersIn(`${body}\n${aliases.join('\n')}`);
+    const generic = new Set(params.map((m) => m[1]));
+    const wanted = importedNames(imports).filter((n) => used.has(n.local) && !generic.has(n.local));
+    const lines: string[] = [];
+    const byModule = new Map<string, ImportedName[]>();
+    for (const n of wanted) {
+        if (n.kind === 'default') lines.push(`import type ${n.local} from '${n.from}';`);
+        else if (n.kind === 'namespace') lines.push(`import type * as ${n.local} from '${n.from}';`);
+        else byModule.set(n.from, [...(byModule.get(n.from) ?? []), n]);
+    }
+    for (const [from, names] of byModule) {
+        lines.push(`import type { ${names.map((n) => (n.imported ? `${n.imported} as ${n.local}` : n.local)).join(', ')} } from '${from}';`);
+    }
+    const own = wanted.filter((n) => n.kind !== 'namespace' && n.from.startsWith('.')).map((n) => n.local);
+    if (own.length > 0) lines.push(`export type { ${own.join(', ')} };`);
+    if (lines.length > 0 || aliases.length > 0) return [...lines, ...aliases, ''];
+    return [];
 }
 
 /**
@@ -195,6 +279,10 @@ export function generateDts(input: DtsInput): string {
     lines.push('  }');
     lines.push('}');
     lines.push('');
+
+    // What the types above name, declared after the header (#1335).
+    const declared = declaredNames(lines.slice(2).join('\n'), input.imports ?? [], input.generics ?? []);
+    lines.splice(2, 0, ...declared);
 
     return lines.join('\n');
 }
