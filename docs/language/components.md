@@ -28,12 +28,18 @@ functions (#495).
 ### Syntax
 
 ```ebnf
-PropDecl ::= "@prop" S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End
+PropDecl ::= "@prop" ( "(icon)" )? S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End
 ```
 
 ### Semantics
 
-Declares a prop, as in alpha. The beta adds **required props** with TypeScript's rule (#130 — landed):
+Declares a prop, as in alpha. `@prop(icon) emptyIcon: string = 'inbox';` (#1317) is one whose value
+names an icon, the descriptor's `prop('inbox', { iconName: true })`: the library's manifest marks it
+`iconName`, and a consumer that writes a built-in icon's name in it, `<pdx-list empty-icon="trash">`,
+gets that icon imported, as for `pdx-icon`'s `name`. It compiles to the same prop as without the
+option.
+
+The beta adds **required props** with TypeScript's rule (#130 — landed):
 
 | Written | Meaning |
 |---|---|
@@ -56,6 +62,8 @@ migrate`'s `?` preserve the meaning of existing code exactly; TypeScript still t
   (optional).
 - The alpha rules stay (`PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
   `PDX_DUP_PROP`, `PDX_PROP_WRITE`).
+- `icon` is the one option: `@prop(colour) …` is `PDX_UNKNOWN_DECLARATION` (error), and so is
+  `@model(icon) …`, since a model is the component's own value and not an icon a parent names.
 
 ### Examples
 
@@ -72,9 +80,19 @@ import type { User } from './user';
 </script>
 ```
 
+```pdx
+<template>
+  <pdx-icon :name="emptyIcon"></pdx-icon>
+</template>
+
+<script>
+@prop(icon) emptyIcon: string = 'inbox';
+</script>
+```
+
 ### Since
 
-alpha → beta (#130)
+alpha → beta (#130); `(icon)`, beta (#1317)
 
 ## @model
 

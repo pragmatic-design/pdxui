@@ -71,3 +71,22 @@ describe('the roles a .pdx script writes', () => {
         expect((mod.declarations[0].roles as string[]).sort()).toEqual(['button', 'note']);
     });
 });
+
+// `@prop(icon)` (#1317) is the .pdx form of `prop('inbox', { iconName: true })`: the manifest says the
+// prop names an icon, and the compiler imports the icon a consumer writes in it (icon-imports.ts).
+describe('a .pdx prop that names an icon', () => {
+    it('is iconName in the manifest, and a plain prop beside it is not', () => {
+        write('z/pdx-z.pdx', [
+            '<template><p>{{ emptyIcon }} {{ label }}</p></template>',
+            '<script>',
+            "@prop(icon) emptyIcon: string = 'inbox';",
+            "@prop label: string = '';",
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 'z/pdx-z.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        const members = mod.declarations[0].members as { name: string; iconName?: boolean; type: { text: string }; default?: string }[];
+        expect(members.find(m => m.name === 'emptyIcon')).toEqual(expect.objectContaining({ iconName: true, type: { text: 'string' }, default: "'inbox'" }));
+        expect(members.find(m => m.name === 'label')).not.toHaveProperty('iconName');
+    });
+});

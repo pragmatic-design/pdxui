@@ -20,8 +20,8 @@ function bareProps(text: string): Bare[] {
     for (const raw of script.content.split('\n')) {
         const lead = raw.length - raw.trimStart().length;
         const trimmed = raw.trim();
-        // Match: `@prop name:` with no `?`. Groups: [1]=the name
-        const m = /^@prop\s+([A-Za-z_$][\w$]*)\s*:/.exec(trimmed);
+        // Match: `@prop name:` or `@prop(icon) name:` (#1317) with no `?`. Groups: [1]=the name
+        const m = /^@prop(?:\(\s*icon\s*\))?\s+([A-Za-z_$][\w$]*)\s*:/.exec(trimmed);
         if (m && !extractTypeAnnotation(trimmed, m[0].length - 1).rest.startsWith('=')) {
             out.push({ nameEnd: offset + lead + m[0].indexOf(m[1]) + m[1].length, line, found: trimmed });
         }

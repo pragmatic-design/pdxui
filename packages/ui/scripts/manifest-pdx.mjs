@@ -67,7 +67,8 @@ export function analyzePdxFile(file, text, categories) {
 
     const asProp = (p) => ({
         name: p.name, type: qualify(p.tsType), runtime: p.runtimeType.toLowerCase(),
-        ...(p.default !== undefined ? { default: p.default } : {}), iconName: false,
+        // `@prop(icon)` (#1317), the .pdx form of `prop(d, { iconName: true })`.
+        ...(p.default !== undefined ? { default: p.default } : {}), iconName: !!p.icon,
         ...(p.required ? { required: true } : {}),
     });
     const plain = a.props.filter(p => !p.model && !p.variant).map(p => ({

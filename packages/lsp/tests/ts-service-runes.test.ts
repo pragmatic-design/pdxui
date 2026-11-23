@@ -104,6 +104,14 @@ describe('the rune declarations', () => {
         expect(diagnose(`${script}panel;\n`)).toEqual([expect.stringMatching(/Cannot find name 'panel'/)]);
     });
 
+    it('a @prop(icon) is the typed name a plain @prop is (#1317)', () => {
+        const script = "@prop(icon) emptyIcon: string = 'inbox';\n@prop(icon) lead?: string;\nconst n: number = emptyIcon.length + (lead ?? '').length;\nn;\n";
+        expect(diagnose(script)).toEqual([]);
+        // The option is no code, and the prop keeps its type: a string is not a number.
+        expect(diagnose("@prop(icon) emptyIcon: string = 'inbox';\nconst n: number = emptyIcon;\nn;\n"))
+            .toEqual([expect.stringMatching(/'string' is not assignable to type 'number'/)]);
+    });
+
     it('a @part with a hyphenated name is no code and declares no name (#1299)', () => {
         const script = '@part root, word-count;\nfunction f() { root?.focus(); }\nf;\n';
         expect(diagnose(script, '<div data-part="root"><span data-part="word-count"></span></div>')).toEqual([]);
