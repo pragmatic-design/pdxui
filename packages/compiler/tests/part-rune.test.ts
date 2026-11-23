@@ -50,6 +50,26 @@ describe('a @part nothing reads has no ref (#1268)', () => {
         expect(code).not.toMatch(/bindRef\(__el\d+,ctx\.(root|label)\)/);
     });
 
+    it('a name only as a key, a property, a type member or a slot parameter is no read (#1332, pdx-file-upload)', () => {
+        const script = [
+            '@part root, label;',
+            '@slot row?: (item: unknown, label: string);',
+            'interface Entry { root: number; label?: string }',
+            'const e = { root: 0, label: "x" };',
+            'function f(o: { label: string }, root: number) { return e.root + o?.label; }',
+        ].join('\n');
+        const { code } = compile(pdx(template, script), 'test.pdx');
+        expect(code).not.toMatch(/const __(root|label) = signal/);
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.(root|label)\)/);
+    });
+
+    it('control — a ternary branch, a shorthand property and a plain read each keep the ref (#1332)', () => {
+        for (const read of ['function f(c) { return c ? root : null; }', 'const o = { root };', 'function f() { root?.focus(); }']) {
+            const { code } = compile(pdx(template, `@part root, label;\n${read}`), 'test.pdx');
+            expect(code, read).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
+        }
+    });
+
     it('a part @host or @expose reads keeps its ref', () => {
         const host = compile(pdx(template, '@part root, label;\n@host { :title="root?.id" }'), 'test.pdx').code;
         expect(host).toMatch(/bindRef\(__el\d+,ctx\.root\)/);

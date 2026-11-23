@@ -11,10 +11,16 @@ import ts from 'typescript';
 import type { TemplateNode } from '../parser/template';
 import { collectTemplateIdentifiers } from './validate';
 
+/** The tokens after which a name followed by `:` is a key or a member: `{ a: …`, `, a: …`, `; a: …`, `(a: T`. */
+const BEFORE_KEY = new Set([ts.SyntaxKind.OpenBraceToken, ts.SyntaxKind.CommaToken, ts.SyntaxKind.SemicolonToken, ts.SyntaxKind.OpenParenToken]);
+
 /**
  * The names among `names` that the script source mentions as code. TypeScript's scanner skips comments
- * and reads a string as one token, so `'root'` and `// the root` are no read; a property name or an
- * object key is counted. A template literal's text is a string too, and what its `${…}` holds is
+ * and reads a string as one token, so `'root'` and `// the root` are no read. Two positions are no
+ * read either, since a bare name never stands there (#1332): a property name, after `.` or `?.`; and a
+ * name followed by `:` right after `{`, `,`, `;` or `(` — an object key, a type or interface member,
+ * an annotated parameter, a slot signature's parameter. A ternary's `? name :`, a shorthand `{ name }`
+ * and `case name:` are reads. A template literal's text is a string too, and what its `${…}` holds is
  * code: at the `}` that closes an expression the scanner is asked to read on as the literal, or it
  * would take the next backtick for the start of another and the rest of the script for its text.
  * The `@part` declarations themselves are left out.
@@ -26,10 +32,21 @@ function scriptMentions(script: string, names: ReadonlySet<string>): Set<string>
     const scanner = ts.createScanner(ts.ScriptTarget.Latest, true, ts.LanguageVariant.Standard, src);
     // For each template literal being read, the depth of the braces opened inside its current `${`.
     const templates: number[] = [];
-    for (let t = scanner.scan(); t !== ts.SyntaxKind.EndOfFileToken; t = scanner.scan()) {
+    // What follows a name that is a key or a member: `:`, or `?:` for an optional one. No expression
+    // has `?` right before `:` — a ternary has its branch between them.
+    const isMemberColon = (): boolean => {
+        const next = scanner.scan();
+        return next === ts.SyntaxKind.ColonToken
+            || (next === ts.SyntaxKind.QuestionToken && scanner.scan() === ts.SyntaxKind.ColonToken);
+    };
+    let previous = ts.SyntaxKind.Unknown;
+    for (let t = scanner.scan(); t !== ts.SyntaxKind.EndOfFileToken; previous = t, t = scanner.scan()) {
         if (t === ts.SyntaxKind.Identifier) {
             const text = scanner.getTokenText();
-            if (names.has(text)) found.add(text);
+            if (!names.has(text)) continue;
+            if (previous === ts.SyntaxKind.DotToken || previous === ts.SyntaxKind.QuestionDotToken) continue;
+            if (BEFORE_KEY.has(previous) && scanner.lookAhead(isMemberColon)) continue;
+            found.add(text);
         } else if (t === ts.SyntaxKind.TemplateHead) {
             templates.push(0);
         } else if (t === ts.SyntaxKind.OpenBraceToken && templates.length > 0) {
