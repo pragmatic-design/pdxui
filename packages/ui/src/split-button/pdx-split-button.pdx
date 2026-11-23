@@ -82,10 +82,6 @@ function loadIcon(): void {
 function menuName(): string {
   return (menuLabel as string) || uiString('split-button', 'menu');
 }
-$effect(() => {
-  const n = menuName();
-  if (arrowEl) arrowEl.setAttribute('aria-label', n);
-});
 
 function buildMenuItems(list: MenuItem[], container: HTMLElement): void {
   container.innerHTML = '';
@@ -330,11 +326,13 @@ onNextFrame(() => {
   built = true;
 });
 
-// Update on prop changes
+// Update on prop changes: the arrow's name at once, the buttons' state a frame later. One effect, so
+// a mount pays for one: what the build draws from the other props is drawn once, as before.
 $effect(() => {
+  const name = menuName();
+  if (arrowEl) arrowEl.setAttribute('aria-label', name);
   const isLoading = loading as boolean;
   const isDisabled = disabled as boolean;
-  void label; void icon; void variant; void size;
   if (!built) return;
   requestAnimationFrame(() => {
     if (!alive) return;
