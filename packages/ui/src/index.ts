@@ -83,7 +83,7 @@ import './split-button/pdx-split-button.pdx';
 // Tier 1E: Layout
 import './app-layout/pdx-app-layout';
 import './app-shell/pdx-app-shell.pdx';
-import './row/pdx-row';
+import './row/pdx-row.pdx';
 import './col/pdx-col';
 import './masonry/pdx-masonry';
 import './splitter/pdx-splitter';

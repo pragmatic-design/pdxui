@@ -1,0 +1,114 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRow",
+  "tagName": "pdx-row",
+  "category": "Layout",
+  "order": 70,
+  "description": "A responsive row that lays out pdx-col columns on a 12-column grid, with gutter, column count and\nalignment.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "cols",
+      "description": "Number of columns in the grid system (default: 12)",
+      "type": {
+        "text": "number"
+      },
+      "default": "12",
+      "attribute": "cols"
+    },
+    {
+      "kind": "field",
+      "name": "gutter",
+      "description": "Gutter between columns: 2xs|xs|sm|md|lg|xl|2xl or CSS value",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'",
+      "attribute": "gutter"
+    },
+    {
+      "kind": "field",
+      "name": "align",
+      "description": "Vertical alignment of children",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "align"
+    },
+    {
+      "kind": "field",
+      "name": "justify",
+      "description": "Horizontal distribution",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "justify"
+    },
+    {
+      "kind": "field",
+      "name": "wrap",
+      "description": "Allow wrapping (default: true)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "wrap"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "cols",
+      "fieldName": "cols",
+      "description": "Number of columns in the grid system (default: 12)",
+      "type": {
+        "text": "number"
+      },
+      "default": "12"
+    },
+    {
+      "name": "gutter",
+      "fieldName": "gutter",
+      "description": "Gutter between columns: 2xs|xs|sm|md|lg|xl|2xl or CSS value",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "align",
+      "fieldName": "align",
+      "description": "Vertical alignment of children",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "justify",
+      "fieldName": "justify",
+      "description": "Horizontal distribution",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "wrap",
+      "fieldName": "wrap",
+      "description": "Allow wrapping (default: true)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ]
+}

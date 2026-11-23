@@ -1,0 +1,84 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A responsive row that lays out pdx-col columns on a 12-column grid, with gutter, column count and
+ * alignment.
+ */
+// pdx-row — Responsive row container for pdx-col columns.
+// Provides 12-column grid context via CSS custom properties.
+// Enhances CSS-only pdx-row with gutter, column count, and alignment props.
+
+/** Number of columns in the grid system (default: 12) */
+@prop cols: number = 12;
+/** Gutter between columns: 2xs|xs|sm|md|lg|xl|2xl or CSS value */
+@prop gutter: string = 'md';
+/** Vertical alignment of children */
+@prop align: string = '';
+/** Horizontal distribution */
+@prop justify: string = '';
+/** Allow wrapping (default: true) */
+@prop wrap: boolean = true;
+@host el;
+
+// Named spacing tokens → CSS values
+const SPACING: Record<string, string> = {
+  '2xs': 'var(--pdx-space-2xs)',
+  'xs': 'var(--pdx-space-xs)',
+  'sm': 'var(--pdx-space-sm)',
+  'md': 'var(--pdx-space-md)',
+  'lg': 'var(--pdx-space-lg)',
+  'xl': 'var(--pdx-space-xl)',
+  '2xl': 'var(--pdx-space-2xl)',
+};
+
+const ALIGN: Record<string, string> = {
+  start: 'flex-start', center: 'center', end: 'flex-end',
+  baseline: 'baseline', stretch: 'stretch',
+};
+
+const JUSTIFY: Record<string, string> = {
+  start: 'flex-start', center: 'center', end: 'flex-end',
+  between: 'space-between', around: 'space-around', evenly: 'space-evenly',
+};
+
+let built = false;
+
+// Its layout a frame after each change, as the TypeScript version wrote it.
+$effect(() => {
+  const count = cols as number;
+  const space = gutter as string;
+  const alignTo = align as string;
+  const justifyTo = justify as string;
+  const wraps = wrap as boolean;
+
+  const gutterCss = SPACING[space] || space || '0px';
+
+  if (!built) {
+    built = true;
+    requestAnimationFrame(() => {
+      // The host carries no class (#290): col.css tells a registered row from CSS-only
+      // markup with `pdx-row:defined`.
+      el.style.display = 'flex';
+      el.style.flexWrap = wraps ? 'wrap' : 'nowrap';
+      el.style.gap = gutterCss;
+      // Provide context to pdx-col children
+      el.style.setProperty('--pdx-row-cols', String(count));
+      el.style.setProperty('--pdx-row-gutter', gutterCss);
+
+      if (alignTo) el.style.alignItems = ALIGN[alignTo] || alignTo;
+      if (justifyTo) el.style.justifyContent = JUSTIFY[justifyTo] || justifyTo;
+    });
+    return;
+  }
+
+  requestAnimationFrame(() => {
+    el.style.flexWrap = wraps ? 'wrap' : 'nowrap';
+    el.style.gap = gutterCss;
+    el.style.setProperty('--pdx-row-cols', String(count));
+    el.style.setProperty('--pdx-row-gutter', gutterCss);
+    el.style.alignItems = alignTo ? (ALIGN[alignTo] || alignTo) : '';
+    el.style.justifyContent = justifyTo ? (JUSTIFY[justifyTo] || justifyTo) : '';
+  });
+});
+</script>

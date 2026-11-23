@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
  *
- *   - Source, row: packages/ui/src/row/pdx-row.ts
+ *   - Source, row: packages/ui/src/row/pdx-row.pdx
  *       · render() = <slot></slot>: the pdx-col children are projected as DIRECT children
  *         of the HOST <pdx-row> (light DOM, no Shadow DOM).
  *       · In an rAF (ctx.track) the host gets an INLINE STYLE (not CSS classes):
