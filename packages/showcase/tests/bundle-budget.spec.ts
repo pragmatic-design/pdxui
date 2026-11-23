@@ -454,7 +454,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // string, and html`` stays for the components not moved yet. pdx-tag-input and it both render a snippet
 // with `@render`, so core's render-snippet leaves tag-input's chunk for one of its own (+377 B, tag-input
 // −195 B). The whole +1.1 KB; the built dist: js 483.8 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 483.9, css: 67, blocking: 102.9 };
+// entry 43.5 → 43.6 (owner's OK, 2026-11-23): with pdx-file-upload the entry chunk is +17 B gzip
+// (44,582 → 44,599 B), which crosses the tenth it rounds to (43.54 → 43.55 KB).
+const BUDGET_KB = { entry: 43.6, js: 483.9, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
