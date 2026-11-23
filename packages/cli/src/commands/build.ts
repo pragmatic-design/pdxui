@@ -3,7 +3,7 @@
 import { defineCommand } from 'citty';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { resolve, basename, dirname, join, relative } from 'pathe';
-import { compile, generateDts, exposedMembers, parseSFC, analyzeScript, deriveTag, dataPartCounts, parseTemplate } from '@pdxui/compiler';
+import { compile, generateDts, exposedMembers, scriptImportStatements, parseSFC, analyzeScript, deriveTag, dataPartCounts, parseTemplate } from '@pdxui/compiler';
 import { loadConfigOrExit, resolveConfig } from '../config/loader';
 import { scanPdxFiles } from '../manifest/scanner';
 import { analyzeComponent } from '../manifest/generator';
@@ -162,6 +162,9 @@ async function buildStandalone(
                 slots: analysis.slots,
                 // A part the template renders more than once is the array of its elements (#988, #1004).
                 exposed: exposedMembers(analysis, dataPartCounts(parseTemplate(descriptor.template?.content ?? ''))),
+                // What its types name: the script's imports and its type parameters (#1335).
+                imports: scriptImportStatements(descriptor.script?.content ?? ''),
+                generics: analysis.generics,
             });
             writeFileSync(join(outDir, `${name}.d.ts`), dts);
 
