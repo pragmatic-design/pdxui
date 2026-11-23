@@ -85,7 +85,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-password-input',
     'pdx-popover',
     'pdx-progress',
-    'pdx-provide',
     'pdx-radio',
     'pdx-radio-group',
     'pdx-rating',

@@ -23147,7 +23147,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/provide/pdx-provide.ts",
+      "path": "src/provide/pdx-provide.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -23206,7 +23206,7 @@
           "name": "pdx-provide",
           "declaration": {
             "name": "PdxProvide",
-            "module": "src/provide/pdx-provide.ts"
+            "module": "src/provide/pdx-provide.pdx"
           }
         }
       ]

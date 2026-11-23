@@ -2,7 +2,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { context, inject, clearProviders } from '@pdxui/core';
-import '../../src/provide/pdx-provide';
+import '../../src/provide/pdx-provide.pdx';
 
 describe('pdx-provide', () => {
     beforeEach(() => { document.body.innerHTML = ''; clearProviders(); });

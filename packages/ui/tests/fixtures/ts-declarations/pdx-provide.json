@@ -1,0 +1,50 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxProvide",
+  "tagName": "pdx-provide",
+  "category": "Infrastructure",
+  "order": 117,
+  "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "token",
+      "description": "The context token the value is provided under (single value mode): `context<T>('name')`.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Value to provide (for single value mode). Reactive if signal.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "values",
+      "description": "Multiple values, a `Map` of token → value. Takes priority over token/value.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    }
+  ],
+  "attributes": [],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "x-pdx-context": {
+    "provides": [
+      ":token"
+    ]
+  }
+}
