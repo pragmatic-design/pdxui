@@ -295,6 +295,11 @@ describe('a type parameter inside the component that declares it', () => {
     it('control — the constraint\'s member alone reads', () => {
         expect(diagnose(SCRIPT + 'function ids() { return items.map((it) => it.id); }', '<p>x</p>')).toEqual([]);
     });
+    it('a constraint of several members, each ending in `;`, reads whole', () => {
+        const many = '@generic T extends { id: string; label?: string };\n@prop items: T[] = [];\n';
+        const found = diagnose(many + 'function ids() { return items.map((it) => it.id + (it.label ?? "") + it.nmae); }', '<p>x</p>');
+        expect(found.map((f) => f.at)).toEqual(['nmae']);
+    });
 });
 
 describe('what the workspace answers for a snippet', () => {
