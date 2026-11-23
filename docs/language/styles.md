@@ -356,10 +356,11 @@ alpha
 
 ```ebnf
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                     /* in the script */
-VariantAxis    ::= Word S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? Word )? S? ";"?
-VariantValue   ::= Word ( S? ":" S? StringLiteral )?                           /* the value's native selector, #986 */
+VariantAxis    ::= Word S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? VariantWord )? S? ";"?
+VariantValue   ::= VariantWord ( S? ":" S? StringLiteral )?                    /* the value's native selector, #986 */
+VariantWord    ::= [A-Za-z0-9_-]+                                              /* a value may hold a hyphen, `bottom-right` (#1324) */
 VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
-VariantTest    ::= Word S? "(" S? Word ( S? "," S? Word )* S? ")"
+VariantTest    ::= VariantWord S? "(" S? VariantWord ( S? "," S? VariantWord )* S? ")"
 LibraryRule    ::= "@variant" S ( Hosts S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
 Hosts          ::= TagName | ":is(" S? TagName ( S? "," S? TagName )* S? ")"
 TagName        ::= "pdx-" Word

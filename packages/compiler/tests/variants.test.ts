@@ -40,6 +40,20 @@ describe('@variants in the script', () => {
         });
     });
 
+    it('a default may hold a hyphen, as a value may (#1324): pdx-fab\'s position', () => {
+        expect(parseVariantsBlock('@variants {\n  position: { bottom-right, bottom-left, top-right, top-left } = bottom-right;\n}')).toEqual({
+            axes: [{ name: 'position', values: ['bottom-right', 'bottom-left', 'top-right', 'top-left'], default: 'bottom-right' }],
+            errors: [],
+        });
+        // The default ordered first in the descriptor, as for any axis: core reflects it when the prop is unset.
+        const { code, warnings } = compile(file('@variants {\n  position: { top-left, bottom-right } = bottom-right;\n}', ''), 'btn.pdx');
+        expect(warnings.filter((w) => w.code === 'PDX_VARIANTS_MALFORMED')).toEqual([]);
+        expect(code).toContain('variants: { position: ["bottom-right", "top-left"] },');
+        // A hyphenated default that is not a value is still refused.
+        expect(parseVariantsBlock('@variants { position: { top-left } = bottom-right; }').errors)
+            .toEqual(["the default of 'position', 'bottom-right', is not one of its values (top-left)"]);
+    });
+
     it('says what it cannot read: a default that is not a value, an axis twice, a line that is not an axis', () => {
         expect(parseVariantsBlock('@variants { size: { sm, md } = xl; }').errors).toEqual(["the default of 'size', 'xl', is not one of its values (sm, md)"]);
         expect(parseVariantsBlock('@variants { a: { x }; a: { y }; }').errors).toEqual(["the axis 'a' is declared twice"]);

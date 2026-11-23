@@ -45,9 +45,10 @@ export interface VariantsBlock {
     errors: string[];
 }
 
-// Match: one axis, `name: { a, b, c } = default;` (the default and the `;` optional).
+// Match: one axis, `name: { a, b, c } = default;` (the default and the `;` optional). The default is
+// read as a value is, a hyphen included: `= bottom-right` (#1324).
 // Groups: [1]=name [2]=the values [3]=default
-const AXIS = /(\w+)\s*:\s*\{([^{}]*)\}\s*(?:=\s*(\w+))?\s*;?/g;
+const AXIS = /(\w+)\s*:\s*\{([^{}]*)\}\s*(?:=\s*([\w-]+))?\s*;?/g;
 
 // Match: one value of an axis, `sm`, or `sm: '.pdx-input-sm'` with its native selector, up to the `,`
 // that ends it. A selector may hold commas, `:is(.a, .b)`, so the list is not split on them.
