@@ -28892,7 +28892,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/split-button/pdx-split-button.ts",
+      "path": "src/split-button/pdx-split-button.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -29147,7 +29147,7 @@
           "name": "pdx-split-button",
           "declaration": {
             "name": "PdxSplitButton",
-            "module": "src/split-button/pdx-split-button.ts"
+            "module": "src/split-button/pdx-split-button.pdx"
           }
         }
       ]

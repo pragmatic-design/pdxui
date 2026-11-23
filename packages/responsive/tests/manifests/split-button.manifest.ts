@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-split-button (tier 1A, button-pair + portaled dropdown menu)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/split-button/pdx-split-button.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/split-button/pdx-split-button.pdx)
  * and the CSS (packages/design/src/components/split-button.css plus surfaces/buttons.css for .pdx-{variant}).
  *
  * ── DOM structure (built imperatively in an rAF inside ctx.track) ──
@@ -86,9 +86,9 @@ export const splitButton: ComponentManifest = {
             // Two things make this component different from the popover and the tooltip, and both
             // were measured rather than assumed:
             //
-            // 1. It exposes no imperative API (no `ctx.expose` in `pdx-split-button.ts`), so the
+            // 1. It exposes no imperative API (no `ctx.expose` in `pdx-split-button.pdx`), so the
             //    setup has to click the chevron — `.pdx-split-arrow`, the element that carries the
-            //    click listener (`pdx-split-button.ts:232`).
+            //    click listener (`pdx-split-button.pdx`).
             // 2. The panel is appended to `document.body` (`:114`), NOT to the host — so it is not
             //    inside the `section[data-scenario]` the runner photographs. That does not stop it
             //    being in the picture, because the screenshot is a CROP of the section's box and
@@ -271,7 +271,7 @@ export const splitButton: ComponentManifest = {
     // ── Dim. 2: axe-core ──
     // Closed: the arrow has aria-haspopup="menu" + aria-expanded="false"; the primary has text (the label) → an accessible name.
     // The chevron-only arrow is named by the `menuLabel` prop (default 'More actions'), forwarded as
-    //   its aria-label, plus an aria-hidden svg (pdx-split-button.ts); without it axe reports "button-name".
+    //   its aria-label, plus an aria-hidden svg (pdx-split-button.pdx); without it axe reports "button-name".
     //   No disableRule: the arrow has a real accessible name.
     // The menu open: a role="menu" panel with menuitems (buttons with text) → fine for axe.
     a11y: {

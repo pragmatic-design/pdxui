@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/split-button/pdx-split-button';
+import '../../src/split-button/pdx-split-button.pdx';
 
 async function mount(props: Record<string, unknown>): Promise<HTMLElement> {
     const el = document.createElement('pdx-split-button');

@@ -284,11 +284,6 @@
       "types": "./dist/context-menu/pdx-context-menu.d.ts",
       "import": "./dist/context-menu/pdx-context-menu.js"
     },
-    "./split-button": {
-      "development": "./src/split-button/pdx-split-button.ts",
-      "types": "./dist/split-button/pdx-split-button.d.ts",
-      "import": "./dist/split-button/pdx-split-button.js"
-    },
     "./block-ui": {
       "development": "./src/block-ui/pdx-block-ui.ts",
       "types": "./dist/block-ui/pdx-block-ui.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/statistic/pdx-statistic.pdx",
       "types": "./dist/statistic/pdx-statistic.d.ts",
       "import": "./dist/statistic/pdx-statistic.js"
+    },
+    "./split-button": {
+      "development": "./src/split-button/pdx-split-button.pdx",
+      "types": "./dist/split-button/pdx-split-button.d.ts",
+      "import": "./dist/split-button/pdx-split-button.js"
     },
     "./package.json": "./package.json"
   },
