@@ -2,7 +2,7 @@
  * MANIFEST — pdx-navbar (Tier 6)
  *
  * Contracts derived by inspecting:
- *  - source: packages/ui/src/navbar/pdx-navbar.ts
+ *  - source: packages/ui/src/navbar/pdx-navbar.pdx
  *      the HOST <pdx-navbar>: in an rAF it sets role="banner" (NOT "navigation": the host is the banner
  *      landmark; the real nav is a child). No class (#289): the custom states :state(sticky) /
  *      :state(compact) from their props, :state(collapsed) from its width, :state(menu-open) from its toggle.

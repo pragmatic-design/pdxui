@@ -42,6 +42,7 @@ const PORTED: Record<string, string> = {
     'pdx-split-button': 'src/split-button/pdx-split-button.pdx',
     'pdx-fab': 'src/fab/pdx-fab.pdx',
     'pdx-image': 'src/image/pdx-image.pdx',
+    'pdx-navbar': 'src/navbar/pdx-navbar.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',

@@ -20725,7 +20725,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/navbar/pdx-navbar.ts",
+      "path": "src/navbar/pdx-navbar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -20938,7 +20938,7 @@
           "name": "pdx-navbar",
           "declaration": {
             "name": "PdxNavbar",
-            "module": "src/navbar/pdx-navbar.ts"
+            "module": "src/navbar/pdx-navbar.pdx"
           }
         }
       ]
