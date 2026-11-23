@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/chip/pdx-chip.pdx';
-import '../../src/fab/pdx-fab';
+import '../../src/fab/pdx-fab.pdx';
 
 describe('pdx-chip\'s axes', () => {
     beforeEach(cleanup);

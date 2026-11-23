@@ -274,11 +274,6 @@
       "types": "./dist/pagination/pdx-pagination.d.ts",
       "import": "./dist/pagination/pdx-pagination.js"
     },
-    "./fab": {
-      "development": "./src/fab/pdx-fab.ts",
-      "types": "./dist/fab/pdx-fab.d.ts",
-      "import": "./dist/fab/pdx-fab.js"
-    },
     "./context-menu": {
       "development": "./src/context-menu/pdx-context-menu.ts",
       "types": "./dist/context-menu/pdx-context-menu.d.ts",
@@ -664,6 +659,11 @@
       "types": "./dist/split-button/pdx-split-button.d.ts",
       "import": "./dist/split-button/pdx-split-button.js"
     },
+    "./fab": {
+      "development": "./src/fab/pdx-fab.pdx",
+      "types": "./dist/fab/pdx-fab.d.ts",
+      "import": "./dist/fab/pdx-fab.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -671,6 +671,7 @@
     "dist/**/pdx-*.js",
     "dist/data-grid/grid-i18n.js",
     "dist/empty-state/empty-state-icons.js",
+    "dist/fab/fab-icons.js",
     "dist/field-list/field-list-strings.js",
     "dist/inline-edit/inline-edit-strings.js",
     "dist/search-input/search-input-icons.js",
@@ -680,6 +681,7 @@
     "src/**/pdx-*.ts",
     "src/data-grid/grid-i18n.ts",
     "src/empty-state/empty-state-icons.ts",
+    "src/fab/fab-icons.ts",
     "src/field-list/field-list-strings.ts",
     "src/inline-edit/inline-edit-strings.ts",
     "src/search-input/search-input-icons.ts",

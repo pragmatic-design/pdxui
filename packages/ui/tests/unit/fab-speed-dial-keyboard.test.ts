@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/fab/pdx-fab';
+import '../../src/fab/pdx-fab.pdx';
 
 type Fab = HTMLElement & { show(): void; close(): void };
 

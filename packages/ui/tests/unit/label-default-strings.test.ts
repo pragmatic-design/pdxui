@@ -12,7 +12,7 @@ import '../../src/split-button/pdx-split-button.pdx';
 import '../../src/scroll-area/pdx-scroll-area';
 import '../../src/progress/pdx-progress.pdx';
 import '../../src/rating/pdx-rating.pdx';
-import '../../src/fab/pdx-fab';
+import '../../src/fab/pdx-fab.pdx';
 import '../../src/file-upload/pdx-file-upload';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
