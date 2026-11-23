@@ -19945,7 +19945,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/menu/pdx-menu.ts",
+      "path": "src/menu/pdx-menu.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -20053,20 +20053,12 @@
           ],
           "events": [
             {
-              "name": "open-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `open`. Does not bubble.",
-              "detail": "{ value: boolean }"
-            },
-            {
               "name": "pdx-select",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when an item is selected.",
-              "detail": "{ key, item }"
+              "detail": "{ key: string; item: MenuItem }"
             },
             {
               "name": "pdx-check",
@@ -20074,7 +20066,15 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-check`.",
-              "detail": "{ key, checked, item } | { key, checked, radioGroup, item }"
+              "detail": "{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }"
+            },
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -20181,7 +20181,7 @@
           "name": "pdx-menu",
           "declaration": {
             "name": "PdxMenu",
-            "module": "src/menu/pdx-menu.ts"
+            "module": "src/menu/pdx-menu.pdx"
           }
         }
       ]

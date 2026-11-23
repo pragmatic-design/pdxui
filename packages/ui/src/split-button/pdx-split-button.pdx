@@ -11,7 +11,7 @@
 // Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
 import { focusGroup, onDestroy, onNextFrame, untracked } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
-import type { MenuItem } from '../menu/pdx-menu';
+import type { MenuItem } from '../menu/menu-types';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString } from '../shared/i18n';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';

@@ -80,7 +80,7 @@
 import { generatedId, getLocale } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { missing, isComplete, withText, orderCultures, cultureName, directionOf, regionOf, type LocalizedText, type RequiredScope } from './localized-text';
-import type { MenuItem } from '../menu/pdx-menu';
+import type { MenuItem } from '../menu/menu-types';
 import '@pdxui/design/components/localized-input';
 
 /** The text, by culture code. A culture with no entry, or an empty one, is missing; the form submits the JSON. */

@@ -5,7 +5,7 @@
 
 import { component, html, signal, focusGroup, onDestroy, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
-import type { MenuItem } from '../menu/pdx-menu';
+import type { MenuItem } from '../menu/menu-types';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';

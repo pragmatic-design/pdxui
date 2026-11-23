@@ -21,7 +21,7 @@ A list of actions.
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 | `closeSubmenu()` | Close only the open submenu, leaving the menu itself open. |
 
-**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-check` → `detail: { key, checked, item } | { key, checked, radioGroup, item }` — Fired on `pdx-check`.; `pdx-select` → `detail: { key, item }` — Fired when an item is selected.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-check` → `detail: { key: string; checked: boolean; radioGroup?: string; item: MenuItem }` — Fired on `pdx-check`.; `pdx-select` → `detail: { key: string; item: MenuItem }` — Fired when an item is selected.
 
 **Renders:** roles `menu` · `menuitem` · `menuitemcheckbox` · `menuitemradio` · `presentation` · `separator`
 
