@@ -1,0 +1,64 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A collapsible sidebar container for a pdx-nav-menu or any content, expanded, collapsed or mini
+ * (icon-only).
+ *
+ * @cssstate collapsed - `open` is off: no width, or the icon rail when `mini`.
+ * @cssstate mini - Collapsed as an icon rail, `collapsedWidth` wide.
+ */
+// pdx-sidebar — Collapsible sidebar container. Wraps pdx-nav-menu or any content.
+// Supports: expanded/collapsed/mini modes, header/footer slots, responsive.
+import { onNextFrame } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/sidebar';
+
+// `open` is the app's to write — the sidebar has no toggle of its own — so it is a prop, not a
+// model; it draws nothing of its own, so it has no parts. sidebar.css lays it out from its tag and
+// these states, as it does `.pdx-sidebar` in CSS-only markup (#289).
+@state collapsed = !open;
+@state mini = !!mini && !open;
+// The axis sidebar.css keys by (#633), reflected on the host and drawn from it; the host is the
+// element the old `.pdx-sidebar-right` class went on, so no native class is kept.
+@variants {
+  /** The edge it sits on: left (the default) or right. */
+  position: { left, right } = left;
+}
+/** Sidebar open/expanded state */
+@prop open: boolean = true;
+/** Mini mode: show only icons when collapsed */
+@prop mini: boolean = false;
+/** Width when expanded (px) */
+@prop width: number = 260;
+/** Width when collapsed/mini (px) */
+@prop collapsedWidth: number = 60;
+@host el;
+
+// A frame after mount, its landmark.
+onNextFrame(() => {
+  el.setAttribute('role', 'complementary');
+  uiAttr(el, 'aria-label', () => uiString('sidebar', 'label'));
+});
+
+// Its width a frame after each change, and the collapse handed to the nav menus inside it.
+$effect(() => {
+  const isOpen = open as boolean;
+  const isMini = mini as boolean;
+  const full = width as number;
+  const rail = collapsedWidth as number;
+  requestAnimationFrame(() => {
+    const currentWidth = isOpen ? full : (isMini ? rail : 0);
+    el.style.width = currentWidth + 'px';
+    el.style.minWidth = currentWidth + 'px';
+
+    // Propagate collapsed to inner pdx-nav-menu
+    el.querySelectorAll('pdx-nav-menu').forEach((nm) => {
+      const menu = nm as HTMLElement & { collapsed?: boolean };
+      if (menu.collapsed !== undefined) menu.collapsed = !isOpen && isMini;
+    });
+  });
+});
+</script>

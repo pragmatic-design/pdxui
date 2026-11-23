@@ -27531,7 +27531,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/sidebar/pdx-sidebar.ts",
+      "path": "src/sidebar/pdx-sidebar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -27677,7 +27677,7 @@
           "name": "pdx-sidebar",
           "declaration": {
             "name": "PdxSidebar",
-            "module": "src/sidebar/pdx-sidebar.ts"
+            "module": "src/sidebar/pdx-sidebar.pdx"
           }
         }
       ]

@@ -1,0 +1,137 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSidebar",
+  "tagName": "pdx-sidebar",
+  "category": "Navigation",
+  "order": 55,
+  "description": "A collapsible sidebar container for a pdx-nav-menu or any content, expanded, collapsed or mini\n(icon-only).",
+  "members": [
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Sidebar open/expanded state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "open"
+    },
+    {
+      "kind": "field",
+      "name": "mini",
+      "description": "Mini mode: show only icons when collapsed",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "mini"
+    },
+    {
+      "kind": "field",
+      "name": "width",
+      "description": "Width when expanded (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "260",
+      "attribute": "width"
+    },
+    {
+      "kind": "field",
+      "name": "collapsedWidth",
+      "description": "Width when collapsed/mini (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "60",
+      "attribute": "collapsedwidth"
+    },
+    {
+      "kind": "field",
+      "name": "position",
+      "description": "The edge it sits on: left (the default) or right.",
+      "type": {
+        "text": "'left' | 'right'"
+      },
+      "default": "'left'",
+      "attribute": "position"
+    }
+  ],
+  "variants": [
+    {
+      "name": "position",
+      "values": [
+        "left",
+        "right"
+      ],
+      "default": "left"
+    }
+  ],
+  "roles": [
+    "complementary"
+  ],
+  "attributes": [
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Sidebar open/expanded state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "mini",
+      "fieldName": "mini",
+      "description": "Mini mode: show only icons when collapsed",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "width",
+      "fieldName": "width",
+      "description": "Width when expanded (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "260"
+    },
+    {
+      "name": "collapsedwidth",
+      "fieldName": "collapsedWidth",
+      "description": "Width when collapsed/mini (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "60"
+    },
+    {
+      "name": "position",
+      "fieldName": "position",
+      "description": "The edge it sits on: left (the default) or right.",
+      "type": {
+        "text": "'left' | 'right'"
+      },
+      "default": "'left'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "collapsed",
+      "description": "`open` is off: no width, or the icon rail when `mini`."
+    },
+    {
+      "name": "mini",
+      "description": "Collapsed as an icon rail, `collapsedWidth` wide."
+    }
+  ]
+}

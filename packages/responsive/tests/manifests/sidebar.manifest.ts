@@ -2,7 +2,7 @@
  * MANIFEST — pdx-sidebar (Tier 6 — layout/navigation)
  *
  * Contracts written by inspecting:
- *  - source: packages/ui/src/sidebar/pdx-sidebar.ts
+ *  - source: packages/ui/src/sidebar/pdx-sidebar.pdx
  *      Light DOM, render: <slot></slot> (no inner wrapper).
  *      In an rAF (on ctx.track's first run) it adds ON THE HOST <pdx-sidebar>:
  *        - role="complementary"
