@@ -8,7 +8,7 @@ import '../../src/checkbox-group/pdx-checkbox-group.pdx';
 import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/input-group/pdx-input-group.pdx';
 import '../../src/button-group/pdx-button-group.pdx';
-import '../../src/statistic/pdx-statistic';
+import '../../src/statistic/pdx-statistic.pdx';
 
 async function frames(n = 3): Promise<void> {
     for (let i = 0; i < n; i++) await new Promise(r => requestAnimationFrame(r));

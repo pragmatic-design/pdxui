@@ -100,7 +100,7 @@ import './kanban/pdx-kanban.pdx';
 import './scheduler/pdx-scheduler.pdx';
 import './description-list/pdx-description-list';
 import './timeline/pdx-timeline';
-import './statistic/pdx-statistic';
+import './statistic/pdx-statistic.pdx';
 import './empty-state/pdx-empty-state.pdx';
 import './image/pdx-image';
 import './carousel/pdx-carousel';

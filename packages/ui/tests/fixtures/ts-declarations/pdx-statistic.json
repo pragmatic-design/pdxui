@@ -1,0 +1,342 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxStatistic",
+  "tagName": "pdx-statistic",
+  "category": "Data Display",
+  "order": 85,
+  "description": "Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "Label text above the value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Main display value",
+      "type": {
+        "text": "string"
+      },
+      "default": "'0'",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "prefix",
+      "description": "Text/symbol before value (e.g. '$')",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "prefix"
+    },
+    {
+      "kind": "field",
+      "name": "suffix",
+      "description": "Text/symbol after value (e.g. '%')",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "suffix"
+    },
+    {
+      "kind": "field",
+      "name": "icon",
+      "description": "Icon name (left of title)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "icon",
+      "iconName": true
+    },
+    {
+      "kind": "field",
+      "name": "trend",
+      "description": "Trend direction: 'up' | 'down' | 'flat' | ''",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "trend"
+    },
+    {
+      "kind": "field",
+      "name": "trendValue",
+      "description": "Trend text e.g. '+12.5%'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "trendvalue"
+    },
+    {
+      "kind": "field",
+      "name": "trendColor",
+      "description": "Auto-color trend (green up, red down)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "trendcolor"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show skeleton placeholder",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "precision",
+      "description": "Decimal places for formatting (-1 = no format)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "precision"
+    },
+    {
+      "kind": "field",
+      "name": "groupSeparator",
+      "description": "Thousands separator",
+      "type": {
+        "text": "string"
+      },
+      "default": "','",
+      "attribute": "groupseparator"
+    },
+    {
+      "kind": "field",
+      "name": "compareValue",
+      "description": "Comparison/previous value (shown muted below main value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "comparevalue"
+    },
+    {
+      "kind": "field",
+      "name": "compareLabel",
+      "description": "Compare label (e.g. \"vs last month\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "comparelabel"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Description text below value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "Label text above the value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "Main display value",
+      "type": {
+        "text": "string"
+      },
+      "default": "'0'"
+    },
+    {
+      "name": "prefix",
+      "fieldName": "prefix",
+      "description": "Text/symbol before value (e.g. '$')",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "suffix",
+      "fieldName": "suffix",
+      "description": "Text/symbol after value (e.g. '%')",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "icon",
+      "fieldName": "icon",
+      "description": "Icon name (left of title)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "trend",
+      "fieldName": "trend",
+      "description": "Trend direction: 'up' | 'down' | 'flat' | ''",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "trendvalue",
+      "fieldName": "trendValue",
+      "description": "Trend text e.g. '+12.5%'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "trendcolor",
+      "fieldName": "trendColor",
+      "description": "Auto-color trend (green up, red down)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show skeleton placeholder",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "precision",
+      "fieldName": "precision",
+      "description": "Decimal places for formatting (-1 = no format)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "groupseparator",
+      "fieldName": "groupSeparator",
+      "description": "Thousands separator",
+      "type": {
+        "text": "string"
+      },
+      "default": "','"
+    },
+    {
+      "name": "comparevalue",
+      "fieldName": "compareValue",
+      "description": "Comparison/previous value (shown muted below main value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "comparelabel",
+      "fieldName": "compareLabel",
+      "description": "Compare label (e.g. \"vs last month\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Description text below value",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "icon",
+      "description": "The icon beside the title."
+    },
+    {
+      "name": "title",
+      "description": "The label above the value."
+    },
+    {
+      "name": "value",
+      "description": "The number, between its prefix and suffix."
+    },
+    {
+      "name": "trend",
+      "description": "The trend line: its arrow and text."
+    },
+    {
+      "name": "description",
+      "description": "The description below the value."
+    },
+    {
+      "name": "compare",
+      "description": "The comparison with a previous value."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "`loading` is set: skeletons in place of the value, and the host `aria-busy`."
+    }
+  ]
+}

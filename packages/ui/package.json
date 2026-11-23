@@ -294,11 +294,6 @@
       "types": "./dist/block-ui/pdx-block-ui.d.ts",
       "import": "./dist/block-ui/pdx-block-ui.js"
     },
-    "./statistic": {
-      "development": "./src/statistic/pdx-statistic.ts",
-      "types": "./dist/statistic/pdx-statistic.d.ts",
-      "import": "./dist/statistic/pdx-statistic.js"
-    },
     "./description-list": {
       "development": "./src/description-list/pdx-description-list.ts",
       "types": "./dist/description-list/pdx-description-list.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/empty-state/pdx-empty-state.pdx",
       "types": "./dist/empty-state/pdx-empty-state.d.ts",
       "import": "./dist/empty-state/pdx-empty-state.js"
+    },
+    "./statistic": {
+      "development": "./src/statistic/pdx-statistic.pdx",
+      "types": "./dist/statistic/pdx-statistic.d.ts",
+      "import": "./dist/statistic/pdx-statistic.js"
     },
     "./package.json": "./package.json"
   },
