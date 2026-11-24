@@ -21,7 +21,7 @@ import {
     routeTitleOf,
 } from './script-analyzer-helpers';
 import { readLoaderOptions } from './loader-options';
-import { readModelOptions, attributeReadingIsAmbiguous, ATTRIBUTE_READINGS } from './model-options';
+import { readModelOptions, propOptionsOf, attributeReadingIsAmbiguous, ATTRIBUTE_READINGS } from './model-options';
 import { maskNonCode, skipNonCode, findClosing, splitAtDepthZero } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
@@ -414,7 +414,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             // and the default are read, which would otherwise swallow them. `{ form: () => expr }`
             // (#751) also says what the form submits when it is not the model, and `{ attribute: x }`
             // (#753) how the attribute is read, apart from the type (model-options.ts).
-            const modelOptions = rune === 'model' ? readModelOptions(trimmed) : null;
+            // A `@prop` takes `{ attribute: x }` alone (#1347): `form` and `missing` are a model's, and
+            // a last group holding them is the prop's default, the object it reads as (`= { form }`).
+            const modelOptions = rune === 'model' ? readModelOptions(trimmed) : propOptionsOf(trimmed);
             const options = modelOptions?.options;
             // The expression becomes a statement of the setup: rewritten as the script is, and read by
             // core's form wiring whenever what it reads changes. Kept for the end of the body, so it may
@@ -454,15 +456,20 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     warnings.push({
                         code: 'PDX_MODEL_ATTRIBUTE_UNKNOWN',
                         severity: 'error',
-                        message: `@model '${name}' reads its attribute as '${options.attribute}', which is not one of string, number, boolean, json.`,
+                        message: `@${rune} '${name}' reads its attribute as '${options.attribute}', which is not one of string, number, boolean, json.`,
                         hint: `Write { attribute: string }, number, boolean or json.`,
                     });
-                } else if (rune === 'model' && options?.attribute === undefined && attributeReadingIsAmbiguous(tsType)) {
+                } else if (options?.attribute === undefined && attributeReadingIsAmbiguous(tsType)) {
+                    // A model's attribute is read as JSON. A prop's is an Object prop's (#960): not
+                    // observed, the one present at mount read as JSON, and nothing said so (#1347).
+                    const said = rune === 'model'
+                        ? 'so the type alone does not say how its attribute is read; it is read as JSON.'
+                        : 'so the type alone does not say how its attribute is read; it is not observed: one present at mount is read as JSON, and a later change sets nothing.';
                     warnings.push({
-                        code: 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS',
+                        code: rune === 'model' ? 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS' : 'PDX_PROP_ATTRIBUTE_AMBIGUOUS',
                         severity: 'warn',
-                        message: `@model '${name}': its type, '${tsType}', unites values whose attribute is read differently, so the type alone does not say how its attribute is read; it is read as JSON.`,
-                        hint: `Say how: @model ${name}: ${tsType}${defaultVal !== undefined ? ` = ${defaultVal}` : ''} { attribute: string }; (or number, boolean, json).`,
+                        message: `@${rune} '${name}': its type, '${tsType}', unites values whose attribute is read differently, ${said}`,
+                        hint: `Say how: @${rune} ${name}: ${tsType}${defaultVal !== undefined ? ` = ${defaultVal}` : ''} { attribute: string }; (or number, boolean, json).`,
                     });
                 }
                 props.push({

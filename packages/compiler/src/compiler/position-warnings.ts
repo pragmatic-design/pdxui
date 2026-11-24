@@ -114,6 +114,7 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_PROP_INVALID_TYPE':
         case 'PDX_PROP_TYPE_MISMATCH':
         case 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS':
+        case 'PDX_PROP_ATTRIBUTE_AMBIGUOUS':
         case 'PDX_MODEL_ATTRIBUTE_UNKNOWN':
             // `@prop(icon) name` (#1317) is found as `@prop name` is.
             return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+${escape(name)}\\b`)) : undefined;

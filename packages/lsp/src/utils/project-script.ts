@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { analyzeScript, DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
+import { analyzeScript, DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, propOptionsOf, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -180,13 +180,14 @@ export function projectScriptMapped(
             // Match: the name and the `?` after it. Groups: [1]=up to the `?`
             const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(afterKw));
             if (optional) out[afterKw + optional[1].length] = ' ';
-            if (kw === 'model') {
+            if (kw === 'model' || kw === 'prop') {
                 // `@model name: T = d { form }` (#135), `{ form: () => expr }` (#751) or
-                // `{ attribute: string }` (#753): the options are no TypeScript, so they are blanked, as
-                // far as the compiler's own reader takes them (readModelOptions).
+                // `{ attribute: string }` (#753), and a prop's `{ attribute: string }` (#1347): the options
+                // are no TypeScript, so they are blanked, as far as the compiler's own reader takes them
+                // (readModelOptions, propOptionsOf).
                 const lineEnd = s.indexOf('\n', m.index);
                 const line = s.slice(m.index, lineEnd < 0 ? s.length : lineEnd);
-                const options = readModelOptions(line);
+                const options = kw === 'model' ? readModelOptions(line) : propOptionsOf(line);
                 if (options) {
                     const end = withoutStatementEnd(line).length;
                     for (let o = options.start; o < end; o++) out[m.index + o] = ' ';

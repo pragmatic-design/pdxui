@@ -162,6 +162,8 @@ whether missing is an error. When the type unites values the
 attribute reads differently — a select's `string | string[] | null` — say how the attribute is read:
 `{ attribute: string }` (or `number`, `boolean`, `json`; beside `form`, comma-separated). Without it
 such a union reads the attribute as JSON (`value="1"` is the number 1), `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`.
+A `@prop` takes the same option alone, `@prop columns: number | 'auto' = 3 { attribute: string };`:
+without it such a prop does not observe its attribute, `PDX_PROP_ATTRIBUTE_AMBIGUOUS`.
 
 **A button that runs a component's method needs no script**: every `@expose`d method is an invoker
 command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The

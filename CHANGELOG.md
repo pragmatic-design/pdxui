@@ -11,6 +11,12 @@ semver.
 
 ### Features
 
+- `@prop … { attribute: string }` (or `number`, `boolean`, `json`) says how a prop's attribute is read,
+  apart from its type, as on a `@model` (#1347): `@prop columns: number | 'auto' = 3 { attribute: string };`
+  reads `columns="2"` as `'2'` and keeps `number | 'auto'` in the `.d.ts` and the manifest. A prop whose
+  type unites values read differently, with no option, is `PDX_PROP_ATTRIBUTE_AMBIGUOUS`: it did not
+  observe its attribute, and nothing said so.
+
 - `@pdxui/ui`'s browser build serves the parts of core's API a page that drives the components calls
   (#1203): `dist/browser/core/reactivity.js` and `dist/browser/core/i18n.js`. A page that loads one
   button and takes `signal` from `core.js` downloads all of core's API, 131 KB gzip; from

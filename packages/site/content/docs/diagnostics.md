@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 119 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 120 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1048,9 +1048,9 @@ write:
 
 ### PDX_MODEL_ATTRIBUTE_UNKNOWN
 
-*error* — A `@model`'s `{ attribute: … }` names a reading that does not exist.
+*error* — A `@model`'s or a `@prop`'s `{ attribute: … }` names a reading that does not exist.
 
-An attribute is read as `string`, `number`, `boolean` or `json`; any other word leaves the model with no reading to compile (#753).
+An attribute is read as `string`, `number`, `boolean` or `json`; any other word leaves the model or the prop with no reading to compile (#753, #1347).
 
 **Fix.** `{ attribute: string }`, `number`, `boolean` or `json`.
 
@@ -1407,6 +1407,36 @@ write:
 </template>
 <script>
 let count = $signal(0);
+</script>
+```
+
+### PDX_PROP_ATTRIBUTE_AMBIGUOUS
+
+*warn* — A `@prop`'s type unites values whose attribute is read differently, so its attribute is not observed.
+
+A prop of `number | 'auto'` is an Object prop (#960): its attribute is not observed, so a change of `columns` after mount sets nothing, the one present at mount is read as JSON (`"2"` as the number 2), and the manifest lists no attribute for it. The type cannot say whether the attribute is a string, a number or a boolean when it unites several of them (#1347). A union with an object type, `DataSource<T> | null`, is a property by intent and is not reported.
+
+**Fix.** Say how the attribute is read: `@prop columns: number | 'auto' = 3 { attribute: string };`
+
+Instead of:
+
+```html
+<template>
+  <p>{{ columns }}</p>
+</template>
+<script>
+@prop columns: number | 'auto' = 3;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ columns }}</p>
+</template>
+<script>
+@prop columns: number | 'auto' = 3 { attribute: string };
 </script>
 ```
 

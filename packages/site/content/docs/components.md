@@ -330,6 +330,10 @@ The reading is `string`, `number`, `boolean` or `json`, beside `form` and comma-
 `{ attribute: string, form }`. A union like that with no option is `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`. In
 TypeScript: `model<string | string[] | null>(null, { type: String })`.
 
+A `@prop` takes the same option, alone: `@prop columns: number | 'auto' = 3 { attribute: string };`
+reads `columns="2"` as the string `'2'` and keeps `number | 'auto'` as the type. Without it such a prop
+does not observe its attribute, `PDX_PROP_ATTRIBUTE_AMBIGUOUS`. In TypeScript: `prop(3, { type: String })`.
+
 ## @event — what a component communicates
 
 A component shouldn't know *what* the parent does when something happens: it just **emits an event**.
