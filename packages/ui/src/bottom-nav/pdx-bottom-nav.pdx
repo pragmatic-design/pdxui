@@ -1,0 +1,122 @@
+<template></template>
+
+<script>
+/**
+ * A mobile tab bar fixed at the bottom of the screen, with three to five items that carry icons and
+ * optional badges.
+ *
+ * @csspart bar - The row of items.
+ * @csspart item - An item, a button; the current one is `aria-current="page"`.
+ * @csspart icon - An item's icon, and the badge over it.
+ * @csspart badge - An item's count.
+ * @csspart label - An item's text.
+ * @cssstate ready - Its bar is drawn, pinned to the bottom of the viewport.
+ */
+// pdx-bottom-nav — Mobile bottom tab bar. Fixed at bottom, 3-5 items with icons.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it.
+import { uiString, format, uiAttr } from '../shared/i18n';
+import type { BottomNavItem } from './bottom-nav-types';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/bottom-nav';
+import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+
+// `activeKey` is the app's to write, never the bar's: a prop, not a model (#289).
+/** An item was chosen: its `key` and its item. */
+@event 'pdx-select': { key: string; item: BottomNavItem };
+// A state, not a class (#289): bottom-nav.css pins the bar from it.
+@state ready = isReady;
+// Every element is built by the script, a frame after mount (#1284).
+@part(external) bar, item, icon, badge, label;
+@prop items: unknown[] = [];
+@prop activeKey: string = '';
+@host el;
+
+let isReady = $signal(false);
+let built = false;
+
+function buildItems(list: BottomNavItem[], current: string): void {
+  const bar = el.querySelector('.pdx-bottom-nav-bar') || document.createElement('div');
+  bar.className = 'pdx-bottom-nav-bar';
+  bar.setAttribute('data-part', 'bar');
+  bar.innerHTML = '';
+
+  for (const entry of list) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pdx-bottom-nav-item';
+    btn.setAttribute('data-part', 'item');
+    // The active tab is its aria-current, which bottom-nav.css selects: no class (#289).
+    if (entry.key === current) btn.setAttribute('aria-current', 'page');
+    btn.setAttribute('data-nav-key', entry.key);
+
+    // Icon
+    const iconWrap = document.createElement('span');
+    iconWrap.className = 'pdx-bottom-nav-icon';
+    iconWrap.setAttribute('data-part', 'icon');
+    const glyph = document.createElement('pdx-icon');
+    glyph.setAttribute('name', entry.icon);
+    glyph.setAttribute('size', '22');
+    iconWrap.appendChild(glyph);
+
+    // Badge
+    if (entry.badge) {
+      const count = document.createElement('span');
+      count.className = 'pdx-bottom-nav-badge';
+      count.setAttribute('data-part', 'badge');
+      if (entry.badgeVariant && entry.badgeVariant !== 'default') {
+        count.classList.add('pdx-bottom-nav-badge-' + entry.badgeVariant);
+      }
+      count.textContent = entry.badge;
+      iconWrap.appendChild(count);
+      // The name holds what is shown, in the order shown (WCAG 2.5.3, label in name, #1154):
+      // the badge is drawn in the icon, before the label, so "3 Messages". Captured, not
+      // read in the closure: the count this name describes is the one rendered above it,
+      // and the narrowing from `if (entry.badge)` does not survive a callback that runs
+      // again on a locale change.
+      const badgeText = entry.badge;
+      uiAttr(btn, 'aria-label', () => format(uiString('bottom-nav', 'badge'), { label: entry.label, badge: badgeText }));
+    }
+
+    btn.appendChild(iconWrap);
+    // A space between the badge and the label, so the text reads "3 Messages", not
+    // "3Messages". The button is a flex container: the space is not laid out.
+    if (entry.badge) btn.appendChild(document.createTextNode(' '));
+
+    // Label
+    const text = document.createElement('span');
+    text.className = 'pdx-bottom-nav-label';
+    text.setAttribute('data-part', 'label');
+    text.textContent = entry.label;
+    btn.appendChild(text);
+
+    btn.addEventListener('click', () => {
+      pdxSelect({ key: entry.key, item: entry });
+    });
+
+    bar.appendChild(btn);
+  }
+
+  if (!el.contains(bar)) el.appendChild(bar);
+}
+
+// Its items a frame after mount and after each change, as the TypeScript version built them.
+$effect(() => {
+  const list = items as BottomNavItem[];
+  const current = activeKey as string;
+
+  if (!built) {
+    built = true;
+    requestAnimationFrame(() => {
+      isReady = true;
+      el.setAttribute('role', 'navigation');
+      uiAttr(el, 'aria-label', () => uiString('bottom-nav', 'label'));
+      buildItems(list, current);
+    });
+    return;
+  }
+
+  requestAnimationFrame(() => buildItems(list, current));
+});
+</script>

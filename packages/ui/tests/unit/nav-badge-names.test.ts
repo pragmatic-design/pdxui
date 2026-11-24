@@ -9,7 +9,7 @@
 //   click handler named "…" that takes no focus, and Enter expands the path.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/bottom-nav/pdx-bottom-nav';
+import '../../src/bottom-nav/pdx-bottom-nav.pdx';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/breadcrumb/pdx-breadcrumb';
 

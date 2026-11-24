@@ -67,7 +67,7 @@ import './wizard/pdx-wizard';
 // Tier 1D: Navigation
 import './navbar/pdx-navbar.pdx';
 import './sidebar/pdx-sidebar.pdx';
-import './bottom-nav/pdx-bottom-nav';
+import './bottom-nav/pdx-bottom-nav.pdx';
 import './nav-menu/pdx-nav-menu';
 import './menubar/pdx-menubar';
 import './menu/pdx-menu.pdx';

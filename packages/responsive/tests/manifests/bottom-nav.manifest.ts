@@ -2,7 +2,7 @@
  * MANIFEST — pdx-bottom-nav (Tier 6)
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/bottom-nav/pdx-bottom-nav.ts
+ *  - source: packages/ui/src/bottom-nav/pdx-bottom-nav.pdx
  *      HOST <pdx-bottom-nav> → in an rAF it takes the custom state :state(ready) (#289; it was the
  *      class .pdx-bottom-nav) + role="navigation" + aria-label="Bottom navigation". Inside it, it
  *      creates an INNER <div class="pdx-bottom-nav-bar"> with N <button type="button" class="pdx-bottom-nav-item">.
