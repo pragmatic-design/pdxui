@@ -7,7 +7,7 @@ import { cleanup, mount, tick } from './helpers';
 import '../../src/form/pdx-form.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/form-actions/pdx-form-actions.pdx';
-import '../../src/form-section/pdx-form-section';
+import '../../src/form-section/pdx-form-section.pdx';
 
 // ─── pdx-form ─────────────────────────────────────────────────
 

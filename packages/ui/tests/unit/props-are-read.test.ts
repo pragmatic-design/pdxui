@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describeComponent } from '@pdxui/compiler';
+import { NOT_READ } from './props-not-read';
 
 const SRC = join(__dirname, '..', '..', 'src');
 const FORM_MODEL = join(__dirname, '..', '..', '..', 'core', 'src', 'form', 'form-model.ts');
@@ -35,11 +36,6 @@ const READ_BY_FORM_MODEL: Record<string, RegExp> = {
 /** Whether a module declares a model `{ form: true }`, which core wires to its form. */
 const declaresFormModel = (src: string): boolean => /\bform:\s*(?:true|wireFormModel)\b/.test(src);
 
-/** Props a component declares and deliberately does not read, by `tag.prop`, with the reason. */
-const NOT_READ: Record<string, string> = {
-    // An identifying attribute, like `name` on a native <fieldset>: the page queries it, the component does not.
-    'pdx-form-section.name': 'identifies the section to the page',
-};
 
 function sourceFiles(dir: string): string[] {
     const out: string[] = [];

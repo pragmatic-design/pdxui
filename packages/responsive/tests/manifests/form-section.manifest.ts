@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-form-section
  *
- * Contracts written by inspecting the SOURCE (packages/ui/src/form-section/pdx-form-section.ts)
+ * Contracts written by inspecting the SOURCE (packages/ui/src/form-section/pdx-form-section.pdx)
  * and the CSS (packages/design/src/components/form.css, the "pdx-form-section" block, lines 24-62).
  *
  * ⚠️ IT DIVERGES from the brief: the component has NO `title`/`description`/`collapsible` props.

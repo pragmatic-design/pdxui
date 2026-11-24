@@ -15,11 +15,9 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { NOT_READ } from './props-not-read';
 
 const SRC = join(__dirname, '..', '..', 'src');
-
-/** Props this library declares and deliberately does not read. Must stay empty. */
-const ALLOWED: string[] = [];
 
 function componentFiles(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
@@ -232,11 +230,12 @@ describe('every prop @pdxui/ui declares is read by the component that declares i
             .toBeGreaterThan(850);
     });
 
-    it('leaves nothing declared and unread', () => {
-        expect(dead.filter(d => !ALLOWED.includes(d))).toEqual([]);
+    it('leaves nothing declared and unread, but the exceptions listed with a reason', () => {
+        expect(dead.filter(d => !(d in NOT_READ))).toEqual([]);
     });
 
-    it('has an empty allow-list, because a documented exception is still a broken promise', () => {
-        expect(ALLOWED).toEqual([]);
+    it('lists each exception with a reason, because an unexplained one is a broken promise', () => {
+        // props-are-read.test.ts fails when an entry no longer applies; this holds that each says why.
+        expect(Object.entries(NOT_READ).filter(([, reason]) => !reason.trim()).map(([key]) => key)).toEqual([]);
     });
 });

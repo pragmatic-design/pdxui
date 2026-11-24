@@ -19,16 +19,20 @@ const DESIGN_EXPORTS = Object.keys(
     (JSON.parse(readFileSync(join(UI, '../design/package.json'), 'utf-8')) as { exports: Record<string, unknown> }).exports,
 );
 
-/** `src/accordion/pdx-accordion.ts` → the `@pdxui/design/...` specifiers it imports for their side effect. */
+/**
+ * `src/accordion/pdx-accordion.ts` → the `@pdxui/design/...` specifiers it imports for their side effect.
+ * A component written in .pdx (#1210) imports them in its script and is built to the same `.js` path,
+ * so it is read too: reading only `.ts` let every moved component leave this check unannounced.
+ */
 function designImports(): Map<string, string[]> {
     const found = new Map<string, string[]>();
     const walk = (dir: string): void => {
         for (const name of readdirSync(dir)) {
             const path = join(dir, name);
             if (statSync(path).isDirectory()) { walk(path); continue; }
-            if (!path.endsWith('.ts')) continue;
+            if (!path.endsWith('.ts') && !path.endsWith('.pdx')) continue;
             const specs = [...readFileSync(path, 'utf-8').matchAll(/^import\s+['"](@pdxui\/design[^'"]*)['"]/gm)].map((m) => m[1]);
-            if (specs.length) found.set(relative(SRC, path).split(sep).join('/').replace(/\.ts$/, '.js'), specs);
+            if (specs.length) found.set(relative(SRC, path).split(sep).join('/').replace(/\.(ts|pdx)$/, '.js'), specs);
         }
     };
     walk(SRC);
