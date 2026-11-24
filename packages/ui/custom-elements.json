@@ -12785,7 +12785,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/error-boundary/pdx-error-boundary.ts",
+      "path": "src/error-boundary/pdx-error-boundary.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -12942,7 +12942,7 @@
           "name": "pdx-error-boundary",
           "declaration": {
             "name": "PdxErrorBoundary",
-            "module": "src/error-boundary/pdx-error-boundary.ts"
+            "module": "src/error-boundary/pdx-error-boundary.pdx"
           }
         }
       ]

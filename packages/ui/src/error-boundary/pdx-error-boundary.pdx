@@ -1,0 +1,97 @@
+<template>
+  @try { maxRetries: maxRetries, autoRetry: autoRetry, retryDelay: retryDelay, onError: failed, onRecover: recovered } {
+    <slot></slot>
+  } @catch (err, retry) {
+    @let held = holdRetry(retry);
+    <div class="pdx-error-boundary" role="alert" data-part="fallback">
+      <div class="pdx-error-boundary-icon">⚠</div>
+      <div class="pdx-error-boundary-message" data-part="message">{{ fallbackMessage || uiString('error-boundary', 'message') }}</div>
+      <div class="pdx-error-boundary-detail pdx-txt-small pdx-ink-muted" data-part="detail">{{ err instanceof Error ? err.message : String(err) }}</div>
+      @if (canRetry()) {
+        <button class="pdx-outline" size="sm" data-part="retry" @click="held()">{{ uiString('error-boundary', 'retry') }}</button>
+      } @else {
+        <span class="pdx-txt-small pdx-ink-muted" data-part="retry">{{ uiString('error-boundary', 'maxRetries') }}</span>
+      }
+    </div>
+  }
+</template>
+
+<script>
+/**
+ * Catches render errors and effect failures from its children and shows a fallback UI with retry.
+ *
+ * @csspart fallback - The fallback shown in place of the children (`role="alert"`).
+ * @csspart message - The fallback's message: `fallbackMessage`, or the component string.
+ * @csspart detail - The error's own message, under it.
+ * @csspart retry - The Retry button, while retries are left; the note that none are, after.
+ *
+ * @cssstate error - A child threw: the fallback shows. Cleared when Retry brings the children back.
+ */
+// pdx-error-boundary — Declarative error boundary component.
+// Catches errors from children (render + effects) and displays fallback UI.
+// Provides error state to descendants via Context Protocol.
+//
+// Usage:
+//   <pdx-error-boundary>
+//     <app-risky-widget />
+//   </pdx-error-boundary>
+//
+//   <pdx-error-boundary max-retries="3" auto-retry>
+//     <pdx-data-heavy-panel />
+//   </pdx-error-boundary>
+//
+// The boundary is the template's @try (#1365): the props are its options, the children it projects
+// are kept across a retry by core's boundary, and `onRecover` clears the error when they come back.
+import { computed, provide, signal } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import { ErrorContext } from './error-context';
+// The entry `@pdxui/ui/error-boundary` gives the context token as well as the element (#1352).
+export { ErrorContext } from './error-context';
+
+/** A child threw; the error, and how many retries have been made. */
+@event 'pdx-error': { error: Error; retryCount: number };
+// On the host as a custom state (#132, #290): a page can tell a failed boundary from outside it.
+@state error = currentError() !== null;
+@part fallback, message, detail, retry;
+/** Maximum retries before permanent fallback. 0 = no retry. Default: 3. */
+@prop maxRetries: number = 3;
+/** Auto-retry on error (no user action needed). Default: false. */
+@prop autoRetry: boolean = false;
+/** Delay between auto-retries in ms. Default: 1000. */
+@prop retryDelay: number = 1000;
+/** The fallback's message. Empty: the error-boundary.message component string, «Something went wrong.». */
+@prop fallbackMessage: string = '';
+@host host;
+
+// Signals by hand, not $signal: the context hands the signals themselves to the components inside,
+// and the template calls them.
+const currentError = signal<Error | null>(null);
+const retryCount = signal(0);
+const canRetry = computed(() => retryCount() < (maxRetries as number));
+/** The boundary's retry, handed to the fallback each time it shows: what the context's `retry` calls. */
+let boundaryRetry: (() => void) | null = null;
+
+function retry(): void {
+  if (boundaryRetry && canRetry()) boundaryRetry();
+}
+
+// Provide error context to descendants
+const errorContext: ErrorContext = { error: currentError, retryCount, canRetry, retry };
+provide(ErrorContext, errorContext, host);
+
+/** The fallback's retry, kept for the context: the fallback is rendered with it. */
+function holdRetry(fn: () => void): () => void {
+  boundaryRetry = fn;
+  return fn;
+}
+
+function failed(error: Error, count: number): void {
+  currentError.set(error);
+  retryCount.set(count);
+  pdxError({ error, retryCount: count });
+}
+
+function recovered(): void {
+  currentError.set(null);
+}
+</script>

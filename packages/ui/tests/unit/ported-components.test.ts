@@ -29,6 +29,7 @@ const PORTED: Record<string, string> = {
     'pdx-color-picker': 'src/color-picker/pdx-color-picker.pdx',
     'pdx-data-source': 'src/data-source/pdx-data-source.pdx',
     'pdx-dialog': 'src/dialog/pdx-dialog.pdx',
+    'pdx-error-boundary': 'src/error-boundary/pdx-error-boundary.pdx',
     'pdx-divider': 'src/divider/pdx-divider.pdx',
     'pdx-field-list': 'src/field-list/pdx-field-list.pdx',
     'pdx-form': 'src/form/pdx-form.pdx',

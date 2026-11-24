@@ -6,7 +6,7 @@
 // error on a later signal change goes to the console while the child keeps its old DOM.
 import { describe, it, expect, afterEach } from 'vitest';
 import { component, html, signal, computed, onGlobalError, clearGlobalErrorHandlers } from '@pdxui/core';
-import '../../src/error-boundary/pdx-error-boundary';
+import '../../src/error-boundary/pdx-error-boundary.pdx';
 import { uniqueTag, tick, cleanup } from './helpers';
 
 afterEach(() => { cleanup(); clearGlobalErrorHandlers(); });
