@@ -78,6 +78,17 @@ describe('getScriptDiagnostics', () => {
         expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
     });
 
+    it('`@prop for as htmlFor` (#1239) declares `htmlFor` in the projection, typed, and `for` is not a name', () => {
+        const sc = "\n@prop for as htmlFor: string = '';\nconst s: string = htmlFor;\n";
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
+        expect(projectScript(sc)).toHaveLength(sc.length);
+        expect(projectScript(sc)).toMatch(/var\s+htmlFor: string = '';/);
+        const syntax = ts.transpileModule(projectScript(sc), { reportDiagnostics: true }).diagnostics ?? [];
+        expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
+        expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
+    });
+
     it('a prop\'s `{ attribute: string }` (#1347) is valid TypeScript in the projection, and an object default stays', () => {
         const sc = "\n@prop columns: number | 'auto' = 3 { attribute: string };\n@prop opts: { form: boolean } = { form: true };\nconst n: number | 'auto' = columns;\n";
         const src = '<template></template>\n<script>' + sc + '</script>';

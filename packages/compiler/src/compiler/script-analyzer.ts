@@ -33,7 +33,7 @@ import { DEFER_TRIGGERS, parseDeferTriggers, unknownHydrateTriggers } from './de
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, compileDevAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
-import { isEventName, eventEmitterName, eventOptions, reservedEventName } from './event-names';
+import { isEventName, eventEmitterName, eventOptions, reservedEventName, isReservedWord } from './event-names';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -423,14 +423,39 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             });
             continue; // Dropped, as an unrecognised declaration is: left in the body it would not parse.
         }
-        // Match: `@prop name:`, `@prop(icon) name:`, `@prop name?:` or `@model name:`.
-        // Groups: [1]=rune [2]=`(icon)` [3]=name [4]=`?`
-        const propPrefix = trimmed.match(/^@(prop|model)(\(\s*icon\s*\))?\s+(\w+)\s*(\?)?\s*:/);
+        // Match: `@prop name:`, `@prop(icon) name:`, `@prop name?:`, `@prop for as htmlFor:` (#1239) or
+        // `@model name:`. Groups: [1]=rune [2]=`(icon)` [3]=name [4]=the alias [5]=`?`
+        const propPrefix = trimmed.match(/^@(prop|model)(\(\s*icon\s*\))?\s+(\w+)(?:\s+as\s+(\w+))?\s*(\?)?\s*:/);
         if (propPrefix) {
             const rune = propPrefix[1];
             const icon = propPrefix[2] !== undefined;
-            const name = propPrefix[3];
-            const optional = propPrefix[4] === '?';
+            const publicName = propPrefix[3];
+            const alias = propPrefix[4];
+            // The name the script and the template read: the alias, when written (#1239).
+            const name = alias ?? publicName;
+            const optional = propPrefix[5] === '?';
+            if (alias !== undefined && rune === 'model') {
+                warnings.push({
+                    code: 'PDX_UNKNOWN_DECLARATION',
+                    severity: 'error' as const,
+                    message: `\`${trimmed}\` is not a form of @model: a model takes no alias; \`as\` is a prop's, for a public name the script cannot read.`,
+                    hint: 'Use: @model name: Type = default;',
+                });
+                continue;
+            }
+            // A public name no script can read (#1239): `@prop for` compiled to `const for = …`, a module
+            // that does not parse. The prop keeps its public name with an alias the script reads.
+            if (alias === undefined && isReservedWord(publicName)) {
+                warnings.push({
+                    code: 'PDX_PROP_NAME_RESERVED',
+                    severity: 'error' as const,
+                    message: `@${rune} '${publicName}': \`${publicName}\` is a reserved word of JavaScript, so neither the script nor the template can read it as a name.`,
+                    hint: rune === 'prop'
+                        ? `Keep the public name and read it by another: @prop ${publicName} as ${aliasFor(publicName)}: …; — the attribute and the property stay \`${publicName}\`.`
+                        : `Name the model with a word that is not reserved.`,
+                });
+                continue;
+            }
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
             // `@model name: T = d { form }` (#135): the trailing options are taken off before the type
             // and the default are read, which would otherwise swallow them. `{ form: () => expr }`
@@ -499,6 +524,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     tsType,
                     runtimeType: reading ?? tsToRuntimeType(tsType),
                     default: defaultVal,
+                    ...(alias !== undefined ? { publicName } : {}),
                     ...(rune === 'model' ? { model: true } : {}),
                     ...(options?.form ? { form: true } : {}),
                     ...(rune === 'prop' && !optional && defaultVal === undefined ? { required: true } : {}),
@@ -1617,6 +1643,15 @@ function dropLocallyDeclared(usedFeatures: Set<string>, lines: string[], depthAt
  * specifier — either a bare side-effect import (`import 'x'`) or a `from '…'` clause. Used to
  * accumulate multi-line imports before flattening.
  */
+/**
+ * The alias to suggest for a prop whose public name is reserved (#1239): the DOM's own name where it
+ * has one (`htmlFor` for a label's `for`, `className` for `class`), else the name with `Value` after it.
+ */
+function aliasFor(name: string): string {
+    const DOM: Record<string, string> = { for: 'htmlFor', class: 'className' };
+    return DOM[name] ?? `${name}Value`;
+}
+
 /**
  * Whether an `export {…}` / `export *` statement is complete: its braces closed, and either a
  * `from '…'` or the closing brace ends it (a list of the script's own names).

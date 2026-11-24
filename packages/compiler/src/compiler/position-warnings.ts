@@ -116,8 +116,10 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         case 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS':
         case 'PDX_PROP_ATTRIBUTE_AMBIGUOUS':
         case 'PDX_MODEL_ATTRIBUTE_UNKNOWN':
-            // `@prop(icon) name` (#1317) is found as `@prop name` is.
-            return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+${escape(name)}\\b`)) : undefined;
+        case 'PDX_PROP_NAME_RESERVED':
+            // `@prop(icon) name` (#1317) is found as `@prop name` is, and so is the alias of
+            // `@prop for as htmlFor` (#1239), whichever of the two the message names.
+            return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+(?:\\w+\\s+as\\s+)?${escape(name)}\\b`)) : undefined;
         // The second declaration is the one the author adds by mistake; the first was there.
         case 'PDX_DUP_PROP':
             return name ? find(source, script, new RegExp(`@(?:prop|model)(?:\\(\\s*icon\\s*\\))?\\s+${escape(name)}\\b`), 1) : undefined;

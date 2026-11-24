@@ -193,7 +193,8 @@ export function generateDts(input: DtsInput): string {
     lines.push(`export interface ${pascalTag}Props {`);
     for (const p of input.props) {
         // A required prop (#130) is a required member: a parent that omits it does not type-check.
-        lines.push(`  ${p.name}${p.required ? '' : '?'}: ${p.tsType};`);
+        // The public name (#1239): `for`, a parent's attribute and the element's property.
+        lines.push(`  ${p.publicName ?? p.name}${p.required ? '' : '?'}: ${p.tsType};`);
     }
     lines.push('}');
     lines.push('');

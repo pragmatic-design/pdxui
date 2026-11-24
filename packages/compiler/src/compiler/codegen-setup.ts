@@ -32,7 +32,7 @@ export const PROP_BUILDER = 'prop';
  * runtime type always written, so the coercion is the one the analyser chose and never an inference.
  * The caller imports `prop` (see codegen-new) when there is any.
  */
-export function buildPropsObject(props: { name: string; tsType?: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
+export function buildPropsObject(props: { name: string; publicName?: string; tsType?: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const type = `{ type: ${p.runtimeType} }`;
@@ -49,7 +49,8 @@ export function buildPropsObject(props: { name: string; tsType?: string; runtime
                 : `${PROP_BUILDER}.optional(${type})`;
         // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
         // caller imports `wireFormModel` (see codegen-new), and an app without one does not carry it.
-        return `    ${p.name}: ${p.form ? `{ ...${spec}, form: wireFormModel }` : spec}`;
+        // The descriptor declares the public name (#1239): `for`, which a key may be.
+        return `    ${p.publicName ?? p.name}: ${p.form ? `{ ...${spec}, form: wireFormModel }` : spec}`;
     });
     return `{\n${entries.join(',\n')}\n  }`;
 }
@@ -700,7 +701,8 @@ export function buildSetupBody(
             // `$derived` threw while setup was still running and the component never mounted (#205).
             // The body's own rewrite turns the name into its read — `__width()`, `half()` — and a
             // prop is read off `ctx`, where its signal is.
-            const readOf = (name: string): string => propNames.has(name) ? `ctx.${name}()` : rewriteAll(name);
+            const publicOf = (name: string): string => analysis.props.find(p => p.name === name)?.publicName ?? name;
+            const readOf = (name: string): string => propNames.has(name) ? `ctx.${publicOf(name)}()` : rewriteAll(name);
             const setProps = bindings.map(name =>
                 `      ctx.el.style.setProperty('--pdx-${scopeHash}-${name}', String(${readOf(name)}));`
             ).join('\n');
@@ -714,6 +716,10 @@ export function buildSetupBody(
     let returned = [...analysis.exports];
     for (const { fn: name } of emitters) {
         if (!returned.some(e => e.name === name)) returned.push({ name, kind: 'function' });
+    }
+    for (const name of aliasedProps(analysis)) {
+        // Returned as it is named, the accessor `const htmlFor = ctx.for;`.
+        if (!returned.some(e => e.name === name)) returned.push({ name, kind: 'const' });
     }
     if (returnOnly) returned = returned.filter(e => returnOnly.has(e.name));
     parts.push(generateAutoReturn(returned));
@@ -741,16 +747,26 @@ function propAccessors(analysis: ScriptAnalysis, bodyText: string, generated: st
     const code = maskComments(bodyText);
     const generatedCode = maskComments(generated);
     // A typed snippet is read the same way: core keeps it in a signal on the context (#1291).
-    const names = [...analysis.props.filter(p => !p.model).map(p => p.name), ...typedSlots(analysis)];
-    for (const name of names) {
+    const names = [...analysis.props.filter(p => !p.model).map(p => ({ name: p.name, publicName: p.publicName })),
+        ...typedSlots(analysis).map(name => ({ name, publicName: undefined }))];
+    for (const { name, publicName } of names) {
         const word = new RegExp(`\\b${escapeForRegExp(name)}\\b`);
         const read = new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`);
-        if (word.test(code) || analysis.signals.some(s => word.test(s.initialExpr))
+        // An aliased prop (#1239) is always read: the setup returns it, the template's way to it.
+        if (publicName !== undefined || word.test(code) || analysis.signals.some(s => word.test(s.initialExpr))
             || analysis.deriveds.some(d => word.test(d.expr)) || read.test(generatedCode)) {
-            lines.push(`    const ${name} = ctx.${name};`);
+            lines.push(`    const ${name} = ctx.${publicName ?? name};`);
         }
     }
     return lines.join('\n');
+}
+
+/**
+ * The props read by an alias (#1239), `@prop for as htmlFor`: the context holds the prop under its
+ * public name, so the setup returns it under the alias, the name the template reads off the context.
+ */
+function aliasedProps(analysis: ScriptAnalysis): string[] {
+    return analysis.props.filter(p => !p.model && p.publicName !== undefined).map(p => p.name);
 }
 
 /** The typed snippets the script declares (`@slot row?: (…)`): a projection slot is not a value. */

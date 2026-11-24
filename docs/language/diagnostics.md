@@ -38,6 +38,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_PROP_INVALID_TYPE` | warn | A `@prop`'s type annotation is malformed. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_TYPE_MISMATCH` | warn | A `@prop`'s default does not match its type. | `@prop`, [script.md](script.md) |
 | `PDX_MODEL_ATTRIBUTE_AMBIGUOUS` | warn | A `@model`'s type unites values whose attribute is read differently, and no `{ attribute }` says how to read it. | `@model`, [script.md](script.md) |
+| `PDX_PROP_NAME_RESERVED` | error | A `@prop` named after a reserved word of JavaScript (`for`), with no alias the script can read it by. | `@prop`, [components.md](components.md) |
 | `PDX_PROP_ATTRIBUTE_AMBIGUOUS` | warn | A `@prop`'s type unites values whose attribute is read differently, and no `{ attribute }` says how to read it: the attribute is not observed. | `@prop`, [script.md](script.md) |
 | `PDX_MODEL_ATTRIBUTE_UNKNOWN` | error | A `@model`'s or a `@prop`'s `{ attribute: … }` is not `string`, `number`, `boolean` or `json`. | `@model`, `@prop`, [script.md](script.md) |
 | `PDX_DUP_PROP` | error | The same `@prop` declared twice. | `@prop`, [script.md](script.md) |
