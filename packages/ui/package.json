@@ -64,11 +64,6 @@
       "types": "./dist/fieldset/pdx-fieldset.d.ts",
       "import": "./dist/fieldset/pdx-fieldset.js"
     },
-    "./card": {
-      "development": "./src/card/pdx-card.ts",
-      "types": "./dist/card/pdx-card.d.ts",
-      "import": "./dist/card/pdx-card.js"
-    },
     "./accordion": {
       "development": "./src/accordion/pdx-accordion.ts",
       "types": "./dist/accordion/pdx-accordion.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/avatar-group/pdx-avatar-group.pdx",
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
       "import": "./dist/avatar-group/pdx-avatar-group.js"
+    },
+    "./card": {
+      "development": "./src/card/pdx-card.pdx",
+      "types": "./dist/card/pdx-card.d.ts",
+      "import": "./dist/card/pdx-card.js"
     },
     "./package.json": "./package.json"
   },

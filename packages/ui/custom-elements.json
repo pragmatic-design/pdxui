@@ -5005,7 +5005,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/card/pdx-card.ts",
+      "path": "src/card/pdx-card.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -5308,7 +5308,7 @@
           "name": "pdx-card",
           "declaration": {
             "name": "PdxCard",
-            "module": "src/card/pdx-card.ts"
+            "module": "src/card/pdx-card.pdx"
           }
         }
       ]

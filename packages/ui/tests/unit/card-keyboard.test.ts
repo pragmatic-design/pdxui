@@ -5,7 +5,7 @@
 // card that announces itself as a button. `disabled` and `loading` expose their state.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/card/pdx-card';
+import '../../src/card/pdx-card.pdx';
 
 async function mount(attrs: string, inner = '<div class="pdx-card-body">Card</div>'): Promise<HTMLElement> {
     const host = document.createElement('div');
