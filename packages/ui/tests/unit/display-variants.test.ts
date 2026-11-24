@@ -10,7 +10,7 @@ import '../../src/statistic/pdx-statistic.pdx';
 import '../../src/wizard/pdx-wizard';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/kbd/pdx-kbd.pdx';
-import '../../src/avatar-group/pdx-avatar-group';
+import '../../src/avatar-group/pdx-avatar-group.pdx';
 
 const attrs = (el: Element, names: string[]) => names.map((n) => el.getAttribute(n));
 const classesLike = (el: Element | null | undefined, pattern: RegExp) => [...(el?.classList ?? [])].filter((c) => pattern.test(c));

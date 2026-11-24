@@ -49,11 +49,6 @@
       "types": "./dist/icon/lucide-icons.d.ts",
       "import": "./dist/icon/lucide-icons.js"
     },
-    "./avatar-group": {
-      "development": "./src/avatar-group/pdx-avatar-group.ts",
-      "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
-      "import": "./dist/avatar-group/pdx-avatar-group.js"
-    },
     "./form-template": {
       "development": "./src/form-template/pdx-form-template.ts",
       "types": "./dist/form-template/pdx-form-template.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/error-boundary/pdx-error-boundary.pdx",
       "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
       "import": "./dist/error-boundary/pdx-error-boundary.js"
+    },
+    "./avatar-group": {
+      "development": "./src/avatar-group/pdx-avatar-group.pdx",
+      "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
+      "import": "./dist/avatar-group/pdx-avatar-group.js"
     },
     "./package.json": "./package.json"
   },

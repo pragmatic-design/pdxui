@@ -2246,7 +2246,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/avatar-group/pdx-avatar-group.ts",
+      "path": "src/avatar-group/pdx-avatar-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2440,7 +2440,7 @@
           "name": "pdx-avatar-group",
           "declaration": {
             "name": "PdxAvatarGroup",
-            "module": "src/avatar-group/pdx-avatar-group.ts"
+            "module": "src/avatar-group/pdx-avatar-group.pdx"
           }
         }
       ]

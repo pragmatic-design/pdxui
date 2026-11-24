@@ -1,0 +1,163 @@
+<template></template>
+
+<script>
+/**
+ * Stacked, overlapping avatars, up to a maximum count, with an overflow counter for the rest.
+ *
+ * @csspart root - The row the avatars and the counter are laid out in.
+ * @csspart avatar - Each avatar shown.
+ * @csspart overflow - The «+N» counter for the avatars not shown.
+ */
+// pdx-avatar-group — Stacked avatar group with overflow counter.
+// Shows up to `max` avatars overlapping, with a +N badge for the rest.
+//
+// The group is built by the script a frame after mount, as the TypeScript version built it: a
+// template rendered at mount measured 1.87× its TypeScript version's mount (#1210), which does that
+// work in the frame after.
+import { onNextFrame } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/avatar-group';
+import '../avatar/pdx-avatar.pdx'; // rendered by this component, and registered by nobody else
+
+/** A clickable group's avatar was pressed: its item and its index. */
+@event 'pdx-click': { item: unknown; index: number };
+/** The «+N» counter was pressed: how many are hidden, and which. */
+@event 'pdx-overflow-click': { count: number; items: unknown[] };
+// The row, each avatar and the counter, all built by the script.
+@part(external) root, avatar, overflow;
+// The axis avatar-group.css keys by (#632), reflected on the host: it draws the overflow badge
+// and is passed to every avatar. No native class is kept: the badge is not the root part, and
+// nothing used `.pdx-avatar-size-*` on native markup.
+@variants {
+  /** The avatars' and the badge's size: xs, sm, md (the default), lg or xl. */
+  size: { md, xs, sm, lg, xl } = md;
+}
+@prop items: unknown[] | null = null;
+@prop max: number = 5;
+@prop overlap: number = -8;
+@prop direction: string = 'row';
+/** Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click. */
+@prop clickable: boolean = false;
+@prop bordered: boolean = true;
+@host host;
+
+/** What an item of `items` may carry. */
+interface AvatarItem { name?: string; src?: string; color?: string }
+
+let containerEl: HTMLElement | null = null;
+
+/**
+ * Make `el` a focusable button: a click, Enter or Space all run `activate`. `name` names it when its
+ * content does not: an avatar with a name is an image of that name inside, which the button takes as
+ * its own. An aria-label over that would not hold the initials it shows (WCAG 2.5.3).
+ */
+function makeButton(el: HTMLElement, name: string | null, activate: () => void): void {
+  el.setAttribute('role', 'button');
+  el.setAttribute('tabindex', '0');
+  if (name) el.setAttribute('aria-label', name);
+  el.addEventListener('click', activate);
+  el.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activate();
+  });
+}
+
+function renderGroup(): void {
+  if (!containerEl) return;
+  containerEl.innerHTML = '';
+
+  const allItems = ((items as unknown[] | null) || []) as AvatarItem[];
+  const maxCount = max as number;
+  const avatarSize = size() as string;
+  const overlapPx = overlap as number;
+  const isClickable = clickable as boolean;
+  const isBordered = bordered as boolean;
+  const isReverse = direction === 'row-reverse';
+
+  containerEl.className = 'pdx-avatar-group';
+  containerEl.setAttribute('data-part', 'root');
+  if (isReverse) containerEl.classList.add('pdx-avatar-group-reverse');
+
+  const visible = allItems.slice(0, maxCount);
+  const hidden = allItems.length - maxCount;
+
+  visible.forEach((item, idx) => {
+    const avatar = document.createElement('pdx-avatar');
+    if (item.name) avatar.setAttribute('alt', item.name);
+    if (item.src) avatar.setAttribute('src', item.src);
+    if (item.color) avatar.setAttribute('color', item.color);
+    avatar.setAttribute('size', avatarSize);
+    avatar.className = 'pdx-avatar-group-item';
+    avatar.setAttribute('data-part', 'avatar');
+    if (isBordered) avatar.classList.add('pdx-avatar-group-bordered');
+    // First avatar on top, decreasing z-index for overlap stacking
+    avatar.style.zIndex = String(visible.length + 1 - idx);
+
+    // Overlap: first item has no negative margin
+    if (idx > 0) {
+      if (isReverse) avatar.style.marginRight = overlapPx + 'px';
+      else avatar.style.marginLeft = overlapPx + 'px';
+    }
+
+    if (isClickable) {
+      avatar.classList.add('pdx-avatar-group-clickable');
+      // A button, named by its person: a bare pdx-avatar has no role and no tab
+      // stop, and would be reachable by mouse only.
+      const fire = (): void => { pdxClick({ item, index: idx }); };
+      // Named by the avatar's own image when it has a name; «Member N» when it has none
+      // (the avatar is then hidden, and the button would have no name).
+      makeButton(avatar, item.name ? null : format(uiString('avatar-group', 'member'), { n: idx + 1 }), fire);
+    }
+
+    containerEl!.appendChild(avatar);
+  });
+
+  if (hidden > 0) {
+    const badge = document.createElement('div');
+    badge.className = 'pdx-avatar-group-overflow pdx-avatar-group-item';
+    badge.setAttribute('data-part', 'overflow');
+    if (isBordered) badge.classList.add('pdx-avatar-group-bordered');
+    if (isReverse) badge.style.marginRight = overlapPx + 'px';
+    else badge.style.marginLeft = overlapPx + 'px';
+    badge.textContent = '+' + hidden;
+    // "+3" alone says nothing about what it counts: it is named "3 more" —
+    // a button when the group is clickable, an image otherwise.
+    const moreName = format(uiString('avatar-group', 'more'), { count: hidden });
+    const fireMore = (): void => {
+      pdxOverflowClick({ count: hidden, items: allItems.slice(maxCount) });
+    };
+    if (isClickable) {
+      makeButton(badge, moreName, fireMore);
+    } else {
+      badge.setAttribute('role', 'img');
+      badge.setAttribute('aria-label', moreName);
+      badge.addEventListener('click', fireMore);
+    }
+    containerEl!.appendChild(badge);
+  }
+}
+
+let built = false;
+$effect(() => {
+  // Read all signals to subscribe
+  void items; void max; void size();
+  void overlap; void direction;
+  void clickable; void bordered;
+
+  if (!built) {
+    built = true;
+    // onNextFrame: a setup a move destroyed does not build again.
+    // The host carries no class (#291): avatar-group.css draws it from the tag.
+    onNextFrame(() => {
+      containerEl = document.createElement('div');
+      host.appendChild(containerEl);
+      renderGroup();
+    });
+    return;
+  }
+  requestAnimationFrame(() => renderGroup());
+});
+</script>

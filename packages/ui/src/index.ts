@@ -12,7 +12,7 @@ import './progress/pdx-progress.pdx';
 import './badge/pdx-badge.pdx';
 import './chip/pdx-chip.pdx';
 import './avatar/pdx-avatar.pdx';
-import './avatar-group/pdx-avatar-group';
+import './avatar-group/pdx-avatar-group.pdx';
 import './spinner/pdx-spinner.pdx';
 import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
