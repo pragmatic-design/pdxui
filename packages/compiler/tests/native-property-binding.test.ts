@@ -30,7 +30,7 @@ describe('a bound property the native element certainly has', () => {
 
     it('control: a component is never asked, and an aria attribute is the attribute', () => {
         const code = render('<app-x :checked="on"></app-x><input :aria-label="v">');
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "checked"/);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "checked"/);
         expect(code).toMatch(/bindAttribute\(__el\d+, "aria-label", /);
     });
 });

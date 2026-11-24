@@ -130,6 +130,9 @@ export const ROWS: Row[] = [
     { name: '{{ }} text', expected: '<p>3 items</p>', template: '<p>{{ n }} items</p>', script: 'let n = $signal(3);' },
     { name: '{{ }} text after a change', expected: '<p>2</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(1);', act: click('button') },
     { name: ':attr', expected: '<a href="/a" title="T">x</a>', template: '<a :href="url" :title="t">x</a>', script: "let url = $signal('/a'); let t = $signal('T');" },
+    // Core's bindUrl (#1346): a refused URL leaves no attribute, in a row as at the top, and null removes it.
+    { name: ':href in a @for row, one refused', expected: '<ul><li><a href="/a">x</a></li><li><a>x</a></li></ul>', template: '<ul>@for (items as it, i; track i) {<li><a :href="it">x</a></li>}</ul>', script: "let items = $signal(['/a', 'javascript:alert(1)']);" },
+    { name: ':href changed to null', expected: '<a>x</a><button>n</button>', template: '<a :href="u">x</a><button @click="u = null">n</button>', script: "let u = $signal('/a');", act: click('button') },
     { name: ':prop on a custom element', expected: '<x-probe></x-probe>', expectedRead: '{"a":1}', template: '<x-probe :value="v"></x-probe>', script: 'let v = $signal({ a: 1 });', read: (h) => JSON.stringify((h.querySelector('x-probe') as unknown as { value: unknown }).value) },
     { name: ':class with a string', expected: '<p class="yes">x</p>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
     // The inline path wrote class="[object Object]" (#96).

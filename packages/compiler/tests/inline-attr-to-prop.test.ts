@@ -19,7 +19,7 @@ import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
 import { clearBoundProperty, assignBoundProperty, interpolationText } from '../../core/src/renderer/template';
-import { bindAttribute, bindNativeProperty, bindAttributeOrProperty } from '../../core/src/renderer/bound-attribute';
+import { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp } from '../../core/src/renderer/bound-attribute';
 import { signal, effect, batch } from '../../core/src/reactivity/signal';
 import type { Signal } from '../../core/src/utils/types';
 
@@ -117,9 +117,9 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
         createTextNode: (t: string) => ({ data: t }),
     }, (n) => (n instanceof StubElement ? Object.assign(new StubElement(n.tagName), { attrs: new Map(n.attrs) }) : { ...n }));
     const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', 'interpolationText',
-        'bindAttribute', 'bindNativeProperty', 'bindAttributeOrProperty', `return ${iife};`)(
+        'bindAttribute', 'bindNativeProperty', 'bindAttributeOrProperty', 'bindComponentProp', `return ${iife};`)(
         document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty, interpolationText,
-        bindAttribute, bindNativeProperty, bindAttributeOrProperty) as StubElement;
+        bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp) as StubElement;
     return {
         el: frag.children[0],
         set(next) {

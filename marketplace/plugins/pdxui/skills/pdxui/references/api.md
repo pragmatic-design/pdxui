@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-498 value exports.
+500 value exports.
 
 ### `__adoptStyles`
 
@@ -584,6 +584,17 @@ function bindAttributeOrProperty(el: Element, attr: string, prop: string, value:
 `bindProperty` asks (`prop in el`). A name the element does not have — `:itemprop`, `:for` on a
 <div> — is its attribute; assigning it would set an expando nothing reads. With `once`, `value` is the value itself, written once with no effect (#1270).
 
+### `bindComponentProp`
+
+```ts
+import { bindComponentProp } from '@pdxui/core';
+
+function bindComponentProp(el: Element, prop: string, value: () => unknown): void
+```
+
+`:prop` on a component (#1346): its value assigned through `assignBoundProperty`, which works before
+the component is upgraded. Written out, each one was its own effect. A URL prop is `bindUrl`'s.
+
 ### `bindGesture`
 
 ```ts
@@ -697,6 +708,23 @@ model's event (#124) — with `.lazy`, the native `change` its inner input bubbl
 commit (#479); a prop that is not a model, one way (#125) — a `<select>` and a checkbox through
 `change`. The inline path had its own copy that listened to `input` on
 everything, and `::value` was one-way on a component in a production build (#97).
+
+### `bindUrl`
+
+```ts
+import { bindUrl } from '@pdxui/core';
+
+function bindUrl(el: Element, attr: string, prop: string | null, value: unknown, once?: 1): void
+```
+
+`:href`, `:src`, `:action`, `:formaction`, `:poster`, `:xlink:href` (#1346): the value goes through
+`sanitizeBoundUrl` first, and a refused or null value removes the attribute, so a `javascript:` URL
+never becomes a live link. Written out, each one was its own effect of about 120 bytes gzip.
+
+`prop` is the property the URL is written to: a component's prop (assigned before its upgrade, as
+`assignBoundProperty` does) or a plain element's own property (`href` on an <a>). A plain element
+that does not have it, and `null` for a name that is only an attribute (`xlink:href`, SVG), write
+the attribute. With `once`, `value` is the value itself, written once with no effect (#1270).
 
 ### `booleanIcon`
 

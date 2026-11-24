@@ -14,7 +14,8 @@
  */
 
 import { effect } from '../reactivity/signal';
-import { clearBoundProperty } from './template';
+import { sanitizeBoundUrl } from '../security/sanitize-url';
+import { assignBoundProperty, clearBoundProperty } from './template';
 
 // `once` (#1270): a value that cannot change — a literal, a `@for` row's key, an instance constant —
 // or a `:name.once` is written by the same write with no effect, and then the value argument IS the
@@ -115,4 +116,55 @@ export function bindStyleText(el: Element, value: unknown, once?: 1): void {
 /** `value` to `style.cssText`, null or undefined as `''`. */
 function writeStyleText(el: Element, value: unknown): void {
     (el as HTMLElement).style.cssText = value == null ? '' : String(value);
+}
+
+/**
+ * `:href`, `:src`, `:action`, `:formaction`, `:poster`, `:xlink:href` (#1346): the value goes through
+ * `sanitizeBoundUrl` first, and a refused or null value removes the attribute, so a `javascript:` URL
+ * never becomes a live link. Written out, each one was its own effect of about 120 bytes gzip.
+ *
+ * `prop` is the property the URL is written to: a component's prop (assigned before its upgrade, as
+ * `assignBoundProperty` does) or a plain element's own property (`href` on an <a>). A plain element
+ * that does not have it, and `null` for a name that is only an attribute (`xlink:href`, SVG), write
+ * the attribute. With `once`, `value` is the value itself, written once with no effect (#1270).
+ */
+export function bindUrl(el: Element, attr: string, prop: string | null, value: () => unknown): void;
+export function bindUrl(el: Element, attr: string, prop: string | null, value: unknown, once: 1): void;
+export function bindUrl(el: Element, attr: string, prop: string | null, value: unknown, once?: 1): void {
+    if (once) { writeUrl(el, attr, prop, value); return; }
+    let written: unknown = {};
+    effect(() => {
+        const next = (value as () => unknown)(); // a getter: no flag, by the overloads
+        if (Object.is(next, written)) return;
+        written = next;
+        writeUrl(el, attr, prop, next);
+    });
+}
+
+/** Write a URL as `bindUrl` describes; the same writes the compiled module spelled out before. */
+function writeUrl(el: Element, attr: string, prop: string | null, value: unknown): void {
+    if (prop !== null && (el.localName.includes('-') || prop in el)) {
+        const safe = sanitizeBoundUrl(el, prop, value);
+        if (safe == null) el.removeAttribute(prop);
+        else assignBoundProperty(el, prop, safe);
+        return;
+    }
+    if (value == null || value === false) { el.removeAttribute(attr); return; }
+    const safe = sanitizeBoundUrl(el, attr, value);
+    if (safe == null) el.removeAttribute(attr);
+    else el.setAttribute(attr, safe);
+}
+
+/**
+ * `:prop` on a component (#1346): its value assigned through `assignBoundProperty`, which works before
+ * the component is upgraded. Written out, each one was its own effect. A URL prop is `bindUrl`'s.
+ */
+export function bindComponentProp(el: Element, prop: string, value: () => unknown): void {
+    let written: unknown = {};
+    effect(() => {
+        const next = value();
+        if (Object.is(next, written)) return;
+        written = next;
+        assignBoundProperty(el, prop, next);
+    });
 }

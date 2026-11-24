@@ -45,10 +45,8 @@ describe('inlineBindings: bound names with - or :', () => {
     it(':xlink:href on an SVG link is sanitised and set as the attribute', () => {
         const code = inline('<svg><a :xlink:href="url"><text>t</text></a></svg>');
         parses(code);
-        expect(code).toMatch(/const __b = ctx\.url\(\);/);
-        expect(code).toMatch(/const __v = __b;/);
-        expect(code).toMatch(/sanitizeBoundUrl\(\w+, "xlink:href", __v\)/);
-        expect(code).toMatch(/setAttribute\("xlink:href", __safeUrl\)/);
+        // core's bindUrl with no property: sanitised, then the attribute (#1346, bound-url.test.ts).
+        expect(code).toMatch(/bindUrl\(\w+, "xlink:href", null, \(\)=>ctx\.url\(\)\)/);
         expect(code, 'the name was cut at the colon').not.toMatch(/\["xlink"\]/);
     });
 
@@ -68,8 +66,8 @@ describe('inlineBindings: bound names with - or :', () => {
     it('a hyphenated prop on a component is its camelCase property, as core does', () => {
         const code = inline('<pdx-list :item-height="id"></pdx-list>');
         parses(code);
-        // Assigned through core's assignBoundProperty, which a component's props go through.
-        expect(code).toMatch(/const __b = ctx\.id\(\);.*assignBoundProperty\(__el\d+, "itemHeight", __b\)/);
+        // Assigned through core's bindComponentProp, which a component's props go through (#1346).
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "itemHeight", \(\)=>ctx\.id\(\)\)/);
     });
 });
 

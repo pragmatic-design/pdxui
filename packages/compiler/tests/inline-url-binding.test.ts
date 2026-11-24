@@ -3,7 +3,8 @@
 // The interpreted path (core's `bindProperty`) sanitises the URL names, so `:href="item.url"`
 // holding `javascript:alert(1)` is dropped in dev; a `propBind` that emitted `el["href"] = value`
 // would leave it live in a `production: true, inlineBindings: true` build. The inline path calls
-// core's `sanitizeBoundUrl` for those names and removes the attribute when it refuses.
+// core's `bindUrl` for those names (#1346), which runs `sanitizeBoundUrl` and removes the attribute
+// when it refuses: that it does is core's `bound-url.test.ts`.
 //
 // The compiler does not import core, so the list of URL names is a copy. The last case keeps it
 // the same list as core's two, so the copy cannot drift in silence.
@@ -19,19 +20,18 @@ function inline(template: string, script = "let url = $signal('/');"): string {
 }
 
 describe('inlineBindings: a URL binding is sanitised', () => {
-    it(':href goes through sanitizeBoundUrl, never straight into the element', () => {
+    it(':href goes through core\'s bindUrl, never straight into the element', () => {
         const code = inline('<a :href="url">Go</a>');
-        // The value is read once into __b, beside the value the binding last wrote (#44).
-        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
-        expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
-        expect(code).toMatch(/import \{[^}]*\bsanitizeBoundUrl\b[^}]*\} from '@pdxui\/core'/);
+        expect(code).toMatch(/bindUrl\(\w+, "href", "href", \(\)=>ctx\.url\(\)\)/);
+        expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = /);
+        expect(code).toMatch(/import \{[^}]*\bbindUrl\b[^}]*\} from '@pdxui\/core'/);
         expect(() => new Function(code.replace(/^import .*$/gm, '')), 'the emitted module must parse').not.toThrow();
     });
 
-    it(':src on an image too, and a refused value removes the attribute', () => {
+    it(':src on an image too', () => {
         const code = inline('<img :src="url" />');
-        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "src", __b\)/);
-        expect(code).toMatch(/removeAttribute\("src"\)/);
+        expect(code).toMatch(/bindUrl\(\w+, "src", "src", \(\)=>ctx\.url\(\)\)/);
+        expect(code, 'the raw value must not be assigned').not.toMatch(/\["src"\] = /);
     });
 
     it('a two-way binding on a URL name goes through core\'s bindTwoWay, which sanitises it', () => {
@@ -54,12 +54,12 @@ describe('the controls', () => {
 });
 
 describe('a snippet body, built inline', () => {
-    it(':href goes through sanitizeBoundUrl there too', () => {
+    it(':href goes through bindUrl there too', () => {
         // The alpha slot body was an html`` template, which core's bindProperty sanitised at runtime (#364).
         const source = "<template>\n<pdx-list>@snippet item(row) { <a :href=\"url\">Go</a> }</pdx-list>\n</template>\n<script>\nlet url = $signal('/');\n</script>";
         const code = compile(source, 'slot-url.pdx', [], undefined, { production: true }).code;
         // The template's only <a> is the snippet's.
-        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
+        expect(code).toMatch(/bindUrl\(\w+, "href", "href", \(\)=>ctx\.url\(\)\)/);
         expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
         expect(code).not.toMatch(/html`/);
     });
