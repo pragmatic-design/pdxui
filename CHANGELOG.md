@@ -48,6 +48,11 @@ semver.
 
 ### Fixes
 
+- `:tabindex="on ? '0' : null"` on a component no longer gives it a tab stop (#1263). A name the
+  platform defines and the component does not declare (`tabIndex`, `hidden`, `title`…) was assigned the
+  `null`, and `tabIndex = null` is 0; it is cleared now as on a plain element. A prop the component
+  declares takes the `null` as before, back to its default.
+
 - A `@try` around a `<slot>` keeps the children it projects across a Retry (#1365). The projection
   places a host's children once, when it connects, and a retry rendered a new `<slot>` that nothing
   filled: the boundary came back empty. The boundary now keeps the projected children it clears and puts
