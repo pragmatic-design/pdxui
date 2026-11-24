@@ -140,6 +140,14 @@ export const ROWS: Row[] = [
     { name: ':href in a @for row, one refused', expected: '<ul><li><a href="/a">x</a></li><li><a>x</a></li></ul>', template: '<ul>@for (items as it, i; track i) {<li><a :href="it">x</a></li>}</ul>', script: "let items = $signal(['/a', 'javascript:alert(1)']);" },
     { name: ':href changed to null', expected: '<a>x</a><button>n</button>', template: '<a :href="u">x</a><button @click="u = null">n</button>', script: "let u = $signal('/a');", act: click('button') },
     { name: ':prop on a custom element', expected: '<x-probe></x-probe>', expectedRead: '{"a":1}', template: '<x-probe :value="v"></x-probe>', script: 'let v = $signal({ a: 1 });', read: (h) => JSON.stringify((h.querySelector('x-probe') as unknown as { value: unknown }).value) },
+    // A platform property on a custom element, going to null, is cleared as on a plain element (#1263):
+    // `tabIndex = null` coerced to 0, a tab stop.
+    { name: ':tabindex on a custom element, null', expected: '<x-probe></x-probe>', template: '<x-probe :tabindex="on ? \'0\' : null"></x-probe>', script: 'let on = $signal(false);' },
+    {
+        name: ':tabindex on a custom element, on then null', expected: '<x-probe></x-probe><button>t</button>',
+        template: '<x-probe :tabindex="on ? \'0\' : null"></x-probe><button @click="on = !on">t</button>',
+        script: 'let on = $signal(false);', act: (h) => { click('button')(h); click('button')(h); },
+    },
     { name: ':class with a string', expected: '<p class="yes">x</p>', template: "<p :class=\"on ? 'yes' : 'no'\">x</p>", script: 'let on = $signal(true);' },
     // The inline path wrote class="[object Object]" (#96).
     { name: ':class with an object', expected: '<p class="active">x</p>', template: '<p :class="{ active: on, off: !on }">x</p>', script: 'let on = $signal(true);' },

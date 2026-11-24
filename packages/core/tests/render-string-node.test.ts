@@ -35,6 +35,15 @@ beforeAll(async () => {
 });
 
 describe('renderToString in Node', () => {
+    it('renders a component given null for a platform property, with no browser to read (#1263)', () => {
+        const { html, component } = core;
+        component('node-tabbed', { render: () => html`<i>x</i>` });
+        const { html: markup, skipped } = core.renderToStringWithReport(() =>
+            html`<node-tabbed :tabindex=${() => null}></node-tabbed>`);
+        expect(skipped, 'the server render read a browser global').toEqual([]);
+        expect(markup).not.toContain('tabindex');
+    });
+
     it('renders a template', () => {
         const { html, signal, PART_OPEN, PART_CLOSE } = core;
         const count = signal(3);

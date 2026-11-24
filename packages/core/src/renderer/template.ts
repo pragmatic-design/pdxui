@@ -428,6 +428,16 @@ function hasSetter(el: Element, prop: string): boolean {
 }
 
 /**
+ * Whether `prop` on `el` is the platform's — defined by HTMLElement or Element — and not by a
+ * component's class: the first prototype that has it is one of those.
+ */
+function platformProperty(el: Element, prop: string): boolean {
+    let o: object | null = el;
+    while ((o = Object.getPrototypeOf(o)) && !Object.prototype.hasOwnProperty.call(o, prop));
+    return o === HTMLElement.prototype || o === Element.prototype;
+}
+
+/**
  * Assign a bound value to a property.
  *
  * A component installs its prop accessors when it connects, and a template binds while it builds the
@@ -440,8 +450,20 @@ function hasSetter(el: Element, prop: string): boolean {
  *
  * The prototype walk runs only while the element has no own property of that name, which after the
  * component's setup it always has. The inline build calls this too, for a component's props.
+ *
+ * A null for a name the platform defines and the component does not — `tabIndex`, `hidden`, `title`
+ * — is the plain element's "no value", `clearBoundProperty` (#1263): `el.tabIndex = null` coerces to 0,
+ * a tab stop. A prop the component declares is its own property, and takes the null by its own rule.
  */
 export function assignBoundProperty(el: Element, prop: string, value: unknown): void {
+    // The attribute a platform property reflects is its name in lower case (`tabIndex` → `tabindex`):
+    // `class` and `for`, the two that are not, never reach a component as a property. Not while
+    // rendering to a string: the server's elements have none of the platform's prototypes, and an
+    // attribute that was never written has nothing to clear.
+    if (value == null && el.tagName.includes('-') && !isServerRender() && !Object.prototype.hasOwnProperty.call(el, prop) && platformProperty(el, prop)) {
+        clearBoundProperty(el, prop.toLowerCase(), prop);
+        return;
+    }
     if (el.tagName.includes('-') && !Object.prototype.hasOwnProperty.call(el, prop) && !hasSetter(el, prop)) {
         Object.defineProperty(el, prop, { value, writable: true, configurable: true, enumerable: true });
         return;

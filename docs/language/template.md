@@ -180,7 +180,12 @@ expression as a getter, `() => …`. Core's `bindProperty` decides where the val
 not have as a property (`itemprop`, `pdx-theme`) are set with `setAttribute` — removed for `null` or
 `false`, `''` for `true`; anything else is assigned as a property (`tabindex` → `tabIndex`, the
 mapping is `ATTR_TO_PROP`). On a custom element (a tag with `-`) a kebab-case name is its camelCase
-prop. `href`, `src`, `action`, `formaction`, `xlink:href` and `poster` go through
+prop. A `null` or `undefined` for a property of a plain element clears it by its type: `false` for a
+boolean, `''` and no attribute for a string, no attribute for anything else (`maxLength`, `tabIndex`:
+`tabIndex = null` would be 0). On a custom element the same rule holds for a name the platform defines
+and the component does not declare (`:tabindex="on ? '0' : null"`, #1263); a prop the component
+declares takes the `null` itself, which brings it back to its default. `href`, `src`, `action`,
+`formaction`, `xlink:href` and `poster` go through
 `sanitizeBoundUrl`, so a `javascript:` value is dropped. A binding writes only when its value changes.
 On the inline path the same rule is generated inline, in one `effect` per binding.
 

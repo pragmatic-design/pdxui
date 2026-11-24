@@ -402,6 +402,10 @@ name.
 The prototype walk runs only while the element has no own property of that name, which after the
 component's setup it always has. The inline build calls this too, for a component's props.
 
+A null for a name the platform defines and the component does not — `tabIndex`, `hidden`, `title`
+— is the plain element's "no value", `clearBoundProperty` (#1263): `el.tabIndex = null` coerces to 0,
+a tab stop. A prop the component declares is its own property, and takes the null by its own rule.
+
 ### `attach`
 
 ```ts
