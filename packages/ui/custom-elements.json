@@ -24195,7 +24195,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/relative-time/pdx-relative-time.ts",
+      "path": "src/relative-time/pdx-relative-time.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -24337,7 +24337,7 @@
           "name": "pdx-relative-time",
           "declaration": {
             "name": "PdxRelativeTime",
-            "module": "src/relative-time/pdx-relative-time.ts"
+            "module": "src/relative-time/pdx-relative-time.pdx"
           }
         }
       ]

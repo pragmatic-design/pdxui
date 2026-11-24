@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/relative-time/pdx-relative-time';
+import '../../src/relative-time/pdx-relative-time.pdx';
 
 beforeEach(cleanup);
 
