@@ -1,0 +1,120 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxScrollSpy",
+  "tagName": "pdx-scroll-spy",
+  "category": "Layout",
+  "order": 75,
+  "description": "Highlights the navigation link of the section currently visible, as the user scrolls.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "sectionSelector",
+      "description": "CSS selector for sections to observe",
+      "type": {
+        "text": "string"
+      },
+      "default": "'[data-section]'",
+      "attribute": "sectionselector"
+    },
+    {
+      "kind": "field",
+      "name": "linkSelector",
+      "description": "CSS selector for nav links to highlight",
+      "type": {
+        "text": "string"
+      },
+      "default": "'[data-spy-link]'",
+      "attribute": "linkselector"
+    },
+    {
+      "kind": "field",
+      "name": "offset",
+      "description": "Offset from top for activation threshold (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "100",
+      "attribute": "offset"
+    },
+    {
+      "kind": "field",
+      "name": "smoothScroll",
+      "description": "Smooth scroll to section on link click",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "smoothscroll"
+    },
+    {
+      "kind": "method",
+      "name": "getActiveSection",
+      "parameters": [],
+      "description": "The id of the section marked active, or '' before the first measurement."
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "section": "$event.detail.value"
+  },
+  "alphaRename": {
+    "pdx-change": "section-change"
+  },
+  "events": [
+    {
+      "name": "section-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The section in view changed: its `data-section`, or its id.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "sectionselector",
+      "fieldName": "sectionSelector",
+      "description": "CSS selector for sections to observe",
+      "type": {
+        "text": "string"
+      },
+      "default": "'[data-section]'"
+    },
+    {
+      "name": "linkselector",
+      "fieldName": "linkSelector",
+      "description": "CSS selector for nav links to highlight",
+      "type": {
+        "text": "string"
+      },
+      "default": "'[data-spy-link]'"
+    },
+    {
+      "name": "offset",
+      "fieldName": "offset",
+      "description": "Offset from top for activation threshold (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "100"
+    },
+    {
+      "name": "smoothscroll",
+      "fieldName": "smoothScroll",
+      "description": "Smooth scroll to section on link click",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ]
+}

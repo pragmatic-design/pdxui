@@ -26066,7 +26066,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/scroll-spy/pdx-scroll-spy.ts",
+      "path": "src/scroll-spy/pdx-scroll-spy.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -26195,7 +26195,7 @@
           "name": "pdx-scroll-spy",
           "declaration": {
             "name": "PdxScrollSpy",
-            "module": "src/scroll-spy/pdx-scroll-spy.ts"
+            "module": "src/scroll-spy/pdx-scroll-spy.pdx"
           }
         }
       ]

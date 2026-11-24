@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-scroll-spy (Tier 6)
  *
- * Contracts written by inspecting the source (packages/ui/src/scroll-spy/pdx-scroll-spy.ts).
+ * Contracts written by inspecting the source (packages/ui/src/scroll-spy/pdx-scroll-spy.pdx).
  *
  * WHAT IT DOES
  *   It highlights the navigation entry for the section currently in the viewport,

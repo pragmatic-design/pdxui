@@ -97,7 +97,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-scheduler-agenda',
     'pdx-scheduler-year',
     'pdx-scroll-area',
-    'pdx-scroll-spy',
     'pdx-search-input',
     'pdx-segmented',
     'pdx-select',
