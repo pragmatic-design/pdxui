@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-fieldset
  *
- * Contracts written by inspecting the source (packages/ui/src/fieldset/pdx-fieldset.ts) and the
+ * Contracts written by inspecting the source (packages/ui/src/fieldset/pdx-fieldset.pdx) and the
  * CSS (packages/design/src/surfaces/forms.css, the "Fieldset / Legend" block, lines 383-462).
  *
  * DOM structure (NATIVE, no custom role):

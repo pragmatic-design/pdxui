@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/fieldset/pdx-fieldset';
+import '../../src/fieldset/pdx-fieldset.pdx';
 
 const toggleOf = (el: HTMLElement): HTMLButtonElement => el.querySelector('.pdx-fieldset-toggle') as HTMLButtonElement;
 

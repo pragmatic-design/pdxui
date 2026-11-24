@@ -13737,7 +13737,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/fieldset/pdx-fieldset.ts",
+      "path": "src/fieldset/pdx-fieldset.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -14032,7 +14032,7 @@
           "name": "pdx-fieldset",
           "declaration": {
             "name": "PdxFieldset",
-            "module": "src/fieldset/pdx-fieldset.ts"
+            "module": "src/fieldset/pdx-fieldset.pdx"
           }
         }
       ]

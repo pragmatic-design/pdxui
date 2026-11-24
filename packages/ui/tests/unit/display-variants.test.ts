@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/card/pdx-card.pdx';
-import '../../src/fieldset/pdx-fieldset';
+import '../../src/fieldset/pdx-fieldset.pdx';
 import '../../src/tabs/pdx-tabs';
 import '../../src/description-list/pdx-description-list';
 import '../../src/statistic/pdx-statistic.pdx';
