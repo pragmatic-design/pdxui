@@ -130,6 +130,10 @@ export const ROWS: Row[] = [
     { name: '{{ }} text', expected: '<p>3 items</p>', template: '<p>{{ n }} items</p>', script: 'let n = $signal(3);' },
     { name: '{{ }} text after a change', expected: '<p>2</p><button>+</button>', template: '<p>{{ n }}</p><button @click="n++">+</button>', script: 'let n = $signal(1);', act: click('button') },
     { name: ':attr', expected: '<a href="/a" title="T">x</a>', template: '<a :href="url" :title="t">x</a>', script: "let url = $signal('/a'); let t = $signal('T');" },
+    // A control-flow node alone at the root is the render itself (#1354): mounted, and after a change.
+    { name: 'a root @if chain, after a change', expected: '<p>b</p>', template: "@if (m === 'a') { <p @click=\"m = 'b'\">a</p> } @else if (m === 'b') { <p>b</p> } @else { <p>c</p> }", script: "let m = $signal('a');", act: click('p') },
+    { name: 'a root @switch, after a change', expected: '<p>?</p>', template: "@switch (m) { @case ('a') { <p @click=\"m = 'z'\">a</p> } @default { <p>?</p> } }", script: "let m = $signal('a');", act: click('p') },
+    { name: 'a root @for, after a change', expected: '<p>1</p><p>2</p><p>3</p>', template: '@for (items as it; track it) { <p @click="items = [...items, 3]">{{ it }}</p> }', script: 'let items = $signal([1, 2]);', act: click('p') },
     // Core's bindUrl (#1346): a refused URL leaves no attribute, in a row as at the top, and null removes it.
     { name: ':href in a @for row, one refused', expected: '<ul><li><a href="/a">x</a></li><li><a>x</a></li></ul>', template: '<ul>@for (items as it, i; track i) {<li><a :href="it">x</a></li>}</ul>', script: "let items = $signal(['/a', 'javascript:alert(1)']);" },
     { name: ':href changed to null', expected: '<a>x</a><button>n</button>', template: '<a :href="u">x</a><button @click="u = null">n</button>', script: "let u = $signal('/a');", act: click('button') },
