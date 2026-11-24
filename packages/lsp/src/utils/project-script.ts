@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { analyzeScript, DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, propOptionsOf, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
+import { analyzeScript, DECORATOR_RUNES, eventEmitterName, isReservedWord, parseActionDecl, parseFetchDecl, parseVariantsBlock, propOptionsOf, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -175,6 +175,24 @@ export function projectScriptMapped(
             if (icon) {
                 for (let o = 0; o < icon[0].length; o++) out[afterKw + o] = ' ';
                 afterKw += icon[0].length;
+            }
+            // `@prop for as htmlFor: T` (#1239): the script reads the alias, so the public name and `as`
+            // are blanked — `var htmlFor: T`, the name the script and the template declare.
+            // Match: the public name and `as` before the alias. Groups: [1]=the leading space [2]=`for as `
+            const aliased = kw === 'prop' ? /^(\s+)([A-Za-z_$][\w$]*\s+as\s+)(?=[A-Za-z_$])/.exec(s.slice(afterKw)) : null;
+            if (aliased) {
+                const from = afterKw + aliased[1].length;
+                for (let o = 0; o < aliased[2].length; o++) out[from + o] = ' ';
+            }
+            // `@prop for: T` with no alias: the compiler drops the declaration and says why,
+            // PDX_PROP_NAME_RESERVED (#1239). Projected, `var for` would be three TypeScript errors on
+            // top of it, so the declaration is blanked to the end of its line, as the compiler drops it.
+            // Match: the name right after the keyword. Groups: [1]=the name
+            const named = aliased ? null : /^\s+([A-Za-z_$][\w$]*)/.exec(s.slice(afterKw));
+            if (named && isReservedWord(named[1])) {
+                const lineEnd = s.indexOf('\n', m.index);
+                for (let o = m.index; o < (lineEnd < 0 ? s.length : lineEnd); o++) out[o] = ' ';
+                continue;
             }
             // `@prop hint?: T` (#130): a variable takes no `?`, so it is blanked — the name keeps its type.
             // Match: the name and the `?` after it. Groups: [1]=up to the `?`

@@ -334,6 +334,10 @@ A `@prop` takes the same option, alone: `@prop columns: number | 'auto' = 3 { at
 reads `columns="2"` as the string `'2'` and keeps `number | 'auto'` as the type. Without it such a prop
 does not observe its attribute, `PDX_PROP_ATTRIBUTE_AMBIGUOUS`. In TypeScript: `prop(3, { type: String })`.
 
+A public name no script can read, a reserved word such as a label's `for`, is read by an alias:
+`@prop for as htmlFor: string = '';`. The attribute and the property are `for`; the script and the
+template read `htmlFor`. Without `as` it is `PDX_PROP_NAME_RESERVED`.
+
 ## @event — what a component communicates
 
 A component shouldn't know *what* the parent does when something happens: it just **emits an event**.

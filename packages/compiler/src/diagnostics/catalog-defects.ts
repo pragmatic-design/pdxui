@@ -202,6 +202,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<p>{{ value }}</p>', '@model value: string | string[] | null = null { attribute: string };'),
         },
     },
+    PDX_PROP_NAME_RESERVED: {
+        severity: 'error', category: 'defect',
+        summary: "A `@prop`'s name is a reserved word of JavaScript, which no script can read as a name.",
+        explanation: "`@prop for: string` compiled to `const for = …`, a module that does not parse, reported as the compiler's own fault (#1239). The script and the template read a prop by its name, and `for`, `class` or `default` cannot be one. The public name can stay what the platform names it, read by an alias.",
+        fix: "Keep the public name, and read it by an alias: `@prop for as htmlFor: string = '';` — the attribute and the property are `for`, the script and the template read `htmlFor`.",
+        example: {
+            bad: pdx('<label>x</label>', "@prop for: string = '';"),
+            good: pdx('<label :for="htmlFor">x</label>', "@prop for as htmlFor: string = '';"),
+        },
+    },
     PDX_PROP_ATTRIBUTE_AMBIGUOUS: {
         severity: 'warn', category: 'defect',
         summary: "A `@prop`'s type unites values whose attribute is read differently, so its attribute is not observed.",

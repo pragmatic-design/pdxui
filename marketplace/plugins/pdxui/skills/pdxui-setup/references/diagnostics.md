@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 120 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 121 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1451,6 +1451,36 @@ Unbalanced brackets or a trailing `|`, `&` or `,` — the generated `.d.ts` may 
 It reaches the prop only because the compiler knows the component; written for an unknown element it would not.
 
 **Fix.** Write the declared name: `:maxItems`. `pdx check --fix` and the editor apply it.
+
+### PDX_PROP_NAME_RESERVED
+
+*error* — A `@prop`'s name is a reserved word of JavaScript, which no script can read as a name.
+
+`@prop for: string` compiled to `const for = …`, a module that does not parse, reported as the compiler's own fault (#1239). The script and the template read a prop by its name, and `for`, `class` or `default` cannot be one. The public name can stay what the platform names it, read by an alias.
+
+**Fix.** Keep the public name, and read it by an alias: `@prop for as htmlFor: string = '';` — the attribute and the property are `for`, the script and the template read `htmlFor`.
+
+Instead of:
+
+```html
+<template>
+  <label>x</label>
+</template>
+<script>
+@prop for: string = '';
+</script>
+```
+
+write:
+
+```html
+<template>
+  <label :for="htmlFor">x</label>
+</template>
+<script>
+@prop for as htmlFor: string = '';
+</script>
+```
 
 ### PDX_PROP_NO_TYPE
 

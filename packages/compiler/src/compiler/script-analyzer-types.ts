@@ -7,7 +7,14 @@ import type { VariantAxis } from './variants';
 // ─── Types ─────────────────────────────────────────────────────────
 
 export interface PropInfo {
+    /** The name the script and the template read the prop by: the alias, when there is one. */
     name: string;
+    /**
+     * `@prop for as htmlFor: T` (#1239): the public name, the attribute and the element's property, when
+     * it differs from `name`. Absent, the public name is `name`. The descriptor, the `.d.ts`, the manifest
+     * and a parent's attribute use it; the script and the template use `name`.
+     */
+    publicName?: string;
     tsType: string;       // 'string', 'number', 'boolean', 'Item[]', etc.
     runtimeType: string;  // 'String', 'Number', 'Boolean', 'Array', 'Object'
     default?: string;     // default value expression as string

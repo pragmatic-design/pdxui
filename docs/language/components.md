@@ -28,7 +28,7 @@ functions (#495).
 ### Syntax
 
 ```ebnf
-PropDecl ::= "@prop" ( "(icon)" )? S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? ( S? "{" S? "attribute" S? ":" S? Reading S? "}" )? End
+PropDecl ::= "@prop" ( "(icon)" )? S Identifier ( S "as" S Identifier )? "?"? S? ":" S? Type ( S? "=" S? Expression )? ( S? "{" S? "attribute" S? ":" S? Reading S? "}" )? End
 Reading  ::= "string" | "number" | "boolean" | "json"
 ```
 
@@ -46,6 +46,12 @@ string };` is `prop(3, { type: String })`, and its `.d.ts` and manifest keep `nu
 the type decides; a union of values whose attributes are read differently is an Object prop, whose
 attribute is not observed, and is `PDX_PROP_ATTRIBUTE_AMBIGUOUS`. A union with an object type is a
 property by intent, and is not reported.
+
+`as` (#1239 — landed) reads a prop by another name than its public one, for a public name no script
+can read: `@prop for as htmlFor: string = '';`. The attribute, the element's property, the descriptor's
+key, the `.d.ts` and the manifest are `for`, as on a native `<label>`; the script and the template read
+`htmlFor`, the DOM's own name for a label's `for`. A `@prop` named after a reserved word with no `as` is
+`PDX_PROP_NAME_RESERVED` (error). A `@model` takes no alias (`PDX_UNKNOWN_DECLARATION`).
 
 The beta adds **required props** with TypeScript's rule (#130 — landed):
 
@@ -70,6 +76,8 @@ migrate`'s `?` preserve the meaning of existing code exactly; TypeScript still t
   (optional).
 - The alpha rules stay (`PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
   `PDX_DUP_PROP`, `PDX_PROP_WRITE`).
+- A name that is a reserved word of JavaScript (`for`, `class`, `default`) with no `as` is
+  `PDX_PROP_NAME_RESERVED` (error), at the `@prop`.
 - A union of differently read values with no `{ attribute }` is `PDX_PROP_ATTRIBUTE_AMBIGUOUS`
   (warning); a reading that is not `string`, `number`, `boolean` or `json` is
   `PDX_MODEL_ATTRIBUTE_UNKNOWN` (error), the model's code.

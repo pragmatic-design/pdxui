@@ -55,6 +55,11 @@ const RESERVED = new Set([
     'protected', 'public', 'arguments', 'eval',
 ]);
 
+/** Whether `name` is a word no binding of a module may take (RESERVED): a prop's too (#1239). */
+export function isReservedWord(name: string): boolean {
+    return RESERVED.has(name);
+}
+
 /** A name to suggest instead of a reserved one: the past participle an event is usually named by. */
 const INSTEAD: Record<string, string> = {
     delete: 'remove` or `deleted', import: 'imported', export: 'exported', new: 'created', default: 'reset',

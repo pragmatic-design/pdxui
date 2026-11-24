@@ -327,7 +327,8 @@ export class ComponentResolver {
             const cached = this.projectRequired.get(file);
             if (cached && cached.mtimeMs === mtimeMs) return cached;
             const analysis = analyzeScript(parseSFC(readFileSync(file, 'utf-8')).script?.content ?? '', file);
-            const props = new Set(analysis.props.filter(p => p.required).map(p => p.name));
+            // A parent sets the public name, `for` of `@prop for as htmlFor` (#1239).
+            const props = new Set(analysis.props.filter(p => p.required).map(p => p.publicName ?? p.name));
             const slots = new Set(analysis.slots.filter(s => s.required).map(s => s.name));
             const declared = { mtimeMs, props, slots };
             this.projectRequired.set(file, declared);

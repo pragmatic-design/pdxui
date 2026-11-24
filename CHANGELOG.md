@@ -11,6 +11,11 @@ semver.
 
 ### Features
 
+- `@prop for as htmlFor: string = ''` reads a prop by an alias (#1239), for a public name no script can
+  read: the attribute, the property, the `.d.ts` and the manifest are `for`, the script and the template
+  read `htmlFor`. A `@prop` named after a reserved word with no alias is `PDX_PROP_NAME_RESERVED`, at its
+  line; it compiled to a module that did not parse, reported as the compiler's fault.
+
 - A component's script may re-export another module, `export { X } from './x'` or `export * from './x'`
   (#1352): the statement is the module's, emitted beside its imports, and the `.d.ts` re-exports it. A
   library component whose entry gives values besides the component (`DataSourceContext`, `toast`,

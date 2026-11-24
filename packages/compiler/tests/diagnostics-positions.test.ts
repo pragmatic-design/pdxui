@@ -46,6 +46,7 @@ const ROWS: Record<string, Row> = {
     PDX_PROP_INVALID_TYPE: { src: pdx('<p>{{ items }}</p>', '@prop items: Array<string = [];'), at: '@prop items' },
     PDX_PROP_TYPE_MISMATCH: { src: pdx('<p>{{ n }}</p>', "let a = $signal(1);\n@prop n: number = 'x';"), at: '@prop n: number' },
     PDX_MODEL_ATTRIBUTE_AMBIGUOUS: { src: pdx('<p>{{ value }}</p>', 'let a = $signal(1);\n@model value: string | number = 1;'), at: '@model value' },
+    PDX_PROP_NAME_RESERVED: { src: pdx('<p>x</p>', "let a = $signal(1);\n@prop for: string = '';"), at: '@prop for' },
     PDX_PROP_ATTRIBUTE_AMBIGUOUS: { src: pdx('<p>{{ columns }}</p>', "let a = $signal(1);\n@prop columns: number | 'auto' = 3;"), at: '@prop columns' },
     PDX_MODEL_ATTRIBUTE_UNKNOWN: { src: pdx('<p>{{ value }}</p>', "let a = $signal(1);\n@model value: string = '' { attribute: date };"), at: '@model value' },
     PDX_DUP_PROP: { src: pdx('<p>{{ a }}</p>', "@prop a: string = 'x';\n@prop a: string = 'y';"), at: "@prop a: string = 'y';" },

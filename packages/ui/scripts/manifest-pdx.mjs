@@ -65,14 +65,16 @@ export function analyzePdxFile(file, text, categories) {
     ];
     const qualify = packageTypes(d.script);
 
+    // A prop's public name (#1239): `for` of `@prop for as htmlFor`, the attribute and the property.
+    const publicOf = (p) => p.publicName ?? p.name;
     const asProp = (p) => ({
-        name: p.name, type: qualify(p.tsType), runtime: p.runtimeType.toLowerCase(),
+        name: publicOf(p), type: qualify(p.tsType), runtime: p.runtimeType.toLowerCase(),
         // `@prop(icon)` (#1317), the .pdx form of `prop(d, { iconName: true })`.
         ...(p.default !== undefined ? { default: p.default } : {}), iconName: !!p.icon,
         ...(p.required ? { required: true } : {}),
     });
     const plain = a.props.filter(p => !p.model && !p.variant).map(p => ({
-        ...asProp(p), description: docOf('prop', p.name) || PROP_DESC[`${tag}:${p.name}`] || describeProp(p.name),
+        ...asProp(p), description: docOf('prop', publicOf(p)) || PROP_DESC[`${tag}:${publicOf(p)}`] || describeProp(publicOf(p)),
     }));
     // A variant axis is a String prop typed with its values (#512), as gen-manifest's.
     const variants = a.variants ?? [];
