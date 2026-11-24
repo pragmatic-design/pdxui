@@ -1,0 +1,81 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxMasonry",
+  "tagName": "pdx-masonry",
+  "category": "Layout",
+  "order": 72,
+  "description": "A masonry grid: items of different heights flow top to bottom down each column.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "columns",
+      "description": "Number of columns, or 'auto' to fit as many columns of `columnWidth` as the width allows.\n0 and negatives mean 'auto' too. Anything else warns and is treated as 'auto'.",
+      "type": {
+        "text": "number | 'auto'"
+      },
+      "default": "'3'",
+      "attribute": "columns"
+    },
+    {
+      "kind": "field",
+      "name": "columnWidth",
+      "description": "Minimum column width for auto mode (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "250",
+      "attribute": "columnwidth"
+    },
+    {
+      "kind": "field",
+      "name": "gap",
+      "description": "Gap between items (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'1rem'",
+      "attribute": "gap"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "columns",
+      "fieldName": "columns",
+      "description": "Number of columns, or 'auto' to fit as many columns of `columnWidth` as the width allows.\n0 and negatives mean 'auto' too. Anything else warns and is treated as 'auto'.",
+      "type": {
+        "text": "number | 'auto'"
+      },
+      "default": "'3'"
+    },
+    {
+      "name": "columnwidth",
+      "fieldName": "columnWidth",
+      "description": "Minimum column width for auto mode (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "250"
+    },
+    {
+      "name": "gap",
+      "fieldName": "gap",
+      "description": "Gap between items (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'1rem'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-masonry-gap"
+    }
+  ]
+}

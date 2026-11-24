@@ -17,7 +17,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, tick } from './helpers';
-import '../../src/masonry/pdx-masonry';
+import '../../src/masonry/pdx-masonry.pdx';
 
 async function masonry(attrs: string): Promise<HTMLElement> {
     const el = document.createElement('pdx-masonry');

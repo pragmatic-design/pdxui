@@ -234,11 +234,6 @@
       "types": "./dist/app-layout/pdx-app-layout.d.ts",
       "import": "./dist/app-layout/pdx-app-layout.js"
     },
-    "./masonry": {
-      "development": "./src/masonry/pdx-masonry.ts",
-      "types": "./dist/masonry/pdx-masonry.d.ts",
-      "import": "./dist/masonry/pdx-masonry.js"
-    },
     "./affix": {
       "development": "./src/affix/pdx-affix.ts",
       "types": "./dist/affix/pdx-affix.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/dialog/pdx-dialog.pdx",
       "types": "./dist/dialog/pdx-dialog.d.ts",
       "import": "./dist/dialog/pdx-dialog.js"
+    },
+    "./masonry": {
+      "development": "./src/masonry/pdx-masonry.pdx",
+      "types": "./dist/masonry/pdx-masonry.d.ts",
+      "import": "./dist/masonry/pdx-masonry.js"
     },
     "./package.json": "./package.json"
   },

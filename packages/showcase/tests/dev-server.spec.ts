@@ -114,7 +114,7 @@ test('and it still carries the diagnostics a production build strips', async ({ 
     expect(await env.text(), 'the dev server resolved the dev flag to false')
         .toContain('export const DEV = true');
 
-    const masonry = await page.request.get(`/@fs/${packages}/ui/src/masonry/pdx-masonry.ts`);
+    const masonry = await page.request.get(`/@fs/${packages}/ui/src/masonry/pdx-masonry.pdx`);
     expect(await masonry.text(), 'a diagnostic was removed from the dev build too, not just guarded')
         .toContain('is neither a number nor');
 });

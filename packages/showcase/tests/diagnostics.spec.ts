@@ -31,7 +31,7 @@ const bundle = (): string => readdirSync(DIST)
 /** Diagnostics: each teaches the author something, and none of them can help a visitor. */
 const TEACHING: [string, string][] = [
     ['autoPageSize: no row rendered', '@pdxui/ui — data-grid/auto-page-size.ts'],
-    ['is neither a number nor', '@pdxui/ui — masonry/pdx-masonry.ts'],
+    ['is neither a number nor', '@pdxui/ui — masonry/pdx-masonry.pdx'],
     ['options is not an array', '@pdxui/ui — segmented/pdx-segmented.ts'],
     ['is announced "button" alone', '@pdxui/ui — button/pdx-button.pdx and toolbar/pdx-toolbar.ts'],
     ['is not a region', '@pdxui/ui — app-layout/pdx-app-layout.ts'],

@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS:
  *
- *   - Source: packages/ui/src/masonry/pdx-masonry.ts
+ *   - Source: packages/ui/src/masonry/pdx-masonry.pdx
  *       · render() = <slot></slot>: the children (the items) are projected as DIRECT children
  *         of the HOST <pdx-masonry> (light DOM). There is no inner wrapper.
  *       · Props:

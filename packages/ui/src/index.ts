@@ -85,7 +85,7 @@ import './app-layout/pdx-app-layout';
 import './app-shell/pdx-app-shell.pdx';
 import './row/pdx-row.pdx';
 import './col/pdx-col.pdx';
-import './masonry/pdx-masonry';
+import './masonry/pdx-masonry.pdx';
 import './splitter/pdx-splitter';
 import './scroll-area/pdx-scroll-area';
 import './scroll-spy/pdx-scroll-spy.pdx';
