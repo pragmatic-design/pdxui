@@ -11,6 +11,12 @@ semver.
 
 ### Features
 
+- `@try { maxRetries: 3, autoRetry: true, retryDelay: 2000, onError: report } { … } @catch …` (#1365):
+  a block right after `@try` takes core's `errorBoundary` options, each an expression read as the block
+  renders, and the editor checks each value against its key. An unknown key, a key twice and a key with
+  no value stop the compile. A boundary rendered on the server calls `onError` too, so a fallback that
+  reads what it set is the markup the client renders.
+
 - `@prop for as htmlFor: string = ''` reads a prop by an alias (#1239), for a public name no script can
   read: the attribute, the property, the `.d.ts` and the manifest are `for`, the script and the template
   read `htmlFor`. A `@prop` named after a reserved word with no alias is `PDX_PROP_NAME_RESERVED`, at its
@@ -39,6 +45,11 @@ semver.
   esbuild, against 4.3 and 12.3 when the sub-path was the root bundle; the root itself fell to 3.6.
 
 ### Fixes
+
+- A `@try` around a `<slot>` keeps the children it projects across a Retry (#1365). The projection
+  places a host's children once, when it connects, and a retry rendered a new `<slot>` that nothing
+  filled: the boundary came back empty. The boundary now keeps the projected children it clears and puts
+  them in its next content's slots; an automatic retry too.
 
 - `import { pipe } from '@pdxui/core/renderer'` gives the template helper in a build, as it does in
   development and as its types say (#1213). The sub-path was the root bundle once built, and the

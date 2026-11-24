@@ -733,7 +733,9 @@ Two ways, and they are the same machinery.
 ```
 
 `retry` is handed to you: calling it re-runs the block. That is the "and it can be retried" half, and
-it costs nothing extra.
+it costs nothing extra. A block right after `@try` takes the boundary's options, the ones
+`pdx-error-boundary` takes as props: `@try { maxRetries: 3, autoRetry: true, retryDelay: 2000,
+onError: report } { … } @catch …`. Children projected into a `<slot>` inside the block survive a retry.
 
 **As a component**, when the boundary wraps something you did not write:
 

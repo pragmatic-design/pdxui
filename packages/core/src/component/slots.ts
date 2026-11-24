@@ -6,6 +6,7 @@
 import { slotsIn } from './element';
 import type { PdxElement } from './element';
 import { watchPartNodes, unwatchPartNodes } from '../renderer/part-nodes';
+import { setProjectedResolver } from '../renderer/projected';
 
 /** What `PdxElement` asks of the projection: its class's `static slotProjection`. */
 export interface SlotProjection {
@@ -17,9 +18,27 @@ export interface SlotProjection {
     watch(host: PdxElement): void;
 }
 
+/**
+ * The children a host up the tree from `marker` projected that are in `range`, or inside one of its
+ * nodes: the author's, which an error boundary keeps when it clears its range (#1365).
+ */
+function lightChildrenIn(marker: Node, range: Node[]): Node[] {
+    const out: Node[] = [];
+    for (let p = marker.parentNode; p; p = p.parentNode) {
+        const light = (p as Partial<PdxElement>)._lightChildren;
+        if (!light) continue;
+        for (const child of light) if (range.some((n) => n === child || n.contains(child))) out.push(child);
+    }
+    return out;
+}
+
+// Set the first time a component projects, not at load: the module stays free of load-time effects.
+let resolverSet = false;
+
 /** Replace <slot> placeholders with projected children. */
 function projectSlots(host: PdxElement): void {
     if (host._projectedChildren.length === 0) return;
+    if (!resolverSet) { setProjectedResolver(lightChildrenIn); resolverSet = true; }
 
     // Only the slots OUR template rendered (captured from body() before it was inserted — see
     // connectedCallback). `querySelectorAll` does not stop at component boundaries: an empty

@@ -556,6 +556,20 @@ A subtree can fail (a component that throws, malformed data). `@try` isolates it
 The error doesn't propagate and crash the whole page: it stays confined to the boundary, which shows
 the fallback.
 
+A block right after `@try` takes the boundary's options: how many retries it allows, whether it retries
+by itself and after how long, and a function told of each error before the fallback shows:
+
+```pdx
+@try { maxRetries: 3, autoRetry: true, retryDelay: 2000, onError: report } {
+  <slot></slot>
+} @catch (e, retry) {
+  <button @click="retry()">Retry</button>
+}
+```
+
+Children a component projects into a `<slot>` inside the block are kept while the fallback shows, and
+a retry puts them back.
+
 What is thrown is not always an `Error`, so the editor types `e` as `unknown`, as TypeScript types a
 `catch`: say what you expect before reading a member, as above. The error of `@await … @error (e)` is
 the same.

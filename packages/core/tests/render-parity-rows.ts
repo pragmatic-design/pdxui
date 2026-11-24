@@ -332,6 +332,8 @@ export const ROWS: Row[] = [
         read: (h) => (h.querySelector('x-probe') as unknown as { value: unknown }).value,
     },
     { name: '@try / @catch', expected: '<p>caught</p>', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
+    // errorBoundary's options from the template (#1365): onError hears the error with its count first.
+    { name: '@try with options', expected: '<p>caught 1</p>', template: '@try { maxRetries: 0, onError: seen } { <p>{{ boom() }}</p> } @catch (e) { <p>caught {{ count }}</p> }', script: "let count = $signal(0);\nfunction seen(_e: Error, n: number) { count = n; }\nfunction boom() { throw new Error('x'); }" },
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.
     { name: '@if with @transition', hydrateDiffers: 'the element the server wrote stays where it is: it does not enter', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<p class="pdx-enter-active pdx-fade">x</p>', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
     { name: '@for with @transition', hydrateDiffers: 'the element the server wrote stays where it is: it does not enter', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<ul><li class="pdx-enter-active pdx-fade">a</li></ul>', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },

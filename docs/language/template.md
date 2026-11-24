@@ -1694,17 +1694,37 @@ alpha; the source, `as`, the plain values and the timing as above since #145
 #### Syntax
 
 ```ebnf
-TryBlock       ::= "@try" Block S? "@catch" S? "(" S? Identifier ( S? "," S? Identifier )? S? ")" Block
+TryBlock       ::= "@try" S? TryOptions? Block S? "@catch" S? "(" S? Identifier ( S? "," S? Identifier )? S? ")" Block
+TryOptions     ::= "{" S? TryOption ( S? "," S? TryOption )* S? "}" S?
+TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" ) S? ":" S? Expression
 ```
 
 #### Semantics
 
-`errorBoundary(() => html\`…\`, (err, retry) => html\`…\`)`: an error thrown while the body renders,
-or by one of its effects, replaces the body with the `@catch` body. The first name is the error; the
-second, `retry` when omitted, renders the body again.
+`errorBoundary(() => html\`…\`, (err, retry) => html\`…\`, { … })`: an error thrown while the body
+renders, or by one of its effects, replaces the body with the `@catch` body. The first name is the
+error; the second, `retry` when omitted, renders the body again.
+
+The options are core's (#1365), each an expression of the script's names, read when the block renders:
+
+- `maxRetries` — how many retries the boundary allows; after that the second name does nothing.
+  Unlimited when omitted.
+- `autoRetry` — `true` renders the body again by itself, `retryDelay` ms after an error, until
+  `maxRetries`; then the `@catch` body. `false` when omitted.
+- `retryDelay` — the delay of an automatic retry, in ms. 1000 when omitted.
+- `onError` — a function called with the error and how many errors in a row there have been, before
+  the `@catch` body renders: telemetry, or a state the `@catch` body reads. A page rendered on the
+  server calls it too, with the count 1, so its fallback is the markup the client renders.
+
+The children a host projects into a `<slot>` inside the body are the author's, not the body's: when
+the body is replaced, by the `@catch` body or by a retry, they are kept, and a retry puts them back in
+its slots. They connect again there, so a child that threw mounts afresh.
 
 #### Rules
 
+- The options block is the block right after `@try` when another block follows it — a body is
+  followed by `@catch`, never by a block. A key that is not one of the four, a key twice and a key
+  with no value stop the compile.
 - `@catch` is required right after the body: `Expected @catch after @try`.
 - At most two names, valid identifiers, not the same twice; anything else stops the compile.
 - Both names are in the `@catch` body's scope, whatever they are called: `@catch (problem, again)`
@@ -1730,9 +1750,27 @@ function total(o: { lines: number[] }) { return o.lines.reduce((a, b) => a + b, 
 </script>
 ```
 
+A boundary around a component's children, with a retry limit and a log of what failed:
+
+```pdx
+<template>
+  @try { maxRetries: 3, onError: logged } {
+    <slot></slot>
+  } @catch (err, retry) {
+    <p role="alert">Something went wrong ({{ failures }}).</p>
+    <button @click="retry()">Retry</button>
+  }
+</template>
+
+<script>
+let failures = $signal(0);
+function logged(error: Error, count: number) { failures = count; console.warn(error); }
+</script>
+```
+
 #### Since
 
-alpha
+alpha; the options and the kept children since #1365
 
 ### `@let`
 

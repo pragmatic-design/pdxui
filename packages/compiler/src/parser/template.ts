@@ -16,6 +16,8 @@
 import { BLOCK_DIRECTIVES, TEMPLATE_AT_DIRECTIVES } from './template-directives';
 import { splitAwaitBinding } from './await-binding';
 import { splitAtDepthZero } from '../compiler/tokenizer';
+import { parseTryOptions } from './try-options';
+import type { TryOption } from './try-options';
 
 // ─── Source Location ───────────────────────────────────────────────
 
@@ -183,6 +185,8 @@ export interface TryNode {
     /** The name the catch body calls to retry — the author's second name, or `retry`. */
     retryVar: string;
     catchBody: TemplateNode[];
+    /** errorBoundary's options, from the block right after `@try` (#1365); undefined without one. */
+    options?: TryOption[];
     loc?: SourceLoc;
 }
 
@@ -1103,9 +1107,25 @@ function parseBoundaryParams(raw: string, directive: string, ctx: ParseContext):
 
 // ─── @try / @catch ────────────────────────────────────────────────
 
-/** Parse @try { ... } @catch (error) { ... } — error boundary directive. */
+/**
+ * Parse @try { ... } @catch (error) { ... } — error boundary directive — and its options,
+ * @try { maxRetries: n, … } { ... } @catch …, a block right after `@try` that another block follows
+ * (./try-options, #1365).
+ */
 function parseTry(ctx: ParseContext, loc: SourceLoc): TryNode {
     skipWhitespace(ctx);
+    let options: TryOption[] | undefined;
+    if (ctx.source[ctx.pos] === '{') {
+        const blockEnd = findClosingBrace(ctx.source, ctx.pos + 1);
+        let after = blockEnd + 1;
+        while (after < ctx.source.length && /\s/.test(ctx.source[after])) after++;
+        if (blockEnd > ctx.pos && ctx.source[after] === '{') {
+            const line = ctx.line;
+            options = parseTryOptions(ctx.source.slice(ctx.pos + 1, blockEnd), line);
+            advanceTo(ctx, blockEnd + 1);
+            skipWhitespace(ctx);
+        }
+    }
     const body = parseBlock(ctx);
 
     skipWhitespace(ctx);
@@ -1122,7 +1142,7 @@ function parseTry(ctx: ParseContext, loc: SourceLoc): TryNode {
     skipWhitespace(ctx);
     const catchBody = parseBlock(ctx);
 
-    return { type: 'try', body, errorVar, retryVar, catchBody, loc };
+    return { type: 'try', body, errorVar, retryVar, catchBody, ...(options ? { options } : {}), loc };
 }
 
 // ─── @slot(name, { … }) { … } (removed, #492) ─────────────────────

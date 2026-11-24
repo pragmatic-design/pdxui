@@ -6,6 +6,7 @@ import type { Dispose } from '../utils/types';
 import { nodesBetween } from './helpers';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
+import { projectedIn, projectKept } from './projected';
 
 // A boundary's range is the nodes between its two comments. Marking them lets an error find its
 // boundary through the DOM, which is what encloses a component: the handler stack only covers the
@@ -137,6 +138,9 @@ export function followBoundary(
     let showingFallback = false;
     // While the fallback shows: the effect watching `resetOn`, disposed when the content comes back.
     let resetWatch: Dispose | null = null;
+    // The host's own children the projection had placed in the content, taken out when the range was
+    // cleared and put in the slots of the next content (./projected, #1365).
+    let kept: Node[] = [];
 
     if (!resolverInstalled) {
         setErrorOwnerResolver(resolveOwner);
@@ -161,8 +165,11 @@ export function followBoundary(
         const parent = end.parentNode;
         if (!parent) return;
         // Everything between the markers, not the nodes inserted: a `<slot>` in the content is
-        // replaced by the projected children, which a snapshot would leave behind.
-        for (const n of nodesBetween(start, end)) parent.removeChild(n);
+        // replaced by the projected children, which a snapshot would leave behind. Those children are
+        // the host's, not the content's: kept for the next content's slots, which nothing else fills.
+        const range = nodesBetween(start, end);
+        kept.push(...projectedIn(start, range));
+        for (const n of range) parent.removeChild(n);
     }
 
     function insertNodes(content: Node | DocumentFragment): void {
@@ -172,6 +179,15 @@ export function followBoundary(
             ? Array.from(content.childNodes)
             : [content];
         for (const n of nodes) placePartNode(parent, n, end);
+    }
+
+    /** The content, with the children kept from the last clear in its slots. */
+    function renderWithKept(): Node | DocumentFragment {
+        const content = contentFn();
+        if (kept.length === 0) return content;
+        const nodes = kept;
+        kept = [];
+        return projectKept(content, nodes);
     }
 
     function renderContent(): void {
@@ -192,7 +208,7 @@ export function followBoundary(
 
         pushErrorHandler(errorHandler);
         try {
-            const [, dispose] = collectDisposers(() => take(contentFn));
+            const [, dispose] = collectDisposers(() => take(renderWithKept));
             childDispose = dispose;
             retryCount = 0; // Reset on success
         } catch (err) {

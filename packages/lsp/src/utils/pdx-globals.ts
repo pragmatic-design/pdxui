@@ -83,6 +83,9 @@ declare global {
     : T extends { data(): infer D; state(): unknown } ? Exclude<D, undefined>
     : T;
   function __pdxAwaited<T>(source: T): PdxAwaited<T>;
+  // \`@try { maxRetries: n, … } { … }\` (#1365): the options of core's errorBoundary, each value an
+  // expression the projection checks against its key.
+  function __pdxTryOptions(options: { maxRetries?: number; autoRetry?: boolean; retryDelay?: number; onError?: (error: Error, retryCount: number) => void }): void;
   // What \`@fetch name: 'GET /url' as T\` gives the script and the template: core's Resource<T>, whose
   // reads are signals — \`name.data()\`, not \`name.data\`. tests/fetch-types.test.ts fails when a
   // member of Resource is missing here.

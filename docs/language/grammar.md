@@ -292,7 +292,9 @@ AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")"
 AwaitTiming    ::= "{" S? TimingOption ( S? "," S? TimingOption )? S? "}"
 TimingOption   ::= ( "minMs" | "maxMs" ) S? ":" S? Digits
 ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
-TryBlock       ::= "@try" Block S? "@catch" S? ErrorNames Block
+TryBlock       ::= "@try" S? TryOptions? Block S? "@catch" S? ErrorNames Block                              (#1365: the options)
+TryOptions     ::= "{" S? TryOption ( S? "," S? TryOption )* S? "}" S?
+TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" ) S? ":" S? Expression
 LetDecl        ::= "@let" S Identifier S? "=" S? Expression ";"
 RawBlock       ::= "@raw" S? "{" /* any text with balanced braces */ "}"
 ```
