@@ -274,11 +274,6 @@
       "types": "./dist/affix/pdx-affix.d.ts",
       "import": "./dist/affix/pdx-affix.js"
     },
-    "./scroll-spy": {
-      "development": "./src/scroll-spy/pdx-scroll-spy.ts",
-      "types": "./dist/scroll-spy/pdx-scroll-spy.d.ts",
-      "import": "./dist/scroll-spy/pdx-scroll-spy.js"
-    },
     "./timeline": {
       "development": "./src/timeline/pdx-timeline.ts",
       "types": "./dist/timeline/pdx-timeline.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/relative-time/pdx-relative-time.pdx",
       "types": "./dist/relative-time/pdx-relative-time.d.ts",
       "import": "./dist/relative-time/pdx-relative-time.js"
+    },
+    "./scroll-spy": {
+      "development": "./src/scroll-spy/pdx-scroll-spy.pdx",
+      "types": "./dist/scroll-spy/pdx-scroll-spy.d.ts",
+      "import": "./dist/scroll-spy/pdx-scroll-spy.js"
     },
     "./package.json": "./package.json"
   },
