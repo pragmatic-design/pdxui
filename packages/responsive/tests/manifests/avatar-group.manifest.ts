@@ -2,7 +2,7 @@
  * MANIFEST — pdx-avatar-group
  *
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
- *   - Source: packages/ui/src/avatar-group/pdx-avatar-group.ts
+ *   - Source: packages/ui/src/avatar-group/pdx-avatar-group.pdx
  *       · render() = html`` (EMPTY). The DOM is built imperatively in ctx.track:
  *         · the HOST <pdx-avatar-group> carries no class (#291): the tag is display:inline-block.
  *         · a <div class="pdx-avatar-group"> (the INNER box) is created and appended to the host → it is

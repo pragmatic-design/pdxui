@@ -1,0 +1,85 @@
+<template>
+  <div class="pdx-avatar-group" :class="{ 'pdx-avatar-group-reverse': reverse }" data-part="root">
+    @for (shown as item, idx; track idx) {
+      <pdx-avatar class="pdx-avatar-group-item" data-part="avatar"
+        :class="{ 'pdx-avatar-group-bordered': bordered, 'pdx-avatar-group-clickable': clickable }"
+        :alt="item.name || null" :src="item.src || null" :color="item.color || null" :size="size"
+        :style="{ 'z-index': shown.length + 1 - idx, 'margin-left': idx > 0 && !reverse ? overlap + 'px' : null, 'margin-right': idx > 0 && reverse ? overlap + 'px' : null }"
+        :role="clickable ? 'button' : null" :tabindex="clickable ? '0' : null"
+        :aria-label="clickable && !item.name ? format(uiString('avatar-group', 'member'), { n: idx + 1 }) : null"
+        @click="clickable && pdxClick({ item, index: idx })"
+        @keydown="e => clickable && pressed(e, () => pdxClick({ item, index: idx }))"></pdx-avatar>
+    }
+    @if (hidden > 0) {
+      <div class="pdx-avatar-group-overflow pdx-avatar-group-item" data-part="overflow"
+        :class="{ 'pdx-avatar-group-bordered': bordered }"
+        :style="{ 'margin-left': reverse ? null : overlap + 'px', 'margin-right': reverse ? overlap + 'px' : null }"
+        :role="clickable ? 'button' : 'img'" :tabindex="clickable ? '0' : null"
+        :aria-label="format(uiString('avatar-group', 'more'), { count: hidden })"
+        @click="more()"
+        @keydown="e => clickable && pressed(e, more)">+{{ hidden }}</div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * Stacked, overlapping avatars, up to a maximum count, with an overflow counter for the rest.
+ *
+ * @csspart root - The row the avatars and the counter are laid out in.
+ * @csspart avatar - Each avatar shown.
+ * @csspart overflow - The «+N» counter for the avatars not shown.
+ */
+// pdx-avatar-group — Stacked avatar group with overflow counter.
+// Shows up to `max` avatars overlapping, with a +N badge for the rest.
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/avatar-group';
+import '../avatar/pdx-avatar.pdx'; // rendered by this component, and registered by nobody else
+
+/** A clickable group's avatar was pressed: its item and its index. */
+@event 'pdx-click': { item: unknown; index: number };
+/** The «+N» counter was pressed: how many are hidden, and which. */
+@event 'pdx-overflow-click': { count: number; items: unknown[] };
+@part root, avatar, overflow;
+// The axis avatar-group.css keys by (#632), reflected on the host: it draws the overflow badge
+// and is passed to every avatar. No native class is kept: the badge is not the root part, and
+// nothing used `.pdx-avatar-size-*` on native markup.
+@variants {
+  /** The avatars' and the badge's size: xs, sm, md (the default), lg or xl. */
+  size: { md, xs, sm, lg, xl } = md;
+}
+@prop items: unknown[] | null = null;
+@prop max: number = 5;
+@prop overlap: number = -8;
+@prop direction: string = 'row';
+/** Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click. */
+@prop clickable: boolean = false;
+@prop bordered: boolean = true;
+
+/** What an item of `items` may carry. */
+interface AvatarItem { name?: string; src?: string; color?: string }
+
+const all = $derived(((items as unknown[] | null) ?? []) as AvatarItem[]);
+const shown = $derived(all.slice(0, max as number));
+const hidden = $derived(all.length - (max as number));
+const reverse = $derived(direction === 'row-reverse');
+
+/**
+ * Enter or Space on an avatar or the counter that is a button runs `activate`, as a click does.
+ * The avatar is named by its own image when it has a name; «Member N» when it has none (the avatar
+ * is then hidden, and the button would have no name). An aria-label over a named avatar would not
+ * hold the initials it shows (WCAG 2.5.3).
+ */
+function pressed(e: KeyboardEvent, activate: () => void): void {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  activate();
+}
+
+/** The «+N» counter: how many are hidden, and which. Fires whether or not the group is clickable. */
+function more(): void {
+  pdxOverflowClick({ count: hidden, items: all.slice(max as number) });
+}
+</script>

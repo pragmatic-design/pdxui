@@ -1,0 +1,185 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAvatarGroup",
+  "tagName": "pdx-avatar-group",
+  "category": "Atoms",
+  "order": 7,
+  "description": "Stacked, overlapping avatars, up to a maximum count, with an overflow counter for the rest.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "overlap",
+      "description": "How much adjacent avatars overlap.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-8",
+      "attribute": "overlap"
+    },
+    {
+      "kind": "field",
+      "name": "direction",
+      "description": "Stacking direction.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'row'",
+      "attribute": "direction"
+    },
+    {
+      "kind": "field",
+      "name": "clickable",
+      "description": "Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clickable"
+    },
+    {
+      "kind": "field",
+      "name": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "bordered"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "The avatars' and the badge's size: xs, sm, md (the default), lg or xl.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-click",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A clickable group's avatar was pressed: its item and its index.",
+      "detail": "{ item: unknown; index: number }"
+    },
+    {
+      "name": "pdx-overflow-click",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The «+N» counter was pressed: how many are hidden, and which.",
+      "detail": "{ count: number; items: unknown[] }"
+    }
+  ],
+  "roles": [
+    "button",
+    "img"
+  ],
+  "attributes": [
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5"
+    },
+    {
+      "name": "overlap",
+      "fieldName": "overlap",
+      "description": "How much adjacent avatars overlap.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-8"
+    },
+    {
+      "name": "direction",
+      "fieldName": "direction",
+      "description": "Stacking direction.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'row'"
+    },
+    {
+      "name": "clickable",
+      "fieldName": "clickable",
+      "description": "Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "bordered",
+      "fieldName": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "The avatars' and the badge's size: xs, sm, md (the default), lg or xl.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The row the avatars and the counter are laid out in."
+    },
+    {
+      "name": "avatar",
+      "description": "Each avatar shown."
+    },
+    {
+      "name": "overflow",
+      "description": "The «+N» counter for the avatars not shown."
+    }
+  ]
+}
