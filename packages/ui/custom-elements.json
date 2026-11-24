@@ -3314,7 +3314,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/bottom-nav/pdx-bottom-nav.ts",
+      "path": "src/bottom-nav/pdx-bottom-nav.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -3417,7 +3417,7 @@
           "name": "pdx-bottom-nav",
           "declaration": {
             "name": "PdxBottomNav",
-            "module": "src/bottom-nav/pdx-bottom-nav.ts"
+            "module": "src/bottom-nav/pdx-bottom-nav.pdx"
           }
         }
       ]

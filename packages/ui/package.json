@@ -229,11 +229,6 @@
       "types": "./dist/toolbar/pdx-toolbar.d.ts",
       "import": "./dist/toolbar/pdx-toolbar.js"
     },
-    "./bottom-nav": {
-      "development": "./src/bottom-nav/pdx-bottom-nav.ts",
-      "types": "./dist/bottom-nav/pdx-bottom-nav.d.ts",
-      "import": "./dist/bottom-nav/pdx-bottom-nav.js"
-    },
     "./pagination": {
       "development": "./src/pagination/pdx-pagination.ts",
       "types": "./dist/pagination/pdx-pagination.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/col/pdx-col.pdx",
       "types": "./dist/col/pdx-col.d.ts",
       "import": "./dist/col/pdx-col.js"
+    },
+    "./bottom-nav": {
+      "development": "./src/bottom-nav/pdx-bottom-nav.pdx",
+      "types": "./dist/bottom-nav/pdx-bottom-nav.d.ts",
+      "import": "./dist/bottom-nav/pdx-bottom-nav.js"
     },
     "./package.json": "./package.json"
   },
