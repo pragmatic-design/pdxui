@@ -14,7 +14,7 @@ import { component, html, createForm, formField, createFormCoordinator, provideF
 import type { FormCoordinator } from '@pdxui/core';
 import '../../src/form/pdx-form.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
-import '../../src/field-group/pdx-field-group';
+import '../../src/field-group/pdx-field-group.pdx';
 import { cleanup, tick } from './helpers';
 
 const setupOrder: string[] = [];

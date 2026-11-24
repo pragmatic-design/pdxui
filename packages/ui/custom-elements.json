@@ -13314,7 +13314,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/field-group/pdx-field-group.ts",
+      "path": "src/field-group/pdx-field-group.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -13462,7 +13462,7 @@
           "name": "pdx-field-group",
           "declaration": {
             "name": "PdxFieldGroup",
-            "module": "src/field-group/pdx-field-group.ts"
+            "module": "src/field-group/pdx-field-group.pdx"
           }
         }
       ]

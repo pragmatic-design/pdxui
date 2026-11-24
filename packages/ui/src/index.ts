@@ -60,7 +60,7 @@ import './form-section/pdx-form-section.pdx';
 import './form-actions/pdx-form-actions.pdx';
 import './form-field/pdx-form-field.pdx';
 import './fieldset/pdx-fieldset';
-import './field-group/pdx-field-group';
+import './field-group/pdx-field-group.pdx';
 import './field-list/pdx-field-list.pdx';
 import './wizard/pdx-wizard';
 

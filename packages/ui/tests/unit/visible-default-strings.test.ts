@@ -19,7 +19,7 @@ import '../../src/empty-state/pdx-empty-state.pdx';
 import '../../src/list/pdx-list.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/edit-drawer/pdx-edit-drawer';
-import '../../src/field-group/pdx-field-group';
+import '../../src/field-group/pdx-field-group.pdx';
 import '../../src/data-grid/pdx-data-grid';
 import '../../src/infinite-scroll/pdx-infinite-scroll.pdx';
 import '../../src/password-input/pdx-password-input.pdx';

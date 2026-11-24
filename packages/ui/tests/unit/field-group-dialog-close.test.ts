@@ -5,7 +5,7 @@
 // no longer sends would leave the group's open state true behind a closed dialog.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/field-group/pdx-field-group';
+import '../../src/field-group/pdx-field-group.pdx';
 
 describe('pdx-field-group dialog — closing', () => {
     beforeEach(cleanup);

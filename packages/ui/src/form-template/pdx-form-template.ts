@@ -18,7 +18,7 @@ import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternal
 import '../form/pdx-form.pdx';
 import '../form-field/pdx-form-field.pdx';
 import '../form-actions/pdx-form-actions.pdx';
-import '../field-group/pdx-field-group';
+import '../field-group/pdx-field-group.pdx';
 import '../field-list/pdx-field-list.pdx';
 import '../input/pdx-input.pdx';
 import '../textarea/pdx-textarea.pdx';
