@@ -50,6 +50,7 @@ const PORTED: Record<string, string> = {
     'pdx-provide': 'src/provide/pdx-provide.pdx',
     'pdx-sidebar': 'src/sidebar/pdx-sidebar.pdx',
     'pdx-row': 'src/row/pdx-row.pdx',
+    'pdx-col': 'src/col/pdx-col.pdx',
     'pdx-form-section': 'src/form-section/pdx-form-section.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',

@@ -18,7 +18,7 @@
  *         The `gutter` prop 'md' resolves to `var(--pdx-space-md)` = calc(1rem * density) ≈ 16px (> 0).
  *       · No event is emitted. No keydown handler. No role and no aria. → keyboard 'none'.
  *
- *   - Source, col: packages/ui/src/col/pdx-col.ts
+ *   - Source, col: packages/ui/src/col/pdx-col.pdx
  *       · render() = <slot></slot>. In an rAF it writes an INLINE STYLE (no class, #290):
  *           - flex = `0 0 calc(<span>/var(--pdx-row-cols,12)*100% - var(--pdx-row-gutter,0px))`
  *           - maxWidth = `calc(<span>/var(--pdx-row-cols,12)*100%)`

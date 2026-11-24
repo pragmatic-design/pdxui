@@ -1,0 +1,117 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A column of a 12-column grid, inside `pdx-row` or any flex container, whose span can change at
+ * each breakpoint.
+ */
+// pdx-col — Responsive grid column with animated span transitions.
+// Works inside pdx-row (WC) or any flex container. 12-column system.
+// Breakpoint props (sm/md/lg/xl) override span at viewport thresholds.
+import { onDestroy } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/col';
+
+/** Column span 1-12 (default: 12 = full width) */
+@prop span: number = 12;
+/** Span override at >= 640px */
+@prop sm: number = 0;
+/** Span override at >= 768px */
+@prop md: number = 0;
+/** Span override at >= 1024px */
+@prop lg: number = 0;
+/** Span override at >= 1280px */
+@prop xl: number = 0;
+/** Column offset (0-11) — pushes column to the right */
+@prop offset: number = 0;
+/** CSS order override */
+@prop order: number = 0;
+@host el;
+
+// Breakpoints aligned with design system (px)
+const BP = { sm: 640, md: 768, lg: 1024, xl: 1280 } as const;
+
+let built = false;
+let destroyed = false;
+let mqCleanups: (() => void)[] = [];
+
+/** Resolve effective span: largest matching breakpoint, or base span. */
+function getEffectiveSpan(): number {
+  const w = window.innerWidth;
+  const xlVal = xl as number;
+  const lgVal = lg as number;
+  const mdVal = md as number;
+  const smVal = sm as number;
+  const base = span as number;
+
+  if (xlVal > 0 && w >= BP.xl) return xlVal;
+  if (lgVal > 0 && w >= BP.lg) return lgVal;
+  if (mdVal > 0 && w >= BP.md) return mdVal;
+  if (smVal > 0 && w >= BP.sm) return smVal;
+  return base;
+}
+
+function applyStyles(): void {
+  const width = Math.max(1, Math.min(12, getEffectiveSpan()));
+  const push = offset as number;
+  const place = order as number;
+  // Parent provides --pdx-row-cols (default 12) and --pdx-row-gutter
+  const pct = `calc(${width} / var(--pdx-row-cols, 12) * 100%)`;
+  const gutter = `var(--pdx-row-gutter, 0px)`;
+
+  el.style.flex = `0 0 calc(${pct} - ${gutter})`;
+  el.style.maxWidth = pct;
+  el.style.marginLeft = push > 0 ? `calc(${push} / var(--pdx-row-cols, 12) * 100%)` : '';
+  el.style.order = place > 0 ? String(place) : '';
+}
+
+/** Set up matchMedia listeners for breakpoint changes. */
+function setupBreakpointListeners(): void {
+  cleanupListeners();
+  for (const px of Object.values(BP)) {
+    const mql = window.matchMedia(`(min-width: ${px}px)`);
+    const handler = () => requestAnimationFrame(applyStyles);
+    mql.addEventListener('change', handler);
+    mqCleanups.push(() => mql.removeEventListener('change', handler));
+  }
+}
+
+function cleanupListeners(): void {
+  mqCleanups.forEach(fn => fn());
+  mqCleanups = [];
+}
+
+// Its layout a frame after each change, as the TypeScript version wrote it.
+$effect(() => {
+  // Read all props to subscribe
+  void span;
+  void sm;
+  void md;
+  void lg;
+  void xl;
+  void offset;
+  void order;
+
+  if (!built) {
+    built = true;
+    // The host carries no class (#290): col.css styles the tag, and nothing read `.pdx-col`.
+    requestAnimationFrame(() => {
+      // Removed before this frame: nothing to style, and no listener to leave behind.
+      if (destroyed) return;
+      applyStyles();
+      setupBreakpointListeners();
+    });
+    return;
+  }
+
+  requestAnimationFrame(applyStyles);
+});
+
+// The media query lists hold their listeners, and each listener reaches this column: without
+// removing them when it is destroyed, every column ever mounted stayed alive (#881).
+onDestroy(() => {
+  destroyed = true;
+  cleanupListeners();
+});
+</script>

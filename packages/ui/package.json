@@ -274,11 +274,6 @@
       "types": "./dist/masonry/pdx-masonry.d.ts",
       "import": "./dist/masonry/pdx-masonry.js"
     },
-    "./col": {
-      "development": "./src/col/pdx-col.ts",
-      "types": "./dist/col/pdx-col.d.ts",
-      "import": "./dist/col/pdx-col.js"
-    },
     "./affix": {
       "development": "./src/affix/pdx-affix.ts",
       "types": "./dist/affix/pdx-affix.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/form-section/pdx-form-section.pdx",
       "types": "./dist/form-section/pdx-form-section.d.ts",
       "import": "./dist/form-section/pdx-form-section.js"
+    },
+    "./col": {
+      "development": "./src/col/pdx-col.pdx",
+      "types": "./dist/col/pdx-col.d.ts",
+      "import": "./dist/col/pdx-col.js"
     },
     "./package.json": "./package.json"
   },
