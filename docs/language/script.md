@@ -40,10 +40,15 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
 - **The rest is TypeScript**, type-erased (file.md). A syntax error raises
   `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, imports,
   functions, classes, variables) raise `PDX_DUP_DECLARATION`.
-- **Nothing is exported.** The script is the body of the component's setup, run once per instance.
-  An `export` of a value raises `PDX_SCRIPT_EXPORT`, and the declaration is compiled without it; a
-  type export is erased like any type. What other files share goes in a `.ts` module. A `@store`
-  module and a `.pdx.ts` module are modules, and keep their exports.
+- **Nothing the script makes is exported.** The script is the body of the component's setup, run once
+  per instance. An `export` of a value raises `PDX_SCRIPT_EXPORT`, and the declaration is compiled
+  without it; a type export is erased like any type. What other files share goes in a `.ts` module. A
+  `@store` module and a `.pdx.ts` module are modules, and keep their exports.
+- **A re-export is the module's** (#1352). `export { X } from './x'`, `export { X as Y } from './x'`
+  and `export * from './x'`, on one line or several, are statements of the component's module: they
+  are emitted beside its imports, outside the setup, and the `.d.ts` re-exports them. A component
+  whose entry also gives its API, as `@pdxui/ui/data-source` gives `DataSourceContext`, keeps it there.
+  An `export { a }` with no `from` is the script's own name, and stays `PDX_SCRIPT_EXPORT`.
 
 **The signal rewrite.** One pass over the TypeScript AST (`signal-rewrite-ast.ts`) rewrites the setup
 body, the bodies of `$effect`, `$watch`, `onMount` and `onDestroy`, every `$derived` expression and
