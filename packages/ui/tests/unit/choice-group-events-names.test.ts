@@ -13,7 +13,7 @@ import '../../src/checkbox-group/pdx-checkbox-group.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/radio-group/pdx-radio-group.pdx';
 import '../../src/segmented/pdx-segmented.pdx';
-import '../../src/label/pdx-label';
+import '../../src/label/pdx-label.pdx';
 
 const CHECKBOXES = '<pdx-checkbox value="a" label="A"></pdx-checkbox><pdx-checkbox value="b" label="B"></pdx-checkbox>';
 const RADIOS = '<pdx-radio value="a" label="A"></pdx-radio><pdx-radio value="b" label="B"></pdx-radio>';

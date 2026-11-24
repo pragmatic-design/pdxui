@@ -59,6 +59,7 @@ const PORTED: Record<string, string> = {
     'pdx-form-section': 'src/form-section/pdx-form-section.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
+    'pdx-label': 'src/label/pdx-label.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',
     'pdx-number-input': 'src/number-input/pdx-number-input.pdx',
     'pdx-password-input': 'src/password-input/pdx-password-input.pdx',

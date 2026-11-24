@@ -2,7 +2,7 @@
  * MANIFEST — pdx-label
  *
  * NEW contracts (label was not in universal.ts), derived by inspecting:
- *  - source: packages/ui/src/label/pdx-label.ts
+ *  - source: packages/ui/src/label/pdx-label.pdx
  *      render → <label class="pdx-field-label" data-part="root"> holding:
  *        - the text prop → text, otherwise <slot>
  *        - for prop → attributo :for

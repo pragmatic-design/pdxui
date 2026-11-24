@@ -10,7 +10,7 @@ import '../../src/tabs/pdx-tabs';
 import '../../src/wizard/pdx-wizard';
 import '../../src/timeline/pdx-timeline';
 import '../../src/slider/pdx-slider.pdx';
-import '../../src/label/pdx-label';
+import '../../src/label/pdx-label.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/scroll-area/pdx-scroll-area';
 import '../../src/statistic/pdx-statistic.pdx';

@@ -1,0 +1,219 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxLabel",
+  "tagName": "pdx-label",
+  "category": "Atoms",
+  "order": 11,
+  "description": "An accessible form label, with a required or optional indicator, a hint and a description.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "for",
+      "description": "ID of the control this label describes.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "for"
+    },
+    {
+      "kind": "field",
+      "name": "text",
+      "description": "The label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "text"
+    },
+    {
+      "kind": "field",
+      "name": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "required"
+    },
+    {
+      "kind": "field",
+      "name": "optional",
+      "description": "Shows an 'optional' marker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "optional"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "hint",
+      "description": "Secondary hint text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "hint"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl: the label's text size.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-field-label-md",
+        "xs": ".pdx-field-label-xs",
+        "sm": ".pdx-field-label-sm",
+        "lg": ".pdx-field-label-lg",
+        "xl": ".pdx-field-label-xl"
+      }
+    }
+  ],
+  "attributes": [
+    {
+      "name": "for",
+      "fieldName": "for",
+      "description": "ID of the control this label describes.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "text",
+      "fieldName": "text",
+      "description": "The label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "required",
+      "fieldName": "required",
+      "description": "Marks the field as required.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "optional",
+      "fieldName": "optional",
+      "description": "Shows an 'optional' marker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "hint",
+      "fieldName": "hint",
+      "description": "Secondary hint text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl: the label's text size.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<label>` itself."
+    },
+    {
+      "name": "description",
+      "description": "The description under the label, with `description`."
+    },
+    {
+      "name": "hint",
+      "description": "The hint under the label, with `hint`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "required",
+      "description": "`required`: the label carries the required marker (`--pdx-field-required-marker`)."
+    },
+    {
+      "name": "optional",
+      "description": "`optional`: the label says the field is optional."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled`: the label is dimmed with its control."
+    }
+  ]
+}

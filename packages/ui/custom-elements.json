@@ -18188,7 +18188,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/label/pdx-label.ts",
+      "path": "src/label/pdx-label.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -18416,7 +18416,7 @@
           "name": "pdx-label",
           "declaration": {
             "name": "PdxLabel",
-            "module": "src/label/pdx-label.ts"
+            "module": "src/label/pdx-label.pdx"
           }
         }
       ]
