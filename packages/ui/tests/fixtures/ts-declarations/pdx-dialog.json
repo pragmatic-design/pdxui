@@ -1,0 +1,332 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDialog",
+  "tagName": "pdx-dialog",
+  "category": "Overlay + Containers",
+  "order": 93,
+  "summary": "Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.",
+  "description": "Modal dialog with backdrop, focus trap and Escape-to-close.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "The dialog heading.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnBackdrop",
+      "description": "Close when the backdrop is clicked.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonbackdrop"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonescape"
+    },
+    {
+      "kind": "field",
+      "name": "showClose",
+      "description": "Shows the close (×) button.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showclose"
+    },
+    {
+      "kind": "field",
+      "name": "initialfocus",
+      "description": "Selector of the element to focus on open.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "initialfocus"
+    },
+    {
+      "kind": "field",
+      "name": "preventClose",
+      "description": "Blocks all dismiss paths (must close programmatically).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "preventclose"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default), lg, xl or full.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg' | 'xl' | 'full'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg",
+        "xl",
+        "full"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-dialog-md",
+        "sm": ".pdx-dialog-sm",
+        "lg": ".pdx-dialog-lg",
+        "xl": ".pdx-dialog-xl",
+        "full": ".pdx-dialog-full"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-before-close",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired (cancelable) before closing; call preventDefault() to block it."
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "The dialog heading.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "closeonbackdrop",
+      "fieldName": "closeOnBackdrop",
+      "description": "Close when the backdrop is clicked.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonescape",
+      "fieldName": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showclose",
+      "fieldName": "showClose",
+      "description": "Shows the close (×) button.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "initialfocus",
+      "fieldName": "initialfocus",
+      "description": "Selector of the element to focus on open.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "preventclose",
+      "fieldName": "preventClose",
+      "description": "Blocks all dismiss paths (must close programmatically).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default), lg, xl or full.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg' | 'xl' | 'full'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The dialog body (main content)."
+    },
+    {
+      "name": "footer",
+      "description": "Action area at the bottom (e.g. Confirm/Cancel); hidden automatically when empty."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "header",
+      "description": "The element reached as `[data-part=\"header\"]`."
+    },
+    {
+      "name": "close",
+      "description": "The element reached as `[data-part=\"close\"]`."
+    },
+    {
+      "name": "body",
+      "description": "The element reached as `[data-part=\"body\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    },
+    {
+      "name": "loading",
+      "description": "Matched with `:state(loading)`."
+    },
+    {
+      "name": "scroll-top",
+      "description": "Matched with `:state(scroll-top)`."
+    },
+    {
+      "name": "scroll-bottom",
+      "description": "Matched with `:state(scroll-bottom)`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-dialog-footer-height",
+      "default": "auto"
+    },
+    {
+      "name": "--pdx-dialog-header-height",
+      "default": "auto"
+    },
+    {
+      "name": "--pdx-dialog-width-lg",
+      "default": "640px"
+    },
+    {
+      "name": "--pdx-dialog-width-md",
+      "default": "480px"
+    },
+    {
+      "name": "--pdx-dialog-width-sm",
+      "default": "360px"
+    },
+    {
+      "name": "--pdx-dialog-width-xl",
+      "default": "800px"
+    }
+  ]
+}

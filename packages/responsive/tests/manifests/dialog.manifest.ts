@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-dialog (overlay, tier 2A)
  *
- * Contracts written by inspecting the source (packages/ui/src/dialog/pdx-dialog.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/dialog/pdx-dialog.pdx) and the CSS
  * (packages/design/src/components/dialog.css, the .pdx-dialog-backdrop / .pdx-dialog-panel block).
  *
  * DOM structure: the custom element <pdx-dialog> renders inside the HOST's own render (NOT portalled to

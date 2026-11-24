@@ -26,7 +26,7 @@ import '../../src/timeline/pdx-timeline';
 import '../../src/bottom-sheet/pdx-bottom-sheet';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/command/pdx-command';
-import '../../src/dialog/pdx-dialog';
+import '../../src/dialog/pdx-dialog.pdx';
 import '../../src/drawer/pdx-drawer';
 import '../../src/popover/pdx-popover';
 import '../../src/slider/pdx-slider.pdx';
