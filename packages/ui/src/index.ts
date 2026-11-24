@@ -112,7 +112,7 @@ import './popover/pdx-popover';
 import './dialog/pdx-dialog';
 import './alert-dialog/pdx-alert-dialog';
 import './drawer/pdx-drawer';
-import './toast/pdx-toast';
+import './toast/pdx-toast.pdx';
 import './tabs/pdx-tabs';
 import './accordion/pdx-accordion';
 import './card/pdx-card';

@@ -462,7 +462,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 484.1 → 477.6 (#1346): a URL binding and a component's bound prop are one call to core each
 // (`bindUrl`, `bindComponentProp`), not an effect written out at every binding site; measured 477.5 KB
 // locally, entry, css and blocking unchanged.
-const BUDGET_KB = { entry: 43.6, js: 477.6, css: 67, blocking: 102.9 };
+// js 477.6 → 477.8 (the standing OK for #1210's moves): pdx-toast moves to .pdx, 0.88× alone with its
+// service and icons (1907 against 2156 B). The showcase raises toasts, and html`` stays for the
+// components not moved yet. Measured 477.7 KB locally; entry, css and blocking unchanged.
+const BUDGET_KB = { entry: 43.6, js: 477.8, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

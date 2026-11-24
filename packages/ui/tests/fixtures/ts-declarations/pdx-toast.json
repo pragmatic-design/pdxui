@@ -1,0 +1,92 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxToast",
+  "tagName": "pdx-toast",
+  "category": "Overlay + Containers",
+  "order": 96,
+  "description": "A container that shows notification toasts from a global queue, in one of six screen positions,\npausing on hover and offering action buttons.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "position",
+      "description": "Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center.",
+      "type": {
+        "text": "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'"
+      },
+      "default": "'top-right'",
+      "attribute": "position"
+    }
+  ],
+  "variants": [
+    {
+      "name": "position",
+      "values": [
+        "top-right",
+        "top-left",
+        "bottom-right",
+        "bottom-left",
+        "top-center",
+        "bottom-center"
+      ],
+      "default": "top-right",
+      "native": {
+        "top-right": ".pdx-toast-container[position=\"top-right\"]",
+        "top-left": ".pdx-toast-container[position=\"top-left\"]",
+        "bottom-right": ".pdx-toast-container[position=\"bottom-right\"]",
+        "bottom-left": ".pdx-toast-container[position=\"bottom-left\"]",
+        "top-center": ".pdx-toast-container[position=\"top-center\"]",
+        "bottom-center": ".pdx-toast-container[position=\"bottom-center\"]"
+      }
+    }
+  ],
+  "roles": [
+    "alert",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "position",
+      "fieldName": "position",
+      "description": "Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center.",
+      "type": {
+        "text": "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'"
+      },
+      "default": "'top-right'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "toast",
+      "description": "The element reached as `[data-part=\"toast\"]`."
+    },
+    {
+      "name": "icon",
+      "description": "The element reached as `[data-part=\"icon\"]`."
+    },
+    {
+      "name": "title",
+      "description": "The element reached as `[data-part=\"title\"]`."
+    },
+    {
+      "name": "message",
+      "description": "The element reached as `[data-part=\"message\"]`."
+    },
+    {
+      "name": "action",
+      "description": "The element reached as `[data-part=\"action\"]`."
+    },
+    {
+      "name": "close",
+      "description": "The element reached as `[data-part=\"close\"]`."
+    },
+    {
+      "name": "progress",
+      "description": "The element reached as `[data-part=\"progress\"]`."
+    }
+  ]
+}

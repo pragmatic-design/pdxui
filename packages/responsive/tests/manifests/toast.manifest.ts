@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-toast (notification, tier ?)
  *
- * Contracts written by inspecting the source (packages/ui/src/toast/pdx-toast.ts),
+ * Contracts written by inspecting the source (packages/ui/src/toast/pdx-toast.pdx),
  * the queue (packages/core/src/component/toast-queue.ts) and the CSS
  * (packages/design/src/components/toast.css, the .pdx-toast-container / .pdx-toast / .pdx-toast-* blocks).
  *
