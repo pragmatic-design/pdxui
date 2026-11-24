@@ -5,7 +5,8 @@
 // above all, cloned a markup of one marker (and the whitespace around it), walked to it, and replaced
 // it with the node: per row, a clone, a walk and a `replaceWith` that place nothing of their own. The
 // pilot's filter popover spent most of its mount there (packages/ui/PILOT.md, #685). Such a block now
-// returns the node itself. The whitespace around it is the block's edge, which keeps none (#907).
+// returns the node itself. The whitespace around it is the block's edge, which keeps none (#907). So
+// does the render's root (#1354): a template whose only root is an `@if` chain returns the chain.
 
 import type { TemplateNode } from '../parser/template';
 import { isSingleElementBody } from './show-single-element';

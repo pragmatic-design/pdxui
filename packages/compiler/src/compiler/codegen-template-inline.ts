@@ -165,7 +165,7 @@ export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>,
     // A production build shares a binding repeated at the top level of the render (inline-dedup.ts).
     // Not on the server (#160): its render runs once, and its bindings are written into the html``.
     if (ctx?.production && !ctx.ssr) gen.dedup = new BindingDedup();
-    gen.walk(nodes);
+    gen.root(nodes);
     return gen.build(hoists ? [] : own.lines);
 }
 
@@ -980,6 +980,18 @@ class InlineGen {
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
 
+    /**
+     * The render's root (#1354). A template whose only root is a control-flow node returns that node, as
+     * a block does (`block`, #685): a markup of one marker, its walk and a `replaceWith` placed nothing
+     * of their own. Not on the server, whose render returns its html``, nor when hydrating, where the
+     * root's range is what the server wrote and is taken over.
+     */
+    root(nodes: TemplateNode[]): void {
+        const sole = this.ctx.ssr || this.ctx.hydrate ? null : soleControlFlow(nodes);
+        if (sole) this.sole = null;
+        this.walk(sole ? [sole.node] : nodes);
+    }
+
     /** What a block returns: its fragment, or — hydrating, when it took over its range — that range. */
     private blockResult(): string {
         if (!this.ctx.hydrate) return '__frag';
@@ -1311,9 +1323,12 @@ class InlineGen {
             if (shared.decls.length > 0) this.imports.add('computed');
             lines = [...shared.decls, ...shared.lines];
         }
-        // On the server (#160) the render returns its markup as html``, with no builder or walk.
-        const ret = this.ctx.ssr ? this.tree.serverLiteral(this.imports) : this.blockResult();
-        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix);
+        // On the server (#160) the render returns its markup as html``, with no builder or walk. A root
+        // that is one control-flow node returns it, and has no markup of its own (`root`, #1354).
+        const sole = this.sole !== undefined;
+        const ret = sole ? (this.sole ?? 'document.createDocumentFragment()')
+            : this.ctx.ssr ? this.tree.serverLiteral(this.imports) : this.blockResult();
+        const prologue = this.ctx.ssr || sole ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix);
         // One keyed selector per signal a @for compares its key with (#117), owned by the render.
         const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
         if (selectors.length > 0) this.imports.add('selector');

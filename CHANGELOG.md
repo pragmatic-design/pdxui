@@ -29,6 +29,10 @@ semver.
 
 ### Changed
 
+- A template whose only root is a control-flow node (`@if`, `@switch`, `@for`, …) renders that node
+  directly, with no marker block, walk or `replaceWith` around it, as a block already did (#1354).
+  `pdx-field-group`'s `.pdx`, an `@if` chain at its root, is 1448 → 1404 B gzip.
+
 - A URL binding (`:href`, `:src`, …) and a bound prop of a component compile to one call to core each,
   `bindUrl` and `bindComponentProp`, instead of an effect written out at every binding (#1346); two
   identical handlers in one `@for` row are declared once. The select the library is porting went from
