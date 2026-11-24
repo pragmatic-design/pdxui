@@ -19430,7 +19430,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/masonry/pdx-masonry.ts",
+      "path": "src/masonry/pdx-masonry.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -19520,7 +19520,7 @@
           "name": "pdx-masonry",
           "declaration": {
             "name": "PdxMasonry",
-            "module": "src/masonry/pdx-masonry.ts"
+            "module": "src/masonry/pdx-masonry.pdx"
           }
         }
       ]
