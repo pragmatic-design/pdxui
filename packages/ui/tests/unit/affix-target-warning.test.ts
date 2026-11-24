@@ -9,7 +9,7 @@
 // (`packages/site/tests/affix-target.spec.ts`), because happy-dom has no layout to measure.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/affix/pdx-affix';
+import '../../src/affix/pdx-affix.pdx';
 
 describe('an affix target that matches nothing', () => {
     /** The spy, typed from the thing it replaces rather than from vitest's generics. */

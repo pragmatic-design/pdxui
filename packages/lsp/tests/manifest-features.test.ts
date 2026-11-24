@@ -86,16 +86,17 @@ describe('component definition', () => {
 
     it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
         // A library component still in TypeScript (#1210 moves the library to .pdx; this one is late).
+        // pdx-affix was this component until it moved too.
         const root = join(__dirname, '..', '..', '..');
-        const real = new Map([['pdx-affix', {
-            ...button, tag: 'pdx-affix',
-            filePath: join(root, 'packages', 'ui', 'src', 'affix', 'pdx-affix.ts'),
+        const real = new Map([['pdx-breadcrumb', {
+            ...button, tag: 'pdx-breadcrumb',
+            filePath: join(root, 'packages', 'ui', 'src', 'breadcrumb', 'pdx-breadcrumb.ts'),
         }]]);
-        // tag → its component('pdx-affix' call, past the file's header
-        const tagLoc = resolveComponentDefinition('pdx-affix', real, []);
+        // tag → its component('pdx-breadcrumb' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-breadcrumb', real, []);
         expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `target:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-affix', real, [], 'target');
+        // member → the `separator:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-breadcrumb', real, [], 'separator');
         expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
     });
 

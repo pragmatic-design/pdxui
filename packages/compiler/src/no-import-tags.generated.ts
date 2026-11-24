@@ -4,7 +4,6 @@
 
 export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-accordion',
-    'pdx-affix',
     'pdx-alert-dialog',
     'pdx-app-layout',
     'pdx-aspect-ratio',
