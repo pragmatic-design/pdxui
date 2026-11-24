@@ -465,7 +465,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 477.6 → 477.8 (the standing OK for #1210's moves): pdx-toast moves to .pdx, 0.88× alone with its
 // service and icons (1907 against 2156 B). The showcase raises toasts, and html`` stays for the
 // components not moved yet. Measured 477.7 KB locally; entry, css and blocking unchanged.
-const BUDGET_KB = { entry: 43.6, js: 477.8, css: 67, blocking: 102.9 };
+// js 477.8 → 478.0 (the standing OK for #1210's moves): pdx-dialog moves to .pdx, 0.97× alone (2095
+// against 2151 B). The showcase opens dialogs, and html`` stays for the components not moved yet.
+// Measured 477.9 KB locally; entry, css and blocking unchanged.
+const BUDGET_KB = { entry: 43.6, js: 478.0, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

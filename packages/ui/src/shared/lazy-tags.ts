@@ -14,7 +14,7 @@ const LOADERS = {
     'pdx-select': () => import('../select/pdx-select'),
     'pdx-date-picker': () => import('../date-picker/pdx-date-picker'),
     'pdx-form-field': () => import('../form-field/pdx-form-field.pdx'),
-    'pdx-dialog': () => import('../dialog/pdx-dialog'),
+    'pdx-dialog': () => import('../dialog/pdx-dialog.pdx'),
 } as const;
 
 export type LazyTag = keyof typeof LOADERS;

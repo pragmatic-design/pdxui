@@ -84,11 +84,6 @@
       "types": "./dist/tabs/pdx-tabs.d.ts",
       "import": "./dist/tabs/pdx-tabs.js"
     },
-    "./dialog": {
-      "development": "./src/dialog/pdx-dialog.ts",
-      "types": "./dist/dialog/pdx-dialog.d.ts",
-      "import": "./dist/dialog/pdx-dialog.js"
-    },
     "./drawer": {
       "development": "./src/drawer/pdx-drawer.ts",
       "types": "./dist/drawer/pdx-drawer.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/toast/pdx-toast.pdx",
       "types": "./dist/toast/pdx-toast.d.ts",
       "import": "./dist/toast/pdx-toast.js"
+    },
+    "./dialog": {
+      "development": "./src/dialog/pdx-dialog.pdx",
+      "types": "./dist/dialog/pdx-dialog.d.ts",
+      "import": "./dist/dialog/pdx-dialog.js"
     },
     "./package.json": "./package.json"
   },

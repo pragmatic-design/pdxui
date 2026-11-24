@@ -2,7 +2,7 @@
 // design CSS's `@variant` rules key on them, and no longer assembled into classes.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/dialog/pdx-dialog';
+import '../../src/dialog/pdx-dialog.pdx';
 import '../../src/sidebar/pdx-sidebar.pdx';
 
 describe('pdx-dialog\'s size', () => {

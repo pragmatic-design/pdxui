@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { cleanup, tick } from './helpers';
-import '../../src/dialog/pdx-dialog';
+import '../../src/dialog/pdx-dialog.pdx';
 import '../../src/drawer/pdx-drawer';
 import '../../src/select/pdx-select';
 import '../../src/date-picker/pdx-date-picker';

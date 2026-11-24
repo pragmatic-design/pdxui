@@ -11002,7 +11002,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/dialog/pdx-dialog.ts",
+      "path": "src/dialog/pdx-dialog.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -11343,7 +11343,7 @@
           "name": "pdx-dialog",
           "declaration": {
             "name": "PdxDialog",
-            "module": "src/dialog/pdx-dialog.ts"
+            "module": "src/dialog/pdx-dialog.pdx"
           }
         }
       ]
