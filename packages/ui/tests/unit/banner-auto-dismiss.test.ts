@@ -6,7 +6,7 @@
 //
 // Only setTimeout/clearTimeout are faked, so the milliseconds below are exact.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import '../../src/banner/pdx-banner';
+import '../../src/banner/pdx-banner.pdx';
 
 type Banner = HTMLElement & { show(): void; dismiss(): void; readonly isVisible: boolean };
 

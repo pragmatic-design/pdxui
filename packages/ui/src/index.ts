@@ -116,7 +116,7 @@ import './toast/pdx-toast';
 import './tabs/pdx-tabs';
 import './accordion/pdx-accordion';
 import './card/pdx-card';
-import './banner/pdx-banner';
+import './banner/pdx-banner.pdx';
 import './bottom-sheet/pdx-bottom-sheet';
 import './command/pdx-command';
 

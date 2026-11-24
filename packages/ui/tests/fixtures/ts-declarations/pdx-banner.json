@@ -1,0 +1,189 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBanner",
+  "tagName": "pdx-banner",
+  "category": "Overlay + Containers",
+  "order": 100,
+  "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "closable",
+      "description": "Shows a close affordance.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "closable"
+    },
+    {
+      "kind": "field",
+      "name": "autoDismiss",
+      "description": "Auto-dismiss after this many ms.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "autodismiss"
+    },
+    {
+      "kind": "field",
+      "name": "showIcon",
+      "description": "Shows the leading status icon.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showicon"
+    },
+    {
+      "kind": "field",
+      "name": "subtle",
+      "description": "Uses the low-emphasis (tinted) style.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "subtle"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "info (the default), success, warning, danger, or error (danger).",
+      "type": {
+        "text": "'info' | 'success' | 'warning' | 'danger' | 'error'"
+      },
+      "default": "'info'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "method",
+      "name": "dismiss",
+      "parameters": [],
+      "description": "Hide the banner and emit `pdx-close`, moving focus out of it first."
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "field",
+      "name": "isVisible",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isVisible`."
+    }
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "info",
+        "success",
+        "warning",
+        "danger",
+        "error"
+      ],
+      "default": "info",
+      "native": {
+        "info": ".pdx-banner-info",
+        "success": ".pdx-banner-success",
+        "warning": ".pdx-banner-warning",
+        "danger": ".pdx-banner-danger",
+        "error": ".pdx-banner-danger"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-close",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The banner was closed: by its button, `dismiss()` or its auto-dismiss. Does not bubble."
+    }
+  ],
+  "roles": [
+    "alert",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "closable",
+      "fieldName": "closable",
+      "description": "Shows a close affordance.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "autodismiss",
+      "fieldName": "autoDismiss",
+      "description": "Auto-dismiss after this many ms.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "showicon",
+      "fieldName": "showIcon",
+      "description": "Shows the leading status icon.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "subtle",
+      "fieldName": "subtle",
+      "description": "Uses the low-emphasis (tinted) style.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "info (the default), success, warning, danger, or error (danger).",
+      "type": {
+        "text": "'info' | 'success' | 'warning' | 'danger' | 'error'"
+      },
+      "default": "'info'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The banner (`role=\"alert\"` for danger and error, `role=\"status\"` otherwise)."
+    },
+    {
+      "name": "icon",
+      "description": "The icon matched to the variant, with `show-icon`."
+    },
+    {
+      "name": "message",
+      "description": "The banner's text, its default slot."
+    },
+    {
+      "name": "close",
+      "description": "The close button, with `closable`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "dismissed",
+      "description": "Closed, by its button, `dismiss()` or its auto-dismiss: banner.css hides it."
+    }
+  ]
+}

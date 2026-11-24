@@ -1,0 +1,113 @@
+<template>
+  <div :class="bannerClass()" data-part="root" :role="variant === 'danger' || variant === 'error' ? 'alert' : 'status'">
+    @if (showIcon) {<pdx-icon :name="iconName()" size="sm" class="pdx-banner-icon" data-part="icon"></pdx-icon>}
+    <span class="pdx-banner-text" data-part="message"><slot></slot></span>
+    @if (closable) {<button class="pdx-banner-close" data-part="close" type="button" :aria-label="uiString('banner', 'close')" @click="closeBanner()">×</button>}
+  </div>
+</template>
+
+<script>
+/**
+ * An inline alert banner with an icon matched to its variant and slots for actions, which the user
+ * can close or which dismisses itself.
+ *
+ * @cssstate dismissed - Closed, by its button, `dismiss()` or its auto-dismiss: banner.css hides it.
+ * @csspart root - The banner (`role="alert"` for danger and error, `role="status"` otherwise).
+ * @csspart icon - The icon matched to the variant, with `show-icon`.
+ * @csspart message - The banner's text, its default slot.
+ * @csspart close - The close button, with `closable`.
+ */
+// pdx-banner — Inline alert/banner with variants, closable, action, auto-dismiss.
+// Uses Pragmatic CSS .pdx-banner classes. Icon auto-matched to variant.
+import { getFocusableElements, untracked } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/banner';
+import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+import './banner-icons';
+
+/** The banner was closed: by its button, `dismiss()` or its auto-dismiss. Does not bubble. */
+@event 'pdx-close': void;
+// Dismissed is the host's state (#291); banner.css hides it, and with it its alert (A4).
+@state dismissed = isDismissed;
+@part root, icon, message, close;
+// The axis banner.css keys by (#631), reflected on the host; each value maps the class that draws
+// the same banner on native markup. `error` is `danger`'s other name, and shares its class.
+@variants {
+  /** info (the default), success, warning, danger, or error (danger). */
+  variant: { info: '.pdx-banner-info', success: '.pdx-banner-success', warning: '.pdx-banner-warning', danger: '.pdx-banner-danger', error: '.pdx-banner-danger' } = info;
+}
+@prop closable: boolean = false;
+@prop autoDismiss: number = 0;
+@prop showIcon: boolean = true;
+@prop subtle: boolean = false;
+@host el;
+
+// Imperative API — no prop named dismiss/show/isVisible, so no shadowing.
+@expose dismiss, show, isVisible;
+
+const VARIANT_ICONS: Record<string, string> = {
+  info: 'info',
+  success: 'check-circle',
+  warning: 'alert-triangle',
+  danger: 'alert-circle',
+  error: 'alert-circle',
+};
+
+let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+/** Closed, and so the host's :state(dismissed). */
+let isDismissed = $signal(false);
+/** Read-only, via a ref: `el.isVisible`. */
+const isVisible = $derived(!isDismissed);
+
+function closeBanner() {
+  // Focus inside the banner would fall to <body> once it hides — a keyboard user closing it
+  // with Enter would be sent to the top of the page. It moves to what follows the
+  // banner, or to what precedes it when nothing does.
+  const hadFocus = el.contains(document.activeElement);
+  const around = hadFocus
+    ? getFocusableElements(document.body).filter((f) => !el.contains(f) && !f.closest('[hidden],[inert]'))
+    : [];
+  isDismissed = true;
+  pdxClose();
+  if (!hadFocus) return;
+  const follows = (f: Element) => Boolean(el.compareDocumentPosition(f) & Node.DOCUMENT_POSITION_FOLLOWING);
+  const next = around.find(follows) ?? around.filter((f) => !follows(f)).pop();
+  next?.focus();
+}
+
+/** Hide the banner and emit `pdx-close`, moving focus out of it first. */
+function dismiss() { closeBanner(); }
+
+/** Starts the auto-dismiss countdown over, when there is one. */
+function startDismissTimer() {
+  if (dismissTimer) { clearTimeout(dismissTimer); dismissTimer = null; }
+  const ms = untracked(() => autoDismiss) as number;
+  if (ms > 0) dismissTimer = setTimeout(closeBanner, ms);
+}
+
+// Shown again, an auto-dismissing banner counts again: a timer run once, from mount, would
+// leave a banner put back with show() there for good.
+function show() {
+  isDismissed = false;
+  startDismissTimer();
+}
+
+function bannerClass(): string {
+  return subtle ? 'pdx-banner pdx-banner-subtle' : 'pdx-banner';
+}
+
+function iconName(): string {
+  return VARIANT_ICONS[variant as string] || 'info';
+}
+
+// The auto-dismiss countdown, again when `auto-dismiss` changes; its cleanup clears the wait.
+$effect(() => {
+  void autoDismiss;
+  startDismissTimer();
+  return () => {
+    if (dismissTimer) { clearTimeout(dismissTimer); dismissTimer = null; }
+  };
+});
+</script>
