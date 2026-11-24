@@ -294,7 +294,7 @@ TimingOption   ::= ( "minMs" | "maxMs" ) S? ":" S? Digits
 ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
 TryBlock       ::= "@try" S? TryOptions? Block S? "@catch" S? ErrorNames Block                              (#1365: the options)
 TryOptions     ::= "{" S? TryOption ( S? "," S? TryOption )* S? "}" S?
-TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" ) S? ":" S? Expression
+TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" | "onRecover" ) S? ":" S? Expression
 LetDecl        ::= "@let" S Identifier S? "=" S? Expression ";"
 RawBlock       ::= "@raw" S? "{" /* any text with balanced braces */ "}"
 ```

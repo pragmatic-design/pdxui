@@ -60,6 +60,11 @@ export interface ErrorBoundaryOptions {
     /** Callback for error telemetry/logging. Called on every error. */
     onError?: (error: Error, retryCount: number) => void;
     /**
+     * Called when the content renders again after an error — a retry, an automatic retry, a `resetOn`
+     * change — and not by the first render: where a state `onError` set is cleared (#1365).
+     */
+    onRecover?: () => void;
+    /**
      * Leave the fallback when this value changes (`Object.is`), and render the content again. What
      * `@await (p)` passes as `() => p`: a new promise in the signal is the retry.
      */
@@ -135,7 +140,10 @@ export function followBoundary(
     const autoRetry = options?.autoRetry ?? false;
     const onError = options?.onError;
     const resetOn = options?.resetOn;
+    const onRecover = options?.onRecover;
     let showingFallback = false;
+    // Since the last error, until the content renders: the render that ends it calls onRecover.
+    let failed = false;
     // While the fallback shows: the effect watching `resetOn`, disposed when the content comes back.
     let resetWatch: Dispose | null = null;
     // The host's own children the projection had placed in the content, taken out when the range was
@@ -211,6 +219,7 @@ export function followBoundary(
             const [, dispose] = collectDisposers(() => take(renderWithKept));
             childDispose = dispose;
             retryCount = 0; // Reset on success
+            if (failed) { failed = false; onRecover?.(); }
         } catch (err) {
             caught = err instanceof Error ? err : new Error(String(err));
         } finally {
@@ -223,6 +232,7 @@ export function followBoundary(
     }
 
     function handleError(error: Error): void {
+        failed = true;
         retryCount++;
         onError?.(error, retryCount);
 

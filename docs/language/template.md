@@ -1696,7 +1696,7 @@ alpha; the source, `as`, the plain values and the timing as above since #145
 ```ebnf
 TryBlock       ::= "@try" S? TryOptions? Block S? "@catch" S? "(" S? Identifier ( S? "," S? Identifier )? S? ")" Block
 TryOptions     ::= "{" S? TryOption ( S? "," S? TryOption )* S? "}" S?
-TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" ) S? ":" S? Expression
+TryOption      ::= ( "maxRetries" | "autoRetry" | "retryDelay" | "onError" | "onRecover" ) S? ":" S? Expression
 ```
 
 #### Semantics
@@ -1715,6 +1715,9 @@ The options are core's (#1365), each an expression of the script's names, read w
 - `onError` — a function called with the error and how many errors in a row there have been, before
   the `@catch` body renders: telemetry, or a state the `@catch` body reads. A page rendered on the
   server calls it too, with the count 1, so its fallback is the markup the client renders.
+- `onRecover` — a function called when the body renders again after an error: a retry, an automatic
+  retry, or a `resetOn` of the boundary. Not by the first render. Where a state `onError` set is
+  cleared.
 
 The children a host projects into a `<slot>` inside the body are the author's, not the body's: when
 the body is replaced, by the `@catch` body or by a retry, they are kept, and a retry puts them back in
@@ -1723,7 +1726,7 @@ its slots. They connect again there, so a child that threw mounts afresh.
 #### Rules
 
 - The options block is the block right after `@try` when another block follows it — a body is
-  followed by `@catch`, never by a block. A key that is not one of the four, a key twice and a key
+  followed by `@catch`, never by a block. A key that is not one of the five, a key twice and a key
   with no value stop the compile.
 - `@catch` is required right after the body: `Expected @catch after @try`.
 - At most two names, valid identifiers, not the same twice; anything else stops the compile.

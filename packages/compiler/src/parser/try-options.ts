@@ -1,4 +1,4 @@
-// `@try { maxRetries: n, autoRetry: on, retryDelay: ms, onError: fn } { … }` (#1365): the options of
+// `@try { maxRetries: n, autoRetry: on, retryDelay: ms, onError: fn, onRecover: fn } { … }` (#1365): the options of
 // core's errorBoundary, in a block right after `@try`, as `@await` takes its timing in one.
 //
 // The block is options when a second block follows it: a `@try` body is followed by `@catch`, never
@@ -8,7 +8,7 @@
 import { splitAtDepthZero } from '../compiler/tokenizer';
 
 /** The keys errorBoundary takes from a template, in the order its options declare them. */
-export const TRY_OPTION_KEYS = ['maxRetries', 'autoRetry', 'retryDelay', 'onError'] as const;
+export const TRY_OPTION_KEYS = ['maxRetries', 'autoRetry', 'retryDelay', 'onError', 'onRecover'] as const;
 
 /** One option: its key and the expression written for it, as written. */
 export interface TryOption {
