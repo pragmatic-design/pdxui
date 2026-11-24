@@ -1,0 +1,216 @@
+<template><div class="pdx-toast-container" data-part="root"></div></template>
+
+<script>
+/**
+ * A container that shows notification toasts from a global queue, in one of six screen positions,
+ * pausing on hover and offering action buttons.
+ */
+// pdx-toast — Toast notification container.
+// Renders toasts from a global queue. Supports 6 positions, 3 variants,
+// title+description, progress bar, pause on hover, action buttons, promise API.
+import { onNextFrame } from '@pdxui/core';
+import type { Toast } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { getToastQueue } from './toast-service';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/toast';
+import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+import './toast-icons';
+// The entry `@pdxui/ui/toast` gives the queue and the API as well as the element (#1352).
+export { getToastQueue, toast } from './toast-service';
+
+// The stack, and each toast with its pieces (#288). A toast's own state stays on the toast — its
+// type class and `data-open` while it shows — as an option's does: the host holds many toasts and
+// opens none of them itself, so it has no open state, no `open-change` and no overlay verbs.
+@part root;
+// Each toast and its pieces are built by the script, one per queue item.
+@part(external) toast, icon, title, message, action, close, progress;
+// The axis toast.css and adaptive.css key by (#631), reflected on the host; each value maps the
+// container's attribute that places the same stack on native markup.
+@variants {
+  /** Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center. */
+  position: { top-right: '.pdx-toast-container[position="top-right"]', top-left: '.pdx-toast-container[position="top-left"]', bottom-right: '.pdx-toast-container[position="bottom-right"]', bottom-left: '.pdx-toast-container[position="bottom-left"]', top-center: '.pdx-toast-container[position="top-center"]', bottom-center: '.pdx-toast-container[position="bottom-center"]' } = top-right;
+}
+@host host;
+
+const ICON_MAP: Record<string, string> = {
+  success: 'check-circle',
+  error: 'alert-circle',
+  warning: 'alert-triangle',
+  info: 'info',
+};
+
+const queue = getToastQueue();
+// The stack, found a frame after mount: the toasts are drawn into it from then on.
+let containerEl = $signal<HTMLElement | null>(null);
+onNextFrame(() => { containerEl = host.querySelector<HTMLElement>('.pdx-toast-container'); });
+$effect(() => {
+  const items = queue.items();
+  if (containerEl) renderToasts(containerEl, items);
+});
+
+function renderToasts(container: HTMLElement, items: Toast[]): void {
+  const existingIds = new Set<string>();
+  for (const child of Array.from(container.children)) {
+    const id = (child as HTMLElement).dataset.toastId;
+    if (id) existingIds.add(id);
+  }
+
+  const currentIds = new Set(items.map(t => t.id));
+
+  // Remove stale
+  for (const child of Array.from(container.children)) {
+    const id = (child as HTMLElement).dataset.toastId;
+    if (id && !currentIds.has(id)) {
+      const leaving = child as HTMLElement;
+      leaving.removeAttribute('data-open');
+      // A4 (#288): a status carries text only while it has something to say. The toast stays 300 ms
+      // to slide out; for those it is no longer a live region, and `inert` takes it out of the
+      // accessibility tree and its buttons out of reach — not `aria-hidden`, which would hide the
+      // close button the user just pressed while it still has the focus.
+      leaving.removeAttribute('role');
+      leaving.removeAttribute('aria-live');
+      leaving.inert = true;
+      setTimeout(() => child.remove(), 300);
+    }
+  }
+
+  // Add/update
+  for (const t of items) {
+    if (existingIds.has(t.id)) {
+      // Update existing (for promise transitions)
+      const existing = container.querySelector(`[data-toast-id="${t.id}"]`) as HTMLElement;
+      if (existing) updateToastElement(existing, t);
+      continue;
+    }
+    const el = createToastElement(t);
+    container.appendChild(el);
+    requestAnimationFrame(() => el.setAttribute('data-open', ''));
+  }
+}
+
+function updateToastElement(el: HTMLElement, t: Toast): void {
+  // Update class for type/variant change (e.g., promise: info→success)
+  el.className = buildToastClass(t);
+  const msg = el.querySelector('.pdx-toast-message');
+  if (msg) msg.textContent = t.message;
+  const title = el.querySelector('.pdx-toast-title');
+  if (title && t.title) title.textContent = t.title;
+  const icon = el.querySelector('.pdx-toast-icon') as HTMLElement;
+  if (icon && t.icon !== null) {
+    const iconName = t.icon ?? ICON_MAP[t.type] ?? 'info';
+    icon.setAttribute('name', iconName);
+  }
+  // Sync progress bar with current duration (handles promise loading→success/error)
+  const existingProgress = el.querySelector('.pdx-toast-progress') as HTMLElement | null;
+  if (t.duration > 0) {
+    if (!existingProgress) {
+      const progress = document.createElement('div');
+      progress.className = 'pdx-toast-progress';
+      progress.dataset.part = 'progress';
+      progress.style.animationDuration = t.duration + 'ms';
+      el.appendChild(progress);
+    } else {
+      // Duration changed (e.g. promise transition) — restart animation with new duration
+      existingProgress.style.animationDuration = t.duration + 'ms';
+      existingProgress.style.animation = 'none';
+      existingProgress.offsetHeight; // force reflow
+      existingProgress.style.animation = '';
+    }
+  } else if (existingProgress) {
+    existingProgress.remove();
+  }
+}
+
+function buildToastClass(t: Toast): string {
+  let cls = `pdx-toast pdx-toast-${t.type}`;
+  if (t.variant === 'bordered') cls += ' pdx-toast-bordered';
+  else if (t.variant === 'minimal') cls += ' pdx-toast-minimal';
+  if (t.title) cls += ' pdx-toast-rich';
+  if (t.size === 'compact') cls += ' pdx-toast-compact';
+  else if (t.size === 'large') cls += ' pdx-toast-large';
+  return cls;
+}
+
+function createToastElement(t: Toast): HTMLElement {
+  const el = document.createElement('div');
+  el.className = buildToastClass(t);
+  el.dataset.toastId = t.id;
+  el.dataset.part = 'toast';
+  el.setAttribute('role', t.type === 'error' ? 'alert' : 'status');
+  el.setAttribute('aria-live', t.type === 'error' ? 'assertive' : 'polite');
+
+  // Icon (unless explicitly null)
+  if (t.icon !== null) {
+    const icon = document.createElement('pdx-icon');
+    const iconName = t.icon ?? ICON_MAP[t.type] ?? 'info';
+    icon.setAttribute('name', iconName);
+    icon.setAttribute('size', t.title ? 'md' : 'sm');
+    icon.className = 'pdx-toast-icon';
+    icon.dataset.part = 'icon';
+    el.appendChild(icon);
+  }
+
+  // Content (title + message)
+  const content = document.createElement('div');
+  content.className = 'pdx-toast-content';
+  if (t.title) {
+    const titleEl = document.createElement('div');
+    titleEl.className = 'pdx-toast-title';
+    titleEl.dataset.part = 'title';
+    titleEl.textContent = t.title;
+    content.appendChild(titleEl);
+  }
+  const msg = document.createElement('div');
+  msg.className = 'pdx-toast-message';
+  msg.dataset.part = 'message';
+  msg.textContent = t.message;
+  content.appendChild(msg);
+  el.appendChild(content);
+
+  // Action button
+  if (t.action) {
+    const actionBtn = document.createElement('button');
+    actionBtn.className = 'pdx-toast-action';
+    actionBtn.dataset.part = 'action';
+    actionBtn.textContent = t.action.label;
+    actionBtn.onclick = () => { t.action!.onClick(); queue.dismiss(t.id); };
+    el.appendChild(actionBtn);
+  }
+
+  // Close button
+  if (t.dismissible) {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'pdx-toast-close';
+    closeBtn.dataset.part = 'close';
+    uiAttr(closeBtn, 'aria-label', () => uiString('toast', 'dismiss'));
+    closeBtn.textContent = '×';
+    closeBtn.onclick = () => queue.dismiss(t.id);
+    el.appendChild(closeBtn);
+  }
+
+  // Progress bar
+  if (t.duration > 0) {
+    const progress = document.createElement('div');
+    progress.className = 'pdx-toast-progress';
+    progress.dataset.part = 'progress';
+    progress.style.animationDuration = t.duration + 'ms';
+    el.appendChild(progress);
+  }
+
+  // Pause on hover
+  el.addEventListener('mouseenter', () => {
+    queue.pause(t.id);
+    const p = el.querySelector('.pdx-toast-progress') as HTMLElement;
+    if (p) p.style.animationPlayState = 'paused';
+  });
+  el.addEventListener('mouseleave', () => {
+    queue.resume(t.id);
+    const p = el.querySelector('.pdx-toast-progress') as HTMLElement;
+    if (p) p.style.animationPlayState = 'running';
+  });
+
+  return el;
+}
+</script>

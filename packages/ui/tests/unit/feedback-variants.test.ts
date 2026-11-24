@@ -5,7 +5,7 @@ import { cleanup, mount, tick } from './helpers';
 import '../../src/badge/pdx-badge.pdx';
 import '../../src/banner/pdx-banner.pdx';
 import '../../src/progress/pdx-progress.pdx';
-import { toast } from '../../src/toast/pdx-toast';
+import { toast } from '@pdxui/ui/toast';
 
 describe('pdx-badge\'s axes', () => {
     beforeEach(cleanup);

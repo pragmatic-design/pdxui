@@ -31975,7 +31975,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/toast/pdx-toast.ts",
+      "path": "src/toast/pdx-toast.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -32076,7 +32076,7 @@
           "name": "pdx-toast",
           "declaration": {
             "name": "PdxToast",
-            "module": "src/toast/pdx-toast.ts"
+            "module": "src/toast/pdx-toast.pdx"
           }
         }
       ]
