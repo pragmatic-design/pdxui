@@ -96,9 +96,17 @@ export const serverBlocks: BlockVisitor<ServerBlock> = {
         });
     },
 
-    /** The content, or — when rendering it throws — the fallback with the error. A retry has nothing to do. */
-    boundary: (contentFn, fallbackFn) => serverBlock('error-boundary', '/error-boundary', () => [contentFn()], null,
-        (err) => [fallbackFn(asError(err), () => {})]),
+    /**
+     * The content, or — when rendering it throws — the fallback with the error. A retry has nothing to
+     * do. `onError` hears it first, with its count, 1, as on the client: a fallback that reads what it
+     * set writes the markup the client renders (#1365).
+     */
+    boundary: (contentFn, fallbackFn, options) => serverBlock('error-boundary', '/error-boundary', () => [contentFn()], null,
+        (err) => {
+            const error = asError(err);
+            options?.onError?.(error, 1);
+            return [fallbackFn(error, () => {})];
+        }),
 
     /** The marker it leaves in place: the content goes to another part of the document, on the client. */
     portal: () => serverBlock('portal', null, () => []),

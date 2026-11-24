@@ -285,6 +285,13 @@ export function projectTemplate(
                     emit('}\n');
                     break;
                 case 'try':
+                    // The options block (#1365): each value checked against its key. Both mapped to the
+                    // text the author wrote — TypeScript reports a value of the wrong type on its key.
+                    if (node.options?.length) {
+                        emit(';__pdxTryOptions({ ');
+                        for (const o of node.options) { verbatim(o.key); emit(': '); verbatim(o.expr); emit(', '); }
+                        emit('});\n');
+                    }
                     emit('try {\n'); walk(node.body); emit('}\n');
                     // `unknown`, as TypeScript types a strict `catch` binding (#122).
                     emit('catch ('); verbatim((node.errorVar || 'err').trim()); emit(': unknown) {\n');

@@ -1264,8 +1264,12 @@ class InlineGen {
         this.imports.add('errorBoundary');
         const body = this.sub(node.body);
         const catchBody = withBoundaryScope(node.errorVar, node.retryVar, this.ctx, () => this.sub(node.catchBody));
+        // errorBoundary's options (#1365): each value read as the block renders, as a prop is.
+        const opts = node.options?.length
+            ? `,{${node.options.map((o) => `${o.key}:${callSignals(prefixCtx(o.expr, this.ctx), this.ctx)}`).join(',')}}`
+            : '';
         const cf = this.v('cf');
-        this.out(`const ${cf}=errorBoundary(()=>{${body}},(${node.errorVar},${node.retryVar})=>{${catchBody}});`);
+        this.out(`const ${cf}=errorBoundary(()=>{${body}},(${node.errorVar},${node.retryVar})=>{${catchBody}}${opts});`);
         this.place(cf);
     }
 

@@ -1,0 +1,12 @@
+<template>
+  @try {
+    <slot></slot>
+  } @catch (err, retry) {
+    <p class="fallback">{{ err instanceof Error ? err.message : String(err) }}</p>
+    <button class="retry" @click="retry()">Retry</button>
+  }
+</template>
+
+<script>
+// A boundary around its projected children (#1365): the template's own @try, nothing in the script.
+</script>
