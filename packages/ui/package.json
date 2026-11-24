@@ -89,11 +89,6 @@
       "types": "./dist/accordion/pdx-accordion.d.ts",
       "import": "./dist/accordion/pdx-accordion.js"
     },
-    "./banner": {
-      "development": "./src/banner/pdx-banner.ts",
-      "types": "./dist/banner/pdx-banner.d.ts",
-      "import": "./dist/banner/pdx-banner.js"
-    },
     "./tabs": {
       "development": "./src/tabs/pdx-tabs.ts",
       "types": "./dist/tabs/pdx-tabs.d.ts",
@@ -664,11 +659,17 @@
       "types": "./dist/scroll-spy/pdx-scroll-spy.d.ts",
       "import": "./dist/scroll-spy/pdx-scroll-spy.js"
     },
+    "./banner": {
+      "development": "./src/banner/pdx-banner.pdx",
+      "types": "./dist/banner/pdx-banner.d.ts",
+      "import": "./dist/banner/pdx-banner.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
     "dist/index.js",
     "dist/**/pdx-*.js",
+    "dist/banner/banner-icons.js",
     "dist/data-grid/grid-i18n.js",
     "dist/empty-state/empty-state-icons.js",
     "dist/fab/fab-icons.js",
@@ -679,6 +680,7 @@
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
     "src/**/pdx-*.ts",
+    "src/banner/banner-icons.ts",
     "src/data-grid/grid-i18n.ts",
     "src/empty-state/empty-state-icons.ts",
     "src/fab/fab-icons.ts",

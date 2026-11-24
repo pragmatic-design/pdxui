@@ -54,6 +54,7 @@ const PORTED: Record<string, string> = {
     'pdx-bottom-nav': 'src/bottom-nav/pdx-bottom-nav.pdx',
     'pdx-relative-time': 'src/relative-time/pdx-relative-time.pdx',
     'pdx-scroll-spy': 'src/scroll-spy/pdx-scroll-spy.pdx',
+    'pdx-banner': 'src/banner/pdx-banner.pdx',
     'pdx-form-section': 'src/form-section/pdx-form-section.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',

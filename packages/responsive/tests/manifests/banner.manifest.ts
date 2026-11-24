@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-banner
  *
- * Contracts written by inspecting the source (packages/ui/src/banner/pdx-banner.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/banner/pdx-banner.pdx) and the CSS
  * (packages/design/src/components/banner.css, the .pdx-banner / .pdx-banner-* block).
  *
  * DOM structure: the custom element <pdx-banner> renders an inner

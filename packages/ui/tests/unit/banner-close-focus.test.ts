@@ -5,7 +5,7 @@
 // or the previous one when nothing follows.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/banner/pdx-banner';
+import '../../src/banner/pdx-banner.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');
