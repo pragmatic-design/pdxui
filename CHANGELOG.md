@@ -29,6 +29,11 @@ semver.
 
 ### Changed
 
+- A URL binding (`:href`, `:src`, …) and a bound prop of a component compile to one call to core each,
+  `bindUrl` and `bindComponentProp`, instead of an effect written out at every binding (#1346); two
+  identical handlers in one `@for` row are declared once. The select the library is porting went from
+  7703 to 7389 B gzip. A module compiled by this compiler needs the core released with it.
+
 - A component compiled from `.pdx` is lighter (#1207): a bound attribute, a handler and the `@state`
   runes are one call to core each (`bindAttribute`, `bindNativeProperty`, `bindAttributeOrProperty`,
   `eventHandler`, `ctx.states`) instead of code written out where each is used, and identical blocks

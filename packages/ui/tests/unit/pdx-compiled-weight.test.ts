@@ -29,6 +29,9 @@
 // effect: the select's four bindings of its `listboxId`, a `const` template literal, went from
 // `()=>t.listboxId` to `t.listboxId,1` — fewer bytes raw, four more gzip (7699 → 7703 B) because the
 // getter's shape repeats through the module and compresses better — for four effects fewer at each mount.
+// With #1346 a component's prop and a URL are core's binding too (`bindComponentProp`, `bindUrl`), no
+// longer an effect written out each: the select 7703 → 7389 B (its bindings on its own child components),
+// the switch 1258 → 1256 B.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -45,8 +48,8 @@ const UI = join(__dirname, '..', '..');
 
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
-    'src/switch-toggle/pdx-switch.pdx': 1258,
-    'pilot/select.pdx': 7703,
+    'src/switch-toggle/pdx-switch.pdx': 1256,
+    'pilot/select.pdx': 7389,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

@@ -17,7 +17,7 @@ import { createCompileContext } from '../src/compiler/compile-context';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 import { parseTemplate } from '../src/parser/template';
 // The inline module imports it from core; the harness hands it the real one.
-import { assignBoundProperty } from '../../core/src/renderer/template';
+import { bindComponentProp } from '../../core/src/renderer/bound-attribute';
 
 const resolver = new ComponentResolver();
 resolver.registerUiManifest();
@@ -29,8 +29,8 @@ function compileTemplate(template: string, withProps = true) {
 }
 
 const codes = (r: ReturnType<typeof compile>) => r.warnings.map((w) => w.code);
-/** The name a one-way binding assigns, in the inline render: `assignBoundProperty(el, "name", …)`. */
-const assigns = (code: string, name: string) => new RegExp(`assignBoundProperty\\(__el\\d+, "${name}", `).test(code);
+/** The name a one-way binding assigns, in the inline render: `bindComponentProp(el, "name", …)` (#1346). */
+const assigns = (code: string, name: string) => new RegExp(`bindComponentProp\\(__el\\d+, "${name}", `).test(code);
 
 describe('the manifest gives the compiler each component\'s props', () => {
     it('pdx-app-layout declares withBorder and headerHeight; a readonly getter is not a settable prop', () => {
@@ -83,11 +83,11 @@ describe('a bound name on a known component', () => {
 });
 
 describe('the inline build binds a component prop the same way', () => {
-    it('resolves the lowercase name, and assigns through core\'s assignBoundProperty', () => {
+    it('resolves the lowercase name, and assigns through core\'s bindComponentProp (#1346)', () => {
         const source = '<template>\n<pdx-app-layout :withborder="on"></pdx-app-layout>\n</template>\n<script>\n  let on = $signal(false);\n</script>';
         const r = compile(source, 'bound-names.pdx', [], undefined, { production: true, propsOf });
-        expect(r.code).toMatch(/assignBoundProperty\(__el\d+, "withBorder", /);
-        expect(r.code).toMatch(/import \{[^}]*\bassignBoundProperty\b[^}]*\} from '@pdxui\/core'/);
+        expect(r.code).toMatch(/bindComponentProp\(__el\d+, "withBorder", /);
+        expect(r.code).toMatch(/import \{[^}]*\bbindComponentProp\b[^}]*\} from '@pdxui\/core'/);
         expect(codes(r)).toContain('PDX_PROP_NAME_CASE');
     });
 
@@ -111,7 +111,7 @@ describe('the inline build binds a component prop the same way', () => {
         );
         const effect = (fn: () => void) => fn();
         const ctx = { top: () => 5 };
-        const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'assignBoundProperty', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, assignBoundProperty) as Unconnected;
+        const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'bindComponentProp', `return ${iife};`)(document, stubStaticBlock(document), effect, ctx, bindComponentProp) as Unconnected;
         expect((frag.children[0] as unknown as { offsetTop: number }).offsetTop).toBe(5);
     });
 });

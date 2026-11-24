@@ -138,13 +138,13 @@ describe('bound names on the inline path', () => {
     it('a camelCase prop is assigned as written, multi-word too', () => {
         const code = inline('<pdx-select :itemTemplate="renderFn"></pdx-select><pdx-grid :selectedRowKeys="keys"></pdx-grid>',
             'function renderFn() { return null; }\nlet keys = $signal([]);');
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "itemTemplate", /);
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "selectedRowKeys", /);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "itemTemplate", /);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "selectedRowKeys", /);
     });
 
     it('control — :class and :style are not props: they bind the class and the style', () => {
         const code = inline('<div :class="cls" :style="stl"></div>', "let cls = $signal('a');\nlet stl = $signal('');");
-        expect(code).not.toMatch(/assignBoundProperty\(__el\d+, "(class|style)"/);
+        expect(code).not.toMatch(/(?:assignBoundProperty|bindComponentProp)\(__el\d+, "(class|style)"/);
         expect(code, 'the bindings themselves were dropped').toContain('ctx.cls()');
         expect(code).toContain('ctx.stl()');
     });

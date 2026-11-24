@@ -36,10 +36,9 @@ describe('an object literal bound to a prop', () => {
     });
 
     it('assigns the object, not a block', () => {
-        // In expression position, where `{` opens an object: the value of a const, then the prop.
+        // Parenthesised in the getter core's bindComponentProp is given (#1346), where `{` would open a block.
         const code = inline(TEMPLATE);
-        expect(code).toContain("const __b = { activity: '', hours: 1 };");
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "itemDefault", __b\)/);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "itemDefault", \(\)=>\(\{ activity: '', hours: 1 \}\)\)/);
     });
 
     it('and an expression that merely STARTS inside a string is untouched', () => {

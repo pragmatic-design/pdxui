@@ -617,27 +617,40 @@ class InlineGen {
     }
 
     /**
-     * The call to core's binding of a plain element's attribute or property (`bound-attribute.ts`), the
-     * same three writes `assign` spells out: the attribute, a property the element certainly has, or
-     * the property asked for with `in`. Null for what `assign` keeps inline: a component's prop, which
-     * goes through `assignBoundProperty`, and a URL name, which goes through `sanitizeBoundUrl`.
+     * The call to core's binding of an attribute or property (`bound-attribute.ts`), the same writes
+     * `assign` spells out: the attribute, a property the element certainly has, the property asked for
+     * with `in`, a URL through `sanitizeBoundUrl` (`bindUrl`), or a component's prop through
+     * `assignBoundProperty` (`bindComponentProp`, #1346). Null only for a component's prop written once:
+     * that is one `assignBoundProperty` call already, with nothing to save.
      * `once` (#1270): a value that cannot change, or a `:name.once`, is written with no effect — the
      * same call with its flag, and then `value` is passed as the value, not as a getter: a getter cost
      * an allocation per row for nothing.
      */
     private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind, once = false): string | null {
-        if (kind.custom || URL_BINDINGS.has(prop.toLowerCase())) return null;
         // Parenthesised when the value starts with `{`: `() => { a: 'x' }['a']` is a block (render-parity).
         // As a plain argument, `{ a: 'x' }['a']` is an expression already.
         const getter = once ? value : arrowOf(value);
         const flag = once ? ', 1' : '';
+        const attribute = isAttributeBinding(prop, kind);
+        // A URL (#1346): sanitised, and a refused or null value removes the attribute. The property it
+        // goes to, or null where the name is only an attribute.
+        if (URL_BINDINGS.has(prop.toLowerCase())) {
+            this.imports.add('bindUrl');
+            const target = attribute ? 'null' : jsString(propName(prop, kind));
+            return `bindUrl(${el}, ${jsString(prop)}, ${target}, ${getter}${flag});`;
+        }
+        if (kind.custom && !attribute) {
+            if (once) return null;
+            this.imports.add('bindComponentProp');
+            return `bindComponentProp(${el}, ${jsString(propName(prop, kind))}, ${getter});`;
+        }
         // `:style="expr"` writes `style.cssText`, HTML and SVG alike (#1240): not the property, which
         // only a browser forwards to cssText.
-        if (prop === 'style') {
+        if (!kind.custom && prop === 'style') {
             this.imports.add('bindStyleText');
             return `bindStyleText(${el}, ${getter}${flag});`;
         }
-        if (isAttributeBinding(prop, kind)) {
+        if (attribute) {
             this.imports.add('bindAttribute');
             return `bindAttribute(${el}, ${jsString(prop)}, ${getter}${flag});`;
         }
@@ -757,6 +770,24 @@ class InlineGen {
         this.out(`bindGesture(${el}, ${jsQuote(gesture.name)}, ${gestureValue(gesture, handler)});`);
     }
 
+    /**
+     * The name of a row handler declared once before the outermost @for (#375), declaring it unless the
+     * same handler is declared already (#1346): two `@click="choose(c)"` in two branches of a row are one
+     * function. A hoisted handler reads only `ctx` and what the row passes it, so equal text is the same
+     * function; each `delegate` call still passes its own row's scope.
+     */
+    private rowHandler(fn: string): string {
+        const handlers = this.ctx.rowHandlers!;
+        for (const h of handlers) {
+            // Match: const __rh3=<fn>;  Groups: [1]=the name
+            const m = h.match(/^const (\w+)=/);
+            if (m && h === `const ${m[1]}=${fn};`) return m[1];
+        }
+        const name = this.v('rh');
+        handlers.push(`const ${name}=${fn};`);
+        return name;
+    }
+
     /** `opaque`: the element is a component, under one, or in a @portal — never delegated (#113). */
     private eventBind(el: string, desc: string, expr: string, preRewritten = false, opaque = false): void {
         if (this.ctx.ssr) return;
@@ -775,9 +806,7 @@ class InlineGen {
         const listen = (fn: string, options: string): string => {
             if (!delegated) return `${el}.addEventListener(${jsQuote(ev)}, ${fn}${options});`;
             if (!hoisted) return `delegate(ctx.el,${el},${jsQuote(ev)},${fn});`;
-            const name = this.v('rh');
-            this.ctx.rowHandlers!.push(`const ${name}=${fn};`);
-            return `delegate(ctx.el,${el},${jsQuote(ev)},${name},${scopeArg});`;
+            return `delegate(ctx.el,${el},${jsQuote(ev)},${this.rowHandler(fn)},${scopeArg});`;
         };
         // The SAME builder the template path uses, so every handler form the docs promise compiles
         // the same here: `$event` bound, `count++` and `open = !open` rewritten
@@ -817,9 +846,7 @@ class InlineGen {
             if (rt.has('stop')) w.push('e.stopPropagation();');
             if (hoisted) {
                 // The handler once, and the modifiers around it once, passing the row's scope on.
-                const inner = this.v('rh');
-                this.ctx.rowHandlers!.push(`const ${inner}=${handler};`);
-                w.push(`${inner}(e,__s);`);
+                w.push(`${this.rowHandler(handler)}(e,__s);`);
                 this.out(listen(`(e,__s)=>{${w.join('')}}`, opts));
                 return;
             }
