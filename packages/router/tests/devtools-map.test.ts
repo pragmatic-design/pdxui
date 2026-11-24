@@ -39,23 +39,31 @@ describe('__PDX_DEVTOOLS__.map()', () => {
     it('reads a hostile pattern in linear time', () => {
         // `:0(` then `:0((` repeated: what made a regex scan polynomial (#67, CodeQL).
         const hostile = (n: number) => `/:0(${':0(('.repeat(n)}`;
-        // The fastest of five runs (#538): load only ever adds time, so the minimum is the scan's own cost.
-        const fastest = (n: number): number => {
-            const path = hostile(n);
-            let best = Infinity;
-            for (let i = 0; i < 5; i++) {
-                const started = performance.now();
-                paramsOf(path);
-                best = Math.min(best, performance.now() - started);
-            }
-            return best;
+        // The time of one scan, from as many scans as fill 20 ms (#700): one scan of the small size takes
+        // about 1 ms, near the timer's resolution and a single scheduling pause, and the ratio of two
+        // single scans measured 8.7 under the gate's load on a linear scan.
+        const perScan = (path: string): number => {
+            let scans = 0;
+            const started = performance.now();
+            let elapsed = 0;
+            do { paramsOf(path); scans++; elapsed = performance.now() - started; } while (elapsed < 20);
+            return elapsed / scans;
         };
         // The GROWTH, not a time (#700): load slows both sizes alike, and an absolute bound measured the
-        // machine. Four times the input: a linear scan takes about four times as long, a quadratic one
-        // about sixteen. Twice the input did not tell them apart: a quadratic scan measured 2.9.
-        const small = fastest(25_000);
-        const large = fastest(100_000);
-        expect(large / small, `25 000 → ${small.toFixed(1)} ms, 100 000 → ${large.toFixed(1)} ms`).toBeLessThan(8);
+        // machine. Sixteen times the input: a linear scan takes about sixteen times as long, a quadratic
+        // one about 256, and the bound is between the two, 64. A scan builds one object a parameter, so
+        // the large size pays more garbage collection and a linear scan reads above 16. Measured with
+        // the ui suite running beside it: linear 17.6 to 31.2, quadratic 172. Four times the input,
+        // bound 8, did not leave room: linear read up to 8.4 under load, quadratic 15.
+        // The two sizes alternate, so a slow stretch of the machine falls on both, and the fastest of
+        // five rounds is each size's own cost (#538): load only ever adds time.
+        const smallPath = hostile(6_250), largePath = hostile(100_000);
+        let small = Infinity, large = Infinity;
+        for (let round = 0; round < 5; round++) {
+            small = Math.min(small, perScan(smallPath));
+            large = Math.min(large, perScan(largePath));
+        }
+        expect(large / small, `6 250 → ${small.toFixed(2)} ms, 100 000 → ${large.toFixed(1)} ms a scan`).toBeLessThan(64);
         // A loose ceiling, for a scan that became uniformly very slow.
         expect(large).toBeLessThan(2000);
         expect(paramsOf(hostile(10)).length).toBe(11);
