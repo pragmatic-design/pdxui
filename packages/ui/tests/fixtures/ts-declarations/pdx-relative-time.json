@@ -1,0 +1,133 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRelativeTime",
+  "tagName": "pdx-relative-time",
+  "category": "Data Display",
+  "order": 90,
+  "description": "Shows a time relative to now (\"3 hours ago\", \"in 2 days\"), locale-aware and kept up to date.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "datetime",
+      "description": "The date/time to render relative to now.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "datetime"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale of the wording. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "formatStyle",
+      "description": "Wording length: 'long', 'short' or 'narrow'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'long'",
+      "attribute": "formatstyle"
+    },
+    {
+      "kind": "field",
+      "name": "numeric",
+      "description": "'always' (1 day ago) or 'auto' (yesterday).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "numeric"
+    },
+    {
+      "kind": "field",
+      "name": "updateInterval",
+      "description": "How often (ms) to refresh the text.",
+      "type": {
+        "text": "number"
+      },
+      "default": "60000",
+      "attribute": "updateinterval"
+    },
+    {
+      "kind": "field",
+      "name": "showTooltip",
+      "description": "Shows the absolute date on hover.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showtooltip"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "datetime",
+      "fieldName": "datetime",
+      "description": "The date/time to render relative to now.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale of the wording. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "formatstyle",
+      "fieldName": "formatStyle",
+      "description": "Wording length: 'long', 'short' or 'narrow'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'long'"
+    },
+    {
+      "name": "numeric",
+      "fieldName": "numeric",
+      "description": "'always' (1 day ago) or 'auto' (yesterday).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "updateinterval",
+      "fieldName": "updateInterval",
+      "description": "How often (ms) to refresh the text.",
+      "type": {
+        "text": "number"
+      },
+      "default": "60000"
+    },
+    {
+      "name": "showtooltip",
+      "fieldName": "showTooltip",
+      "description": "Shows the absolute date on hover.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<time>`, with the machine-readable `datetime` and the full date as its title."
+    }
+  ]
+}

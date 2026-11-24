@@ -5,7 +5,7 @@
 // nothing must stay armed, or every element ever mounted would keep updating a <time> no longer in the
 // document. The freeze itself is measured in Chromium (display-d-beta-contract.spec.ts).
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import '../../src/relative-time/pdx-relative-time';
+import '../../src/relative-time/pdx-relative-time.pdx';
 
 const frame = () => new Promise<void>(r => requestAnimationFrame(() => r()));
 

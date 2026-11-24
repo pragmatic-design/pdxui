@@ -14,11 +14,11 @@ describe('in Node, without a DOM', () => {
     let libraryImport: Promise<unknown>;
     beforeAll(async () => {
         // A library component written in TypeScript whose graph holds no .pdx: core's suite does not
-        // compile .pdx, and the library moves to .pdx one component at a time (#1210) — pdx-button,
-        // the component this imported, is one now, and every component that renders a button reaches
-        // it. pdx-relative-time imports core, its stylesheet and a locale helper only. When it moves
-        // too, this import has to be of a compiled module, which core's suite then has to compile.
-        libraryImport = import('../../ui/src/relative-time/pdx-relative-time');
+        // compile .pdx, and the library moves to .pdx one component at a time (#1210). pdx-button,
+        // then pdx-relative-time, were the components this imported, and both are .pdx now.
+        // pdx-affix imports core only. When it moves too, this import has to be of a compiled
+        // module, which core's suite then has to compile.
+        libraryImport = import('../../ui/src/affix/pdx-affix');
         // Settled here; a rejection is asserted by the test below, which names it, not by the hook.
         await libraryImport.catch(() => undefined);
     });

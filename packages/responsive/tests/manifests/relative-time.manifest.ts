@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-relative-time
  *
- * Contracts written by inspecting the source (packages/ui/src/relative-time/pdx-relative-time.ts)
+ * Contracts written by inspecting the source (packages/ui/src/relative-time/pdx-relative-time.pdx)
  * and the CSS (packages/design/src/components/relative-time.css).
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -68,7 +68,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * The source's header comment and the brief speak of a <time> element
  * with a `datetime` attribute. The source, instead, renders a `<span class="pdx-rt-root">`
- * (packages/ui/src/relative-time/pdx-relative-time.ts:120-121) — NOT a `<time
+ * (packages/ui/src/relative-time/pdx-relative-time.ts:120-121, as it was) — NOT a `<time
  * datetime="...">`. Conseguenze:
  *   - the machine-readable `datetime` on a semantic <time> element is missing;
  *   - the relative text ("6 years ago") changes with time and is NOT exposed in an
