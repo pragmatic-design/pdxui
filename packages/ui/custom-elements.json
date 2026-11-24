@@ -21908,7 +21908,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/page-header/pdx-page-header.ts",
+      "path": "src/page-header/pdx-page-header.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -22042,7 +22042,7 @@
           "name": "pdx-page-header",
           "declaration": {
             "name": "PdxPageHeader",
-            "module": "src/page-header/pdx-page-header.ts"
+            "module": "src/page-header/pdx-page-header.pdx"
           }
         }
       ]

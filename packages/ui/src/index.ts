@@ -74,7 +74,7 @@ import './menu/pdx-menu.pdx';
 import './dropdown-menu/pdx-dropdown-menu.pdx';
 import './context-menu/pdx-context-menu';
 import './breadcrumb/pdx-breadcrumb.pdx';
-import './page-header/pdx-page-header';
+import './page-header/pdx-page-header.pdx';
 import './toolbar/pdx-toolbar.pdx';
 import './pagination/pdx-pagination.pdx';
 import './fab/pdx-fab.pdx';

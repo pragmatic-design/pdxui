@@ -86,6 +86,7 @@ const PORTED: Record<string, string> = {
     'pdx-field-group': 'src/field-group/pdx-field-group.pdx',
     'pdx-form-section': 'src/form-section/pdx-form-section.pdx',
     'pdx-masonry': 'src/masonry/pdx-masonry.pdx',
+    'pdx-page-header': 'src/page-header/pdx-page-header.pdx',
     'pdx-input-group': 'src/input-group/pdx-input-group.pdx',
     'pdx-kbd': 'src/kbd/pdx-kbd.pdx',
     'pdx-label': 'src/label/pdx-label.pdx',

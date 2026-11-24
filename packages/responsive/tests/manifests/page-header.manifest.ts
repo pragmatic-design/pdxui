@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-page-header (Tier 6)
  *
- * Written by inspecting the source (packages/ui/src/page-header/pdx-page-header.ts) and the CSS
+ * Written by inspecting the source (packages/ui/src/page-header/pdx-page-header.pdx) and the CSS
  * (packages/design/src/components/page-header.css; the crumbs are drawn by nav.css, which base.css
  * carries). Selected by its parts (#289):
  *   - `root`, the `<header class="pdx-page-header">`, a column: the breadcrumb above the title row;

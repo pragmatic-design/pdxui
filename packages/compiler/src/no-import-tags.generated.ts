@@ -73,7 +73,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-number-input',
     'pdx-otp-input',
     'pdx-overlay-outlet',
-    'pdx-page-header',
     'pdx-pagination',
     'pdx-password-input',
     'pdx-popover',

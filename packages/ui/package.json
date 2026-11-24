@@ -230,7 +230,7 @@
       "import": "./dist/shared/filter-popover.js"
     },
     "./page-header": {
-      "development": "./src/page-header/pdx-page-header.ts",
+      "development": "./src/page-header/pdx-page-header.pdx",
       "types": "./dist/page-header/pdx-page-header.d.ts",
       "import": "./dist/page-header/pdx-page-header.js"
     },
