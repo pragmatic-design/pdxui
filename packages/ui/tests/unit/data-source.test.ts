@@ -1,7 +1,7 @@
 // Tests for pdx-data-source non-rendering component.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/data-source/pdx-data-source';
+import '../../src/data-source/pdx-data-source.pdx';
 
 describe('pdx-data-source', () => {
     beforeEach(() => { document.body.innerHTML = ''; });

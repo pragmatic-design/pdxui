@@ -1,0 +1,91 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,
+ * tables and selects.
+ */
+// pdx-data-source — Non-rendering data provider component.
+// Creates a DataSource from declarative props and provides it under DataSourceContext (#495): a
+// pdx-list, pdx-pagination, pdx-infinite-scroll, pdx-select or pdx-autocomplete inside reads the
+// nearest one with no binding. Usage:
+//   <pdx-data-source url="/api/users" :page-size="25">
+//     <pdx-select label-field="name"></pdx-select>
+//     <pdx-pagination></pdx-pagination>
+//   </pdx-data-source>
+//
+// Or with static data:
+//   <pdx-data-source :data="items" id-field="id"> … </pdx-data-source>
+// Any other child injects it: inject(DataSourceContext, el, null).
+import { createDataSource, restTransport, arrayTransport, provide } from '@pdxui/core';
+import type { CompositeFilter, Context, DataSource, FilterDescriptor, IDataTransport, SortDescriptor } from '@pdxui/core';
+import { DataSourceContext } from './data-source-context';
+// The entry `@pdxui/ui/data-source` gives the token as well as the element (#1352).
+export { DataSourceContext } from './data-source-context';
+
+/** REST endpoint URL. When set, creates a restTransport-backed DataSource. */
+@prop url: string = '';
+/** Static data array. When set, creates an arrayTransport-backed DataSource. */
+@prop data: unknown[] | null = null;
+/** Custom transport object (IDataTransport). Takes priority over url/data. */
+@prop transport: Record<string, unknown> | null = null;
+/** ID field for identifying items. Default: 'id'. */
+@prop idField: string = 'id';
+/** Page size. 0 = no pagination. Default: 0. */
+@prop pageSize: number = 0;
+/** Auto-load on creation. Default: true. */
+@prop autoLoad: boolean = true;
+/** Initial sort. Array of { field, dir } objects. */
+@prop sort: unknown[] | null = null;
+/** Initial filter. Array of filter descriptors. */
+@prop filter: unknown[] | null = null;
+/** Additional params passed to transport.read(). */
+@prop params: Record<string, unknown> | null = null;
+/**
+ * A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided
+ * under too: a component below injects that one by it, past a nearer `<pdx-data-source>`.
+ */
+@prop token: Record<string, unknown> | null = null;
+@host el;
+@expose source;
+
+let ds = $signal<DataSource<Record<string, unknown>> | null>(null);
+
+// Create/recreate the DataSource when its configuration changes.
+$effect(() => {
+  const id = idField || 'id';
+  const custom = transport as unknown as IDataTransport<Record<string, unknown>> | null;
+  let chosen: IDataTransport<Record<string, unknown>>;
+  if (custom && typeof custom.read === 'function') {
+    chosen = custom;
+  } else if (url) {
+    chosen = restTransport({ baseUrl: url, idField: id });
+  } else if (data && Array.isArray(data)) {
+    chosen = arrayTransport({ data: data as Record<string, unknown>[], idField: id });
+  } else {
+    // No source configured yet.
+    ds = null;
+    return;
+  }
+  const next = createDataSource({
+    transport: chosen,
+    idField: id,
+    pageSize,
+    autoLoad,
+    // The props are typed as a parent writes them; the source reads them as descriptors.
+    sort: (sort as SortDescriptor[] | null) ?? undefined,
+    filter: (filter as (FilterDescriptor | CompositeFilter)[] | null) ?? undefined,
+    params: params ?? undefined,
+  });
+  ds = next;
+  // Under the token it is given, for a component that wants this source by name (#495)…
+  if (token) provide(token as unknown as Context<DataSource<Record<string, unknown>>>, next, el);
+  // …and always under DataSourceContext: the nearest source, for the library's consumers.
+  provide(DataSourceContext, next, el);
+});
+
+/** The DataSource itself, as a computed: call it — `el.source()` — and it re-reads when the source is replaced. */
+function source(): DataSource<Record<string, unknown>> | null {
+  return ds;
+}
+</script>

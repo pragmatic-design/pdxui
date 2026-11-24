@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-data-source (a non-rendering provider)
  *
- * ── DOM (packages/ui/src/data-source/pdx-data-source.ts) ──
+ * ── DOM (packages/ui/src/data-source/pdx-data-source.pdx) ──
  *   <pdx-data-source :data="…">                ← renders nothing of its own: it projects its children
  *     <pdx-list>                               ← here, the list it feeds
  *

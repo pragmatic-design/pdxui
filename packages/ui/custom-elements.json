@@ -9792,7 +9792,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/data-source/pdx-data-source.ts",
+      "path": "src/data-source/pdx-data-source.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -9900,6 +9900,7 @@
             {
               "kind": "method",
               "name": "source",
+              "parameters": [],
               "description": "The DataSource itself, as a computed: call it — `el.source()` — and it re-reads when the source is replaced."
             }
           ],
@@ -9961,7 +9962,7 @@
           "name": "pdx-data-source",
           "declaration": {
             "name": "PdxDataSource",
-            "module": "src/data-source/pdx-data-source.ts"
+            "module": "src/data-source/pdx-data-source.pdx"
           }
         }
       ]

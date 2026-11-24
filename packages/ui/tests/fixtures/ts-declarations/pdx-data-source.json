@@ -1,0 +1,161 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDataSource",
+  "tagName": "pdx-data-source",
+  "category": "Data-bound",
+  "order": 105,
+  "description": "A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,\ntables and selects.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "url",
+      "description": "REST endpoint URL. When set, creates a restTransport-backed DataSource.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "url"
+    },
+    {
+      "kind": "field",
+      "name": "data",
+      "description": "Static data array. When set, creates an arrayTransport-backed DataSource.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "transport",
+      "description": "Custom transport object (IDataTransport). Takes priority over url/data.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "description": "ID field for identifying items. Default: 'id'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "pageSize",
+      "description": "Page size. 0 = no pagination. Default: 0.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "pagesize"
+    },
+    {
+      "kind": "field",
+      "name": "autoLoad",
+      "description": "Auto-load on creation. Default: true.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "autoload"
+    },
+    {
+      "kind": "field",
+      "name": "sort",
+      "description": "Initial sort. Array of { field, dir } objects.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "filter",
+      "description": "Initial filter. Array of filter descriptors.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "params",
+      "description": "Additional params passed to transport.read().",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "token",
+      "description": "A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided\nunder too: a component below injects that one by it, past a nearer `<pdx-data-source>`.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "method",
+      "name": "source",
+      "parameters": [],
+      "description": "The DataSource itself, as a computed: call it — `el.source()` — and it re-reads when the source is replaced."
+    }
+  ],
+  "attributes": [
+    {
+      "name": "url",
+      "fieldName": "url",
+      "description": "REST endpoint URL. When set, creates a restTransport-backed DataSource.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "description": "ID field for identifying items. Default: 'id'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "pagesize",
+      "fieldName": "pageSize",
+      "description": "Page size. 0 = no pagination. Default: 0.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "autoload",
+      "fieldName": "autoLoad",
+      "description": "Auto-load on creation. Default: true.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "x-pdx-context": {
+    "provides": [
+      ":token",
+      "DataSourceContext"
+    ]
+  }
+}

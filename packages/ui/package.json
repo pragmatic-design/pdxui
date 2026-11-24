@@ -139,11 +139,6 @@
       "types": "./dist/autocomplete/pdx-autocomplete.d.ts",
       "import": "./dist/autocomplete/pdx-autocomplete.js"
     },
-    "./data-source": {
-      "development": "./src/data-source/pdx-data-source.ts",
-      "types": "./dist/data-source/pdx-data-source.d.ts",
-      "import": "./dist/data-source/pdx-data-source.js"
-    },
     "./error-boundary": {
       "development": "./src/error-boundary/pdx-error-boundary.ts",
       "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/label/pdx-label.pdx",
       "types": "./dist/label/pdx-label.d.ts",
       "import": "./dist/label/pdx-label.js"
+    },
+    "./data-source": {
+      "development": "./src/data-source/pdx-data-source.pdx",
+      "types": "./dist/data-source/pdx-data-source.d.ts",
+      "import": "./dist/data-source/pdx-data-source.js"
     },
     "./package.json": "./package.json"
   },

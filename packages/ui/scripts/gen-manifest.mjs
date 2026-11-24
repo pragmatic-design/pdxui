@@ -530,6 +530,10 @@ function scanExposedMethods(sourceFile) {
  * method that takes arguments.
  */
 function parametersOf(prop, sourceFile) {
+    // An exposed `computed(…)` is called with no argument, `el.source()`: a method of none, as a
+    // `.pdx` that exposes a function reading the same signal records it (#1210).
+    if (ts.isPropertyAssignment(prop) && ts.isCallExpression(prop.initializer)
+        && ts.isIdentifier(prop.initializer.expression) && prop.initializer.expression.text === 'computed') return [];
     const named = ts.isShorthandPropertyAssignment(prop) ? prop.name.text
         : ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.initializer) ? prop.initializer.text : null;
     const fn = ts.isMethodDeclaration(prop) ? prop

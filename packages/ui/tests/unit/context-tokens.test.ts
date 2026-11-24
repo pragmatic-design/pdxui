@@ -4,7 +4,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { context, inject, clearProviders, isDataSource, type DataSource } from '@pdxui/core';
-import { DataSourceContext } from '../../src/data-source/pdx-data-source';
+// The public entry, as an app imports the token: the component's .pdx re-exports it (#1352).
+import { DataSourceContext } from '@pdxui/ui/data-source';
 import { ErrorContext } from '../../src/error-boundary/pdx-error-boundary';
 
 const settle = () => new Promise((r) => setTimeout(r, 50));
