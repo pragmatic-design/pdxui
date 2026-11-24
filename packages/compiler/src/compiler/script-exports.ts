@@ -4,8 +4,10 @@
 // a syntax error: the module failed to load in the browser, far from the line, and the compiler said
 // nothing. A component's script has nothing a module could export, so each value export is an error
 // at its line, and the setup gets the declaration without its `export` — the module still parses, and
-// the name is the component's own. A type export is erased like any type. A @store module lifts its
-// exports instead (store-exports.ts), and is not checked here.
+// the name is the component's own. A type export is erased like any type. A re-export of another
+// module (`export { X } from './x'`, #1352) is the module's, lifted to it: a library component's entry
+// keeps the values it exports. A @store module lifts its exports instead (store-exports.ts), and is
+// not checked here.
 
 import ts from 'typescript';
 import type { SFCDescriptor } from '../parser/sfc';
@@ -21,10 +23,14 @@ function exportModifier(stmt: ts.Statement): ts.Modifier | null {
     return modifiersOf(stmt).find((m) => m.kind === ts.SyntaxKind.ExportKeyword) ?? null;
 }
 
-/** Whether a top-level statement exports a value: a type, or a `declare`, exports nothing at run time. */
+/**
+ * Whether a top-level statement exports a value the script makes: a type, or a `declare`, exports
+ * nothing at run time, and a re-export of another module, `export { X } from './x'` (#1352), is a
+ * statement of the module, which the analyser lifts there (script-analyzer.ts).
+ */
 function exportsValue(stmt: ts.Statement): boolean {
     if (ts.isExportAssignment(stmt)) return true;
-    if (ts.isExportDeclaration(stmt)) return !stmt.isTypeOnly;
+    if (ts.isExportDeclaration(stmt)) return !stmt.isTypeOnly && stmt.moduleSpecifier === undefined;
     if (!exportModifier(stmt)) return false;
     if (ts.isInterfaceDeclaration(stmt) || ts.isTypeAliasDeclaration(stmt)) return false;
     return !modifiersOf(stmt).some((m) => m.kind === ts.SyntaxKind.DeclareKeyword);

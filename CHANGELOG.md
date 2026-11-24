@@ -11,6 +11,12 @@ semver.
 
 ### Features
 
+- A component's script may re-export another module, `export { X } from './x'` or `export * from './x'`
+  (#1352): the statement is the module's, emitted beside its imports, and the `.d.ts` re-exports it. A
+  library component whose entry gives values besides the component (`DataSourceContext`, `toast`,
+  `dialog`, `ErrorContext`) keeps them when it moves to `.pdx`. An export of a value the script makes
+  stays `PDX_SCRIPT_EXPORT`.
+
 - `@prop … { attribute: string }` (or `number`, `boolean`, `json`) says how a prop's attribute is read,
   apart from its type, as on a `@model` (#1347): `@prop columns: number | 'auto' = 3 { attribute: string };`
   reads `columns="2"` as `'2'` and keeps `number | 'auto'` in the `.d.ts` and the manifest. A prop whose

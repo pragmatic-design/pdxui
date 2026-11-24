@@ -1658,9 +1658,9 @@ function reset() {
 
 *error* — An `export` of a value in a component script.
 
-A component's script is the body of its setup, run once per instance; an `export` inside a function is a syntax error, and the module failed to load in the browser with no word from the compiler. There is nothing a component could export, so the declaration is compiled without its `export` and the line is reported. A type export (`export interface`, `export type`) is erased like any type; a `@store` module and a `.pdx.ts` module keep their exports.
+A component's script is the body of its setup, run once per instance; an `export` inside a function is a syntax error, and the module failed to load in the browser with no word from the compiler. There is nothing a component could export, so the declaration is compiled without its `export` and the line is reported. A type export (`export interface`, `export type`) is erased like any type; a re-export of another module, `export { X } from './x'`, is a statement of the module and is emitted there (#1352); a `@store` module and a `.pdx.ts` module keep their exports.
 
-**Fix.** Move what you meant to share into a `.ts` module and import it from there; inside the component, drop the `export`.
+**Fix.** Move what you meant to share into a `.ts` module and import it from there, or re-export it from the component: `export { TAX } from './tax';`. Inside the component, drop the `export`.
 
 Instead of:
 

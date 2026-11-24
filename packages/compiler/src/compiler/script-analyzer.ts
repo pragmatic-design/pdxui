@@ -269,6 +269,28 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
+        // ─── Re-exports (#1352) ───
+        // `export { X } from './x'` and `export * from './x'` re-export another module: a statement of
+        // the module, lifted beside the imports, so a library component's entry keeps the values it
+        // exports. Read to its end as an import is; a list with no `from` is the script's own export,
+        // left in the body for PDX_SCRIPT_EXPORT.
+        // Match: `export {` or `export *` at the start of the line. Groups: none
+        if (/^export\s*[{*]/.test(codeLines[i].trim())) {
+            let stmt = line;
+            let end = i;
+            while (!isCompleteExportList(stmt) && end + 1 < lines.length) {
+                end++;
+                stmt += '\n' + lines[end];
+            }
+            const flat = stmt.replace(/\s+/g, ' ').trim();
+            // Match: ends with `from '<module>'`, a `;` or not. Groups: none
+            if (/\sfrom\s+(['"])[^'"]+\1\s*;?$/.test(flat)) {
+                userImports.push(flat.endsWith(';') ? flat : `${flat};`);
+                i = end;
+                continue;
+            }
+        }
+
         // A leading `@` that is inside a comment or string (masked view does NOT start with
         // `@`) is NOT a directive — e.g. `/* @page '/x' */`. Pass it through as body so the
         // commented-out directive is never processed.
@@ -1595,6 +1617,19 @@ function dropLocallyDeclared(usedFeatures: Set<string>, lines: string[], depthAt
  * specifier — either a bare side-effect import (`import 'x'`) or a `from '…'` clause. Used to
  * accumulate multi-line imports before flattening.
  */
+/**
+ * Whether an `export {…}` / `export *` statement is complete: its braces closed, and either a
+ * `from '…'` or the closing brace ends it (a list of the script's own names).
+ */
+function isCompleteExportList(text: string): boolean {
+    const opens = (text.match(/\{/g) ?? []).length;
+    const closes = (text.match(/\}/g) ?? []).length;
+    if (opens !== closes) return false;
+    const t = text.trim();
+    // Match: ends with `from '…'`, or with the list's `}`, each with an optional `;`. Groups: none
+    return /from\s+['"][^'"]+['"]\s*;?$/.test(t) || /\}\s*;?$/.test(t);
+}
+
 function isCompleteImport(text: string): boolean {
     const opens = (text.match(/\{/g) ?? []).length;
     const closes = (text.match(/\}/g) ?? []).length;

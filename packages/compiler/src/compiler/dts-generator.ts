@@ -107,8 +107,9 @@ export interface DtsInput {
  * nowhere (`Form`, `DataSource`), since the compiled module imports only core's values.
  */
 export function scriptImportStatements(script: string): string[] {
-    // Match: a one-line `import … from '…';`. Groups: none
-    return script.split('\n').map((l) => l.trim()).filter((l) => /^import\s.+\sfrom\s+(['"])[^'"]+\1;?$/.test(l));
+    // Match: a one-line `import … from '…';`, or a re-export `export { X } from '…';` / `export * from '…';`
+    // (#1352), which the declaration re-exports as the module does. Groups: none
+    return script.split('\n').map((l) => l.trim()).filter((l) => /^(?:import|export)\s.+\sfrom\s+(['"])[^'"]+\1;?$/.test(l));
 }
 
 /** A name a script import binds, as a type: `{ A as B }`, a default, or a namespace. */
@@ -282,7 +283,9 @@ export function generateDts(input: DtsInput): string {
 
     // What the types above name, declared after the header (#1335).
     const declared = declaredNames(lines.slice(2).join('\n'), input.imports ?? [], input.generics ?? []);
-    lines.splice(2, 0, ...declared);
+    // The script's re-exports (#1352): the module re-exports them, and so does its declaration.
+    const reExports = (input.imports ?? []).filter((s) => s.startsWith('export '));
+    lines.splice(2, 0, ...declared, ...(reExports.length > 0 ? [...reExports, ''] : []));
 
     return lines.join('\n');
 }
