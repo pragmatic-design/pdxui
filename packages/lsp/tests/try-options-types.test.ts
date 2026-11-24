@@ -26,7 +26,7 @@ function diagnose(script: string, template: string): { message: string; at: stri
 }
 
 const SCRIPT = 'let tries = $signal(3);\nlet label = $signal(\'x\');\n'
-    + 'function failed(error: Error, count: number) { void error; void count; }';
+    + 'function failed(error: Error, count: number) { void error; void count; }\nfunction recovered() {}';
 const CATCH = '@catch (err, retry) { <button @click="retry()">Retry</button> }';
 
 // The language service's cold start, paid here with a timeout of its own (see await-types.test.ts).
@@ -34,7 +34,7 @@ beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('@try options in the editor', () => {
     it('values of the types errorBoundary takes are not errors', () => {
-        expect(diagnose(SCRIPT, `@try { maxRetries: tries, autoRetry: true, retryDelay: 500, onError: failed } { <p>a</p> } ${CATCH}`)).toEqual([]);
+        expect(diagnose(SCRIPT, `@try { maxRetries: tries, autoRetry: true, retryDelay: 500, onError: failed, onRecover: recovered } { <p>a</p> } ${CATCH}`)).toEqual([]);
     });
 
     it('a value of the wrong type is an error on the key it is given to, as TypeScript reports it', () => {

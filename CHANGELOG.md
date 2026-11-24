@@ -15,7 +15,9 @@ semver.
   a block right after `@try` takes core's `errorBoundary` options, each an expression read as the block
   renders, and the editor checks each value against its key. An unknown key, a key twice and a key with
   no value stop the compile. A boundary rendered on the server calls `onError` too, so a fallback that
-  reads what it set is the markup the client renders.
+  reads what it set is the markup the client renders. `onRecover`, an option of `errorBoundary` and a
+  key of `@try`, is called when the content renders again after an error — a retry, an automatic retry,
+  a `resetOn` change — and is where a state `onError` set is cleared.
 
 - `@prop for as htmlFor: string = ''` reads a prop by an alias (#1239), for a public name no script can
   read: the attribute, the property, the `.d.ts` and the manifest are `for`, the script and the template

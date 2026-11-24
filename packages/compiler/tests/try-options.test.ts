@@ -11,6 +11,7 @@ const SCRIPT = [
     '@prop autoRetry: boolean = false;',
     '@prop retryDelay: number = 1000;',
     'function failed(error: Error, count: number) { void error; void count; }',
+    'function recovered() {}',
 ].join('\n');
 
 function compiled(template: string, script = SCRIPT): string {
@@ -22,8 +23,8 @@ const CATCH = '@catch (err, retry) { <button @click="retry()">Retry</button> }';
 
 describe('@try options', () => {
     it('the block after @try is errorBoundary\'s options, each value read as the block renders', () => {
-        const code = compiled(`@try { maxRetries: maxRetries, autoRetry: autoRetry, retryDelay: retryDelay, onError: failed } { <p>body</p> } ${CATCH}`);
-        expect(code, code).toMatch(/errorBoundary\(\(\)=>\{.*\},\(err,retry\)=>\{.*\},\{maxRetries:ctx\.maxRetries\(\),autoRetry:ctx\.autoRetry\(\),retryDelay:ctx\.retryDelay\(\),onError:ctx\.failed\}\)/s);
+        const code = compiled(`@try { maxRetries: maxRetries, autoRetry: autoRetry, retryDelay: retryDelay, onError: failed, onRecover: recovered } { <p>body</p> } ${CATCH}`);
+        expect(code, code).toMatch(/errorBoundary\(\(\)=>\{.*\},\(err,retry\)=>\{.*\},\{maxRetries:ctx\.maxRetries\(\),autoRetry:ctx\.autoRetry\(\),retryDelay:ctx\.retryDelay\(\),onError:ctx\.failed,onRecover:ctx\.recovered\}\)/s);
     });
 
     it('a literal value, and only some of the keys', () => {
@@ -45,7 +46,7 @@ describe('@try options', () => {
 
     it('an unknown key stops the compile at its line', () => {
         expect(() => parseTemplate(`<p>a</p>\n@try { maxRetry: 3 } { <p>body</p> } ${CATCH}`))
-            .toThrow(/@try option 'maxRetry' at line 2.*maxRetries, autoRetry, retryDelay, onError/s);
+            .toThrow(/@try option 'maxRetry' at line 2.*maxRetries, autoRetry, retryDelay, onError, onRecover/s);
     });
 
     it('a key twice stops the compile', () => {
