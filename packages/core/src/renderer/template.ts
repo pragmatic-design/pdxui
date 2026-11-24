@@ -457,8 +457,10 @@ function platformProperty(el: Element, prop: string): boolean {
  */
 export function assignBoundProperty(el: Element, prop: string, value: unknown): void {
     // The attribute a platform property reflects is its name in lower case (`tabIndex` → `tabindex`):
-    // `class` and `for`, the two that are not, never reach a component as a property.
-    if (value == null && el.tagName.includes('-') && !Object.prototype.hasOwnProperty.call(el, prop) && platformProperty(el, prop)) {
+    // `class` and `for`, the two that are not, never reach a component as a property. Not while
+    // rendering to a string: the server's elements have none of the platform's prototypes, and an
+    // attribute that was never written has nothing to clear.
+    if (value == null && el.tagName.includes('-') && !isServerRender() && !Object.prototype.hasOwnProperty.call(el, prop) && platformProperty(el, prop)) {
         clearBoundProperty(el, prop.toLowerCase(), prop);
         return;
     }
