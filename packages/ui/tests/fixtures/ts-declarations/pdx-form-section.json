@@ -1,0 +1,141 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFormSection",
+  "tagName": "pdx-form-section",
+  "category": "Forms",
+  "order": 47,
+  "description": "Groups related fields of a form under a labelled heading, and can scope validation to its own\nfields.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Section name (used for identification).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Display label for the section header.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "fields",
+      "description": "Comma-separated field names that belong to this section.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "fields"
+    },
+    {
+      "kind": "field",
+      "name": "validate",
+      "description": "When to validate: 'onLeave' | 'onSubmit' | 'blocking'. Default: 'onSubmit'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'onSubmit'",
+      "attribute": "validate"
+    },
+    {
+      "kind": "field",
+      "name": "active",
+      "description": "Whether the section is currently active/visible.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "active"
+    }
+  ],
+  "roles": [
+    "group"
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Section name (used for identification).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Display label for the section header.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "fields",
+      "fieldName": "fields",
+      "description": "Comma-separated field names that belong to this section.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "validate",
+      "fieldName": "validate",
+      "description": "When to validate: 'onLeave' | 'onSubmit' | 'blocking'. Default: 'onSubmit'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'onSubmit'"
+    },
+    {
+      "name": "active",
+      "fieldName": "active",
+      "description": "Whether the section is currently active/visible.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<fieldset>`."
+    },
+    {
+      "name": "legend",
+      "description": "The legend, with `label`."
+    },
+    {
+      "name": "content",
+      "description": "The fields."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "active",
+      "description": "`active` (the default): the section is shown; a section that is not active is hidden."
+    },
+    {
+      "name": "invalid",
+      "description": "The last `validateSection()` found an error in one of its fields."
+    }
+  ]
+}

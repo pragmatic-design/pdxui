@@ -1,0 +1,91 @@
+<template>
+  <fieldset class="pdx-form-section" data-part="root" role="group" :aria-label="label">
+    @if (label) {<legend class="pdx-form-section-legend" data-part="legend">{{ label }}</legend>}
+    <div class="pdx-form-section-content" data-part="content"><slot></slot></div>
+  </fieldset>
+</template>
+
+<script>
+/**
+ * Groups related fields of a form under a labelled heading, and can scope validation to its own
+ * fields.
+ *
+ * @cssstate active - `active` (the default): the section is shown; a section that is not active is hidden.
+ * @cssstate invalid - The last `validateSection()` found an error in one of its fields.
+ *
+ * @csspart root - The `<fieldset>`.
+ * @csspart legend - The legend, with `label`.
+ * @csspart content - The fields.
+ */
+// pdx-form-section — Logical section of a form for tab/step/accordion layouts.
+// Validates only its own fields (specified by `fields` prop).
+// Validation timing is configurable: onLeave, onSubmit, or blocking.
+import { tryUseForm, formField } from '@pdxui/core';
+import type { Form } from '@pdxui/core';
+// This component's styles live in form.css — written where the
+// container is rather than where the component is. Imported explicitly so they travel anyway.
+import '@pdxui/design/components/form';
+
+/** Section name (used for identification). */
+@prop name: string = '';
+/** Display label for the section header. */
+@prop label: string = '';
+/** Comma-separated field names that belong to this section. */
+@prop fields: string = '';
+/** When to validate: 'onLeave' | 'onSubmit' | 'blocking'. Default: 'onSubmit'. */
+@prop validate: string = 'onSubmit';
+/** Whether the section is currently active/visible. */
+@prop active: boolean = true;
+@host el;
+
+// `active` stays a prop: the section never writes it, its parent does. Its conditions are states
+// of the host (#293), which form.css draws; the fieldset carries no class for them.
+@state active = !!active;
+@state invalid = !sectionValid;
+@part root, legend, content;
+
+// Looked up when read, and kept once found: set up before its <pdx-form>, a one-time lookup
+// at setup would never find it. See tryUseForm(from).
+let found: Form<any> | undefined;
+function currentForm(): Form<any> | undefined { return found ??= tryUseForm(el) as Form<any> | undefined; }
+let sectionValid = $signal(true);
+let sectionDirty = $signal(false);
+
+function getFieldNames(): string[] {
+  const f = fields as string;
+  return f ? f.split(',').map(s => s.trim()).filter(Boolean) : [];
+}
+
+// Validate only this section's fields. Returns true if all valid.
+async function validateSection(): Promise<boolean> {
+  const form = currentForm();
+  if (!form) return true;
+  const names = getFieldNames();
+  if (names.length === 0) return true;
+
+  // Touch section fields; the loop's name is not `name`, which is the prop.
+  for (const fieldName of names) {
+    const field = formField(form as Form<any>, fieldName);
+    if (field) field.onBlur(); // trigger touched
+  }
+
+  await form.validate();
+  // Check only section fields
+  const errors = form.errors();
+  const sectionHasErrors = names.some(n => errors[n]);
+  sectionValid = !sectionHasErrors;
+  return !sectionHasErrors;
+}
+
+// Track section dirty state
+$effect(() => {
+  const form = currentForm();
+  if (!form) return;
+  const names = getFieldNames();
+  const hasDirty = names.some(n => {
+    const field = formField(form as Form<any>, n);
+    return field?.dirty();
+  });
+  sectionDirty = hasDirty;
+});
+</script>
