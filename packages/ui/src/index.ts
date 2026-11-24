@@ -16,7 +16,7 @@ import './avatar-group/pdx-avatar-group';
 import './spinner/pdx-spinner.pdx';
 import './divider/pdx-divider.pdx';
 import './kbd/pdx-kbd.pdx';
-import './label/pdx-label';
+import './label/pdx-label.pdx';
 import './input/pdx-input.pdx';
 import './checkbox/pdx-checkbox.pdx';
 import './radio/pdx-radio.pdx';

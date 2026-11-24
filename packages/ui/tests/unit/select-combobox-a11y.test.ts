@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/select/pdx-select';
 import '../../src/form-field/pdx-form-field.pdx';
-import '../../src/label/pdx-label';
+import '../../src/label/pdx-label.pdx';
 
 beforeEach(cleanup);
 

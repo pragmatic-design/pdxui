@@ -54,11 +54,6 @@
       "types": "./dist/avatar-group/pdx-avatar-group.d.ts",
       "import": "./dist/avatar-group/pdx-avatar-group.js"
     },
-    "./label": {
-      "development": "./src/label/pdx-label.ts",
-      "types": "./dist/label/pdx-label.d.ts",
-      "import": "./dist/label/pdx-label.js"
-    },
     "./form-template": {
       "development": "./src/form-template/pdx-form-template.ts",
       "types": "./dist/form-template/pdx-form-template.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/field-group/pdx-field-group.pdx",
       "types": "./dist/field-group/pdx-field-group.d.ts",
       "import": "./dist/field-group/pdx-field-group.js"
+    },
+    "./label": {
+      "development": "./src/label/pdx-label.pdx",
+      "types": "./dist/label/pdx-label.d.ts",
+      "import": "./dist/label/pdx-label.js"
     },
     "./package.json": "./package.json"
   },
