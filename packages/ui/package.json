@@ -129,11 +129,6 @@
       "types": "./dist/autocomplete/pdx-autocomplete.d.ts",
       "import": "./dist/autocomplete/pdx-autocomplete.js"
     },
-    "./error-boundary": {
-      "development": "./src/error-boundary/pdx-error-boundary.ts",
-      "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
-      "import": "./dist/error-boundary/pdx-error-boundary.js"
-    },
     "./calendar": {
       "development": "./src/calendar/pdx-calendar.ts",
       "types": "./dist/calendar/pdx-calendar.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/masonry/pdx-masonry.pdx",
       "types": "./dist/masonry/pdx-masonry.d.ts",
       "import": "./dist/masonry/pdx-masonry.js"
+    },
+    "./error-boundary": {
+      "development": "./src/error-boundary/pdx-error-boundary.pdx",
+      "types": "./dist/error-boundary/pdx-error-boundary.d.ts",
+      "import": "./dist/error-boundary/pdx-error-boundary.js"
     },
     "./package.json": "./package.json"
   },

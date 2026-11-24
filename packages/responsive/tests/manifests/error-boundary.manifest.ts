@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-error-boundary (#290)
  *
- * Contracts written by inspecting the source (packages/ui/src/error-boundary/pdx-error-boundary.ts):
+ * Contracts written by inspecting the source (packages/ui/src/error-boundary/pdx-error-boundary.pdx):
  *   - it renders its children; when one throws it renders a fallback in their place:
  *       <div class="pdx-error-boundary" role="alert" data-part="fallback">
  *         <div class="pdx-error-boundary-icon">⚠</div>

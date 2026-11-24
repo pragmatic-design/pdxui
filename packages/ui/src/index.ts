@@ -139,7 +139,7 @@ import './rich-text/pdx-rich-text';
 
 // Infrastructure components (non-rendering / utility)
 import './provide/pdx-provide.pdx';
-import './error-boundary/pdx-error-boundary';
+import './error-boundary/pdx-error-boundary.pdx';
 import './overlay/pdx-overlay-outlet';
 
 // Utilities (functions, not components)

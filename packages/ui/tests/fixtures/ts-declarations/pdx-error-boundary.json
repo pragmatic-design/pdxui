@@ -1,0 +1,148 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxErrorBoundary",
+  "tagName": "pdx-error-boundary",
+  "category": "Infrastructure",
+  "order": 118,
+  "description": "Catches render errors and effect failures from its children and shows a fallback UI with retry.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "maxRetries",
+      "description": "Maximum retries before permanent fallback. 0 = no retry. Default: 3.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3",
+      "attribute": "maxretries"
+    },
+    {
+      "kind": "field",
+      "name": "autoRetry",
+      "description": "Auto-retry on error (no user action needed). Default: false.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "autoretry"
+    },
+    {
+      "kind": "field",
+      "name": "retryDelay",
+      "description": "Delay between auto-retries in ms. Default: 1000.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1000",
+      "attribute": "retrydelay"
+    },
+    {
+      "kind": "field",
+      "name": "fallbackMessage",
+      "description": "The fallback's message. Empty: the error-boundary.message component string, «Something went wrong.».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "fallbackmessage"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A child threw; the error, and how many retries have been made.",
+      "detail": "{ error: Error; retryCount: number }"
+    }
+  ],
+  "roles": [
+    "alert"
+  ],
+  "attributes": [
+    {
+      "name": "maxretries",
+      "fieldName": "maxRetries",
+      "description": "Maximum retries before permanent fallback. 0 = no retry. Default: 3.",
+      "type": {
+        "text": "number"
+      },
+      "default": "3"
+    },
+    {
+      "name": "autoretry",
+      "fieldName": "autoRetry",
+      "description": "Auto-retry on error (no user action needed). Default: false.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "retrydelay",
+      "fieldName": "retryDelay",
+      "description": "Delay between auto-retries in ms. Default: 1000.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1000"
+    },
+    {
+      "name": "fallbackmessage",
+      "fieldName": "fallbackMessage",
+      "description": "The fallback's message. Empty: the error-boundary.message component string, «Something went wrong.».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "ErrorContext",
+      "fields": [
+        "error: Signal<Error | null>",
+        "retryCount: Signal<number>",
+        "canRetry: ReadonlySignal<boolean>",
+        "retry: () => void"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "fallback",
+      "description": "The fallback shown in place of the children (`role=\"alert\"`)."
+    },
+    {
+      "name": "message",
+      "description": "The fallback's message: `fallbackMessage`, or the component string."
+    },
+    {
+      "name": "detail",
+      "description": "The error's own message, under it."
+    },
+    {
+      "name": "retry",
+      "description": "The Retry button, while retries are left; the note that none are, after."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "error",
+      "description": "A child threw: the fallback shows. Cleared when Retry brings the children back."
+    }
+  ],
+  "x-pdx-context": {
+    "provides": [
+      "ErrorContext"
+    ]
+  }
+}
