@@ -75,6 +75,16 @@ export function readModelOptions(declaration: string): { options: ModelOptions; 
     return { options, start: lastOpen };
 }
 
+/**
+ * A `@prop` declaration's options block (#1347): `{ attribute: x }`, a prop's one option. A last group
+ * with `form` or `missing`, a model's, is no prop's options: it is the default, the object it reads as.
+ */
+export function propOptionsOf(declaration: string): { options: ModelOptions; start: number } | null {
+    const read = readModelOptions(declaration);
+    if (!read || read.options.form || read.options.missingExpr !== undefined || read.options.attribute === undefined) return null;
+    return read;
+}
+
 /** `body` split at its top-level commas, each entry trimmed, empty ones dropped. */
 function splitTopLevel(body: string): string[] {
     const out: string[] = [];

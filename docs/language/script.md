@@ -227,8 +227,15 @@ component's `models`.
 - A model whose type unites values whose attribute is read differently — two or more of a string, a
   number, a boolean and an array of them, `null` and `undefined` aside, as `string | string[] | null` —
   with no `{ attribute }`, is `PDX_MODEL_ATTRIBUTE_AMBIGUOUS` (warning): the type alone reads it as JSON,
-  so `value="1"` is the number 1. A union of literals of one kind (`'sm' | 'md'`) is not. A `@prop` has
-  no such option.
+  so `value="1"` is the number 1. A union of literals of one kind (`'sm' | 'md'`) is not.
+- A `@prop` takes `{ attribute: … }` too (#1347), its one option in braces, read the same way:
+  `@prop columns: number | 'auto' = 3 { attribute: string };` is `prop(3, { type: String })`, and the
+  `.d.ts` keeps `number | 'auto'`. A last group holding `form` or `missing` is a model's option, so on a
+  prop it stays the default it reads as (`= { form }`). Without the option, a prop whose type unites values
+  whose attribute is read differently is `PDX_PROP_ATTRIBUTE_AMBIGUOUS` (warning): it is an Object prop,
+  whose attribute is not observed, so a later `columns="2"` sets nothing, and the one present at mount is
+  read as JSON. A union with an object type (`DataSource<T> | null`) is a property by intent and is not
+  reported.
 
 #### Examples
 

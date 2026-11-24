@@ -202,10 +202,20 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<p>{{ value }}</p>', '@model value: string | string[] | null = null { attribute: string };'),
         },
     },
+    PDX_PROP_ATTRIBUTE_AMBIGUOUS: {
+        severity: 'warn', category: 'defect',
+        summary: "A `@prop`'s type unites values whose attribute is read differently, so its attribute is not observed.",
+        explanation: "A prop of `number | 'auto'` is an Object prop (#960): its attribute is not observed, so a change of `columns` after mount sets nothing, the one present at mount is read as JSON (`\"2\"` as the number 2), and the manifest lists no attribute for it. The type cannot say whether the attribute is a string, a number or a boolean when it unites several of them (#1347). A union with an object type, `DataSource<T> | null`, is a property by intent and is not reported.",
+        fix: "Say how the attribute is read: `@prop columns: number | 'auto' = 3 { attribute: string };`",
+        example: {
+            bad: pdx('<p>{{ columns }}</p>', "@prop columns: number | 'auto' = 3;"),
+            good: pdx('<p>{{ columns }}</p>', "@prop columns: number | 'auto' = 3 { attribute: string };"),
+        },
+    },
     PDX_MODEL_ATTRIBUTE_UNKNOWN: {
         severity: 'error', category: 'defect',
-        summary: "A `@model`'s `{ attribute: … }` names a reading that does not exist.",
-        explanation: 'An attribute is read as `string`, `number`, `boolean` or `json`; any other word leaves the model with no reading to compile (#753).',
+        summary: "A `@model`'s or a `@prop`'s `{ attribute: … }` names a reading that does not exist.",
+        explanation: 'An attribute is read as `string`, `number`, `boolean` or `json`; any other word leaves the model or the prop with no reading to compile (#753, #1347).',
         fix: '`{ attribute: string }`, `number`, `boolean` or `json`.',
         reproducedIn: `${T}model-attribute-option.test.ts`,
     },

@@ -28,7 +28,8 @@ functions (#495).
 ### Syntax
 
 ```ebnf
-PropDecl ::= "@prop" ( "(icon)" )? S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End
+PropDecl ::= "@prop" ( "(icon)" )? S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? ( S? "{" S? "attribute" S? ":" S? Reading S? "}" )? End
+Reading  ::= "string" | "number" | "boolean" | "json"
 ```
 
 ### Semantics
@@ -38,6 +39,13 @@ names an icon, the descriptor's `prop('inbox', { iconName: true })`: the library
 `iconName`, and a consumer that writes a built-in icon's name in it, `<pdx-list empty-icon="trash">`,
 gets that icon imported, as for `pdx-icon`'s `name`. It compiles to the same prop as without the
 option.
+
+`{ attribute: string }` (#1347 — landed; or `number`, `boolean`, `json`) says how the attribute is
+read, apart from the prop's type, as on a `@model`: `@prop columns: number | 'auto' = 3 { attribute:
+string };` is `prop(3, { type: String })`, and its `.d.ts` and manifest keep `number | 'auto'`. Without it
+the type decides; a union of values whose attributes are read differently is an Object prop, whose
+attribute is not observed, and is `PDX_PROP_ATTRIBUTE_AMBIGUOUS`. A union with an object type is a
+property by intent, and is not reported.
 
 The beta adds **required props** with TypeScript's rule (#130 — landed):
 
@@ -62,6 +70,9 @@ migrate`'s `?` preserve the meaning of existing code exactly; TypeScript still t
   (optional).
 - The alpha rules stay (`PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
   `PDX_DUP_PROP`, `PDX_PROP_WRITE`).
+- A union of differently read values with no `{ attribute }` is `PDX_PROP_ATTRIBUTE_AMBIGUOUS`
+  (warning); a reading that is not `string`, `number`, `boolean` or `json` is
+  `PDX_MODEL_ATTRIBUTE_UNKNOWN` (error), the model's code.
 - `icon` is the one option: `@prop(colour) …` is `PDX_UNKNOWN_DECLARATION` (error), and so is
   `@model(icon) …`, since a model is the component's own value and not an icon a parent names.
 
