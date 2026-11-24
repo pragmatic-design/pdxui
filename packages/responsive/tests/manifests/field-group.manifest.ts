@@ -2,13 +2,13 @@
  * MANIFEST — pdx-field-group
  *
  * A NOTE ON SCOPE (it matters): the real component is NOT a layout helper with
- * orientation and horizontal-vertical gaps. The source (packages/ui/src/field-group/pdx-field-group.ts)
+ * orientation and horizontal-vertical gaps. The source (packages/ui/src/field-group/pdx-field-group.pdx)
  * defines it as a FORM component that groups several fields and scopes the name by path
  * (name → a nested object key in the form). The REAL props: name, label, display (inline|dialog|panel),
  * collapsed. There is no orientation or gap prop. This manifest certifies the REAL component in its
  * inline mode (the default), with several slotted fields.
  *
- * DOM STRUCTURE — inline mode (the default), render in pdx-field-group.ts lines 108-116:
+ * DOM STRUCTURE — inline mode (the default), the inline branch of pdx-field-group.pdx's template:
  *   <pdx-field-group>                                  ← host CE (light DOM)
  *     <fieldset class="pdx-field-group" role="group" aria-label="{label}">  ← a NATIVE <fieldset>
  *       <legend class="pdx-field-group-legend">{label}</legend>   ← only when label is set (line 111)

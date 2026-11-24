@@ -1,0 +1,111 @@
+<template>
+  @if (display === 'dialog') {
+    <div class="pdx-field-group pdx-field-group-dialog" data-part="root">
+      <button type="button" class="pdx-outline pdx-field-group-trigger" data-part="trigger" size="sm" @click="openDialog()">{{ label || name || uiString('field-group', 'edit') }}</button>
+      @if (dialogOpen) {
+        <pdx-dialog :open="true" :title="label" @open-change="e => { if (!e.detail.value) closeDialog(); }">
+          <div class="pdx-field-group-content"><slot></slot></div>
+        </pdx-dialog>
+      }
+    </div>
+  } @else if (display === 'panel') {
+    <!-- The legend and its toggle are there with or without a label: rendered only with one, a
+         collapsed panel without a label could never be opened. Without a label the toggle shows
+         its chevron and is named by the registered string. -->
+    <fieldset class="pdx-field-group pdx-field-group-panel" data-part="root" role="group" :aria-label="label || null">
+      <legend class="pdx-field-group-legend" data-part="legend">
+        <button type="button" class="pdx-field-group-toggle" data-part="toggle"
+                :aria-expanded="String(!collapsed)"
+                :aria-controls="contentId"
+                :aria-label="label ? null : uiString('field-group', 'toggle')"
+                @click="togglePanel()">{{ label }}</button>
+      </legend>
+      <div class="pdx-field-group-content" data-part="content" :id="contentId" :hidden="collapsed"><slot></slot></div>
+    </fieldset>
+  } @else {
+    <fieldset class="pdx-field-group" data-part="root" role="group" :aria-label="label || null">
+      @if (label) {<legend class="pdx-field-group-legend" data-part="legend">{{ label }}</legend>}
+      <div class="pdx-field-group-content" data-part="content"><slot></slot></div>
+    </fieldset>
+  }
+</template>
+
+<script>
+/**
+ * Scopes the fields inside it to a nested object of the form, rendered inline, as a collapsible
+ * panel or behind a dialog.
+ *
+ * @cssstate collapsed - `collapsed`: a panel shows its legend line only.
+ *
+ * @csspart root - The `<fieldset>`, or the dialog mode's wrapper.
+ * @csspart legend - The `<legend>`, with `label` or in panel mode.
+ * @csspart toggle - The panel's disclosure button, in its legend.
+ * @csspart content - The box that holds the fields, inline and in panel mode.
+ * @csspart trigger - The dialog mode's button that opens the dialog.
+ */
+// pdx-field-group — Scopes child field paths to a nested object in the form.
+// Inside <pdx-form :form="f">, a <pdx-field-group name="customer"> prefixes
+// all descendant field names: name="email" → form['customer.email'].
+//
+// The compiler handles static path prefixing at build time.
+// This component provides runtime context for dynamic cases (e.g., field-list items).
+//
+// Display modes:
+//   - inline (default): fieldset with legend, always visible
+//   - dialog: trigger button → opens <pdx-dialog> with the fields
+//   - panel: collapsible fieldset; the legend holds a disclosure button (not a
+//     <legend role="button"> with no tabindex, which Tab would skip)
+import { provideFieldGroupPath, useFieldGroupPath, generatedId } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+// This component's styles live in form.css — written where the
+// container is rather than where the component is. Imported explicitly so they travel anyway.
+import '@pdxui/design/components/form';
+import '../dialog/pdx-dialog'; // rendered by this component, and registered by nobody else
+
+/** Group name — maps to a nested object key in the form data. */
+@prop name: string = '';
+/** Optional label rendered as a fieldset legend. */
+@prop label: string = '';
+/**
+ * Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its
+ * fixed class, so it is no variant axis; what changes within one, collapsed, is a state.
+ */
+@prop display: string = 'inline';
+// `collapsed` is a model (#293): the panel's toggle writes it.
+/** Whether a panel is collapsed (display="panel" only). */
+@model collapsed: boolean = false;
+@state collapsed = display === 'panel' && !!collapsed;
+@part root, legend, toggle, content, trigger;
+@host el;
+
+// Build full dotted path from parent field-group context (supports nesting). Read when used,
+// not once at setup: a group set up before its parent group would find no parent path and
+// provide its own name alone — `address` instead of `order.address`.
+function fullPath(): string {
+  const parentPath = useFieldGroupPath(el) ?? '';
+  return parentPath ? `${parentPath}.${name}` : name as string;
+}
+
+// Provide path context to descendants (runtime fallback for dynamic forms), and provide it
+// again when it changes. Only when it changes: providing wakes every path lookup, this one
+// included.
+let providedPath = '';
+$effect(() => {
+  const path = fullPath();
+  if (!path || path === providedPath) return;
+  providedPath = path;
+  provideFieldGroupPath(path, el);
+});
+
+// Panel: the content id the toggle's aria-controls names.
+const contentId = `${generatedId('pdx-field-group')}-content`;
+// The toggle writes the model, which announces `collapsed-change`; a parent's write does not.
+function togglePanel(): void {
+  collapsed = !collapsed;
+}
+
+// Dialog: open state
+let dialogOpen = $signal(false);
+function openDialog(): void { dialogOpen = true; }
+function closeDialog(): void { dialogOpen = false; }
+</script>

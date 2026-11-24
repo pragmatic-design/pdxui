@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/field-group/pdx-field-group';
+import '../../src/field-group/pdx-field-group.pdx';
 
 const toggleOf = (el: HTMLElement) => el.querySelector('legend button') as HTMLButtonElement | null;
 

@@ -1,0 +1,139 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFieldGroup",
+  "tagName": "pdx-field-group",
+  "category": "Forms",
+  "order": 51,
+  "description": "Scopes the fields inside it to a nested object of the form, rendered inline, as a collapsible\npanel or behind a dialog.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Group name — maps to a nested object key in the form data.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Optional label rendered as a fieldset legend.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "display",
+      "description": "Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its\nfixed class, so it is no variant axis; what changes within one, collapsed, is a state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inline'",
+      "attribute": "display"
+    },
+    {
+      "kind": "field",
+      "name": "collapsed",
+      "description": "Whether a panel is collapsed (display=\"panel\" only).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "collapsed"
+    }
+  ],
+  "models": [
+    "collapsed"
+  ],
+  "events": [
+    {
+      "name": "collapsed-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `collapsed`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "group"
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Group name — maps to a nested object key in the form data.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Optional label rendered as a fieldset legend.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "display",
+      "fieldName": "display",
+      "description": "Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its\nfixed class, so it is no variant axis; what changes within one, collapsed, is a state.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'inline'"
+    },
+    {
+      "name": "collapsed",
+      "fieldName": "collapsed",
+      "description": "Whether a panel is collapsed (display=\"panel\" only).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<fieldset>`, or the dialog mode's wrapper."
+    },
+    {
+      "name": "legend",
+      "description": "The `<legend>`, with `label` or in panel mode."
+    },
+    {
+      "name": "toggle",
+      "description": "The panel's disclosure button, in its legend."
+    },
+    {
+      "name": "content",
+      "description": "The box that holds the fields, inline and in panel mode."
+    },
+    {
+      "name": "trigger",
+      "description": "The dialog mode's button that opens the dialog."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "collapsed",
+      "description": "`collapsed`: a panel shows its legend line only."
+    }
+  ]
+}

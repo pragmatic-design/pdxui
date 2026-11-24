@@ -74,11 +74,6 @@
       "types": "./dist/fieldset/pdx-fieldset.d.ts",
       "import": "./dist/fieldset/pdx-fieldset.js"
     },
-    "./field-group": {
-      "development": "./src/field-group/pdx-field-group.ts",
-      "types": "./dist/field-group/pdx-field-group.d.ts",
-      "import": "./dist/field-group/pdx-field-group.js"
-    },
     "./card": {
       "development": "./src/card/pdx-card.ts",
       "types": "./dist/card/pdx-card.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/banner/pdx-banner.pdx",
       "types": "./dist/banner/pdx-banner.d.ts",
       "import": "./dist/banner/pdx-banner.js"
+    },
+    "./field-group": {
+      "development": "./src/field-group/pdx-field-group.pdx",
+      "types": "./dist/field-group/pdx-field-group.d.ts",
+      "import": "./dist/field-group/pdx-field-group.js"
     },
     "./package.json": "./package.json"
   },
