@@ -17,7 +17,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cleanup, tick } from './helpers';
-import '../../src/card/pdx-card';
+import '../../src/card/pdx-card.pdx';
 
 async function card(attrs: Record<string, string>, inner = ''): Promise<HTMLElement> {
     const el = document.createElement('pdx-card');

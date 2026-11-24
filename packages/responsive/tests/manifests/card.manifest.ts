@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-card
  *
- * Contracts written by inspecting the source (packages/ui/src/card/pdx-card.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/card/pdx-card.pdx) and the CSS
  * (packages/design/src/surfaces/base.css, the .pdx-surface-card / .pdx-card-* block).
  *
  * DOM structure: the custom element <pdx-card> renders an inner <div class="pdx-surface pdx-surface-card ...">.

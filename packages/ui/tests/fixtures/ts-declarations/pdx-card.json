@@ -1,0 +1,294 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCard",
+  "tagName": "pdx-card",
+  "category": "Overlay + Containers",
+  "order": 99,
+  "description": "A structured card with header, body, footer and media slots, which can show a loading skeleton\nand be clickable or selectable.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading skeleton state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "clickable",
+      "description": "Make entire card clickable (emits pdx-click)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clickable"
+    },
+    {
+      "kind": "field",
+      "name": "hoverable",
+      "description": "Hoverable elevation effect",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "hoverable"
+    },
+    {
+      "kind": "field",
+      "name": "horizontal",
+      "description": "Horizontal layout (media + content side by side)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "horizontal"
+    },
+    {
+      "kind": "field",
+      "name": "compact",
+      "description": "Compact padding",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "compact"
+    },
+    {
+      "kind": "field",
+      "name": "selected",
+      "description": "Selectable card (radio/checkbox style). On a clickable card, announced as pressed (`aria-pressed`).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "selected"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "href",
+      "description": "Makes the card a link: it renders an `<a>` overlay across the card, so middle-click,\nopen-in-a-new-tab, copy-link-address and the status bar all work, and the address is in\nthe DOM. An interactive element inside the card stays clickable (it sits above the\noverlay). The URL is sanitised before it is written.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "href"
+    },
+    {
+      "kind": "field",
+      "name": "elevation",
+      "description": "Shadow elevation: 0 (none), 1 (sm), 2 (md), 3 (lg), 4 (xl)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "elevation"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "default, outline, elevated or flat.",
+      "type": {
+        "text": "'default' | 'outline' | 'elevated' | 'flat'"
+      },
+      "default": "'default'",
+      "attribute": "variant"
+    }
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "default",
+        "outline",
+        "elevated",
+        "flat"
+      ],
+      "default": "default",
+      "native": {
+        "default": ".pdx-card-default",
+        "outline": ".pdx-card-outline",
+        "elevated": ".pdx-card-elevated",
+        "flat": ".pdx-card-flat"
+      }
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-click",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The card was clicked, or pressed with Enter or Space, as `clickable`."
+    }
+  ],
+  "roles": [
+    "button",
+    "link"
+  ],
+  "attributes": [
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading skeleton state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "clickable",
+      "fieldName": "clickable",
+      "description": "Make entire card clickable (emits pdx-click)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "hoverable",
+      "fieldName": "hoverable",
+      "description": "Hoverable elevation effect",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "horizontal",
+      "fieldName": "horizontal",
+      "description": "Horizontal layout (media + content side by side)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "compact",
+      "fieldName": "compact",
+      "description": "Compact padding",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "selected",
+      "fieldName": "selected",
+      "description": "Selectable card (radio/checkbox style). On a clickable card, announced as pressed (`aria-pressed`).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "href",
+      "fieldName": "href",
+      "description": "Makes the card a link: it renders an `<a>` overlay across the card, so middle-click,\nopen-in-a-new-tab, copy-link-address and the status bar all work, and the address is in\nthe DOM. An interactive element inside the card stays clickable (it sits above the\noverlay). The URL is sanitised before it is written.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "elevation",
+      "fieldName": "elevation",
+      "description": "Shadow elevation: 0 (none), 1 (sm), 2 (md), 3 (lg), 4 (xl)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "default, outline, elevated or flat.",
+      "type": {
+        "text": "'default' | 'outline' | 'elevated' | 'flat'"
+      },
+      "default": "'default'"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The card's box (`.pdx-surface-card`); the header, body and footer inside it are your markup."
+    },
+    {
+      "name": "link",
+      "description": "The `<a>` laid across the card when it has an `href`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "horizontal",
+      "description": "`horizontal` is set: media beside the body."
+    },
+    {
+      "name": "compact",
+      "description": "`compact` is set: tighter sections."
+    },
+    {
+      "name": "hoverable",
+      "description": "It lifts on hover: `hoverable`, `clickable` or an `href`."
+    },
+    {
+      "name": "clickable",
+      "description": "It is pressed or followed as a whole: `clickable` or an `href`."
+    },
+    {
+      "name": "selected",
+      "description": "`selected` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set: a skeleton in place of the content, and `aria-busy`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-card-border-color",
+      "default": "var(--pdx-color-border)"
+    },
+    {
+      "name": "--pdx-card-radius",
+      "default": "var(--pdx-radius-lg)"
+    },
+    {
+      "name": "--pdx-card-shadow",
+      "default": "var(--pdx-shadow-sm)"
+    }
+  ]
+}

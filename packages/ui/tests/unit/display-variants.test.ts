@@ -2,7 +2,7 @@
 // where the design CSS's `@variant` rules key on them, and no longer assembled into classes.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/card/pdx-card';
+import '../../src/card/pdx-card.pdx';
 import '../../src/fieldset/pdx-fieldset';
 import '../../src/tabs/pdx-tabs';
 import '../../src/description-list/pdx-description-list';
