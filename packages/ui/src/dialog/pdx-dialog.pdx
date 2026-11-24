@@ -1,6 +1,6 @@
 <template>
   <div class="pdx-dialog-backdrop" data-part="backdrop" @click="onBackdropClick">
-    <div class="pdx-dialog-panel" data-part="root" role="dialog" aria-modal="true" :ref="panelEl"
+    <div class="pdx-dialog-panel" data-part="root" role="dialog" aria-modal="true"
       :aria-label="title || uiString('dialog', 'label')"
       :aria-busy="loading ? 'true' : null">
       <div class="pdx-dialog-header" data-part="header">
@@ -51,8 +51,9 @@ export { dialog, getDialogQueue } from './dialog-service';
 @state loading = !!loading;
 @state scroll-top = atTop;
 @state scroll-bottom = atBottom;
-// `backdrop`, `body` and `footer` are read by the script as their elements; the panel, the root
-// part, is `panelEl`.
+// The script finds the backdrop, the panel, the body and the footer when the dialog opens, by class,
+// as the TypeScript version did: a ref on each would bind four elements at every mount, for a dialog
+// that may never open.
 @part root, backdrop, header, close, body, footer;
 // The axis dialog.css keys by (#633), reflected on the host and drawn on the panel, the root part;
 // each value maps the class that draws the same panel elsewhere (pdx-alert-dialog, the overlay
@@ -76,7 +77,6 @@ export { dialog, getDialogQueue } from './dialog-service';
 // Each writes the model, so each announces `open-change`.
 @expose show, close, toggle, isOpen;
 
-let panelEl = $signal<HTMLElement | null>(null);
 /** The `open` state: set a frame after the backdrop is placed, so the design CSS animates it in. */
 let shown = $signal(false);
 let atTop = $signal(false);
@@ -142,9 +142,9 @@ function focusInitial(): void {
     if (target) { target.focus(); return; }
   }
   // Default: first focusable inside the dialog body
-  const body = host.querySelector('.pdx-dialog-body');
-  if (body) {
-    const first = body.querySelector(
+  const bodyEl = host.querySelector('.pdx-dialog-body');
+  if (bodyEl) {
+    const first = bodyEl.querySelector(
       'button:not(.pdx-dialog-close), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     ) as HTMLElement;
     if (first) { first.focus(); return; }
@@ -163,7 +163,8 @@ function release(): void {
 
 // A click on the backdrop or on the dialog's text keeps focus inside.
 onNextFrame(() => {
-  const backdropNow = backdrop, panel = panelEl;
+  const backdropNow = host.querySelector<HTMLElement>('.pdx-dialog-backdrop');
+  const panel = host.querySelector<HTMLElement>('.pdx-dialog-panel');
   if (backdropNow && panel) holdModalFocus(backdropNow, panel);
 });
 
@@ -175,7 +176,8 @@ $effect(() => {
   if (innerRafId) { cancelAnimationFrame(innerRafId); innerRafId = 0; }
   rafId = requestAnimationFrame(() => {
     rafId = 0;
-    const backdropNow = backdrop, panel = panelEl;
+    const backdropNow = host.querySelector<HTMLElement>('.pdx-dialog-backdrop');
+    const panel = host.querySelector<HTMLElement>('.pdx-dialog-panel');
     if (isOpenNow) {
       overlayId = generatedId('pdx-dialog');
       const zIndex = overlayStack.push(overlayId, { modal: true });
@@ -192,10 +194,10 @@ $effect(() => {
           setTimeout(() => focusInitial(), 0);
         }
         // Hide footer if no slotted content
-        const footerNow = footer;
+        const footerNow = host.querySelector<HTMLElement>('.pdx-dialog-footer');
         if (footerNow) footerNow.style.display = host.querySelector('[slot="footer"]') ? '' : 'none';
         // Scroll shadow
-        const bodyNow = body;
+        const bodyNow = host.querySelector<HTMLElement>('.pdx-dialog-body');
         if (bodyNow) scrollCleanup = setupScrollShadow(bodyNow);
       });
 
