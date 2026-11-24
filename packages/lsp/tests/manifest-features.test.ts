@@ -87,15 +87,15 @@ describe('component definition', () => {
     it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
         // A library component still in TypeScript (#1210 moves the library to .pdx; this one is late).
         const root = join(__dirname, '..', '..', '..');
-        const real = new Map([['pdx-relative-time', {
-            ...button, tag: 'pdx-relative-time',
-            filePath: join(root, 'packages', 'ui', 'src', 'relative-time', 'pdx-relative-time.ts'),
+        const real = new Map([['pdx-affix', {
+            ...button, tag: 'pdx-affix',
+            filePath: join(root, 'packages', 'ui', 'src', 'affix', 'pdx-affix.ts'),
         }]]);
-        // tag → its component('pdx-relative-time' call, past the file's header
-        const tagLoc = resolveComponentDefinition('pdx-relative-time', real, []);
+        // tag → its component('pdx-affix' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-affix', real, []);
         expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `datetime:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-relative-time', real, [], 'datetime');
+        // member → the `target:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-affix', real, [], 'target');
         expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
     });
 
