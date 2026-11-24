@@ -1,0 +1,286 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFieldset",
+  "tagName": "pdx-fieldset",
+  "category": "Forms",
+  "order": 50,
+  "description": "A semantic form group on the native fieldset and legend, collapsible, with disabled propagation\nand an error state.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "legend",
+      "description": "The fieldset legend/title.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "legend"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "invalid",
+      "description": "Marks the group as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "invalid"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "collapsible",
+      "description": "Allows the group to collapse.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "collapsible"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "bordered (the default), filled or plain.",
+      "type": {
+        "text": "'bordered' | 'filled' | 'plain'"
+      },
+      "default": "'bordered'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "collapsed",
+      "description": "Whether a collapsible fieldset is collapsed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "collapsed"
+    }
+  ],
+  "models": [
+    "collapsed"
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "bordered",
+        "filled",
+        "plain"
+      ],
+      "default": "bordered",
+      "native": {
+        "bordered": ".pdx-fieldset-bordered",
+        "filled": ".pdx-fieldset-filled",
+        "plain": ".pdx-fieldset-plain"
+      }
+    },
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-fieldset-md",
+        "sm": ".pdx-fieldset-sm",
+        "lg": ".pdx-fieldset-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "toggle"
+  ],
+  "alphaDetail": {
+    "collapsed": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "collapsed-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `collapsed`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "alert"
+  ],
+  "attributes": [
+    {
+      "name": "legend",
+      "fieldName": "legend",
+      "description": "The fieldset legend/title.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "invalid",
+      "fieldName": "invalid",
+      "description": "Marks the group as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "collapsible",
+      "fieldName": "collapsible",
+      "description": "Allows the group to collapse.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "bordered (the default), filled or plain.",
+      "type": {
+        "text": "'bordered' | 'filled' | 'plain'"
+      },
+      "default": "'bordered'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "collapsed",
+      "fieldName": "collapsed",
+      "description": "Whether a collapsible fieldset is collapsed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The native `<fieldset>`."
+    },
+    {
+      "name": "legend",
+      "description": "The `<legend>`: the text and, when collapsible, the toggle."
+    },
+    {
+      "name": "toggle",
+      "description": "The collapse button in the legend."
+    },
+    {
+      "name": "description",
+      "description": "The description under the legend, with `description`."
+    },
+    {
+      "name": "content",
+      "description": "The slotted controls."
+    },
+    {
+      "name": "error",
+      "description": "The error message, with `error`; it is the fieldset's description."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`invalid`, or an `error` is set: the border turns to the danger colour."
+    },
+    {
+      "name": "collapsed",
+      "description": "`collapsed`: the content is hidden and the chevron turned."
+    },
+    {
+      "name": "collapsible",
+      "description": "`collapsible`: the legend holds the toggle."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled`: every control inside is disabled, by the native fieldset."
+    }
+  ]
+}

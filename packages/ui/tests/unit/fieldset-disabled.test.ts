@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/fieldset/pdx-fieldset';
+import '../../src/fieldset/pdx-fieldset.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     document.body.innerHTML = html;
