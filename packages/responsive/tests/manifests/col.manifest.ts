@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS:
  *
- *   - Source, col: packages/ui/src/col/pdx-col.ts
+ *   - Source, col: packages/ui/src/col/pdx-col.pdx
  *       · render() = <slot></slot>: the children (the content) are projected as DIRECT children
  *         of the HOST <pdx-col> (light DOM). There is no inner wrapper → the geometry is the host's.
  *       · Props:

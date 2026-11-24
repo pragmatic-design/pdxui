@@ -1,0 +1,152 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCol",
+  "tagName": "pdx-col",
+  "category": "Layout",
+  "order": 71,
+  "description": "A column of a 12-column grid, inside `pdx-row` or any flex container, whose span can change at\neach breakpoint.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "span",
+      "description": "Column span 1-12 (default: 12 = full width)",
+      "type": {
+        "text": "number"
+      },
+      "default": "12",
+      "attribute": "span"
+    },
+    {
+      "kind": "field",
+      "name": "sm",
+      "description": "Span override at >= 640px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "sm"
+    },
+    {
+      "kind": "field",
+      "name": "md",
+      "description": "Span override at >= 768px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "md"
+    },
+    {
+      "kind": "field",
+      "name": "lg",
+      "description": "Span override at >= 1024px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "lg"
+    },
+    {
+      "kind": "field",
+      "name": "xl",
+      "description": "Span override at >= 1280px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "xl"
+    },
+    {
+      "kind": "field",
+      "name": "offset",
+      "description": "Column offset (0-11) — pushes column to the right",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "offset"
+    },
+    {
+      "kind": "field",
+      "name": "order",
+      "description": "CSS order override",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "order"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "span",
+      "fieldName": "span",
+      "description": "Column span 1-12 (default: 12 = full width)",
+      "type": {
+        "text": "number"
+      },
+      "default": "12"
+    },
+    {
+      "name": "sm",
+      "fieldName": "sm",
+      "description": "Span override at >= 640px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "md",
+      "fieldName": "md",
+      "description": "Span override at >= 768px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "lg",
+      "fieldName": "lg",
+      "description": "Span override at >= 1024px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "xl",
+      "fieldName": "xl",
+      "description": "Span override at >= 1280px",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "offset",
+      "fieldName": "offset",
+      "description": "Column offset (0-11) — pushes column to the right",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "order",
+      "fieldName": "order",
+      "description": "CSS order override",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ]
+}

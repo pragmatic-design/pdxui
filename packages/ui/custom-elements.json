@@ -7687,7 +7687,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/col/pdx-col.ts",
+      "path": "src/col/pdx-col.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -7848,7 +7848,7 @@
           "name": "pdx-col",
           "declaration": {
             "name": "PdxCol",
-            "module": "src/col/pdx-col.ts"
+            "module": "src/col/pdx-col.pdx"
           }
         }
       ]
