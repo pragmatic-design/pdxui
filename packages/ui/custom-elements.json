@@ -6677,7 +6677,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/chart/pdx-sparkline.ts",
+      "path": "src/chart/pdx-sparkline.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -6838,7 +6838,7 @@
           "name": "pdx-sparkline",
           "declaration": {
             "name": "PdxSparkline",
-            "module": "src/chart/pdx-sparkline.ts"
+            "module": "src/chart/pdx-sparkline.pdx"
           }
         }
       ]

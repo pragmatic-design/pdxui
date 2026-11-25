@@ -100,7 +100,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-slider',
     'pdx-sortable-list',
     'pdx-spacer',
-    'pdx-sparkline',
     'pdx-spinner',
     'pdx-split',
     'pdx-split-button',

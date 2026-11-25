@@ -7,7 +7,7 @@ import { mount, tick, cleanup, uniqueTag } from './helpers';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/inline-edit/pdx-inline-edit.pdx';
-import '../../src/chart/pdx-sparkline';
+import '../../src/chart/pdx-sparkline.pdx';
 
 void uniqueTag; // helper importato per uniformità
 

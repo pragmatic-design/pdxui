@@ -2,7 +2,7 @@
  * MANIFEST — pdx-sparkline
  *
  * Contracts DERIVED by inspecting the source:
- *   - Source: packages/ui/src/chart/pdx-sparkline.ts
+ *   - Source: packages/ui/src/chart/pdx-sparkline.pdx
  *       · render(): one <canvas data-part="canvas" style="display:block;max-width:100%">.
  *       · In a frame the setup sizes the canvas from the `width` and `height` props (120px × 32px by
  *         default) and draws: a line with a faint area, an area, or bars. No axes, tooltip or legend.
