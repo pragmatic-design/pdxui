@@ -8,7 +8,7 @@
 // one native dropdown on a page otherwise kept free of them.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { tick, whenUpgraded } from './helpers';
-import '../../src/pagination/pdx-pagination';
+import '../../src/pagination/pdx-pagination.pdx';
 
 // The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
 // that reads the select before it is upgraded fails every time instead of once in a while (#692).

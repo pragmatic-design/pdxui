@@ -72,6 +72,7 @@ const PORTED: Record<string, string> = {
     'pdx-label': 'src/label/pdx-label.pdx',
     'pdx-masked-input': 'src/masked-input/pdx-masked-input.pdx',
     'pdx-number-input': 'src/number-input/pdx-number-input.pdx',
+    'pdx-pagination': 'src/pagination/pdx-pagination.pdx',
     'pdx-password-input': 'src/password-input/pdx-password-input.pdx',
     'pdx-progress': 'src/progress/pdx-progress.pdx',
     'pdx-radio': 'src/radio/pdx-radio.pdx',

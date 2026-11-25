@@ -16,7 +16,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { setLocaleStrings, clearComponentStrings } from '@pdxui/core';
 import '../../src/breadcrumb/pdx-breadcrumb';
-import '../../src/pagination/pdx-pagination';
+import '../../src/pagination/pdx-pagination.pdx';
 import { cleanup, tick } from './helpers';
 
 const ITALIAN = {

@@ -22035,7 +22035,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/pagination/pdx-pagination.ts",
+      "path": "src/pagination/pdx-pagination.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -22334,7 +22334,7 @@
           "name": "pdx-pagination",
           "declaration": {
             "name": "PdxPagination",
-            "module": "src/pagination/pdx-pagination.ts"
+            "module": "src/pagination/pdx-pagination.pdx"
           }
         }
       ]
