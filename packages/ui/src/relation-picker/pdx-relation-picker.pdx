@@ -1,0 +1,162 @@
+<template></template>
+
+<script>
+/**
+ * Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new
+ * one to be created.
+ *
+ * @csspart grid - The data grid the rows are picked from.
+ * @csspart foot - The footer under the grid.
+ * @csspart count - "n selected", empty while nothing is picked.
+ * @csspart create - The create button, with `create-label`.
+ * @csspart add - The add button, disabled while nothing is picked.
+ */
+// pdx-relation-picker — pick one or more existing rows for an N-N relation (and optionally create a new one).
+// Wraps pdx-data-grid (multiple selection) + a footer: "Add selected" emits the chosen rows; "Create new"
+// requests on-the-fly creation. Promoted from the profiler's hand-built multi-pick drawer (UI-15g, the
+// reusable half). The master-detail orchestration around it stays app-descriptor-driven.
+//
+// Usage:
+//   <pdx-relation-picker :source="${ds}" :columns="${cols}" create-label="New PCC"></pdx-relation-picker>
+//   el.addEventListener('pdx-pick',   e => link(e.detail.items));   // [{...row}, ...]
+//   el.addEventListener('pdx-create', () => openCreateForm());
+//
+// Its elements are built by the script a frame after the source is set, as the TypeScript version
+// built them. The script's own names are not the parts' names: a part's name read in the script
+// makes it a signal of the part's elements at every mount.
+import { uiString, format } from '../shared/i18n';
+import '../data-grid/pdx-data-grid';
+import '../button/pdx-button.pdx';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/relation-picker';
+
+/** The DataSource of the rows to pick from, handed to the grid the picker renders. */
+@prop source: Record<string, unknown> | null = null;
+@prop columns: unknown[] = [];
+@prop createLabel: string = '';
+/** The add button's text. Empty: the relation-picker.add component string. */
+@prop addLabel: string = '';
+@prop idField: string = 'id';
+/**
+ * Let the user narrow the list — the one thing a picker exists for.
+ *
+ * It turns on the grid's FILTER ROW: a field under each column header, debounced, which
+ * calls `source.setFilter()`. So the narrowing happens where the rows come from and a
+ * picker over ten thousand customers works the same as one over fourteen.
+ *
+ * ⚠️ Not the grid's toolbar, which is what this issue first proposed: measured, the
+ * toolbar is a reload button, filter chips and "+ Add Filter" — a filter builder, not a
+ * search. Whether the picker should also carry a search field of its OWN, above the grid
+ * and across every column, is a design decision and is still open.
+ */
+@prop searchable: boolean = false;
+// Declared (#138): they stay on the host, which the parent listens on.
+/** Add was pressed with rows picked: the rows themselves. */
+@event 'pdx-pick': { items: Record<string, unknown>[] };
+/** The create button was pressed: the parent opens its form. */
+@event 'pdx-create': void;
+// Every element is built by the script.
+@part(external) grid, foot, count, create, add;
+@host host;
+
+let built = false;
+let selected: Record<string, unknown>[] = [];
+let _createBtn: HTMLElement | null = null;
+let _addBtn: HTMLElement | null = null;
+
+$effect(() => {
+  const src = source;
+  const cols = columns;
+  const createText = createLabel as string;
+  const addText = (addLabel as string) || uiString('relation-picker', 'add');
+  const idName = idField as string;
+  const narrow = searchable as boolean;
+  if (!src) return;
+  // label and idField update after the build too: ignoring changes after the
+  // first build would be a prop-reactivity violation.
+  if (built) { requestAnimationFrame(() => syncAll(src, cols, createText, addText, idName, narrow)); return; }
+  built = true;
+  requestAnimationFrame(() => build(src, cols, createText, addText, idName, narrow));
+});
+
+function build(src: unknown, cols: unknown, createText: string, addText: string,
+  idName: string, narrow: boolean): void {
+  // No class on the host (#292): the design CSS selects the element itself.
+  host.innerHTML = '';
+
+  const gridEl = document.createElement('pdx-data-grid') as HTMLElement & { source: unknown; columns: unknown };
+  gridEl.dataset.part = 'grid';
+  gridEl.setAttribute('selection', 'multiple');
+  gridEl.setAttribute('hover', '');
+  gridEl.setAttribute('id-field', idName);
+  if (narrow) gridEl.setAttribute('filterable', '');
+  gridEl.className = 'pdx-relation-picker-grid';
+  gridEl.source = src;
+  gridEl.columns = cols;
+  // The grid announces ids — `{ selected, count }` — not rows. Reading `detail.items` would keep
+  // `selected` empty for good: no count, and pdx-pick could never fire.
+  gridEl.addEventListener('pdx-selection-change', (e: Event) => {
+    const ids = ((e as CustomEvent).detail?.selected ?? []) as unknown[];
+    const rows = (gridEl as unknown as { grid?: { source: { getById(id: unknown): unknown } } }).grid?.source;
+    selected = ids.map(id => rows?.getById(id)).filter(Boolean) as Record<string, unknown>[];
+    updateCount();
+  });
+  host.appendChild(gridEl);
+
+  const footEl = document.createElement('div'); footEl.className = 'pdx-relation-picker-foot';
+  footEl.dataset.part = 'foot';
+  const countEl = document.createElement('span'); countEl.className = 'pdx-relation-picker-count';
+  countEl.dataset.part = 'count';
+  footEl.appendChild(countEl);
+
+  // Labels through pdx-button's `label` prop. `textContent` on a connected pdx-button
+  // replaces its rendered <button> with bare text: no role, no tab stop.
+  if (createText) {
+    const createBtn = document.createElement('pdx-button');
+    createBtn.setAttribute('variant', 'ghost'); createBtn.setAttribute('size', 'sm');
+    createBtn.setAttribute('label', createText);
+    createBtn.dataset.part = 'create';
+    createBtn.addEventListener('click', () => pdxCreate());
+    footEl.appendChild(createBtn);
+    _createBtn = createBtn;
+  }
+
+  const addBtn = document.createElement('pdx-button');
+  addBtn.setAttribute('variant', 'primary'); addBtn.setAttribute('size', 'sm');
+  addBtn.setAttribute('label', addText);
+  addBtn.dataset.part = 'add';
+  addBtn.addEventListener('click', () => { if (selected.length) pdxPick({ items: selected }); });
+  footEl.appendChild(addBtn);
+  _addBtn = addBtn;
+
+  host.appendChild(footEl);
+
+  function updateCount(): void {
+    countEl.textContent = selected.length ? format(uiString('relation-picker', 'selected'), { n: selected.length }) : '';
+    // Nothing to add: the button says so instead of doing nothing when pressed.
+    addBtn.toggleAttribute('disabled', selected.length === 0);
+  }
+  updateCount();
+}
+
+function syncGrid(src: unknown, cols: unknown): void {
+  const gridEl = host.querySelector('pdx-data-grid') as (HTMLElement & { source: unknown; columns: unknown }) | null;
+  if (gridEl) { gridEl.source = src; gridEl.columns = cols; }
+}
+
+/** Full post-build sync: data + label + idField + searchable. */
+function syncAll(src: unknown, cols: unknown, createText: string, addText: string,
+  idName: string, narrow: boolean): void {
+  syncGrid(src, cols);
+  const gridEl = host.querySelector('pdx-data-grid');
+  if (gridEl) {
+    gridEl.setAttribute('id-field', idName);
+    // Toggled, not set once: a picker that becomes searchable after its first build
+    // would otherwise be the same prop-reactivity violation as the labels.
+    gridEl.toggleAttribute('filterable', narrow);
+  }
+  if (_createBtn) _createBtn.setAttribute('label', createText);
+  if (_addBtn) _addBtn.setAttribute('label', addText);
+}
+</script>
