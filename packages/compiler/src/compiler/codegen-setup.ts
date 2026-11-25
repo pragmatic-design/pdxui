@@ -603,12 +603,13 @@ export function buildSetupBody(
         }
     });
 
-    // Lifecycle: onDestroy — return a cleanup function
+    // Lifecycle: onDestroy — core's hook, registered on the component's scope (#1407). It was an effect
+    // returning the callback as its cleanup: one effect created and run at every mount, for nothing.
     analysis.lifecycle.onDestroy.forEach((body, k) => {
         if (scriptOnly) {
             // Plain module: no destroy lifecycle — skip (modules don't unmount)
         } else {
-            parts.push(markCall(`    ctx.track(() => () => { (${rewriteAll(body)})(); });`, analysis.origins?.onDestroy[k]));
+            parts.push(markCall(`    onDestroy(${rewriteAll(body)});`, analysis.origins?.onDestroy[k]));
         }
     });
 

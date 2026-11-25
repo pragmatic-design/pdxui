@@ -28428,7 +28428,7 @@ const today = at(1);
     function onResize(e) { __last.setRaw(e.detail.event.title + ' now ends at ' + e.detail.to.end.slice(11, 16) + '.'); }
     function onCreate(e) { __last.setRaw(e.detail.event.title + ' created.'); }
     function onRejected(e) { __last.setRaw(e.detail.reason === 'overlap' ? 'Refused: that room is already booked.' : 'Refused by the app.'); }
-    ctx.track(() => () => { (() => job.dispose())(); });
+    onDestroy(() => job.dispose());
     ctx.el.setAttribute('data-pdx-ud01dx', '');
     return { today, rooms, bookings: __bookings, last: __last, jobEl: __jobEl, job, onMove, onResize, onCreate, onRejected };
   },
@@ -39948,10 +39948,10 @@ const placements = [
         if (arenaScroll) { arenaScroll.scrollTop = 190; arenaScroll.scrollLeft = 100; }
     });
 });
-    ctx.track(() => () => { (function() {
+    onDestroy(function() {
     autoUpdateDispose?.();
     if (floatEl) floatEl.remove();
-})(); });
+});
     ctx.el.setAttribute('data-pdx-y9fn6i', '');
     return { placements, currentPlacement: __currentPlacement, posLog: __posLog, useOffset: __useOffset, useFlip: __useFlip, useShift: __useShift, refBoxRef: __refBoxRef, arenaEl: __arenaEl, arenaScrollEl: __arenaScrollEl, floatEl, autoUpdateDispose, ensureFloatEl, setPlacement, toggleOffset, toggleFlip, toggleShift, buildMiddleware, updatePosition, startAutoUpdate };
   },
@@ -40020,9 +40020,9 @@ let cursorFloatEl = null;
     function onCursorLeave() {
         if (cursorFloatEl) cursorFloatEl.style.display = 'none';
     }
-    ctx.track(() => () => { (function() {
+    onDestroy(function() {
     if (cursorFloatEl) cursorFloatEl.remove();
-})(); });
+});
     ctx.el.setAttribute('data-pdx-4rlr0g', '');
     return { cursorFloatEl, onCursorMove, onCursorLeave };
   },
