@@ -153,7 +153,8 @@ function identifiersIn(text: string): Set<string> {
  * gives the types its interface mentions, as a TypeScript module exporting them did; one from a package
  * is the package's to export.
  */
-function declaredNames(body: string, imports: readonly string[], generics: readonly string[]): string[] {
+function declaredNames(body: string, imports: readonly string[], generics: readonly string[],
+    reExported: ReadonlySet<string> = new Set()): string[] {
     // Match: `T` or `T extends X`. Groups: [1]=the name [2]=the constraint
     const params = generics.map((g) => /^([A-Za-z_$][\w$]*)(?:\s+extends\s([\s\S]+))?$/.exec(g.trim()))
         .filter((m): m is RegExpExecArray => m !== null);
@@ -173,10 +174,26 @@ function declaredNames(body: string, imports: readonly string[], generics: reado
     for (const [from, names] of byModule) {
         lines.push(`import type { ${names.map((n) => (n.imported ? `${n.imported} as ${n.local}` : n.local)).join(', ')} } from '${from}';`);
     }
-    const own = wanted.filter((n) => n.kind !== 'namespace' && n.from.startsWith('.')).map((n) => n.local);
+    // A name the script re-exports itself is exported by that line (#1414): exported here too, the
+    // declaration would hold it twice.
+    const own = wanted.filter((n) => n.kind !== 'namespace' && n.from.startsWith('.') && !reExported.has(n.local)).map((n) => n.local);
     if (own.length > 0) lines.push(`export type { ${own.join(', ')} };`);
     if (lines.length > 0 || aliases.length > 0) return [...lines, ...aliases, ''];
     return [];
+}
+
+/**
+ * The names a script's re-exports export (#1414): `export { a, b as c } from …` exports `a` and `c`.
+ * `export * from …` names none it can be checked against, so it adds none.
+ */
+function reExportedNames(statements: readonly string[]): Set<string> {
+    const names = new Set<string>();
+    const sf = ts.createSourceFile('re-exports.ts', statements.join('\n'), ts.ScriptTarget.Latest, false);
+    for (const st of sf.statements) {
+        if (!ts.isExportDeclaration(st) || !st.exportClause || !ts.isNamedExports(st.exportClause)) continue;
+        for (const el of st.exportClause.elements) names.add(el.name.text);
+    }
+    return names;
 }
 
 /**
@@ -282,10 +299,10 @@ export function generateDts(input: DtsInput): string {
     lines.push('}');
     lines.push('');
 
-    // What the types above name, declared after the header (#1335).
-    const declared = declaredNames(lines.slice(2).join('\n'), input.imports ?? [], input.generics ?? []);
     // The script's re-exports (#1352): the module re-exports them, and so does its declaration.
     const reExports = (input.imports ?? []).filter((s) => s.startsWith('export '));
+    // What the types above name, declared after the header (#1335), less what a re-export exports.
+    const declared = declaredNames(lines.slice(2).join('\n'), input.imports ?? [], input.generics ?? [], reExportedNames(reExports));
     lines.splice(2, 0, ...declared, ...(reExports.length > 0 ? [...reExports, ''] : []));
 
     return lines.join('\n');
