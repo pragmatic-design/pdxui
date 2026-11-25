@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/bulk-actions/pdx-bulk-actions';
+import '../../src/bulk-actions/pdx-bulk-actions.pdx';
 
 async function mount(actions: unknown[]): Promise<HTMLElement> {
     const el = document.createElement('pdx-bulk-actions');

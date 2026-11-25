@@ -17,7 +17,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-bottom-nav',
     'pdx-bottom-sheet',
     'pdx-breadcrumb',
-    'pdx-bulk-actions',
     'pdx-button',
     'pdx-card',
     'pdx-carousel',

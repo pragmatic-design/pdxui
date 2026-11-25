@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-bulk-actions (the action bar of a multi-selection)
  *
- * ── DOM (light DOM, packages/ui/src/bulk-actions/pdx-bulk-actions.ts) ──
+ * ── DOM (light DOM, packages/ui/src/bulk-actions/pdx-bulk-actions.pdx) ──
  *   <pdx-bulk-actions>
  *     <div data-part="root" role="toolbar">                      ← inline-flex while count > 0, hidden at 0
  *       <span data-part="count">3 selected</span>

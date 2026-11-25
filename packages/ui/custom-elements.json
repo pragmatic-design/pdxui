@@ -3902,7 +3902,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/bulk-actions/pdx-bulk-actions.ts",
+      "path": "src/bulk-actions/pdx-bulk-actions.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -4041,7 +4041,7 @@
           "name": "pdx-bulk-actions",
           "declaration": {
             "name": "PdxBulkActions",
-            "module": "src/bulk-actions/pdx-bulk-actions.ts"
+            "module": "src/bulk-actions/pdx-bulk-actions.pdx"
           }
         }
       ]

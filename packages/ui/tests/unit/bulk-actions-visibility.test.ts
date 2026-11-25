@@ -6,7 +6,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { setComponentStrings, clearComponentStrings, setLocale } from '@pdxui/core';
 import { tick } from './helpers';
-import '../../src/bulk-actions/pdx-bulk-actions';
+import '../../src/bulk-actions/pdx-bulk-actions.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

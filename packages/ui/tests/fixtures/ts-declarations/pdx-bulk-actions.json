@@ -1,0 +1,130 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBulkActions",
+  "tagName": "pdx-bulk-actions",
+  "category": "Data-bound",
+  "order": 109,
+  "description": "A contextual action bar for a multi-selection: while items are selected it shows how many, a\nbutton per action and a clear button.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "count",
+      "description": "Number of selected items — drives visibility and the default label.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "count"
+    },
+    {
+      "kind": "field",
+      "name": "actions",
+      "description": "Actions to offer.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Label template; `{count}` is substituted. Default: the `bulk-actions.selected` component string, \"{count} selected\".",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Show the trailing clear (✕) button.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "clearable"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-action",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An action was pressed; an `aria-disabled` one emits nothing.",
+      "detail": "{ key: string; action: BulkAction }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The clear button was pressed: the parent clears its selection."
+    }
+  ],
+  "roles": [
+    "toolbar"
+  ],
+  "attributes": [
+    {
+      "name": "count",
+      "fieldName": "count",
+      "description": "Number of selected items — drives visibility and the default label.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Label template; `{count}` is substituted. Default: the `bulk-actions.selected` component string, \"{count} selected\".",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Show the trailing clear (✕) button.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "BulkAction",
+      "fields": [
+        "key: string",
+        "label: string",
+        "icon?: string",
+        "tone?: string",
+        "disabled?: boolean",
+        "disabledReason?: string"
+      ]
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The bar, a `role=\"toolbar\"`, shown while `count` is above 0."
+    },
+    {
+      "name": "count",
+      "description": "The \"{count} selected\" label."
+    },
+    {
+      "name": "action",
+      "description": "An action's button."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable`."
+    }
+  ]
+}
