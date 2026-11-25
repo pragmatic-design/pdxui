@@ -120,7 +120,7 @@
       "import": "./dist/mention/pdx-mention.js"
     },
     "./cascader": {
-      "development": "./src/cascader/pdx-cascader.ts",
+      "development": "./src/cascader/pdx-cascader.pdx",
       "types": "./dist/cascader/pdx-cascader.d.ts",
       "import": "./dist/cascader/pdx-cascader.js"
     },
@@ -672,6 +672,7 @@
     "dist/banner/banner-icons.js",
     "dist/calendar/calendar-strings.js",
     "dist/carousel/carousel-icons.js",
+    "dist/cascader/cascader-strings.js",
     "dist/data-grid/grid-i18n.js",
     "dist/empty-state/empty-state-icons.js",
     "dist/entity-grid/entity-grid-icons.js",
@@ -691,6 +692,7 @@
     "src/banner/banner-icons.ts",
     "src/calendar/calendar-strings.ts",
     "src/carousel/carousel-icons.ts",
+    "src/cascader/cascader-strings.ts",
     "src/data-grid/grid-i18n.ts",
     "src/empty-state/empty-state-icons.ts",
     "src/entity-grid/entity-grid-icons.ts",

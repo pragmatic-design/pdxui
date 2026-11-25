@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/cascader/pdx-cascader';
+import '../../src/cascader/pdx-cascader.pdx';
 
 const LAZY = [
     { value: 'mammals', label: 'Mammals', isLeaf: false },

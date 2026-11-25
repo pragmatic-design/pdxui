@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-cascader (tier 3, a hierarchical drill-down selection in columns)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/cascader/pdx-cascader.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/cascader/pdx-cascader.pdx)
  * and the CSS (packages/design/src/components/cascader.css).
  *
  * ── DOM structure (light DOM, built imperatively in an rAF, pdx-cascader.ts:225) ──
