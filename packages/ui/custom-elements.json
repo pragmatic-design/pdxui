@@ -3756,7 +3756,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/breadcrumb/pdx-breadcrumb.ts",
+      "path": "src/breadcrumb/pdx-breadcrumb.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -3895,7 +3895,7 @@
           "name": "pdx-breadcrumb",
           "declaration": {
             "name": "PdxBreadcrumb",
-            "module": "src/breadcrumb/pdx-breadcrumb.ts"
+            "module": "src/breadcrumb/pdx-breadcrumb.pdx"
           }
         }
       ]

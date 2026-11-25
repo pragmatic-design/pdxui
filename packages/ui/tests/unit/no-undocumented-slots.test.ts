@@ -41,6 +41,8 @@ function renderedSlots(src: Source): { tag: string | null; names: string[] } {
     for (const m of text.matchAll(/declaredSnippet\(\s*ctx\s*,\s*'([\w-]+)'/g)) names.add(m[1]);
     // Match: `snippetOf('x')`, pdx-data-grid's reader of its own snippets. Groups: [1]=the snippet's name
     for (const m of text.matchAll(/snippetOf\(\s*'([\w-]+)'\s*\)/g)) names.add(m[1]);
+    // A .pdx's snippet declaration, at the start of a line (#1210). Match: `@slot row?: (…)`. Groups: [1]=the name
+    if (typeof src !== 'string') for (const m of text.matchAll(/^@slot\s+([\w-]+)\??\s*:/gm)) names.add(m[1]);
     return { tag, names: [...names].sort() };
 }
 
@@ -82,6 +84,12 @@ describe('the scan can fail', () => {
     it('sees an undocumented slot of a .pdx, its tag from the file name (#1210)', () => {
         const pdx = { text: '<template><slot name="header"></slot><slot name="footer"></slot></template>', tag: 'pdx-probe' };
         expect(undocumented([pdx], docs)).toEqual(['pdx-probe: header']);
+    });
+    it('sees the snippets a .pdx declares with @slot (#1210)', () => {
+        // A .pdx reads a parent's snippet through its `@slot` declaration, not declaredSnippet: the scan
+        // missed every moved component's snippets, and its count fell with each move.
+        const pdx = { text: '<template></template>\n<script>\n@slot row?: (item: T, index: number);\n@slot footer?: ();\n</script>', tag: 'pdx-probe' };
+        expect(undocumented([pdx], docs)).toEqual(['pdx-probe: row']);
     });
     it('does not accuse a documented slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"footer\"></slot>` })";

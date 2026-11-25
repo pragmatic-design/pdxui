@@ -1,0 +1,192 @@
+<template></template>
+
+<script>
+/**
+ * Navigation breadcrumbs, with overflow collapse and custom separators.
+ *
+ * @slot item - Renders one crumb: a snippet `item(item, index, isLast)`.
+ *
+ * @csspart nav - The `<nav>` that names the trail (`.pdx-breadcrumb`).
+ * @csspart list - The `<ol>` of the crumbs.
+ * @csspart item - One crumb, an `<li>`; the last is `aria-current="page"` when a snippet draws it.
+ * @csspart link - A crumb that leads somewhere: a link with an `href`, a button without one.
+ * @csspart current - The page you are on, the last crumb, `aria-current="page"`.
+ * @csspart separator - The glyph between two crumbs, hidden from assistive technology.
+ * @csspart ellipsis - The button that stands for the crumbs `max-items` collapsed.
+ */
+// pdx-breadcrumb — Breadcrumb navigation with overflow collapse and custom separators.
+// Snippet: "item" — custom breadcrumb item template (priority: snippet > default)
+//
+// Usage:
+//   <pdx-breadcrumb :items="crumbs">
+//     @snippet item(item, index, isLast) { <a :href="item.href">{{ item.label }}</a> }
+//   </pdx-breadcrumb>
+//
+// The crumbs are built by the script a frame after a change, as the TypeScript version built them.
+// A crumb is `crumb` in the script: `item` is the snippet, and a part's name.
+import { sanitizeUrl, routeTrail } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import type { BreadcrumbItem } from './breadcrumb-types';
+
+// The crumb shape an app builds in TypeScript (`import type { BreadcrumbItem } from '@pdxui/ui/breadcrumb'`).
+export type { BreadcrumbItem } from './breadcrumb-types';
+
+// It holds no position of its own (#289): the page you are on is its last crumb, so it has no
+// model and no state.
+/** A crumb was chosen: its `key` and the item. */
+@event 'pdx-select': { key: string; item: T };
+// Every element is built by the script.
+@part(external) nav, list, item, link, current, separator, ellipsis;
+// The crumb a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+@generic T extends { key: string; label: string };
+@prop items: T[] = [];
+// Empty = use the theme's --pdx-breadcrumb-separator (filled via CSS on the
+// empty .pdx-breadcrumb-sep). A non-empty prop is an explicit override.
+@prop separator: string = '';
+@prop maxItems: number = 0;
+// A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
+@slot item?: (item: T, index: number, isLast: boolean);
+@host host;
+
+/** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
+}
+
+/**
+ * The crumbs to render: `items` when the app passed any, otherwise the trail the router
+ * published.
+ *
+ * `items` stays authoritative. Given nothing, an empty nav would make every page restate by
+ * hand a path the router already holds — and the copy goes stale the day a route is renamed.
+ *
+ * The trail comes from core's registry, which `@pdxui/router` fills on every
+ * navigation. Reading it here rather than importing the router keeps this package's
+ * dependency on core alone.
+ */
+function crumbs(): BreadcrumbItem[] {
+  const given = items as unknown as BreadcrumbItem[];
+  if (given.length > 0) return given;
+  return routeTrail().map((c, i) => ({
+    key: `${i}:${c.href}`,
+    label: c.label,
+    // The page you are on is not a link — the component already renders the last crumb
+    // as a span with aria-current, and an href on it would undo that.
+    href: c.current ? undefined : c.href,
+  }));
+}
+
+$effect(() => {
+  const trail = crumbs();
+  const sepText = separator as string;
+  const limit = maxItems as number;
+  requestAnimationFrame(() => buildBreadcrumb(trail, sepText, limit));
+});
+
+function buildBreadcrumb(trail: BreadcrumbItem[], sepText: string, limit: number): void {
+  const navEl = host.querySelector('nav') || document.createElement('nav');
+  navEl.className = 'pdx-breadcrumb';
+  navEl.setAttribute('data-part', 'nav');
+  uiAttr(navEl, 'aria-label', () => uiString('breadcrumb', 'label'));
+  navEl.innerHTML = '';
+
+  let visibleItems = trail;
+
+  if (limit > 0 && trail.length > limit) {
+    const first = trail.slice(0, 1);
+    const last = trail.slice(-(limit - 1));
+    visibleItems = [...first, { key: '__ellipsis', label: '...' }, ...last];
+  }
+
+  const ol = document.createElement('ol');
+  ol.className = 'pdx-breadcrumb-list';
+  ol.setAttribute('data-part', 'list');
+  ol.setAttribute('role', 'list');
+
+  const snippet = item;
+  visibleItems.forEach((crumb, i) => {
+    const li = document.createElement('li');
+    li.className = 'pdx-breadcrumb-item';
+    li.setAttribute('data-part', 'item');
+    const isLast = i === visibleItems.length - 1;
+    const isEllipsis = crumb.key === '__ellipsis';
+
+    if (isEllipsis) {
+      // A button: a <span> with a click handler, named "…", has no focus and no key.
+      // Expanding rebuilds the path, so focus goes to the first crumb it
+      // revealed rather than to <body>.
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'pdx-breadcrumb-ellipsis';
+      btn.setAttribute('data-part', 'ellipsis');
+      btn.textContent = '…';
+      uiAttr(btn, 'aria-label', () => uiString('breadcrumb', 'expand'));
+      btn.addEventListener('click', () => {
+        buildBreadcrumb(trail, sepText, 0);
+        const revealed = navEl.querySelectorAll<HTMLElement>('.pdx-breadcrumb-item')[1];
+        revealed?.querySelector<HTMLElement>('a, button, [tabindex]')?.focus();
+      });
+      li.appendChild(btn);
+    } else if (snippet) {
+      // The parent's snippet draws every crumb but the ellipsis
+      li.appendChild(snippet(crumb as unknown as T, i, isLast));
+      if (isLast) li.setAttribute('aria-current', 'page');
+    } else if (isLast) {
+      const span = document.createElement('span');
+      span.className = 'pdx-breadcrumb-current';
+      span.setAttribute('data-part', 'current');
+      span.setAttribute('aria-current', 'page');
+      if (crumb.icon) {
+        loadIcon();
+        const icon = document.createElement('pdx-icon');
+        icon.setAttribute('name', crumb.icon);
+        icon.setAttribute('size', '14');
+        span.appendChild(icon);
+      }
+      span.appendChild(document.createTextNode(crumb.label));
+      li.appendChild(span);
+    } else {
+      // ⚠️ An <a> without an href is not focusable and is not announced as a link, and
+      // this crumb always has a click handler that emits pdx-select. So an item with no
+      // href — the event-driven route the skill recommends — is a button, or it would be a
+      // control nobody could reach from the keyboard. With one, it stays a real link: middle-click, open in
+      // a new tab, copy the address all keep working.
+      const safeHref = sanitizeUrl(crumb.href);
+      const a = document.createElement(safeHref ? 'a' : 'button');
+      a.className = 'pdx-breadcrumb-link';
+      a.setAttribute('data-part', 'link');
+      if (safeHref) (a as HTMLAnchorElement).href = safeHref;
+      else (a as HTMLButtonElement).type = 'button';
+      if (crumb.icon) {
+        loadIcon();
+        const icon = document.createElement('pdx-icon');
+        icon.setAttribute('name', crumb.icon);
+        icon.setAttribute('size', '14');
+        a.appendChild(icon);
+      }
+      a.appendChild(document.createTextNode(crumb.label));
+      a.addEventListener('click', (e) => {
+        if (!crumb.href) e.preventDefault();
+        pdxSelect({ key: crumb.key, item: crumb as unknown as T });
+      });
+      li.appendChild(a);
+    }
+
+    // Separator (not after last)
+    if (!isLast) {
+      const sep = document.createElement('span');
+      sep.className = 'pdx-breadcrumb-sep';
+      sep.setAttribute('data-part', 'separator');
+      sep.setAttribute('aria-hidden', 'true');
+      // Leave empty when no explicit prop → CSS fills the glyph from the theme token.
+      if (sepText) sep.textContent = sepText;
+      li.appendChild(sep);
+    }
+
+    ol.appendChild(li);
+  });
+
+  navEl.appendChild(ol);
+  if (!host.contains(navEl)) host.appendChild(navEl);
+}
+</script>

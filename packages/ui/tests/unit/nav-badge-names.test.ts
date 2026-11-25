@@ -11,7 +11,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
 import '../../src/bottom-nav/pdx-bottom-nav.pdx';
 import '../../src/nav-menu/pdx-nav-menu';
-import '../../src/breadcrumb/pdx-breadcrumb';
+import '../../src/breadcrumb/pdx-breadcrumb.pdx';
 
 async function create(tag: string, props: Record<string, unknown>): Promise<HTMLElement> {
     const el = document.createElement(tag) as HTMLElement & Record<string, unknown>;

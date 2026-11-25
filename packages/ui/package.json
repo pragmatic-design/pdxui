@@ -150,7 +150,7 @@
       "import": "./dist/nav-menu/pdx-nav-menu.js"
     },
     "./breadcrumb": {
-      "development": "./src/breadcrumb/pdx-breadcrumb.ts",
+      "development": "./src/breadcrumb/pdx-breadcrumb.pdx",
       "types": "./dist/breadcrumb/pdx-breadcrumb.d.ts",
       "import": "./dist/breadcrumb/pdx-breadcrumb.js"
     },
