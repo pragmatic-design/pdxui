@@ -134,6 +134,32 @@ describe('the roles a .pdx script writes', () => {
     });
 });
 
+// An object a .pdx exposes is a read-only field with its keys as the type, as gen-manifest reads a
+// TypeScript component's `ctx.expose({ api: { … } })`: pdx-scroll-area's `el.scrollArea.scrollTo(…)` (#1210).
+describe('an object a .pdx exposes', () => {
+    it('is a read-only field typed by its keys', () => {
+        write('o/pdx-o.pdx', [
+            '<template></template>',
+            '<script>',
+            '@expose api;',
+            '/** The helpers. */',
+            'const api = {',
+            '  scrollTo: (opts: ScrollToOptions) => opts,',
+            '  focus() { return 1; },',
+            '  size: 3,',
+            '};',
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 'o/pdx-o.pdx');
+        const members = analyzePdxFile(file, readFileSync(file, 'utf-8'), {})[0].declarations[0].members as Record<string, unknown>[];
+        expect(members.find((m) => m.name === 'api')).toEqual({
+            kind: 'field', name: 'api', readonly: true,
+            type: { text: '{ scrollTo(opts), focus(), size }' },
+            description: 'The helpers.',
+        });
+    });
+});
+
 // A module beside the component is part of it, as gen-manifest reads a TypeScript component's: the
 // roles and contexts of the code it moved there are the component's. pdx-json-editor's sub-modal
 // is a role="dialog" built in json-editor-fields.ts (#1210), and the manifest lost it.

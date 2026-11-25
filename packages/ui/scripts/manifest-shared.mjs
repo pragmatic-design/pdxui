@@ -313,6 +313,42 @@ export function declaredFunction(name, sourceFile) {
     return found;
 }
 
+/**
+ * The object literal a name is bound to in the same file, `const api = { … }`: what a .pdx's
+ * `@expose api` puts on the element (#1210), as `ctx.expose({ api: { … } })` does in TypeScript.
+ */
+export function declaredObject(name, sourceFile) {
+    let found = null;
+    const visit = (node) => {
+        if (found) return;
+        if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name
+            && node.initializer && ts.isObjectLiteralExpression(node.initializer)) {
+            found = node.initializer; return;
+        }
+        ts.forEachChild(node, visit);
+    };
+    visit(sourceFile);
+    return found;
+}
+
+/**
+ * The shape of an exposed object, as a reader would call it: `{ scrollTo(opts), getViewport() }`.
+ * Each key with its parameter names, because the whole point of publishing it is that
+ * `el.scrollArea.scrollTo(...)` is reachable and `el.scrollArea()` is not.
+ */
+export function objectShape(object, sourceFile) {
+    const parts = [];
+    for (const prop of object.properties) {
+        const key = prop.name && (ts.isIdentifier(prop.name) || ts.isStringLiteral(prop.name)) ? prop.name.text : null;
+        if (!key) continue;
+        const fn = ts.isMethodDeclaration(prop) ? prop
+            : ts.isPropertyAssignment(prop) && (ts.isArrowFunction(prop.initializer) || ts.isFunctionExpression(prop.initializer))
+                ? prop.initializer : null;
+        parts.push(fn ? `${key}(${fn.parameters.map(p => p.name.getText(sourceFile)).join(', ')})` : key);
+    }
+    return `{ ${parts.join(', ')} }`;
+}
+
 /** A function's parameters as the manifest lists them: name, its type when written, optional when it may be left out. */
 export function functionParameters(fn, sourceFile) {
     return fn.parameters.map(p => ({

@@ -87,7 +87,7 @@ import './row/pdx-row.pdx';
 import './col/pdx-col.pdx';
 import './masonry/pdx-masonry.pdx';
 import './splitter/pdx-splitter';
-import './scroll-area/pdx-scroll-area';
+import './scroll-area/pdx-scroll-area.pdx';
 import './scroll-spy/pdx-scroll-spy.pdx';
 import './affix/pdx-affix';
 import './aspect-ratio/pdx-aspect-ratio.pdx';

@@ -1,0 +1,213 @@
+<template>
+  <div class="pdx-scroll-area-viewport" data-part="viewport"><slot></slot></div>
+</template>
+
+<script>
+/**
+ * A scrollable container that replaces the native scrollbars with styled, auto-hiding overlay
+ * scrollbars, vertical, horizontal or on both axes.
+ *
+ * @csspart viewport - The element that scrolls (`.pdx-scroll-area-viewport`), around the content.
+ * @csspart scrollbar - An overlay scrollbar's track, one per axis it scrolls on.
+ * @csspart thumb - A scrollbar's thumb.
+ *
+ * @cssstate at-top - Scrolled to the top: nothing more above.
+ * @cssstate at-bottom - Scrolled to the bottom: nothing more below.
+ * @cssstate at-left - Scrolled to the left edge (horizontal or two-axis area).
+ * @cssstate at-right - Scrolled to the right edge (horizontal or two-axis area).
+ */
+// pdx-scroll-area — Custom scrollbar container.
+// Wraps content with overlay or inset scrollbars. Uses useScrollbar() primitive.
+// Props: type (auto/always/hover/scroll/never), axis, scrollHideDelay.
+// API: scrollTo, scrollBy, scrollIntoView. Events: pdx-scroll.
+//
+// The viewport is found by its class a frame after mount, as the TypeScript version found it: a ref
+// would bind it at every mount, for a scroll area whose script reads it only in that frame.
+import { onDestroy, useScrollbar } from '@pdxui/core';
+import type { ScrollbarReturn } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/scroll-area';
+
+/** The viewport scrolled: where it is, and how big the content and the viewport are. */
+@event 'pdx-scroll': { scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number };
+// On the host as custom states (#132, #290), in place of the `data-at-*` attributes it wrote:
+// scroll-area.css fades the edges that have more content past them from these.
+@state at-top = atTop;
+@state at-bottom = atBottom;
+@state at-left = atLeft;
+@state at-right = atRight;
+@part viewport;
+// The track and the thumb useScrollbar draws.
+@part(external) scrollbar, thumb;
+/** Scrollbar visibility: auto (show on scroll+hover), always, hover (show on hover only), never */
+@prop type: string = 'auto';
+/** Axis: vertical (default), horizontal, both */
+@prop axis: string = 'vertical';
+/** Auto-hide delay in ms (0 = never hide). Used when type=auto */
+@prop scrollHideDelay: number = 1200;
+/** Max height (CSS value). Enables scroll when content overflows */
+@prop maxHeight: string = '';
+/** Height (CSS value) */
+@prop height: string = '';
+/** Names the scrollable area ("Release notes") and makes it a region landmark. Empty: no
+ *  landmark — the area stays focusable (tabindex 0) so the keyboard can scroll it. */
+@prop label: string = '';
+@host host;
+
+// Imperative API — namespaced under `scrollArea` because scrollTo/scrollBy/scrollIntoView
+// are native Element methods; flattening them onto the host would shadow the natives.
+@expose scrollArea;
+
+let atTop = $signal(false);
+let atBottom = $signal(false);
+let atLeft = $signal(false);
+let atRight = $signal(false);
+let _built = false;
+let _scrollbar: ScrollbarReturn | null = null;
+let _viewportEl: HTMLElement | null = null;
+
+/** A purely numeric value ("160") is not valid CSS for height/max-height → it appends px. */
+function toCssLength(v: string): string {
+  return /^-?\d+(\.\d+)?$/.test(v.trim()) ? v.trim() + 'px' : v;
+}
+
+/**
+ * A region only when it has a name of its own, or four scroll areas on one page would be four
+ * landmarks all called "Scrollable content": without `label` the viewport keeps
+ * tabindex 0, so the keyboard can still scroll it, and is no landmark.
+ */
+function applyRegion(): void {
+  if (!_viewportEl) return;
+  const own = label.peek() as string;
+  if (own) {
+    _viewportEl.setAttribute('role', 'region');
+    _viewportEl.setAttribute('aria-label', own);
+  } else {
+    _viewportEl.removeAttribute('role');
+    _viewportEl.removeAttribute('aria-label');
+  }
+}
+$effect(() => {
+  void label;
+  applyRegion();
+});
+
+// The primitive attaches listeners/observers: dispose on destroy
+onDestroy(() => { _scrollbar?.dispose(); _scrollbar = null; });
+
+$effect(() => {
+  const scrollType = type as string;
+  const direction = axis as string;
+  const hideDelay = scrollHideDelay as number;
+  const maxH = maxHeight as string;
+  const h = height as string;
+
+  if (_built) return;
+  _built = true;
+  // The host carries no class (#290): scroll-area.css draws it on the tag.
+  requestAnimationFrame(() => {
+    // The viewport is in the template, around the slot: the children are projected
+    // into it when the scroll area mounts. They are not MOVED into a viewport built
+    // here, a frame after they have mounted: a move is a disconnect, and every component
+    // inside would be destroyed and set up again while the first setup's frame still
+    // builds its DOM — a pdx-mention would come out with three textareas.
+    _viewportEl = host.querySelector<HTMLElement>(':scope > .pdx-scroll-area-viewport');
+    const vp = _viewportEl;
+    if (!vp) return;
+    // Keyboard operability (WCAG 2.1.1): a scrollable region whose content alone is
+    // not focusable would be unreachable from the keyboard. tabindex=0 makes it
+    // focusable and scrollable with the arrows; role=region + aria-label only with `label`.
+    vp.tabIndex = 0;
+    applyRegion();
+    // It normalizes bare numeric values ("160", say) into px: without a unit the CSS is
+    // invalid and would be ignored in silence (the region would not be constrained).
+    if (maxH) vp.style.maxHeight = toCssLength(maxH);
+    if (h) vp.style.height = toCssLength(h);
+
+    // Set overflow based on axis
+    if (direction === 'horizontal') {
+      vp.style.overflowX = 'auto';
+      vp.style.overflowY = 'hidden';
+    } else if (direction === 'both') {
+      vp.style.overflow = 'auto';
+    } else {
+      vp.style.overflowX = 'hidden';
+      vp.style.overflowY = 'auto';
+    }
+
+    // Determine autoHideMs based on type
+    let autoHideMs = hideDelay;
+    if (scrollType === 'always') autoHideMs = 0;
+    else if (scrollType === 'never') autoHideMs = -1; // special: never show
+    else if (scrollType === 'hover') autoHideMs = 100;
+
+    // Hide native scrollbar
+    vp.style.scrollbarWidth = 'none'; // Firefox
+    vp.classList.add('pdx-scroll-area-hide-native');
+
+    // Apply useScrollbar only if type != 'never'
+    if (scrollType !== 'never') {
+      _scrollbar = useScrollbar(
+        () => _viewportEl,
+        {
+          axis: direction as 'vertical' | 'horizontal' | 'both',
+          mode: 'overlay',
+          autoHideMs,
+        }
+      );
+      // The track and thumb it draws, named as parts. It builds them synchronously,
+      // beside the viewport, inside the wrapper it puts around it.
+      for (const t of host.querySelectorAll('[data-pdx-scrollbar-track]')) t.setAttribute('data-part', 'scrollbar');
+      for (const t of host.querySelectorAll('[data-pdx-scrollbar-thumb]')) t.setAttribute('data-part', 'thumb');
+    }
+
+    // Wheel → horizontal scroll for horizontal-only axis
+    if (direction === 'horizontal') {
+      vp.addEventListener('wheel', (e: WheelEvent) => {
+        if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.preventDefault();
+          vp.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+    }
+
+    // Scroll event emission
+    vp.addEventListener('scroll', () => {
+      pdxScroll({
+        scrollTop: vp.scrollTop,
+        scrollLeft: vp.scrollLeft,
+        scrollHeight: vp.scrollHeight,
+        scrollWidth: vp.scrollWidth,
+        clientHeight: vp.clientHeight,
+        clientWidth: vp.clientWidth,
+      });
+    }, { passive: true });
+
+    // The edges it has scrolled to, as the host's custom states (#290).
+    const updateEdges = () => {
+      atTop = vp.scrollTop <= 1;
+      atBottom = vp.scrollTop + vp.clientHeight >= vp.scrollHeight - 1;
+      if (direction === 'horizontal' || direction === 'both') {
+        atLeft = vp.scrollLeft <= 1;
+        atRight = vp.scrollLeft + vp.clientWidth >= vp.scrollWidth - 1;
+      }
+    };
+    vp.addEventListener('scroll', updateEdges, { passive: true });
+    updateEdges();
+  });
+});
+
+/**
+ * Helpers over the inner viewport, reached as `el.scrollArea.scrollTo(…)`: the host is not
+ * the element that scrolls, so the natives would act on the wrong box (which is also why
+ * they are namespaced here rather than flattened onto the host).
+ */
+const scrollArea = {
+  scrollTo: (opts: ScrollToOptions) => _viewportEl?.scrollTo(opts),
+  scrollBy: (opts: ScrollToOptions) => _viewportEl?.scrollBy(opts),
+  scrollIntoView: (el: HTMLElement, opts?: ScrollIntoViewOptions) => el.scrollIntoView(opts),
+  getViewport: () => _viewportEl,
+  recalculate: () => _scrollbar?.recalculate(),
+};
+</script>

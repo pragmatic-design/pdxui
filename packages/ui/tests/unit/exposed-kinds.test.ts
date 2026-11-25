@@ -57,6 +57,18 @@ function exposedObjectLiterals(): string[] {
         };
         visit(sf);
         }
+    // A .pdx exposes a name with `@expose a, b;` and binds it in its script (#1210): an object literal
+    // there, `const api = { … }`, is the same case. Its tag is its file name.
+    for (const file of globSync(join(UI, 'src', '**', 'pdx-*.pdx').replace(/\\/g, '/'))) {
+        const text = readFileSync(file, 'utf-8');
+        const tag = file.replace(/^.*[\\/]/, '').replace(/\.pdx$/, '');
+        // Match: `@expose a, b;` at the start of a line. Groups: [1]=the names
+        const exposed = [...text.matchAll(/^@expose\s+([\w\s,]+);/gm)].flatMap(m => m[1].split(',').map(s => s.trim()));
+        for (const name of exposed) {
+            // Match: `const name = {`, an object literal bound to the exposed name.
+            if (new RegExp(`^const\\s+${name}\\s*=\\s*\\{`, 'm').test(text)) found.push(`${tag}.${name}`);
+        }
+    }
     return found.sort();
 }
 

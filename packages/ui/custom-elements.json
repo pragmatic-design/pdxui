@@ -25881,7 +25881,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/scroll-area/pdx-scroll-area.ts",
+      "path": "src/scroll-area/pdx-scroll-area.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -26077,7 +26077,7 @@
           "name": "pdx-scroll-area",
           "declaration": {
             "name": "PdxScrollArea",
-            "module": "src/scroll-area/pdx-scroll-area.ts"
+            "module": "src/scroll-area/pdx-scroll-area.pdx"
           }
         }
       ]

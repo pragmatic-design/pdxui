@@ -9,7 +9,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import '../../src/shared/i18n';
 import '../../src/split-button/pdx-split-button.pdx';
-import '../../src/scroll-area/pdx-scroll-area';
+import '../../src/scroll-area/pdx-scroll-area.pdx';
 import '../../src/progress/pdx-progress.pdx';
 import '../../src/rating/pdx-rating.pdx';
 import '../../src/fab/pdx-fab.pdx';

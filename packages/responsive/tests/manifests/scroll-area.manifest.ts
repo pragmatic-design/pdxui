@@ -2,7 +2,7 @@
  * MANIFEST — pdx-scroll-area (Tier 6 — layout/utility container)
  *
  * Contracts written by inspecting:
- *  - source: packages/ui/src/scroll-area/pdx-scroll-area.ts
+ *  - source: packages/ui/src/scroll-area/pdx-scroll-area.pdx
  *      Light DOM, render: <slot></slot>. On ctx.track's first run, inside a
  *      requestAnimationFrame, the setup:
  *        1. sets no class on the host (#290): scroll-area.css draws it on the tag;
@@ -62,7 +62,7 @@
  * THE REGION AND THE TABINDEX:
  *
  *  [B1] Accessibility — the scrollable viewport must be reachable from the keyboard.
- *       packages/ui/src/scroll-area/pdx-scroll-area.ts
+ *       packages/ui/src/scroll-area/pdx-scroll-area.pdx
  *       WAI-ARIA / WCAG 2.1.1: a scrollable region that may hold ONLY non-focusable content
  *       (text, images) must be keyboard-operable, so the viewport always has tabindex="0".
  *       role="region" + aria-label come ONLY with the `label` prop: without it, four areas on
