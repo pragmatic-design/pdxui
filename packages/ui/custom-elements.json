@@ -3122,7 +3122,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/block-ui/pdx-block-ui.ts",
+      "path": "src/block-ui/pdx-block-ui.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -3307,7 +3307,7 @@
           "name": "pdx-block-ui",
           "declaration": {
             "name": "PdxBlockUi",
-            "module": "src/block-ui/pdx-block-ui.ts"
+            "module": "src/block-ui/pdx-block-ui.pdx"
           }
         }
       ]

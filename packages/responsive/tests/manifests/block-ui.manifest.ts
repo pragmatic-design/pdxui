@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-block-ui (loading overlay, tier 3)
  *
- * Contracts written by inspecting the source (packages/ui/src/block-ui/pdx-block-ui.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/block-ui/pdx-block-ui.pdx) and the CSS
  * (packages/design/src/components/block-ui.css).
  *
  * WHAT IT DOES: it wraps some content (a <slot> by default) and, when `blocked`, shows a

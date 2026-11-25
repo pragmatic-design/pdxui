@@ -23,6 +23,7 @@ const PORTED: Record<string, string> = {
     'pdx-auto-form':'src/auto-form/pdx-auto-form.pdx',
     'pdx-avatar': 'src/avatar/pdx-avatar.pdx',
     'pdx-avatar-group': 'src/avatar-group/pdx-avatar-group.pdx',
+    'pdx-block-ui': 'src/block-ui/pdx-block-ui.pdx',
     'pdx-badge': 'src/badge/pdx-badge.pdx',
     'pdx-accordion': 'src/accordion/pdx-accordion.pdx',
     'pdx-breadcrumb': 'src/breadcrumb/pdx-breadcrumb.pdx',

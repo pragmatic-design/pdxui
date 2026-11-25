@@ -55,7 +55,7 @@ describe('a component that draws a spinner only while loading', () => {
         ['pdx-list', 'list/pdx-list.pdx'],
         ['pdx-data-grid', 'data-grid/pdx-data-grid.ts'],
         ['pdx-infinite-scroll', 'infinite-scroll/pdx-infinite-scroll.pdx'],
-        ['pdx-block-ui', 'block-ui/pdx-block-ui.ts'],
+        ['pdx-block-ui', 'block-ui/pdx-block-ui.pdx'],
     ])('%s does not load pdx-spinner statically', (_tag, file) => {
         expect(staticClosure(join(SRC, file)).has(SPINNER), `${file} reaches spinner/pdx-spinner.pdx through static imports`).toBe(false);
     });

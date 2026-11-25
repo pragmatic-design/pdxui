@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/block-ui/pdx-block-ui';
+import '../../src/block-ui/pdx-block-ui.pdx';
 
 async function mount(attrs: Record<string, string>): Promise<HTMLElement> {
     const el = document.createElement('pdx-block-ui');
