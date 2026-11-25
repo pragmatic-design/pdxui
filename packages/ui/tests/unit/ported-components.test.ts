@@ -38,6 +38,7 @@ const PORTED: Record<string, string> = {
     'pdx-data-source': 'src/data-source/pdx-data-source.pdx',
     'pdx-description-list': 'src/description-list/pdx-description-list.pdx',
     'pdx-dialog': 'src/dialog/pdx-dialog.pdx',
+    'pdx-drawer': 'src/drawer/pdx-drawer.pdx',
     'pdx-edit-drawer': 'src/edit-drawer/pdx-edit-drawer.pdx',
     'pdx-entity-grid':'src/entity-grid/pdx-entity-grid.pdx',
     'pdx-error-boundary':'src/error-boundary/pdx-error-boundary.pdx',

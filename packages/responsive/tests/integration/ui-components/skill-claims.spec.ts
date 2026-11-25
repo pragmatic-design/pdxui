@@ -78,7 +78,7 @@ test.describe('claims that are no longer true — the skill must not teach these
 
     test('gotchas.md:81 — "inside app-layout the drawer stays UNDER the chrome" — nothing covers it now', async ({ page }) => {
         // The workaround was to reparent the drawer onto <body> on every open. The component portals
-        // by itself, and ONLY when an ancestor actually traps fixed positioning (pdx-drawer.ts:50).
+        // by itself, and ONLY when an ancestor actually traps fixed positioning (needsPortal in pdx-drawer.pdx).
         const errors = await openCase(page, 'drawer-in-layout');
         await openDrawer(page);
         await expect.poll(async () => (await read<{ coveredBy: string | null }>(page)).coveredBy,

@@ -111,7 +111,7 @@ import './tooltip/pdx-tooltip.pdx';
 import './popover/pdx-popover.pdx';
 import './dialog/pdx-dialog.pdx';
 import './alert-dialog/pdx-alert-dialog.pdx';
-import './drawer/pdx-drawer';
+import './drawer/pdx-drawer.pdx';
 import './toast/pdx-toast.pdx';
 import './tabs/pdx-tabs';
 import './accordion/pdx-accordion.pdx';

@@ -11514,7 +11514,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/drawer/pdx-drawer.ts",
+      "path": "src/drawer/pdx-drawer.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -11832,7 +11832,7 @@
           "name": "pdx-drawer",
           "declaration": {
             "name": "PdxDrawer",
-            "module": "src/drawer/pdx-drawer.ts"
+            "module": "src/drawer/pdx-drawer.pdx"
           }
         }
       ]
