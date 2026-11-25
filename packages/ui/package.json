@@ -294,11 +294,6 @@
       "types": "./dist/page-header/pdx-page-header.d.ts",
       "import": "./dist/page-header/pdx-page-header.js"
     },
-    "./relation-picker": {
-      "development": "./src/relation-picker/pdx-relation-picker.ts",
-      "types": "./dist/relation-picker/pdx-relation-picker.d.ts",
-      "import": "./dist/relation-picker/pdx-relation-picker.js"
-    },
     "./icons/*": {
       "development": "./src/icon/pragmatic/*.ts",
       "types": "./dist/icon/pragmatic/*.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/description-list/pdx-description-list.pdx",
       "types": "./dist/description-list/pdx-description-list.d.ts",
       "import": "./dist/description-list/pdx-description-list.js"
+    },
+    "./relation-picker": {
+      "development": "./src/relation-picker/pdx-relation-picker.pdx",
+      "types": "./dist/relation-picker/pdx-relation-picker.d.ts",
+      "import": "./dist/relation-picker/pdx-relation-picker.js"
     },
     "./package.json": "./package.json"
   },

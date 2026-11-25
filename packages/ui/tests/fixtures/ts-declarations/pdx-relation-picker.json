@@ -1,0 +1,141 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRelationPicker",
+  "tagName": "pdx-relation-picker",
+  "category": "Data-bound",
+  "order": 113,
+  "description": "Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new\none to be created.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "The DataSource of the rows to pick from, handed to the grid the picker renders.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "columns",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "createLabel",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "createlabel"
+    },
+    {
+      "kind": "field",
+      "name": "addLabel",
+      "description": "The add button's text. Empty: the relation-picker.add component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "addlabel"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "searchable",
+      "description": "Let the user narrow the list — the one thing a picker exists for.\n\nIt turns on the grid's FILTER ROW: a field under each column header, debounced, which\ncalls `source.setFilter()`. So the narrowing happens where the rows come from and a\npicker over ten thousand customers works the same as one over fourteen.\n\n⚠️ Not the grid's toolbar, which is what this issue first proposed: measured, the\ntoolbar is a reload button, filter chips and \"+ Add Filter\" — a filter builder, not a\nsearch. Whether the picker should also carry a search field of its OWN, above the grid\nand across every column, is a design decision and is still open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "searchable"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-pick",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Add was pressed with rows picked: the rows themselves.",
+      "detail": "{ items: Record<string, unknown>[] }"
+    },
+    {
+      "name": "pdx-create",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The create button was pressed: the parent opens its form."
+    }
+  ],
+  "attributes": [
+    {
+      "name": "createlabel",
+      "fieldName": "createLabel",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "addlabel",
+      "fieldName": "addLabel",
+      "description": "The add button's text. Empty: the relation-picker.add component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "searchable",
+      "fieldName": "searchable",
+      "description": "Let the user narrow the list — the one thing a picker exists for.\n\nIt turns on the grid's FILTER ROW: a field under each column header, debounced, which\ncalls `source.setFilter()`. So the narrowing happens where the rows come from and a\npicker over ten thousand customers works the same as one over fourteen.\n\n⚠️ Not the grid's toolbar, which is what this issue first proposed: measured, the\ntoolbar is a reload button, filter chips and \"+ Add Filter\" — a filter builder, not a\nsearch. Whether the picker should also carry a search field of its OWN, above the grid\nand across every column, is a design decision and is still open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "grid",
+      "description": "The data grid the rows are picked from."
+    },
+    {
+      "name": "foot",
+      "description": "The footer under the grid."
+    },
+    {
+      "name": "count",
+      "description": "\"n selected\", empty while nothing is picked."
+    },
+    {
+      "name": "create",
+      "description": "The create button, with `create-label`."
+    },
+    {
+      "name": "add",
+      "description": "The add button, disabled while nothing is picked."
+    }
+  ]
+}

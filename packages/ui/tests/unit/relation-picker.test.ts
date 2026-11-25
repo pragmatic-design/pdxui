@@ -9,7 +9,7 @@
 // is easy to get wrong: a prop that only works when it is set BEFORE the first build.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/relation-picker/pdx-relation-picker';
+import '../../src/relation-picker/pdx-relation-picker.pdx';
 
 /** Enough of a DataSource for the picker to build: it only checks that there is one. */
 const fakeSource = () => ({ data: () => [], getById: () => undefined });

@@ -8,7 +8,7 @@ import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/page-header/pdx-page-header';
-import '../../src/relation-picker/pdx-relation-picker';
+import '../../src/relation-picker/pdx-relation-picker.pdx';
 import '../../src/bottom-sheet/pdx-bottom-sheet';
 
 const CASES: [tag: string, prop: string, expected: unknown[]][] = [

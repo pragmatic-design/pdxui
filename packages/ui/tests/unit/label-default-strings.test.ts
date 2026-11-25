@@ -20,7 +20,7 @@ import '../../src/alert-dialog/pdx-alert-dialog';
 import '../../src/auto-form/pdx-auto-form';
 import '../../src/edit-drawer/pdx-edit-drawer';
 import '../../src/entity-grid/pdx-entity-grid';
-import '../../src/relation-picker/pdx-relation-picker';
+import '../../src/relation-picker/pdx-relation-picker.pdx';
 import '../../src/select/pdx-select';
 import '../../src/timeline/pdx-timeline';
 import '../../src/bottom-sheet/pdx-bottom-sheet';

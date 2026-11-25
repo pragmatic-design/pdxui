@@ -24039,7 +24039,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/relation-picker/pdx-relation-picker.ts",
+      "path": "src/relation-picker/pdx-relation-picker.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -24189,7 +24189,7 @@
           "name": "pdx-relation-picker",
           "declaration": {
             "name": "PdxRelationPicker",
-            "module": "src/relation-picker/pdx-relation-picker.ts"
+            "module": "src/relation-picker/pdx-relation-picker.pdx"
           }
         }
       ]
