@@ -470,7 +470,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // Measured 478.1 KB in CI and 477.9 locally after a clean rebuild: the two agreed on the move before
 // this one (477.7), and the 0.2 KB between them is not explained. The ceiling is held to CI's figure.
 // Entry, css and blocking unchanged.
-const BUDGET_KB = { entry: 43.6, js: 478.2, css: 67, blocking: 102.9 };
+// js 478.2 → 478.5 (the standing OK for #1210's moves): pdx-chart moves to .pdx, 0.91× alone (3101
+// against 3393 B). The showcase's dashboard draws charts, and its chunk takes the compiled template's
+// code where html`` stays for the components not moved yet. Measured 478.5 KB in CI and 478.2 locally,
+// the same gap as the dialog's move; the ceiling is held to CI's figure. Entry, css and blocking
+// unchanged.
+const BUDGET_KB = { entry: 43.6, js: 478.5, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
