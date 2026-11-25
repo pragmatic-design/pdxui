@@ -5722,7 +5722,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/cascader/pdx-cascader.ts",
+      "path": "src/cascader/pdx-cascader.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -6130,7 +6130,7 @@
           "name": "pdx-cascader",
           "declaration": {
             "name": "PdxCascader",
-            "module": "src/cascader/pdx-cascader.ts"
+            "module": "src/cascader/pdx-cascader.pdx"
           }
         }
       ]

@@ -74,12 +74,12 @@ placeholders, filled at render: keep them in the translation.
 | `carousel` | `stopRotation` | `Stop slide rotation` | `@pdxui/ui/src/shared/i18n.ts` |
 | `cascader` | `clear` | `Clear` | `@pdxui/ui/src/shared/i18n.ts` |
 | `cascader` | `level` | `Level {n}` | `@pdxui/ui/src/shared/i18n.ts` |
-| `cascader` | `loading` | `Loading...` | `@pdxui/ui/src/cascader/pdx-cascader.ts` |
-| `cascader` | `noData` | `No data` | `@pdxui/ui/src/cascader/pdx-cascader.ts` |
-| `cascader` | `noMatch` | `No match` | `@pdxui/ui/src/cascader/pdx-cascader.ts` |
-| `cascader` | `placeholder` | `Select...` | `@pdxui/ui/src/cascader/pdx-cascader.ts` |
+| `cascader` | `loading` | `Loading...` | `@pdxui/ui/src/cascader/cascader-strings.ts` |
+| `cascader` | `noData` | `No data` | `@pdxui/ui/src/cascader/cascader-strings.ts` |
+| `cascader` | `noMatch` | `No match` | `@pdxui/ui/src/cascader/cascader-strings.ts` |
+| `cascader` | `placeholder` | `Select...` | `@pdxui/ui/src/cascader/cascader-strings.ts` |
 | `cascader` | `results` | `Search results` | `@pdxui/ui/src/shared/i18n.ts` |
-| `cascader` | `search` | `Search...` | `@pdxui/ui/src/cascader/pdx-cascader.ts` |
+| `cascader` | `search` | `Search...` | `@pdxui/ui/src/cascader/cascader-strings.ts` |
 | `cascader` | `searchLabel` | `Search options` | `@pdxui/ui/src/shared/i18n.ts` |
 | `chart` | `category` | `Category` | `@pdxui/ui/src/shared/i18n.ts` |
 | `chart` | `gauge` | `{label}: {value} of {min}–{max}` | `@pdxui/ui/src/shared/i18n.ts` |

@@ -7,7 +7,7 @@
 // and the clear button have a name.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/cascader/pdx-cascader';
+import '../../src/cascader/pdx-cascader.pdx';
 
 const OPTIONS = [
     { value: 'europe', label: 'Europe', children: [

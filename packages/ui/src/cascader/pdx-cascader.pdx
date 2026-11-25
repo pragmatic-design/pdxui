@@ -1,0 +1,576 @@
+<template></template>
+
+<script>
+/**
+ * A multi-level drill-down selector: each choice opens the next column of children, as in Country,
+ * then Region, then City.
+ *
+ * @slot option - Renders one option in a column: a snippet `option(node, level, selected)`.
+ *
+ * @csspart root - The trigger, the combobox: the frame, its border and background.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel that holds the columns, or the search results.
+ * @csspart search - The search field atop the panel, while `searchable`.
+ * @csspart list - A column, or the list of search results: a `role="listbox"`.
+ * @csspart option - An option of a column, or a search result.
+ * @csspart spinner - The spinner of a branch being fetched by `loadChildren`.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - A branch's children are being fetched by `loadChildren`.
+ *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail labels $event.currentTarget.getLabels()
+ */
+// pdx-cascader — Multi-level drill-down selector.
+// Each selection opens the next column of children (Country → Region → City).
+// Supports lazy loading, search, disabled nodes, clearable.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it
+// (cascader-dom.ts draws the open panel).
+import { generatedId, getComponentString, usePopover, onNextFrame, onDestroy } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { onPressOutside } from '../shared/press-outside';
+import { renderResults, renderColumns } from './cascader-dom';
+import type { PanelView } from './cascader-dom';
+import type { CascaderNode } from './cascader-types';
+import './cascader-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/cascader';
+
+// The node shape an app builds in TypeScript (`import type { CascaderNode } from '@pdxui/ui/cascader'`).
+export type { CascaderNode } from './cascader-types';
+
+// The selected path, the values from the root down (#481). A choice, the clear button and clear()
+// write it, and the write dispatches `value-change`; so does setting `value`, the way to set it.
+// A form submits the path, one entry per level, and resets it (#135).
+/** The path, one option's value per level. A form submits one entry per level under the name (#135). */
+@model value: string[] = [] { form };
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
+/** Fired when the clear button or `clear()` empties the path, after its `value-change`. */
+@event 'pdx-clear': void;
+/** Fired when `loadChildren` rejects; the branch stays askable and can be clicked again. */
+@event 'pdx-load-error': { node: CascaderNode; error: unknown };
+// The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+// from them. The trigger carries no state class.
+@state open = isOpen;
+@state disabled = !!disabled;
+@state loading = loadingSet.size > 0;
+// Every element is built by the script, a frame after mount (cascader-dom.ts draws the panel).
+@part(external) root, clear, popup, search, list, option, spinner;
+// The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+// The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
+@generic T extends { value: string; label: string };
+/** Tree of options */
+@prop options: T[] = [];
+/** Placeholder text */
+@prop placeholder: string = '';
+/** Accessible name (aria-label) for the trigger; falls back to placeholder */
+@prop label: string = '';
+/** Show search input for filtering */
+@prop searchable: boolean = false;
+/** Separator for display text (default: ' / ') */
+@prop separator: string = ' / ';
+/** Clearable */
+@prop clearable: boolean = true;
+/** Disabled */
+@prop disabled: boolean = false;
+/** Allow selecting non-leaf nodes */
+@prop changeOnSelect: boolean = false;
+/** Lazy load function: (node) => Promise<CascaderNode[]> */
+@prop loadChildren: ((...args: unknown[]) => unknown) | null = null;
+/** Form field name */
+@prop name: string = '';
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+// A first-column node, or one of a later column through `children`, written out because the
+// editor pastes the signature where no alias is in scope. A recursive node type collapses to `T`.
+@slot option?: (node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean);
+// The host is the one submitter (#135), in FormData under its `name` (#133).
+@host el { :name="name || null" }
+
+// Imperative API (#287): the popup is driven by the overlay verbs, which replace the undeclared
+// openCascader/closeCascader; the path is the model, `el.value`, which replaces getValue/setValue.
+@expose getLabels, clear, show, close, toggle;
+
+let isOpen = $signal(false);
+let activePath = $signal<string[]>([]);
+let searchText = $signal('');
+let loadingSet = $signal<Set<string>>(new Set());
+let domReady = $signal(false);
+/** The column the keyboard is in; its active option is `activePath[cursorLevel]`. */
+let cursorLevel = $signal(0);
+/** The search result the keyboard is on, -1 for none. */
+let searchCursor = $signal(-1);
+/** The keyboard is driving: only then is the active option drawn with a ring (a click is not). */
+let kbd = $signal(false);
+
+// DOM refs
+let triggerEl: HTMLElement | null = null;
+let textEl: HTMLElement | null = null;
+const panelId = generatedId('pdx-cascader-panel');
+let panelEl: HTMLElement | null = null;
+let panelContentEl: HTMLElement | null = null;
+let searchInputEl: HTMLInputElement | null = null;
+let clearEl: HTMLButtonElement | null = null;
+let iconEl: HTMLElement | null = null;
+let popover: ReturnType<typeof usePopover> | null = null;
+/** Removes the press-outside listener, added when the panel opens (#427). */
+let outsideDispose: (() => void) | null = null;
+
+function getOptions(): CascaderNode[] {
+  return (options as unknown as CascaderNode[]) || [];
+}
+
+/** The selected path: the model, read where it is used. (The TypeScript version kept a copy that only
+ *  a non-empty value replaced, so a parent emptying `value` left the old path on show.) */
+function getValuePath(): string[] {
+  const path = value as string[];
+  return Array.isArray(path) ? path : [];
+}
+
+function resolvePathNodes(path: string[]): CascaderNode[] {
+  const nodes: CascaderNode[] = [];
+  let current = getOptions();
+  for (const val of path) {
+    const found = current.find(n => n.value === val);
+    if (!found) break;
+    nodes.push(found);
+    current = found.children || [];
+  }
+  return nodes;
+}
+
+function displayText(): string {
+  const path = getValuePath();
+  if (path.length === 0) return '';
+  const sep = (separator as string) || ' / ';
+  const nodes = resolvePathNodes(path);
+  return nodes.map(n => n.label).join(sep);
+}
+
+function getColumns(): { items: CascaderNode[]; activeValue: string }[] {
+  const path = activePath.peek();
+  const cols: { items: CascaderNode[]; activeValue: string }[] = [];
+  let current = getOptions();
+  cols.push({ items: current, activeValue: path[0] || '' });
+  for (let i = 0; i < path.length; i++) {
+    const node = current.find(n => n.value === path[i]);
+    if (!node || !node.children || node.children.length === 0) break;
+    current = node.children;
+    cols.push({ items: current, activeValue: path[i + 1] || '' });
+  }
+  return cols;
+}
+
+function flattenPaths(nodes: CascaderNode[], path: CascaderNode[] = []): { path: CascaderNode[]; labels: string }[] {
+  const results: { path: CascaderNode[]; labels: string }[] = [];
+  for (const node of nodes) {
+    const current = [...path, node];
+    if (node.children && node.children.length > 0) {
+      results.push(...flattenPaths(node.children, current));
+    } else {
+      results.push({ path: current, labels: current.map(n => n.label).join(' / ') });
+    }
+  }
+  return results;
+}
+
+/** The search results, each a path of nodes: what the search list renders and the keys walk. */
+function searchResults(): { path: CascaderNode[]; labels: string }[] {
+  const q = searchText.peek().toLowerCase();
+  return flattenPaths(getOptions()).filter(p => p.labels.toLowerCase().includes(q));
+}
+
+// ─── Keyboard: APG combobox + listbox over the columns ──────
+// Focus stays on the combobox (or
+// the search input), which points at the active option with aria-activedescendant.
+
+const enabled = (n: CascaderNode) => !n.disabled;
+
+function hasChildren(node: CascaderNode): boolean {
+  if (node.children && node.children.length > 0) return true;
+  return !!loadChildren.peek() && !node.children && node.isLeaf !== true;
+}
+
+function cursorNode(): CascaderNode | undefined {
+  const level = cursorLevel.peek();
+  return getColumns()[level]?.items.find(n => n.value === activePath.peek()[level]);
+}
+
+function moveInColumn(to: 1 | -1 | 'first' | 'last'): void {
+  const level = cursorLevel.peek();
+  const items = (getColumns()[level]?.items ?? []).filter(enabled);
+  if (items.length === 0) return;
+  const at = items.findIndex(n => n.value === activePath.peek()[level]);
+  const target = to === 'first' ? 0
+    : to === 'last' ? items.length - 1
+      : at < 0 ? 0 : Math.max(0, Math.min(items.length - 1, at + to));
+  activePath = [...activePath.peek().slice(0, level), items[target].value];
+}
+
+function enterChild(): void {
+  const node = cursorNode();
+  if (!node || node.disabled) return;
+  const level = cursorLevel.peek();
+  const first = node.children?.find(enabled);
+  if (first) {
+    activePath = [...activePath.peek().slice(0, level + 1), first.value];
+    cursorLevel = level + 1;
+  } else if (hasChildren(node)) {
+    void onItemClick(node, level);   // lazy: load; ArrowRight again enters
+  }
+}
+
+function backToParent(): void {
+  const level = cursorLevel.peek();
+  if (level === 0) return;
+  activePath = activePath.peek().slice(0, level);
+  cursorLevel = level - 1;
+}
+
+/** Enter/Space on the active option: a leaf is selected, as a click would; a branch is entered,
+ *  or selected with change-on-select. */
+function commitCursor(): void {
+  const node = cursorNode();
+  if (!node || node.disabled) return;
+  const path = activePath.peek().slice(0, cursorLevel.peek() + 1);
+  if (!hasChildren(node)) { selectValue(path); closePopover(); return; }
+  if (changeOnSelect.peek()) { selectValue(path); return; }
+  enterChild();
+}
+
+function moveInResults(to: 1 | -1 | 'first' | 'last'): void {
+  const results = searchResults();
+  const usable = results.map((r, i) => (r.path.some(n => n.disabled) ? -1 : i)).filter(i => i >= 0);
+  if (usable.length === 0) return;
+  const at = usable.indexOf(searchCursor.peek());
+  const target = to === 'first' ? 0
+    : to === 'last' ? usable.length - 1
+      : at < 0 ? 0 : Math.max(0, Math.min(usable.length - 1, at + to));
+  searchCursor = usable[target];
+}
+
+/** The keys of the open panel. True when the key was handled. */
+function onOpenKey(e: KeyboardEvent): boolean {
+  const inResults = !!(searchable.peek() && searchText.peek());
+  if (e.key !== 'Tab' && e.key !== 'Shift') kbd = true;
+  switch (e.key) {
+    case 'ArrowDown': inResults ? moveInResults(1) : moveInColumn(1); return true;
+    case 'ArrowUp': inResults ? moveInResults(-1) : moveInColumn(-1); return true;
+    case 'Home': inResults ? moveInResults('first') : moveInColumn('first'); return true;
+    case 'End': inResults ? moveInResults('last') : moveInColumn('last'); return true;
+    case 'ArrowRight': if (inResults) return false; enterChild(); return true;
+    case 'ArrowLeft': if (inResults) return false; backToParent(); return true;
+    case 'Enter': {
+      if (!inResults) { commitCursor(); return true; }
+      const hit = searchResults()[searchCursor.peek()];
+      if (hit) onSearchSelect(hit.path);
+      return true;
+    }
+    case 'Escape': closePopover(); triggerEl?.focus(); return true;
+    default: return false;
+  }
+}
+
+function openPopover(fromKeyboard = false): void {
+  if (disabled.peek()) return;
+  const wasOpen = isOpen.peek();
+  const path = [...getValuePath()];
+  // From the keyboard, an empty cascader opens on its first option, so there is one to move from.
+  if (fromKeyboard && path.length === 0) {
+    const first = getOptions().find(enabled);
+    if (first) path.push(first.value);
+  }
+  activePath = path;
+  cursorLevel = Math.max(0, path.length - 1);
+  searchCursor = -1;
+  kbd = fromKeyboard;
+  isOpen = true;
+  // Close on a press outside, listened for from now (#427). A reopen replaces the listener.
+  outsideDispose?.();
+  outsideDispose = onPressOutside({
+    inside: (t) => el.contains(t),
+    outside: () => closePopover(),
+  });
+  // Announced when it changes (#287): opening an open panel again only resets it.
+  if (!wasOpen) openChange({ value: true });
+}
+
+// Teardown on destroy: otherwise an unmount with the popover open would
+// leave the mousedown on document orphaned forever.
+onDestroy(() => {
+  outsideDispose?.(); outsideDispose = null;
+  // Its scroll/resize listeners and ResizeObserver go with the component.
+  popover?.dispose();
+  popover = null;
+});
+
+function closePopover(): void {
+  const wasOpen = isOpen.peek();
+  isOpen = false;
+  searchText = '';
+  if (searchInputEl) searchInputEl.value = '';
+  outsideDispose?.(); outsideDispose = null;
+  // Announced when it changes (#287): the clear button closes a panel that may not be open.
+  if (wasOpen) openChange({ value: false });
+}
+
+function togglePopover(): void {
+  if (isOpen.peek()) closePopover(); else openPopover();
+}
+
+function selectValue(path: string[]): void {
+  value = [...path];
+}
+
+async function onItemClick(node: CascaderNode, level: number): Promise<void> {
+  if (node.disabled) return;
+  const path = activePath.peek().slice(0, level);
+  path.push(node.value);
+  activePath = path;
+
+  // Lazy load children
+  const loadFn = loadChildren.peek() as ((node: CascaderNode) => Promise<CascaderNode[]>) | null;
+  if (loadFn && !node.children && node.isLeaf !== true) {
+    const adding = new Set(loadingSet.peek());
+    adding.add(node.value);
+    loadingSet = adding;
+    try {
+      const children = await loadFn(node);
+      node.children = children;
+    } catch (error) {
+      // Not cached, and not swallowed — as pdx-tree-select does: an unreachable
+      // branch and an empty one look identical, so the failure is announced and the
+      // node stays askable. It does not escape as an unhandled rejection.
+      pdxLoadError({ node, error });
+    } finally {
+      const s = new Set(loadingSet.peek());
+      s.delete(node.value);
+      loadingSet = s;
+    }
+    // No active-path write here. The loading change above re-renders the columns from the
+    // active path as it is now, children included. Setting the path captured at the click
+    // would take the user back to this branch when it settles after they have clicked
+    // another one. The children stay on the node, so coming back to it lists them.
+    return;
+  }
+
+  // Select if leaf or changeOnSelect
+  const isLeaf = !node.children || node.children.length === 0;
+  if (isLeaf || changeOnSelect.peek()) {
+    selectValue(path);
+    if (isLeaf) closePopover();
+  }
+}
+
+function onClear(e: Event): void {
+  e.stopPropagation();
+  value = [];
+  pdxClear();
+  closePopover();
+}
+
+function onSearchSelect(pathNodes: CascaderNode[]): void {
+  const path = pathNodes.map(n => n.value);
+  selectValue(path);
+  closePopover();
+}
+
+/** The labels of the current path, from the root down. */
+function getLabels(): string[] { return resolvePathNodes(value.peek() ?? []).map(n => n.label); }
+function clear() { value = []; pdxClear(); }
+/** Open the popup. */
+function show() { openPopover(); }
+/** Close the popup. */
+function close() { closePopover(); }
+/** Open the popup when closed, close it when open. */
+function toggle() { togglePopover(); }
+
+// Build DOM once, a frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  const isDisabled = disabled.peek() as boolean;
+  const isClearable = clearable.peek() as boolean;
+  const ph = (placeholder.peek() as string) || getComponentString('cascader', 'placeholder')();
+
+  triggerEl = document.createElement('div');
+  // No state class: `disabled` is the host's :state(disabled) (#287).
+  triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap';
+  triggerEl.setAttribute('data-part', 'root');
+  triggerEl.setAttribute('role', 'combobox');
+  triggerEl.setAttribute('aria-expanded', 'false');
+  triggerEl.setAttribute('aria-haspopup', 'listbox');
+  // An accessible name + aria-controls pointing at the panel (role=combobox requires it).
+  triggerEl.setAttribute('aria-label', (label.peek() as string) || ph);
+  triggerEl.setAttribute('aria-controls', panelId);
+  triggerEl.setAttribute('tabindex', isDisabled ? '-1' : '0');
+  triggerEl.addEventListener('click', () => {
+    if (isOpen.peek()) closePopover(); else openPopover();
+  });
+  triggerEl.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.target !== triggerEl) return;   // the clear button keeps its own keys
+    if (!isOpen.peek()) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPopover(true); }
+      return;
+    }
+    if (e.key === ' ') { e.preventDefault(); commitCursor(); return; }
+    if (e.key === 'Tab') { closePopover(); return; }
+    if (onOpenKey(e)) e.preventDefault();
+  });
+
+  textEl = document.createElement('span');
+  textEl.className = 'pdx-cascader-text pdx-cascader-placeholder';
+  textEl.textContent = ph;
+  triggerEl.appendChild(textEl);
+
+  if (isClearable) {
+    clearEl = document.createElement('button') as HTMLButtonElement;
+    clearEl.type = 'button';
+    clearEl.className = 'pdx-input-clear';
+    clearEl.setAttribute('data-part', 'clear');
+    clearEl.textContent = '×';
+    uiAttr(clearEl, 'aria-label', () => uiString('cascader', 'clear'));
+    clearEl.style.display = 'none';
+    clearEl.addEventListener('click', onClear);
+    triggerEl.appendChild(clearEl);
+  }
+
+  iconEl = document.createElement('span');
+  iconEl.className = 'pdx-cascader-icon';
+  iconEl.textContent = '▾';
+  triggerEl.appendChild(iconEl);
+
+  el.appendChild(triggerEl);
+
+  panelEl = document.createElement('div');
+  panelEl.className = 'pdx-cascader-panel';
+  panelEl.setAttribute('data-part', 'popup');
+  panelEl.id = panelId;
+  panelEl.style.display = 'none';
+
+  if (searchable.peek()) {
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'pdx-cascader-search';
+    const input = document.createElement('input');
+    searchInputEl = input;
+    input.type = 'text';
+    input.setAttribute('data-part', 'search');
+    input.placeholder = getComponentString('cascader', 'search')();
+    // A name, not only a placeholder; the arrows walk the results or the columns from here.
+    uiAttr(input, 'aria-label', () => uiString('cascader', 'searchLabel'));
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-controls', panelId);
+    input.addEventListener('input', () => {
+      searchCursor = -1;
+      searchText = input.value;
+    });
+    input.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (onOpenKey(e)) e.preventDefault();
+    });
+    searchWrap.appendChild(input);
+    panelEl.appendChild(searchWrap);
+  }
+
+  panelContentEl = document.createElement('div');
+  panelContentEl.className = 'pdx-cascader-content';
+  panelEl.appendChild(panelContentEl);
+
+  el.appendChild(panelEl);
+
+  // Positioned by usePopover, `fixed` against the viewport, as pdx-select and
+  // pdx-tree-select do — an `absolute` panel obeys the overflow of any box it sits in and
+  // gets cut. Positioning only: opening, closing and dismissal stay here.
+  popover = usePopover({
+    trigger: 'manual',
+    placement: 'bottom-start',
+    flip: true,
+    dismissOnOutside: false,
+    dismissOnEscape: false,
+    container: el,
+  });
+  popover.setTrigger(triggerEl);
+  popover.setContent(panelEl);
+
+  domReady = true;
+});
+
+// Reactive: update trigger text + panel
+$effect(() => {
+  if (!domReady) return;
+  const openNow = isOpen as boolean;
+  void activePath;
+  const cursorNow = cursorLevel as number;
+  const resultNow = searchCursor as number;
+  const kbdNow = kbd as boolean;
+  const searchNow = searchText as string;
+  const loadingNow = loadingSet as Set<string>;
+  const display = displayText();
+  const isClearable = clearable as boolean;
+  const isDisabled = disabled as boolean;
+  const isSearchable = searchable as boolean;
+  const ph = (placeholder as string) || getComponentString('cascader', 'placeholder')();
+
+  // Update trigger text
+  if (textEl) {
+    textEl.textContent = display || ph;
+    textEl.className = 'pdx-cascader-text' + (display ? '' : ' pdx-cascader-placeholder');
+  }
+  if (clearEl) {
+    clearEl.style.display = (isClearable && display && !isDisabled) ? '' : 'none';
+  }
+  if (triggerEl) {
+    triggerEl.setAttribute('aria-expanded', String(openNow));
+    // Out of the tab order while disabled — set after the mount too, as the state is.
+    triggerEl.setAttribute('tabindex', isDisabled ? '-1' : '0');
+  }
+
+  if (!panelEl || !panelContentEl) return;
+  panelEl.style.display = openNow ? '' : 'none';
+  if (openNow) popover?.open(); else popover?.close();
+  /** The combobox and the search input both point at the option the keyboard is on. */
+  const pointAt = (id: string | null) => {
+    for (const owner of [triggerEl, searchInputEl]) {
+      if (!owner) continue;
+      if (id) owner.setAttribute('aria-activedescendant', id);
+      else owner.removeAttribute('aria-activedescendant');
+    }
+  };
+  if (!openNow) { pointAt(null); return; }
+
+  // Focus search input when panel opens
+  if (searchInputEl && openNow) {
+    const input = searchInputEl;
+    setTimeout(() => input.focus(), 0);
+  }
+
+  // Rebuild only the content area (search input is persistent)
+  panelContentEl.innerHTML = '';
+  const snippet = option;
+  const view: PanelView = {
+    panelId,
+    kbd: kbdNow,
+    loading: loadingNow,
+    optionSnippet: snippet ? (node, level, selected) => snippet(node as unknown as T, level, selected) : undefined,
+    onSearchSelect,
+    onColumnClick: (node, level) => { kbd = false; cursorLevel = level; void onItemClick(node, level); },
+  };
+
+  // Search mode: show flat results; column mode otherwise.
+  pointAt(isSearchable && searchNow
+    ? renderResults(panelContentEl, searchResults(), resultNow, view)
+    : renderColumns(panelContentEl, getColumns(), cursorNow, view));
+});
+</script>

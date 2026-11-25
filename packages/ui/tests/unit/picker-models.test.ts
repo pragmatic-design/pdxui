@@ -16,7 +16,7 @@ import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
 import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
-import '../../src/cascader/pdx-cascader';
+import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';

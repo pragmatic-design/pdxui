@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
-import '../../src/cascader/pdx-cascader';
+import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';

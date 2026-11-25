@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
-import '../../src/cascader/pdx-cascader';
+import '../../src/cascader/pdx-cascader.pdx';
 
 describe('pdx-cascader', () => {
     beforeEach(cleanup);
@@ -73,6 +73,18 @@ describe('pdx-cascader', () => {
         const el = await mountCascader({ value: ['europe', 'italy', 'rome'] });
         const text = el.querySelector('.pdx-cascader-text');
         expect(text?.textContent).toBe('Europe / Italy / Rome');
+    });
+
+    // A parent that empties `value` — a form reset, a "clear filters" button — empties the trigger,
+    // as `clear()` does. The component kept a copy of the path that only a non-empty value replaced,
+    // so the old path stayed on show (#1210).
+    it('an empty value from outside clears the display text', async () => {
+        const el = await mountCascader({ value: ['europe', 'italy', 'rome'], placeholder: 'Select location' });
+        el.value = [];
+        await tick(50);
+        const text = el.querySelector('.pdx-cascader-text');
+        expect(text?.textContent).toBe('Select location');
+        expect(el.getLabels()).toEqual([]);
     });
 
     it('uses custom separator', async () => {

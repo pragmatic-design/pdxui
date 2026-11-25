@@ -1,0 +1,399 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCascader",
+  "tagName": "pdx-cascader",
+  "category": "Specialized Inputs",
+  "order": 41,
+  "description": "A multi-level drill-down selector: each choice opens the next column of children, as in Country,\nthen Region, then City.",
+  "generics": [
+    "T extends { value: string; label: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "options",
+      "description": "Tree of options",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name (aria-label) for the trigger; falls back to placeholder",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "searchable",
+      "description": "Show search input for filtering",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "searchable"
+    },
+    {
+      "kind": "field",
+      "name": "separator",
+      "description": "Separator for display text (default: ' / ')",
+      "type": {
+        "text": "string"
+      },
+      "default": "' / '",
+      "attribute": "separator"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Clearable",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "changeOnSelect",
+      "description": "Allow selecting non-leaf nodes",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "changeonselect"
+    },
+    {
+      "kind": "field",
+      "name": "loadChildren",
+      "description": "Lazy load function: (node) => Promise<CascaderNode[]>",
+      "type": {
+        "text": "((...args: unknown[]) => unknown) | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The path, one option's value per level. A form submits one entry per level under the name (#135).",
+      "type": {
+        "text": "string[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "method",
+      "name": "getLabels",
+      "parameters": [],
+      "description": "The labels of the current path, from the root down."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the popup."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the popup."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Open the popup when closed, close it when open."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "labels": "$event.currentTarget.getLabels()"
+  },
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the clear button or `clear()` empties the path, after its `value-change`."
+    },
+    {
+      "name": "pdx-load-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.",
+      "detail": "{ node: CascaderNode; error: unknown }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string[] }"
+    }
+  ],
+  "roles": [
+    "combobox",
+    "listbox",
+    "option",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name (aria-label) for the trigger; falls back to placeholder",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "searchable",
+      "fieldName": "searchable",
+      "description": "Show search input for filtering",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "separator",
+      "fieldName": "separator",
+      "description": "Separator for display text (default: ' / ')",
+      "type": {
+        "text": "string"
+      },
+      "default": "' / '"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Clearable",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "changeonselect",
+      "fieldName": "changeOnSelect",
+      "description": "Allow selecting non-leaf nodes",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "CascaderNode",
+      "fields": [
+        "value: string",
+        "label: string",
+        "children?: CascaderNode[]",
+        "isLeaf?: boolean",
+        "disabled?: boolean"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "option",
+      "description": "Renders one option in a column: a snippet `option(node, level, selected)`.",
+      "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The trigger, the combobox: the frame, its border and background."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable`, something is chosen and not `disabled`."
+    },
+    {
+      "name": "popup",
+      "description": "The floating panel that holds the columns, or the search results."
+    },
+    {
+      "name": "search",
+      "description": "The search field atop the panel, while `searchable`."
+    },
+    {
+      "name": "list",
+      "description": "A column, or the list of search results: a `role=\"listbox\"`."
+    },
+    {
+      "name": "option",
+      "description": "An option of a column, or a search result."
+    },
+    {
+      "name": "spinner",
+      "description": "The spinner of a branch being fetched by `loadChildren`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-input-border-color",
+      "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-focus",
+      "description": "The frame's border while focused (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-width",
+      "description": "The frame's bottom border, in the filled input style."
+    },
+    {
+      "name": "--pdx-input-focus-ring",
+      "description": "The ring around the frame while focused."
+    },
+    {
+      "name": "--pdx-input-min-height",
+      "description": "The frame's height, at the md size."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "The popup is open."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "loading",
+      "description": "A branch's children are being fetched by `loadChildren`."
+    }
+  ]
+}
