@@ -18,7 +18,7 @@ import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
-import '../../src/transfer/pdx-transfer';
+import '../../src/transfer/pdx-transfer.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
 import '../../src/mention/pdx-mention.pdx';
 import '../../src/date-picker/pdx-date-picker';

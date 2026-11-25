@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/tree-select/pdx-tree-select';
-import '../../src/transfer/pdx-transfer';
+import '../../src/transfer/pdx-transfer.pdx';
 
 beforeEach(cleanup);
 

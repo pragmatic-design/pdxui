@@ -549,17 +549,17 @@ placeholders, filled at render: keep them in the translation.
 | `toast` | `dismiss` | `Dismiss` | `@pdxui/ui/src/shared/i18n.ts` |
 | `toolbar` | `label` | `Toolbar` | `@pdxui/ui/src/shared/i18n.ts` |
 | `transfer` | `label` | `Transfer` | `@pdxui/ui/src/shared/i18n.ts` |
-| `transfer` | `moveAllLeft` | `Move all to source` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `moveAllRight` | `Move all to target` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `moveLeft` | `Move to source` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `moveRight` | `Move to target` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `noData` | `No data` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `noMatch` | `No match` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `search` | `Search` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `searchIn` | `Search {list}` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `selectAll` | `Select all` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `source` | `Source` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
-| `transfer` | `target` | `Target` | `@pdxui/ui/src/transfer/pdx-transfer.ts` |
+| `transfer` | `moveAllLeft` | `Move all to source` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `moveAllRight` | `Move all to target` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `moveLeft` | `Move to source` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `moveRight` | `Move to target` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `noData` | `No data` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `noMatch` | `No match` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `search` | `Search` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `searchIn` | `Search {list}` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `selectAll` | `Select all` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `source` | `Source` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
+| `transfer` | `target` | `Target` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
 | `tree-select` | `noData` | `No data` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
 | `tree-select` | `noMatch` | `No match` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
 | `tree-select` | `placeholder` | `Select...` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |

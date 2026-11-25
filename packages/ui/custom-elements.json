@@ -32940,7 +32940,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/transfer/pdx-transfer.ts",
+      "path": "src/transfer/pdx-transfer.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -33158,19 +33158,19 @@
           },
           "events": [
             {
+              "name": "pdx-clear",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the value is cleared."
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string[] }"
-            },
-            {
-              "name": "pdx-clear",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value is cleared."
             }
           ],
           "roles": [
@@ -33356,7 +33356,7 @@
           "name": "pdx-transfer",
           "declaration": {
             "name": "PdxTransfer",
-            "module": "src/transfer/pdx-transfer.ts"
+            "module": "src/transfer/pdx-transfer.pdx"
           }
         }
       ]

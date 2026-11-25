@@ -1,0 +1,407 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTransfer",
+  "tagName": "pdx-transfer",
+  "category": "Specialized Inputs",
+  "order": 39,
+  "description": "A dual-list shuttle: the user moves items between a source list and a target list, with search,\nselect-all and disabled items, and the chosen values take part in a form.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "All items — array of { value, label, disabled? }",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource or raw array of objects",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "Field to use as item label (default: 'label')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "valueField",
+      "description": "Field to use as item value/id (default: 'value')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'",
+      "attribute": "valuefield"
+    },
+    {
+      "kind": "field",
+      "name": "assignedField",
+      "description": "Field that determines left vs right panel (boolean or matched value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "assignedfield"
+    },
+    {
+      "kind": "field",
+      "name": "assignedValue",
+      "description": "Value to match against assignedField for target panel (if omitted, treats as boolean)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "assignedvalue"
+    },
+    {
+      "kind": "field",
+      "name": "mode",
+      "description": "Selection mode: 'checkbox' (default) | 'simple' (click highlight) | 'direct' (click to move)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'checkbox'",
+      "attribute": "mode"
+    },
+    {
+      "kind": "field",
+      "name": "searchable",
+      "description": "Show search input in panels",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "searchable"
+    },
+    {
+      "kind": "field",
+      "name": "sourceTitle",
+      "description": "Left panel title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "sourcetitle"
+    },
+    {
+      "kind": "field",
+      "name": "targetTitle",
+      "description": "Right panel title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "targettitle"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "showAllButtons",
+      "description": "Show \"move all\" buttons",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showallbuttons"
+    },
+    {
+      "kind": "field",
+      "name": "draggable",
+      "description": "Enable drag and drop",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "draggable"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the rows, the search fields and the move buttons.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The values of the items in the target list. A form submits one entry per value under the name (#135).",
+      "type": {
+        "text": "string[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "getChanges",
+      "parameters": [],
+      "description": "In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []."
+    },
+    {
+      "kind": "method",
+      "name": "getDirection",
+      "parameters": [],
+      "description": "The last move's direction, 'right' (to the target) or 'left'; null before any move."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-transfer-md",
+        "sm": ".pdx-transfer-sm",
+        "lg": ".pdx-transfer-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "targetValues": "$event.detail.value",
+    "changes": "$event.currentTarget.getChanges()",
+    "direction": "$event.currentTarget.getDirection()"
+  },
+  "events": [
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the value is cleared."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string[] }"
+    }
+  ],
+  "roles": [
+    "group",
+    "listbox",
+    "option"
+  ],
+  "attributes": [
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "Field to use as item label (default: 'label')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "valuefield",
+      "fieldName": "valueField",
+      "description": "Field to use as item value/id (default: 'value')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'"
+    },
+    {
+      "name": "assignedfield",
+      "fieldName": "assignedField",
+      "description": "Field that determines left vs right panel (boolean or matched value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "assignedvalue",
+      "fieldName": "assignedValue",
+      "description": "Value to match against assignedField for target panel (if omitted, treats as boolean)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "mode",
+      "fieldName": "mode",
+      "description": "Selection mode: 'checkbox' (default) | 'simple' (click highlight) | 'direct' (click to move)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'checkbox'"
+    },
+    {
+      "name": "searchable",
+      "fieldName": "searchable",
+      "description": "Show search input in panels",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "sourcetitle",
+      "fieldName": "sourceTitle",
+      "description": "Left panel title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "targettitle",
+      "fieldName": "targetTitle",
+      "description": "Right panel title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "showallbuttons",
+      "fieldName": "showAllButtons",
+      "description": "Show \"move all\" buttons",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "draggable",
+      "fieldName": "draggable",
+      "description": "Enable drag and drop",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the rows, the search fields and the move buttons.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "TransferItem",
+      "fields": [
+        "value: string",
+        "label: string",
+        "disabled?: boolean",
+        "_raw?: any"
+      ]
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, a `role=\"group\"` holding the two panels and the move buttons."
+    },
+    {
+      "name": "panel",
+      "description": "A side, the source or the target: its header, its filter and its list."
+    },
+    {
+      "name": "search",
+      "description": "A side's filter, while `searchable`; it filters, it is not the value."
+    },
+    {
+      "name": "list",
+      "description": "A side's `role=\"listbox\"`."
+    },
+    {
+      "name": "option",
+      "description": "An item of a list."
+    },
+    {
+      "name": "move",
+      "description": "A button that moves the chosen items, or all of them, to the other side."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-transfer-check-bg-selected"
+    },
+    {
+      "name": "--pdx-transfer-option-bg-selected"
+    }
+  ]
+}

@@ -13,7 +13,7 @@ import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
-import '../../src/transfer/pdx-transfer';
+import '../../src/transfer/pdx-transfer.pdx';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/calendar/pdx-calendar';

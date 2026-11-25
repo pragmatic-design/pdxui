@@ -4,7 +4,7 @@
 // text fields' own size rule, the same height as a pdx-input of that size in every theme.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/transfer/pdx-transfer';
+import '../../src/transfer/pdx-transfer.pdx';
 
 const ITEMS = [{ value: 'a', label: 'Alpha' }, { value: 'b', label: 'Beta' }];
 

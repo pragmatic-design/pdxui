@@ -110,7 +110,7 @@
       "import": "./dist/date-picker/pdx-date-picker.js"
     },
     "./transfer": {
-      "development": "./src/transfer/pdx-transfer.ts",
+      "development": "./src/transfer/pdx-transfer.pdx",
       "types": "./dist/transfer/pdx-transfer.d.ts",
       "import": "./dist/transfer/pdx-transfer.js"
     },
@@ -681,6 +681,7 @@
     "dist/search-input/search-input-icons.js",
     "dist/time-picker/time-picker-strings.js",
     "dist/toast/toast-icons.js",
+    "dist/transfer/transfer-strings.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
@@ -697,6 +698,7 @@
     "src/search-input/search-input-icons.ts",
     "src/time-picker/time-picker-strings.ts",
     "src/toast/toast-icons.ts",
+    "src/transfer/transfer-strings.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],

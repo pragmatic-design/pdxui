@@ -25,7 +25,7 @@ describe('setLocaleStrings before the components are imported', () => {
             transfer: { source: 'Origine', target: 'Destinazione', moveRight: 'Sposta a destra' },
         });
         await import('../../src/tree-select/pdx-tree-select');
-        await import('../../src/transfer/pdx-transfer');
+        await import('../../src/transfer/pdx-transfer.pdx');
         expect(getComponentString('tree-select', 'noMatch')(), 'the import did not register its defaults').toBe('No match');
 
         const host = document.createElement('div');
