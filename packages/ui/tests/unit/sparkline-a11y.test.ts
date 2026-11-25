@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/chart/pdx-sparkline';
+import '../../src/chart/pdx-sparkline.pdx';
 
 const name = (el: HTMLElement): string => el.getAttribute('aria-label') ?? '';
 

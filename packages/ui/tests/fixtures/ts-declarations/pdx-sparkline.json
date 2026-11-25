@@ -1,0 +1,152 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSparkline",
+  "tagName": "pdx-sparkline",
+  "category": "Data-bound",
+  "order": 115,
+  "description": "A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip\nor legend.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "data",
+      "description": "Comma-separated values or array",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "data"
+    },
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Chart type: line, area, bar",
+      "type": {
+        "text": "string"
+      },
+      "default": "'line'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "width",
+      "description": "Width (CSS)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'120px'",
+      "attribute": "width"
+    },
+    {
+      "kind": "field",
+      "name": "height",
+      "description": "Height (CSS)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'32px'",
+      "attribute": "height"
+    },
+    {
+      "kind": "field",
+      "name": "color",
+      "description": "Line/fill color (CSS color or design token name)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "color"
+    },
+    {
+      "kind": "field",
+      "name": "smooth",
+      "description": "Smooth line",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "smooth"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name. Empty: the series in words, from the data.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "data",
+      "fieldName": "data",
+      "description": "Comma-separated values or array",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Chart type: line, area, bar",
+      "type": {
+        "text": "string"
+      },
+      "default": "'line'"
+    },
+    {
+      "name": "width",
+      "fieldName": "width",
+      "description": "Width (CSS)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'120px'"
+    },
+    {
+      "name": "height",
+      "fieldName": "height",
+      "description": "Height (CSS)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'32px'"
+    },
+    {
+      "name": "color",
+      "fieldName": "color",
+      "description": "Line/fill color (CSS color or design token name)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "smooth",
+      "fieldName": "smooth",
+      "description": "Smooth line",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name. Empty: the series in words, from the data.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "canvas",
+      "description": "The canvas the trend is drawn on."
+    }
+  ]
+}
