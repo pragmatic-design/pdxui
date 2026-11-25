@@ -14,7 +14,7 @@ import '../../src/data-grid/grid-i18n';
 import { dialog } from '../../src/dialog/dialog-service';
 import '../../src/overlay/pdx-overlay-outlet';
 import '../../src/alert-dialog/pdx-alert-dialog.pdx';
-import '../../src/command/pdx-command';
+import '../../src/command/pdx-command.pdx';
 import '../../src/empty-state/pdx-empty-state.pdx';
 import '../../src/list/pdx-list.pdx';
 import '../../src/search-input/pdx-search-input.pdx';

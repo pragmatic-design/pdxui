@@ -98,6 +98,20 @@ describe('the roles a .pdx script writes', () => {
         expect(roles('h/pdx-h.pdx')).toEqual(['toolbar']);
         expect(roles('k/pdx-k.pdx')).toEqual(['group', 'radiogroup']);
     });
+
+    // A script `@snippet` is a template the component renders with `@render`; the analysis takes it
+    // out of the body, and its roles were lost: pdx-command draws each option in one (#1210, #1412).
+    it('are read in a script @snippet, as in the template', () => {
+        write('s/pdx-s.pdx', [
+            '<template><div role="listbox">@render optionRow(\'a\')</div></template>',
+            '<script>',
+            '@snippet optionRow(label: string) { <div role="option">{{ label }}</div> }',
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 's/pdx-s.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect((mod.declarations[0].roles as string[]).sort()).toEqual(['listbox', 'option']);
+    });
 });
 
 // A module beside the component is part of it, as gen-manifest reads a TypeScript component's: the

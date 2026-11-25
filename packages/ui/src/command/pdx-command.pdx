@@ -1,0 +1,319 @@
+<template>
+  <div class="pdx-command-backdrop" data-part="backdrop" @click="closePalette"></div>
+  <div class="pdx-command" data-part="root" role="dialog" aria-modal="true" :aria-label="uiString('command', 'palette')">
+    <div class="pdx-command-input">
+      <span class="pdx-command-search-icon" aria-hidden="true">&#8981;</span>
+      <input type="text" data-part="input"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+        :placeholder="resolvedPlaceholder()"
+        ::value="{ get: () => query, set: (text) => search(text) }"
+        @keydown="onKeydown"
+        role="combobox"
+        :aria-label="placeholder || uiString('command', 'search')"
+        aria-expanded="true"
+        aria-autocomplete="list"
+        :aria-activedescendant="activeDescendant()"
+        :aria-controls="open ? listId : null" />
+      <kbd class="pdx-command-kbd">ESC</kbd>
+    </div>
+    <!-- The live region OUTSIDE the listbox: role=status is not an allowed child of role=listbox
+         (axe aria-required-children). It stays a sibling and announces the count all the same.
+         Empty while the palette is closed: a status region speaks only when it has something to
+         say (A4, #288). -->
+    <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">{{ statusText() }}</span>
+    <!-- The input is the list's one tab stop: options are divs it points at with
+         aria-activedescendant, not <button>s, which would each be a tab stop.
+         A named group is a role="group" labelled by its heading. -->
+    <div class="pdx-command-list" data-part="list" :id="listId" role="listbox" :aria-label="uiString('command', 'commands')">
+      @if (filteredItems.length === 0) {
+        <div class="pdx-command-empty" data-part="empty">{{ resolvedEmpty() }}</div>
+      } @else {
+        @for (groupedItems as g; track g.name) {
+          @if (g.name) {
+            <div role="group" data-part="group" :aria-labelledby="groupId(g.index)">
+              <span class="pdx-command-group" :id="groupId(g.index)" aria-hidden="true">{{ g.name }}</span>
+              @for (g.rows as row; track row.index) {
+                @render optionRow(row)
+              }
+            </div>
+          } @else {
+            @for (g.rows as row; track row.index) {
+              @render optionRow(row)
+            }
+          }
+        }
+      }
+    </div>
+    <div class="pdx-command-footer" data-part="footer">
+      <span><kbd>↑↓</kbd> {{ uiString('command', 'navigate') }}</span>
+      <span><kbd>↵</kbd> {{ uiString('command', 'select') }}</span>
+      <span><kbd>ESC</kbd> {{ uiString('command', 'close') }}</span>
+    </div>
+  </div>
+</template>
+
+<script>
+/**
+ * A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with
+ * `show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted
+ * command is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is
+ * announced as `aria-keyshortcuts`.
+ * @slot item - Renders one command: a snippet `item(item, index, active)`.
+ */
+// pdx-command — Command palette (Cmd+K search dialog).
+// Keyboard-driven: Ctrl/Cmd+K to open, Escape to close, arrow keys to navigate, Enter to select.
+// Features: fuzzy filter, grouped items, keyboard shortcuts display, empty state, focus trap.
+// Uses overlayStack for z-index coordination + Escape handling.
+import { overlayStack, focusTrap, generatedId } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import type { CommandItem } from './command-types';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/command';
+
+export type { CommandItem } from './command-types';
+
+// `open` is a model (#288): the palette opens and closes itself — the hotkey, Escape, the backdrop, a
+// chosen command — and its own writes announce `open-change` `{ value }`, which `::open` follows. It
+// replaced `pdx-open` and `pdx-close`.
+@model open: boolean = false;
+/** The chosen item itself, after its own `action` (if any) has run. */
+@event 'pdx-select': CommandItem;
+// On the host as a custom state (#132, #288): command.css draws the panel and backdrop from it.
+@state open = open;
+@part root, backdrop, input, list, group, option, empty, footer;
+// The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+@generic T extends { label: string };
+/** The search input's placeholder. Empty: the command.placeholder component string, «Type a command...». */
+@prop placeholder: string = '';
+@prop items: T[] = [];
+/** The message when nothing matches. Empty: the command.empty component string, «No results found.». */
+@prop emptyText: string = '';
+/** Global keyboard shortcut to open (default: Ctrl+K / Cmd+K) */
+@prop hotkey: boolean = true;
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+@slot item?: (item: T, index: number, active: boolean);
+@host host;
+
+// Each writes the model, so each announces `open-change`. `openPalette()` and `closePalette()`, their
+// alpha aliases, are gone (#288).
+@expose show, close, toggle, isOpen;
+
+/** One command as the list draws it: the item and its position in the filtered list. */
+interface CommandRow { item: CommandItem; index: number }
+
+let query = $signal('');
+let activeIndex = $signal(0);
+let trapDispose: Dispose | null = null;
+const uid = generatedId('pdx-cmd');
+const listId = `${uid}-list`;
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(open as boolean);
+
+// Filtered items — simple case-insensitive substring match. A disabled command is listed
+// (aria-disabled) and skipped by the arrows and Enter, not dropped.
+const filteredItems = $derived((): CommandItem[] => {
+  const q = query.toLowerCase().trim();
+  const cmds = (items as unknown as CommandItem[]) || [];
+  if (!q) return cmds;
+  return cmds.filter(i => {
+    const haystack = (i.label + ' ' + (i.group || '') + ' ' + (i.keywords || '')).toLowerCase();
+    return haystack.includes(q);
+  });
+});
+
+// Group items for rendering, each command with its position in the filtered list, and each group
+// with its own: the option ids and the group headings' ids are made from them.
+const groupedItems = $derived((): { name: string; index: number; rows: CommandRow[] }[] => {
+  const map = new Map<string, CommandRow[]>();
+  filteredItems.forEach((item, index) => {
+    const g = item.group || '';
+    if (!map.has(g)) map.set(g, []);
+    map.get(g)!.push({ item, index });
+  });
+  const groups: { name: string; index: number; rows: CommandRow[] }[] = [];
+  for (const [name, rows] of map) groups.push({ name, index: groups.length, rows });
+  return groups;
+});
+
+/** The first enabled command of the list, or -1. */
+function firstEnabled(): number {
+  return filteredItems.findIndex(i => !i.disabled);
+}
+/** Move the highlight `dir` steps, over disabled commands, wrapping. */
+function moveActive(dir: 1 | -1): void {
+  const cmds = filteredItems;
+  const n = cmds.length;
+  let i = activeIndex as number;
+  for (let k = 0; k < n; k++) {
+    i = (i + dir + n) % n;
+    if (!cmds[i].disabled) { activeIndex = i; return; }
+  }
+}
+/** The option's id: the input points at it with aria-activedescendant. */
+const optionId = (index: number): string => `${uid}-opt-${index}`;
+/** A group's heading id: the group is labelled by it. */
+const groupId = (index: number): string => `${uid}-group-${index}`;
+/** The highlighted, enabled option's id while open; null otherwise. */
+function activeDescendant(): string | null {
+  const i = activeIndex as number;
+  const cmds = filteredItems;
+  return open && i >= 0 && i < cmds.length && !cmds[i].disabled ? optionId(i) : null;
+}
+
+// Its own writes of the model announce `open-change`; a value the parent set announces nothing.
+/** Open the palette, clearing the query and highlighting the first command that is not disabled. */
+function show() { open = true; }
+function close() { open = false; }
+function closePalette() { close(); }
+function toggle() { if (open.peek()) close(); else show(); }
+
+// Each opening starts on an empty query with the first enabled command highlighted, however it
+// was opened — the hotkey, show(), `::open`. Peeked: a tracked read of the list would subscribe this
+// to the query, and every key would wipe what was typed.
+$effect(() => {
+  if (!(open as boolean)) return;
+  query = '';
+  activeIndex = filteredItems.peek().findIndex(i => !i.disabled);
+});
+
+function selectItem(entry: CommandItem) {
+  if (entry.disabled) return;
+  close();
+  if (entry.action) entry.action();
+  pdxSelect(entry);
+}
+
+/**
+ * What was typed: the query, and the highlight back on the first enabled command. The field is bound
+ * both ways, so the query always wins over it — an opening clears both.
+ */
+function search(text: string) {
+  query = text;
+  activeIndex = firstEnabled();
+}
+
+function onKeydown(e: KeyboardEvent) {
+  const cmds = filteredItems;
+  const i = activeIndex as number;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    moveActive(1);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    moveActive(-1);
+  } else if (e.key === 'Enter' && cmds[i]) {
+    e.preventDefault();
+    selectItem(cmds[i]);
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    close();
+  }
+}
+
+/** The pointer highlights the command under it, unless it is disabled. */
+function hover(row: CommandRow) {
+  if (!row.item.disabled) activeIndex = row.index;
+}
+
+// Global hotkey: Ctrl/Cmd + K
+function onGlobalKeydown(e: KeyboardEvent) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    if (open.peek()) close();
+    else show();
+  }
+}
+
+// Hotkey registration
+$effect(() => {
+  if (hotkey as boolean) {
+    document.addEventListener('keydown', onGlobalKeydown);
+    return () => document.removeEventListener('keydown', onGlobalKeydown);
+  }
+});
+
+// Overlay stack + focus trap when open
+$effect(() => {
+  if (open as boolean) {
+    overlayStack.push(uid, { modal: true });
+    const dismissDispose = overlayStack.onDismissTop(closePalette);
+
+    requestAnimationFrame(() => {
+      const dialog = host.querySelector('.pdx-command') as HTMLElement;
+      if (dialog) {
+        trapDispose = focusTrap(dialog, { restoreFocus: true, escapeDeactivates: false });
+        const inputEl = dialog.querySelector('input');
+        if (inputEl) inputEl.focus();
+      }
+    });
+
+    return () => {
+      if (trapDispose) { trapDispose(); trapDispose = null; }
+      dismissDispose();
+      overlayStack.pop(uid);
+    };
+  }
+});
+
+// Scroll active item into view
+$effect(() => {
+  const idx = activeIndex as number;
+  if (!(open as boolean)) return;
+  requestAnimationFrame(() => {
+    const optionEl = host.querySelector(`[data-cmd-index="${idx}"]`);
+    if (optionEl) optionEl.scrollIntoView({ block: 'nearest' });
+  });
+});
+
+/** "Ctrl Shift ," → "Control+Shift+,": the aria-keyshortcuts form of a displayed shortcut. */
+function keyShortcuts(shortcut: string): string {
+  const names: Record<string, string> = { ctrl: 'Control', control: 'Control', cmd: 'Meta', '⌘': 'Meta', meta: 'Meta', shift: 'Shift', '⇧': 'Shift', alt: 'Alt', '⌥': 'Alt', option: 'Alt' };
+  return shortcut.trim().split(/[\s+]+/).filter(Boolean).map(k => names[k.toLowerCase()] ?? (k.length === 1 ? k.toUpperCase() : k)).join('+');
+}
+
+/** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
+function commandIcon(iconEl: Element, name: () => string) {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
+  const icon = document.createElement('pdx-icon');
+  icon.setAttribute('name', name());
+  icon.setAttribute('size', '15');
+  iconEl.appendChild(icon);
+  return () => icon.remove();
+}
+
+// The input's placeholder and the empty list's message, from the component strings when the
+// props are not set: English defaults here would reach every locale.
+const resolvedPlaceholder = (): string => (placeholder as string) || uiString('command', 'placeholder');
+const resolvedEmpty = (): string => (emptyText as string) || uiString('command', 'empty');
+/** What the status region says while open: how many commands can be chosen. */
+function statusText(): string {
+  if (!(open as boolean)) return '';
+  const n = filteredItems.filter(i => !i.disabled).length;
+  return n === 0 ? uiString('command', 'noResults') : format(uiString('command', 'commandsAvailable'), { n });
+}
+
+@snippet optionRow(row: CommandRow) {
+  <div :class="activeIndex === row.index ? 'pdx-command-item active' : 'pdx-command-item'"
+    role="option" data-part="option"
+    :id="optionId(row.index)"
+    :aria-selected="activeIndex === row.index ? 'true' : 'false'"
+    :aria-disabled="row.item.disabled ? 'true' : null"
+    :aria-keyshortcuts="row.item.shortcut ? keyShortcuts(row.item.shortcut) : null"
+    :data-active="activeIndex === row.index ? '' : null"
+    :data-cmd-index="row.index"
+    @click="selectItem(row.item)"
+    @mouseenter="hover(row)">
+    @render item?.(row.item, row.index, activeIndex === row.index) @else {
+      @if (row.item.icon) {
+        <span class="pdx-command-item-icon" attach:commandIcon="row.item.icon"></span>
+      }
+      <span class="pdx-command-item-label">{{ row.item.label }}</span>
+      @if (row.item.shortcut) {
+        <span class="pdx-command-item-shortcut" aria-hidden="true">{{ row.item.shortcut }}</span>
+      }
+    }
+  </div>
+}
+</script>

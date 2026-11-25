@@ -8254,7 +8254,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/command/pdx-command.ts",
+      "path": "src/command/pdx-command.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -8347,20 +8347,20 @@
           ],
           "events": [
             {
-              "name": "open-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `open`. Does not bubble.",
-              "detail": "{ value: boolean }"
-            },
-            {
               "name": "pdx-select",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "The chosen item itself, after its own `action` (if any) has run.",
               "detail": "CommandItem"
+            },
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -8479,7 +8479,7 @@
           "name": "pdx-command",
           "declaration": {
             "name": "PdxCommand",
-            "module": "src/command/pdx-command.ts"
+            "module": "src/command/pdx-command.pdx"
           }
         }
       ]
