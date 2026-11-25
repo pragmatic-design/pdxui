@@ -1,0 +1,386 @@
+<template>
+  <div class="pdx-chart-legend" data-part="legend" role="group" :aria-label="uiString('chart', 'legend')" hidden></div>
+  <div class="pdx-chart-canvas" data-part="canvas" aria-hidden="true" style="width:100%;min-height:200px"></div>
+  <div class="pdx-sr-only pdx-chart-data" :id="dataId"></div>
+  <div class="pdx-sr-only pdx-chart-live" aria-live="polite"></div>
+</template>
+
+<script>
+/**
+ * A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.
+ *
+ * @csspart legend - The legend, a group of buttons, while there is more than one series or slice.
+ * @csspart legend-item - A legend button: pressed while its series is shown.
+ * @csspart swatch - A legend button's colour.
+ * @csspart canvas - The box the chart is drawn in.
+ */
+// pdx-chart — Declarative chart Web Component.
+// Zero dependencies. Canvas-rendered. Design-token native.
+// Auto-resize, animated transitions, DataSource binding.
+import { generatedId, onDestroy } from '@pdxui/core';
+import { ChartEngine, type ChartConfig } from './core/engine';
+import { chartDataTable, chartSeries, gaugeReading, pointText, type ChartDataTable } from './core/describe';
+import { chartNumbers } from './core/numbers';
+// `format` is a prop of the chart, the gauge's value format: the string formatter is imported by
+// another name.
+import { uiString, format as formatString } from '../shared/i18n';
+import { resolveLocale } from '../shared/locale';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/chart';
+
+/** What the chart reads rows from: a DataSource's `data` signal, legacy `rows`, a `subscribe`, or an array. */
+type RowSource = {
+  data?: unknown[] | (() => unknown[]);
+  rows?: unknown[] | (() => unknown[]);
+  subscribe?: (fn: () => void) => () => void;
+};
+
+/** Chart type: line, bar, area, pie, doughnut, scatter, gauge, radar */
+@prop type: string = 'line';
+/** Data array (array of objects) */
+@prop data: unknown[] = [];
+/** X-axis field name (auto-detected if omitted) */
+@prop xField: string = '';
+/** Y-axis field name(s) — string or comma-separated */
+@prop yField: string = '';
+/** Series display names (comma-separated) */
+@prop seriesNames: string = '';
+/** Chart title */
+@prop title: string = '';
+/** Smooth line interpolation */
+@prop smooth: boolean = false;
+/** Stack series */
+@prop stacked: boolean = false;
+/** Show tooltip on hover */
+@prop tooltip: boolean = true;
+/** Show legend */
+@prop legend: boolean = true;
+/** Legend position: top, bottom, left, right */
+@prop legendPosition: string = 'top';
+/** Chart height (CSS value) */
+@prop height: string = '';
+/** X-axis label */
+@prop xAxisName: string = '';
+/** Y-axis label */
+@prop yAxisName: string = '';
+/** Right Y-axis label (dual axis) */
+@prop yAxisRightName: string = '';
+/** X-axis format: currency, percent, compact, or template '{value}%' */
+@prop xFormat: string = '';
+/** Left Y-axis format */
+@prop yFormat: string = '';
+/** Right Y-axis format */
+@prop yRightFormat: string = '';
+/** Locale the chart prints numbers in (BCP 47). Empty: the nearest `lang`, then the browser. */
+@prop locale: string = '';
+/** Currency of the `currency` format (ISO 4217, e.g. "EUR"). Empty: "USD". */
+@prop currency: string = '';
+/** Enable zoom: 'inside' (mouse wheel + drag pan) */
+@prop zoom: string = '';
+/** Advanced: per-series config JSON string */
+@prop seriesConfig: string = '';
+/** Gauge: minimum value */
+@prop min: number = 0;
+/** Gauge: maximum value */
+@prop max: number = 100;
+/** Gauge: current value (alternative to data) */
+@prop value: number = 0;
+/** Gauge: value format (e.g. "{value}%") */
+@prop format: string = '';
+/** DataSource binding (duck-typed) */
+@prop source: Record<string, unknown> | null = null;
+@part legend, canvas;
+// The legend's buttons are built by the script.
+@part(external) legend-item, swatch;
+// A figure, named; not role="img", whose children are presentational. Focusable unless it is a
+// gauge, which has no points: the arrow keys walk them, and leaving the chart drops the point.
+@host host {
+  role="figure"
+  :aria-label="figureLabel()"
+  :tabindex="type === 'gauge' ? null : '0'"
+  @keydown="onKeydown"
+  @focusout="clearFocus"
+}
+
+let engine: ChartEngine | null = null;
+let canvasHost: HTMLElement | null = null;
+const dataId = generatedId('pdx-chart-data');
+/** Series the legend has hidden: out of the drawing and out of the data table. */
+const hiddenSeries = new Set<string>();
+let table: ChartDataTable | null = null;
+/** The point the keyboard is on; -1 for none. */
+let focusIndex = -1;
+// A frame asked for by a setup a move destroyed draws nothing, as `ctx.frame` did not: it would
+// find the new render's canvas host in the same element and draw a second chart into it.
+let alive = true;
+
+// ─── The accessible layer ─────────────────────────
+// The canvas is opaque to assistive technology. Around it: a figure named by its title,
+// described by a visually hidden table of its data, a legend of real buttons, and points
+// walked with the arrow keys and announced. It was role="img" — whose children are
+// presentational — named "bar chart, 4 data points", with legend and tooltips mouse-only.
+
+const q = (sel: string) => host.querySelector(sel) as HTMLElement | null;
+
+function renderTable(config: ChartConfig): void {
+  const holder = q('.pdx-chart-data');
+  if (!holder) return;
+  table = chartDataTable(config, hiddenSeries, uiString('chart', 'category'));
+  holder.replaceChildren();
+  if (!table) { host.removeAttribute('aria-describedby'); return; }
+  const t = document.createElement('table');
+  if (config.title) t.createCaption().textContent = config.title;
+  const head = t.createTHead().insertRow();
+  for (const c of table.columns) {
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.textContent = c;
+    head.appendChild(th);
+  }
+  const body = t.createTBody();
+  for (const row of table.rows) {
+    const tr = body.insertRow();
+    row.forEach((cell, i) => {
+      const td = document.createElement(i === 0 ? 'th' : 'td');
+      if (i === 0) (td as HTMLTableCellElement).scope = 'row';
+      td.textContent = cell;
+      tr.appendChild(td);
+    });
+  }
+  holder.appendChild(t);
+  host.setAttribute('aria-describedby', dataId);
+}
+
+function renderLegend(config: ChartConfig): void {
+  const legendEl = q('.pdx-chart-legend');
+  if (!legendEl) return;
+  const items = engine?.getLegendItems?.() ?? chartSeries(config).map(s => ({ name: s.name, color: '', visible: true }));
+  const show = config.legend !== false && items.length > 1 && config.type !== 'gauge';
+  legendEl.hidden = !show;
+  legendEl.replaceChildren();
+  if (!show) return;
+  for (const item of items) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pdx-chart-legend-item';
+    btn.dataset.part = 'legend-item';
+    btn.setAttribute('aria-pressed', String(!hiddenSeries.has(item.name)));
+    const swatchEl = document.createElement('span');
+    swatchEl.className = 'pdx-chart-legend-swatch';
+    swatchEl.dataset.part = 'swatch';
+    swatchEl.setAttribute('aria-hidden', 'true');
+    if (item.color) swatchEl.style.background = item.color;
+    btn.append(swatchEl, document.createTextNode(item.name));
+    btn.addEventListener('click', () => {
+      const nowHidden = !hiddenSeries.has(item.name);
+      if (nowHidden) hiddenSeries.add(item.name); else hiddenSeries.delete(item.name);
+      btn.setAttribute('aria-pressed', String(!nowHidden));
+      engine?.setSeriesVisible?.(item.name, !nowHidden);
+      renderTable(buildConfig());
+    });
+    legendEl.appendChild(btn);
+  }
+}
+
+function announce(text: string): void {
+  const live = q('.pdx-chart-live');
+  if (live) live.textContent = text;
+}
+
+function onKeydown(e: KeyboardEvent): void {
+  if (e.target !== host || !table) return;
+  const last = table.rows.length - 1;
+  let next: number | null = null;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = Math.min(last, focusIndex + 1);
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = Math.max(0, focusIndex - 1);
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = last;
+  else if (e.key === 'Escape' && focusIndex >= 0) { e.preventDefault(); clearFocus(); return; }
+  if (next === null) return;
+  e.preventDefault();
+  focusIndex = next;
+  engine?.focusPoint?.(focusIndex);
+  announce(pointText(table, focusIndex));
+}
+
+function clearFocus(): void {
+  focusIndex = -1;
+  engine?.focusPoint?.(null);
+  announce('');
+}
+
+/**
+ * The figure's name: its title, its type and its number of points, or for a gauge its
+ * reading. The data itself is in the table that describes it (renderTable, above).
+ */
+function figureLabel(): string {
+  const heading = (title as string) || '';
+  const kind = (type as string) || 'line';
+  if (kind === 'gauge') {
+    const nf = chartNumbers(resolveLocale(host, locale as string));
+    const r = gaugeReading(value as number, min as number, max as number, (format as string) || undefined, nf);
+    return formatString(uiString('chart', 'gauge'), { label: heading || uiString('chart', 'gaugeLabel'), ...r });
+  }
+  const n = Array.isArray(data) ? (data as unknown[]).length : 0;
+  return (heading ? heading + ' — ' : '') + formatString(uiString('chart', 'summary'), { type: kind }) + (n ? formatString(uiString('chart', 'points'), { n }) : '');
+}
+
+function buildConfig(): ChartConfig {
+  const rows = (data as Record<string, unknown>[]) || [];
+  const yFields = yField as string;
+  const names = seriesNames as string;
+
+  const chartType = (type as ChartConfig['type']) || 'line';
+  const seriesConfigStr = seriesConfig as string;
+  let seriesConfigParsed: ChartConfig['series'] | undefined;
+  if (seriesConfigStr) {
+    // Not JSON: drawn without it, from the other props, as the TypeScript version did.
+    try { seriesConfigParsed = JSON.parse(seriesConfigStr); } catch { seriesConfigParsed = undefined; }
+  }
+
+  const config: ChartConfig = {
+    type: chartType,
+    data: rows,
+    xField: (xField as string) || undefined,
+    yField: yFields ? yFields.split(',').map(s => s.trim()) : undefined,
+    series: seriesConfigParsed,
+    seriesNames: names ? names.split(',').map(s => s.trim()) : undefined,
+    title: (title as string) || undefined,
+    smooth: smooth as boolean,
+    stacked: stacked as boolean,
+    tooltip: tooltip as boolean,
+    legend: legend as boolean,
+    legendPosition: (legendPosition as ChartConfig['legendPosition']) || undefined,
+    xAxisName: (xAxisName as string) || undefined,
+    yAxisName: (yAxisName as string) || undefined,
+    yAxisRightName: (yAxisRightName as string) || undefined,
+    xFormat: (xFormat as string) || undefined,
+    yFormat: (yFormat as string) || undefined,
+    yRightFormat: (yRightFormat as string) || undefined,
+    zoom: (zoom as string) === 'inside' ? 'inside' : undefined,
+    // The page's locale, not the browser's: an English page in an Italian browser
+    // would print "24.500".
+    locale: resolveLocale(host, locale as string),
+    currency: (currency as string) || undefined,
+  };
+  if (chartType === 'gauge') {
+    config.gauge = {
+      value: value as number,
+      min: min as number,
+      max: max as number,
+      format: (format as string) || undefined,
+      label: (title as string) || undefined,
+    };
+  }
+  return config;
+}
+
+// DataSource integration. createDataSource exposes `data` as a reactive signal (like
+// pdx-data-grid reads) — it has NO `rows` and NO `subscribe`, so checking only those would
+// leave the chart without rows. Support: DataSource `.data` signal,
+// legacy `.rows` (fn or array), `.subscribe`, and a plain static array.
+$effect(() => {
+  const src = source as RowSource | unknown[] | null;
+  if (!src) return;
+
+  const readRows = (): unknown[] => {
+    if (Array.isArray(src)) return src;
+    if (typeof src.data === 'function') return src.data(); // DataSource signal
+    if (Array.isArray(src.data)) return src.data;
+    if (typeof src.rows === 'function') return src.rows();
+    if (Array.isArray(src.rows)) return src.rows;
+    return [];
+  };
+
+  const apply = (rows: unknown[]) => {
+    if (!engine) return;
+    const config = buildConfig();
+    config.data = Array.isArray(rows) ? (rows as Record<string, unknown>[]) : [];
+    engine.update(config);
+  };
+
+  // Read rows NOW — for a DataSource/signal this both fetches the current value AND
+  // subscribes the effect, so future data changes re-run and repaint the chart.
+  const rows = readRows();
+  if (engine) apply(rows);
+  else requestAnimationFrame(() => apply(readRows()));
+
+  // Legacy imperative transport with no reactive signal.
+  if (!Array.isArray(src) && typeof src.data !== 'function' && typeof src.subscribe === 'function') {
+    return src.subscribe(() => apply(readRows()));
+  }
+});
+
+// Main reactive effect: rebuild chart on any prop change
+$effect(() => {
+  // Read all props to create subscriptions
+  void type;
+  void data;
+  void xField;
+  void yField;
+  void seriesNames;
+  void title;
+  void smooth;
+  void stacked;
+  void tooltip;
+  void legend;
+  void height;
+  void xAxisName;
+  void yAxisName;
+  void yAxisRightName;
+  void legendPosition;
+  void xFormat;
+  void yFormat;
+  void yRightFormat;
+  void locale;
+  void currency;
+  void seriesConfig;
+  void zoom;
+  void min;
+  void max;
+  void value;
+  void format;
+
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    if (!canvasHost) {
+      canvasHost = host.querySelector('.pdx-chart-canvas');
+      if (!canvasHost) return;
+    }
+
+    // The legend is a DOM row beside the canvas: a flex host, the legend before or after
+    // it by position. Inline, like the height below, so it holds without the design CSS.
+    const pos = (legendPosition as string) || 'top';
+    host.style.display = 'flex';
+    host.style.flexDirection = pos === 'left' || pos === 'right' ? 'row' : 'column';
+    const legendEl = q('.pdx-chart-legend');
+    if (legendEl) legendEl.style.order = pos === 'bottom' || pos === 'right' ? '2' : '';
+
+    // Apply height
+    const h = height as string;
+    if (h) {
+      canvasHost.style.height = h;
+    } else {
+      canvasHost.style.aspectRatio = '16 / 9';
+    }
+
+    if (!engine) {
+      engine = new ChartEngine(canvasHost);
+    }
+
+    // The legend is the DOM one: the canvas neither draws nor reserves one.
+    const config = buildConfig();
+    engine.update({ ...config, legend: false });
+    // An update rebuilds the series, all visible: the legend's choices are reapplied.
+    for (const name of hiddenSeries) engine.setSeriesVisible?.(name, false);
+    renderLegend(config);
+    renderTable(config);
+    if (focusIndex > (table?.rows.length ?? 0) - 1) clearFocus();
+  });
+});
+
+// destroy() on unmount: otherwise a ResizeObserver + a MutationObserver
+// on documentElement + the canvas listeners survive every unmount.
+onDestroy(() => { alive = false; engine?.destroy(); engine = null; });
+</script>

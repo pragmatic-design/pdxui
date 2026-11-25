@@ -1,0 +1,527 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxChart",
+  "tagName": "pdx-chart",
+  "category": "Data-bound",
+  "order": 114,
+  "description": "A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Chart type: line, bar, area, pie, doughnut, scatter, gauge, radar",
+      "type": {
+        "text": "string"
+      },
+      "default": "'line'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "data",
+      "description": "Data array (array of objects)",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "xField",
+      "description": "X-axis field name (auto-detected if omitted)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "xfield"
+    },
+    {
+      "kind": "field",
+      "name": "yField",
+      "description": "Y-axis field name(s) — string or comma-separated",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "yfield"
+    },
+    {
+      "kind": "field",
+      "name": "seriesNames",
+      "description": "Series display names (comma-separated)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "seriesnames"
+    },
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "Chart title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "smooth",
+      "description": "Smooth line interpolation",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "smooth"
+    },
+    {
+      "kind": "field",
+      "name": "stacked",
+      "description": "Stack series",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "stacked"
+    },
+    {
+      "kind": "field",
+      "name": "tooltip",
+      "description": "Show tooltip on hover",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "tooltip"
+    },
+    {
+      "kind": "field",
+      "name": "legend",
+      "description": "Show legend",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "legend"
+    },
+    {
+      "kind": "field",
+      "name": "legendPosition",
+      "description": "Legend position: top, bottom, left, right",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'",
+      "attribute": "legendposition"
+    },
+    {
+      "kind": "field",
+      "name": "height",
+      "description": "Chart height (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "height"
+    },
+    {
+      "kind": "field",
+      "name": "xAxisName",
+      "description": "X-axis label",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "xaxisname"
+    },
+    {
+      "kind": "field",
+      "name": "yAxisName",
+      "description": "Y-axis label",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "yaxisname"
+    },
+    {
+      "kind": "field",
+      "name": "yAxisRightName",
+      "description": "Right Y-axis label (dual axis)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "yaxisrightname"
+    },
+    {
+      "kind": "field",
+      "name": "xFormat",
+      "description": "X-axis format: currency, percent, compact, or template '{value}%'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "xformat"
+    },
+    {
+      "kind": "field",
+      "name": "yFormat",
+      "description": "Left Y-axis format",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "yformat"
+    },
+    {
+      "kind": "field",
+      "name": "yRightFormat",
+      "description": "Right Y-axis format",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "yrightformat"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale the chart prints numbers in (BCP 47). Empty: the nearest `lang`, then the browser.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "currency",
+      "description": "Currency of the `currency` format (ISO 4217, e.g. \"EUR\"). Empty: \"USD\".",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "currency"
+    },
+    {
+      "kind": "field",
+      "name": "zoom",
+      "description": "Enable zoom: 'inside' (mouse wheel + drag pan)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "zoom"
+    },
+    {
+      "kind": "field",
+      "name": "seriesConfig",
+      "description": "Advanced: per-series config JSON string",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "seriesconfig"
+    },
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Gauge: minimum value",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Gauge: maximum value",
+      "type": {
+        "text": "number"
+      },
+      "default": "100",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Gauge: current value (alternative to data)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "format",
+      "description": "Gauge: value format (e.g. \"{value}%\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "format"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource binding (duck-typed)",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    }
+  ],
+  "roles": [
+    "group"
+  ],
+  "attributes": [
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Chart type: line, bar, area, pie, doughnut, scatter, gauge, radar",
+      "type": {
+        "text": "string"
+      },
+      "default": "'line'"
+    },
+    {
+      "name": "xfield",
+      "fieldName": "xField",
+      "description": "X-axis field name (auto-detected if omitted)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "yfield",
+      "fieldName": "yField",
+      "description": "Y-axis field name(s) — string or comma-separated",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "seriesnames",
+      "fieldName": "seriesNames",
+      "description": "Series display names (comma-separated)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "Chart title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "smooth",
+      "fieldName": "smooth",
+      "description": "Smooth line interpolation",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "stacked",
+      "fieldName": "stacked",
+      "description": "Stack series",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "tooltip",
+      "fieldName": "tooltip",
+      "description": "Show tooltip on hover",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "legend",
+      "fieldName": "legend",
+      "description": "Show legend",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "legendposition",
+      "fieldName": "legendPosition",
+      "description": "Legend position: top, bottom, left, right",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'"
+    },
+    {
+      "name": "height",
+      "fieldName": "height",
+      "description": "Chart height (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "xaxisname",
+      "fieldName": "xAxisName",
+      "description": "X-axis label",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "yaxisname",
+      "fieldName": "yAxisName",
+      "description": "Y-axis label",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "yaxisrightname",
+      "fieldName": "yAxisRightName",
+      "description": "Right Y-axis label (dual axis)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "xformat",
+      "fieldName": "xFormat",
+      "description": "X-axis format: currency, percent, compact, or template '{value}%'",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "yformat",
+      "fieldName": "yFormat",
+      "description": "Left Y-axis format",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "yrightformat",
+      "fieldName": "yRightFormat",
+      "description": "Right Y-axis format",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale the chart prints numbers in (BCP 47). Empty: the nearest `lang`, then the browser.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "currency",
+      "fieldName": "currency",
+      "description": "Currency of the `currency` format (ISO 4217, e.g. \"EUR\"). Empty: \"USD\".",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "zoom",
+      "fieldName": "zoom",
+      "description": "Enable zoom: 'inside' (mouse wheel + drag pan)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "seriesconfig",
+      "fieldName": "seriesConfig",
+      "description": "Advanced: per-series config JSON string",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Gauge: minimum value",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Gauge: maximum value",
+      "type": {
+        "text": "number"
+      },
+      "default": "100"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "Gauge: current value (alternative to data)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "format",
+      "fieldName": "format",
+      "description": "Gauge: value format (e.g. \"{value}%\")",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "legend",
+      "description": "The legend, a group of buttons, while there is more than one series or slice."
+    },
+    {
+      "name": "legend-item",
+      "description": "A legend button: pressed while its series is shown."
+    },
+    {
+      "name": "swatch",
+      "description": "A legend button's colour."
+    },
+    {
+      "name": "canvas",
+      "description": "The box the chart is drawn in."
+    }
+  ]
+}

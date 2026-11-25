@@ -2,11 +2,11 @@
  * MANIFEST — pdx-chart
  *
  * Contracts DERIVED by inspecting the source and the renderer:
- *   - Source: packages/ui/src/chart/pdx-chart.ts
+ *   - Source: packages/ui/src/chart/pdx-chart.pdx
  *       · render(): a single <div class="pdx-chart-canvas" style="width:100%;min-height:200px">.
  *       · In requestAnimationFrame the setup applies the height: when the `height` prop is set →
  *         canvasHost.style.height = height; OTHERWISE canvasHost.style.aspectRatio = '16 / 9'
- *         (pdx-chart.ts:181-187). So the height is NOT an absolute invariant: it either follows the
+ *         (pdx-chart.pdx, the frame of the main effect). So the height is NOT an absolute invariant: it either follows the
  *         `height` prop, or is derived from the width through the aspect ratio.
  *       · There is NO `.pdx-chart` CSS class in the design system (grep `.pdx-chart` in
  *         packages/design/src → no match). The style is inline; the isolation rests on the inline

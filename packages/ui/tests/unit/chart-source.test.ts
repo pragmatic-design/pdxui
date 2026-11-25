@@ -15,7 +15,7 @@ vi.mock('../../src/chart/core/engine', () => ({
     },
 }));
 
-import '../../src/chart/pdx-chart';
+import '../../src/chart/pdx-chart.pdx';
 
 describe('pdx-chart binds to a DataSource `data` signal', () => {
     beforeEach(() => { cleanup(); updateCalls.length = 0; });

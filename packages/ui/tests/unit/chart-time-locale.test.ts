@@ -31,7 +31,7 @@ vi.mock('../../src/chart/core/renderer', () => {
     }
     return { CanvasRenderer };
 });
-import '../../src/chart/pdx-chart';
+import '../../src/chart/pdx-chart.pdx';
 
 const day = (d: number) => new Date(2026, 8, d);   // September 2026, local time
 

@@ -25,7 +25,7 @@ vi.mock('../../src/chart/core/engine', () => ({
     },
 }));
 
-import '../../src/chart/pdx-chart';
+import '../../src/chart/pdx-chart.pdx';
 
 const DATA = [
     { quarter: 'Q1', desktop: 4500, mobile: 3200 },
