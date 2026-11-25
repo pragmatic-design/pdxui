@@ -11,7 +11,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { cpus } from 'node:os';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { cpuInUse, foreignProcesses, loadLine, freeShareOf } from '../../../scripts/lib/machine-load.mjs';
+import { cpuInUse, foreignProcesses, loadLine, freeShareOf, parseWindowsProcessTable } from '../../../scripts/lib/machine-load.mjs';
 import { unitTestWorkers } from '../../../build/unit-test-workers';
 import { KNOWN } from '../../../scripts/lib/known-failures.mjs';
 
@@ -70,6 +70,19 @@ describe('the machine\'s load', () => {
         expect(freeShareOf(0)).toBe(1);
         expect(freeShareOf(0.374)).toBe(0.63);
         expect(freeShareOf(1)).toBe(0);
+    });
+
+    it('a process whose command line holds a raw control character does not break the table (#1409)', () => {
+        // What Windows PowerShell's ConvertTo-Json -Compress wrote for such a process: the character
+        // raw inside the string, which JSON.parse refuses. The pre-push failed on it, depending on
+        // what else was running.
+        const bell = String.fromCharCode(7);
+        const json = `[{"ProcessId":4,"ParentProcessId":0,"Name":"x.exe","CommandLine":"x.exe --sep=${bell}"},`
+            + `{"ProcessId":5,"ParentProcessId":4,"Name":"node.exe","CommandLine":null}]\r\n`;
+        expect(parseWindowsProcessTable(json)).toEqual([
+            { pid: 4, ppid: 0, name: 'x.exe', command: `x.exe --sep=${bell}` },
+            { pid: 5, ppid: 4, name: 'node.exe', command: '' },
+        ]);
     });
 });
 
