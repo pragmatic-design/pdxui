@@ -1,0 +1,268 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxEntityGrid",
+  "tagName": "pdx-entity-grid",
+  "category": "Data-bound",
+  "order": 111,
+  "description": "A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,\nand `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "columns",
+      "description": "Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "data",
+      "description": "Entity rows.",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "schema",
+      "description": "FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "addLabel",
+      "description": "The create button's text. Empty: the entity-grid.add component string, «New».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "addlabel"
+    },
+    {
+      "kind": "field",
+      "name": "selection",
+      "type": {
+        "text": "'none' | 'single' | 'multiple'"
+      },
+      "default": "'multiple'",
+      "attribute": "selection"
+    },
+    {
+      "kind": "field",
+      "name": "rowActions",
+      "description": "Show the per-row edit/delete actions column.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "rowactions"
+    },
+    {
+      "kind": "field",
+      "name": "bulkActions",
+      "description": "Extra bulk actions (besides the built-in Delete).",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Hide all mutating affordances (view-only grid).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "confirmDelete",
+      "description": "Ask before deleting (\"Delete Alice Johnson?\", \"Delete 3 records?\"). `false` for an app that\nconfirms, or offers undo, in its pdx-delete handler: the rows go at once.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "confirmdelete"
+    },
+    {
+      "kind": "field",
+      "name": "rowLabel",
+      "description": "The field that names a row in its action buttons and in the delete confirmation. Empty:\nthe first text column, else the id.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rowlabel"
+    },
+    {
+      "kind": "method",
+      "name": "openCreate",
+      "parameters": [],
+      "description": "Open the drawer on an empty record."
+    },
+    {
+      "kind": "method",
+      "name": "openEdit",
+      "parameters": [
+        {
+          "name": "row",
+          "type": {
+            "text": "Row"
+          }
+        }
+      ],
+      "description": "Open the drawer on this row."
+    },
+    {
+      "kind": "method",
+      "name": "getSelectedIds",
+      "parameters": [],
+      "description": "The ids currently checked."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-create",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A record was created in the drawer. `clientId` names its optimistic row until the app's id replaces it.",
+      "detail": "{ values: Record<string, unknown>; clientId: unknown }"
+    },
+    {
+      "name": "pdx-update",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A record was edited in the drawer.",
+      "detail": "{ id: unknown; values: Record<string, unknown> }"
+    },
+    {
+      "name": "pdx-delete",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Rows were deleted: one from its row's button (with the row), or the selection from the bulk bar.",
+      "detail": "{ ids: unknown[]; rows?: Record<string, unknown>[] }"
+    },
+    {
+      "name": "pdx-bulk",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "One of `bulkActions` was pressed, over the selection.",
+      "detail": "{ key: string; ids: unknown[] }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "title",
+      "fieldName": "title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "addlabel",
+      "fieldName": "addLabel",
+      "description": "The create button's text. Empty: the entity-grid.add component string, «New».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "selection",
+      "fieldName": "selection",
+      "type": {
+        "text": "'none' | 'single' | 'multiple'"
+      },
+      "default": "'multiple'"
+    },
+    {
+      "name": "rowactions",
+      "fieldName": "rowActions",
+      "description": "Show the per-row edit/delete actions column.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Hide all mutating affordances (view-only grid).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "confirmdelete",
+      "fieldName": "confirmDelete",
+      "description": "Ask before deleting (\"Delete Alice Johnson?\", \"Delete 3 records?\"). `false` for an app that\nconfirms, or offers undo, in its pdx-delete handler: the rows go at once.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "rowlabel",
+      "fieldName": "rowLabel",
+      "description": "The field that names a row in its action buttons and in the delete confirmation. Empty:\nthe first text column, else the id.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "toolbar",
+      "description": "The row above the grid: the title and the create button."
+    },
+    {
+      "name": "title",
+      "description": "The title, from `title`."
+    },
+    {
+      "name": "add",
+      "description": "The create button, while there is a `schema` and the grid is not `readonly`."
+    }
+  ]
+}

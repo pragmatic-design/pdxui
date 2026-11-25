@@ -12511,7 +12511,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/entity-grid/pdx-entity-grid.ts",
+      "path": "src/entity-grid/pdx-entity-grid.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -12788,7 +12788,7 @@
           "name": "pdx-entity-grid",
           "declaration": {
             "name": "PdxEntityGrid",
-            "module": "src/entity-grid/pdx-entity-grid.ts"
+            "module": "src/entity-grid/pdx-entity-grid.pdx"
           }
         }
       ]

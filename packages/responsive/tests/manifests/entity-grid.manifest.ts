@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-entity-grid (a CRUD surface over a data grid)
  *
- * ── DOM (packages/ui/src/entity-grid/pdx-entity-grid.ts) ──
+ * ── DOM (packages/ui/src/entity-grid/pdx-entity-grid.pdx) ──
  *   <pdx-entity-grid>
  *     <div class="pdx-entity-grid">                         ← a flex column
  *       <header data-part="toolbar">

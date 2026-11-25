@@ -19,7 +19,7 @@ import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/alert-dialog/pdx-alert-dialog';
 import '../../src/auto-form/pdx-auto-form.pdx';
 import '../../src/edit-drawer/pdx-edit-drawer';
-import '../../src/entity-grid/pdx-entity-grid';
+import '../../src/entity-grid/pdx-entity-grid.pdx';
 import '../../src/relation-picker/pdx-relation-picker.pdx';
 import '../../src/select/pdx-select';
 import '../../src/timeline/pdx-timeline.pdx';

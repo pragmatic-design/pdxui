@@ -1,0 +1,244 @@
+<template>
+  <div class="pdx-entity-grid" style="display:flex;flex-direction:column;gap:var(--pdx-space-sm)">
+    <header class="pdx-entity-grid-toolbar" data-part="toolbar"
+      style="display:flex;align-items:center;justify-content:space-between;gap:var(--pdx-space-md)">
+      <h2 class="pdx-txt-heading" data-part="title" style="margin:0">{{ title }}</h2>
+      <div>
+        @if (schema && !readonly) {
+          <button type="button" size="sm" class="pdx-primary" data-part="add" @click="openCreate()">
+            <pdx-icon name="plus" size="16"></pdx-icon> {{ addLabel || uiString('entity-grid', 'add') }}
+          </button>
+        }
+      </div>
+    </header>
+
+    @if (!readonly && selectedIds.length > 0) {
+      <pdx-bulk-actions :count="selectedIds.length"
+        :actions="allBulkActions"
+        @pdx-action="onBulkAction"
+        @pdx-clear="clearSelection()"></pdx-bulk-actions>
+    }
+
+    <pdx-data-grid :columns="effectiveColumns" :data="rows"
+      :id-field="idField" :selection="selection"
+      @pdx-selection-change="onSelectionChange"></pdx-data-grid>
+
+    @if (schema) {
+      <pdx-edit-drawer :open="drawerOpen" :schema="schema" :value="editing"
+        @pdx-save="onSave"
+        @pdx-cancel="closeDrawer()"></pdx-edit-drawer>
+    }
+
+    @if (!readonly) {
+      <pdx-alert-dialog variant="danger" close-on-escape :open="pendingDelete !== null"
+        :title="confirmTitle()"
+        :confirm-label="uiString('entity-grid', 'confirm')"
+        @pdx-confirm="onDeleteConfirmed()"
+        @pdx-cancel="onDeleteCancelled()"></pdx-alert-dialog>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,
+ * and `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.
+ *
+ * @csspart toolbar - The row above the grid: the title and the create button.
+ * @csspart title - The title, from `title`.
+ * @csspart add - The create button, while there is a `schema` and the grid is not `readonly`.
+ */
+// pdx-entity-grid — a CRUD grid: data-grid + a "New" toolbar + per-row edit/delete actions +
+// a bulk-actions bar + an edit-drawer, wired together. It keeps a local optimistic copy of the
+// rows (so create/update/delete reflect immediately) and emits pdx-create/pdx-update/pdx-delete so
+// the parent can persist. Composes Track A (exposed grid methods), B1 (typed `actions` cell) and
+// B2 (reactive `data` swap).
+import { actions } from '@pdxui/core';
+import type { ColumnDef } from '@pdxui/core';
+import type { BulkAction } from '../bulk-actions/pdx-bulk-actions';
+import { uiString, format } from '../shared/i18n';
+import { firstTextField } from './entity-grid-rows';
+import type { PendingDelete, Row } from './entity-grid-rows';
+// Self-contained: register every composed custom element when this entry is imported directly
+// (e.g. @pdxui/ui/entity-grid), not only via the @pdxui/ui barrel.
+import '../data-grid/pdx-data-grid';
+import '../bulk-actions/pdx-bulk-actions';
+import '../edit-drawer/pdx-edit-drawer';
+import '../alert-dialog/pdx-alert-dialog';
+import '../icon/pdx-icon.pdx';
+// The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
+import './entity-grid-icons';
+
+// Declared (#138): they stay on the host, which the app listens on to persist.
+/** A record was created in the drawer. `clientId` names its optimistic row until the app's id replaces it. */
+@event 'pdx-create': { values: Record<string, unknown>; clientId: unknown };
+/** A record was edited in the drawer. */
+@event 'pdx-update': { id: unknown; values: Record<string, unknown> };
+/** Rows were deleted: one from its row's button (with the row), or the selection from the bulk bar. */
+@event 'pdx-delete': { ids: unknown[]; rows?: Record<string, unknown>[] };
+/** One of `bulkActions` was pressed, over the selection. */
+@event 'pdx-bulk': { key: string; ids: unknown[] };
+@part toolbar, title, add;
+/** Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly. */
+@prop columns: unknown[] = [];
+/** Entity rows. */
+@prop data: unknown[] = [];
+/** FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden. */
+@prop schema: Record<string, unknown> | null = null;
+@prop idField: string = 'id';
+@prop title: string = '';
+/** The create button's text. Empty: the entity-grid.add component string, «New». */
+@prop addLabel: string = '';
+@prop selection: 'none' | 'single' | 'multiple' = 'multiple';
+/** Show the per-row edit/delete actions column. */
+@prop rowActions: boolean = true;
+/** Extra bulk actions (besides the built-in Delete). */
+@prop bulkActions: unknown[] = [];
+/** Hide all mutating affordances (view-only grid). */
+@prop readonly: boolean = false;
+/** Ask before deleting ("Delete Alice Johnson?", "Delete 3 records?"). `false` for an app that
+ *  confirms, or offers undo, in its pdx-delete handler: the rows go at once. */
+@prop confirmDelete: boolean = true;
+/** The field that names a row in its action buttons and in the delete confirmation. Empty:
+ *  the first text column, else the id. */
+@prop rowLabel: string = '';
+@host host;
+
+@expose openCreate, openEdit, getSelectedIds;
+
+// The local optimistic copy: set from `data` below, then changed by each create, edit and delete, so it
+// is a signal the effect resets and the handlers write, not a value derived from `data`.
+let rows = $signal<Row[]>([]);
+let drawerOpen = $signal(false);
+let editing = $signal<Row | null>(null);
+let selectedIds = $signal<unknown[]>([]);
+let pendingDelete = $signal<PendingDelete | null>(null);
+let tempIdSeq = 0; // stable local identity for optimistic rows the parent hasn't persisted yet
+
+// Local optimistic mirror of `data` (new array ref each time → grid re-renders, see B2).
+$effect(() => { rows = [...((data as Row[]) ?? [])]; });
+
+const idOf = (r: Row | null): unknown => (r ? r[idField.peek() as string] : undefined);
+const grid = (): { clearSelection?: () => void } | null =>
+  host.querySelector('pdx-data-grid') as unknown as { clearSelection?: () => void } | null;
+
+// The field that names a row: rowLabel, else the first text column, else the id.
+const labelField = $derived<string>(
+  (rowLabel as string)
+  || firstTextField((columns as ColumnDef[]) ?? [], idField as string)
+  || (idField as string));
+const labelOf = (row: Row, field = labelField.peek()): string => {
+  const v = row[field];
+  return v == null || v === '' ? String(idOf(row) ?? '') : String(v);
+};
+
+// user columns + a typed actions column (B1) calling back into edit/delete. Each button is
+// named after its row. A command column: no filter, resize, drag or chooser entry.
+// Its header has a name: the grid's roving focus lands on it after a delete, and an empty
+// columnheader is announced as nothing.
+const effectiveColumns = $derived((): ColumnDef[] => {
+  const cols = [...((columns as ColumnDef[]) ?? [])];
+  if (rowActions && !readonly && schema) {
+    const field = labelField;
+    const named = (key: string) => (row: Row) => format(uiString('entity-grid', key), { label: labelOf(row, field) });
+    cols.push({
+      field: '__actions', header: uiString('entity-grid', 'actions'), width: 96, command: true,
+      cell: actions([
+        { icon: 'pencil', label: named('edit'), onClick: (row) => openEdit(row as Row) },
+        { icon: 'trash', label: named('delete'), tone: 'danger', onClick: (row) => requestDelete({ ids: [idOf(row as Row)], row: row as Row }) },
+      ]),
+    } as ColumnDef);
+  }
+  return cols;
+});
+
+const allBulkActions = $derived((): BulkAction[] => {
+  // readonly = truly view-only: no bulk bar at all (not even custom actions). For a
+  // read grid WITH actions, omit readonly + schema and pass bulkActions instead.
+  if (readonly) return [];
+  const extra = (bulkActions as BulkAction[]) ?? [];
+  return [...extra, { key: '__delete', label: uiString('entity-grid', 'bulkDelete'), icon: 'trash', tone: 'danger' }];
+});
+
+/** Open the drawer on an empty record. */
+function openCreate(): void { editing = null; drawerOpen = true; }
+/** Open the drawer on this row. */
+function openEdit(row: Row): void { editing = row; drawerOpen = true; }
+function closeDrawer(): void { drawerOpen = false; }
+/** The ids currently checked. */
+function getSelectedIds() { return selectedIds.peek(); }
+
+// A delete asks first: otherwise a click on the trash removes the record at once, and the
+// next click — meant for a confirmation that is not there — removes another.
+function requestDelete(p: PendingDelete): void {
+  if (confirmDelete.peek()) pendingDelete = p;
+  else commitDelete(p);
+}
+
+function commitDelete(p: PendingDelete): void {
+  rows = rows.peek().filter(r => !p.ids.includes(idOf(r)));
+  if (p.row) {
+    pdxDelete({ ids: p.ids, rows: [p.row] });
+  } else {
+    pdxDelete({ ids: p.ids });
+    clearSelection();
+  }
+}
+
+function onDeleteConfirmed(): void {
+  const p = pendingDelete.peek();
+  pendingDelete = null;
+  if (p) commitDelete(p);
+}
+
+function onDeleteCancelled(): void { pendingDelete = null; }
+
+/** The confirmation's title: "Delete Alice Johnson?" or "Delete 3 records?". */
+function confirmTitle(): string {
+  const p = pendingDelete as PendingDelete | null;
+  if (!p) return '';
+  return p.row
+    ? format(uiString('entity-grid', 'confirmOne'), { label: labelOf(p.row) })
+    : format(uiString('entity-grid', 'confirmMany'), { count: p.ids.length });
+}
+
+function onSave(e: CustomEvent): void {
+  const { values, mode } = e.detail as { values: Row; mode: 'edit' | 'create' };
+  if (mode === 'edit') {
+    const id = idOf(editing.peek());
+    rows = rows.peek().map(r => (idOf(r) === id ? { ...r, ...values } : r));
+    pdxUpdate({ id, values });
+  } else {
+    // The optimistic row needs a stable local id (edit/delete/selection are keyed by
+    // idField). If the form didn't supply one we mint a CLIENT-ONLY id — but we do NOT
+    // leak it into the public `values`: the parent persists the clean form output and
+    // gets `clientId` to correlate the server row back to this optimistic one.
+    const key = idField.peek() as string;
+    const hasId = values[key] != null;
+    const clientId = hasId ? values[key] : `__tmp-${++tempIdSeq}`;
+    const row = hasId ? values : { ...values, [key]: clientId };
+    rows = [...rows.peek(), row];
+    pdxCreate({ values, clientId });
+  }
+  drawerOpen = false;
+}
+
+function onSelectionChange(e: CustomEvent): void {
+  selectedIds = (e.detail?.selected as unknown[]) ?? [];
+}
+
+function onBulkAction(e: CustomEvent): void {
+  const key = (e.detail as { key: string }).key;
+  const ids = selectedIds.peek();
+  if (key === '__delete') {
+    requestDelete({ ids: [...ids] });
+  } else {
+    pdxBulk({ key, ids });
+  }
+}
+
+function clearSelection(): void {
+  selectedIds = [];
+  grid()?.clearSelection?.();
+}
+</script>

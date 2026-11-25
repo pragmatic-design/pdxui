@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/entity-grid/pdx-entity-grid';
+import '../../src/entity-grid/pdx-entity-grid.pdx';
 
 type Host = HTMLElement & Record<string, unknown>;
 

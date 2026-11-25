@@ -210,7 +210,7 @@
       "import": "./dist/edit-drawer/pdx-edit-drawer.js"
     },
     "./entity-grid": {
-      "development": "./src/entity-grid/pdx-entity-grid.ts",
+      "development": "./src/entity-grid/pdx-entity-grid.pdx",
       "types": "./dist/entity-grid/pdx-entity-grid.d.ts",
       "import": "./dist/entity-grid/pdx-entity-grid.js"
     },
@@ -672,6 +672,7 @@
     "dist/banner/banner-icons.js",
     "dist/data-grid/grid-i18n.js",
     "dist/empty-state/empty-state-icons.js",
+    "dist/entity-grid/entity-grid-icons.js",
     "dist/fab/fab-icons.js",
     "dist/field-list/field-list-strings.js",
     "dist/icon/icon-setup.js",
@@ -686,6 +687,7 @@
     "src/banner/banner-icons.ts",
     "src/data-grid/grid-i18n.ts",
     "src/empty-state/empty-state-icons.ts",
+    "src/entity-grid/entity-grid-icons.ts",
     "src/fab/fab-icons.ts",
     "src/field-list/field-list-strings.ts",
     "src/icon/icon-setup.ts",
