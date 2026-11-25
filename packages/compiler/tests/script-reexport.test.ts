@@ -50,6 +50,27 @@ describe('a re-export in a component script', () => {
         expect(dts).toContain("export { DataSourceContext } from './data-source-context';");
     });
 
+    it('a type the declaration names and the script re-exports is exported once (#1414)', () => {
+        const script = [
+            "import type { CommandItem } from './command-types';",
+            "export type { CommandItem } from './command-types';",
+            "@event 'pdx-select': CommandItem;",
+            'let n = $signal(0);',
+        ].join('\n');
+        const a = analyzeScript(script + '\n', 'probe.pdx');
+        const dts = generateDts({ tag: 'pdx-probe', props: a.props, events: a.events, slots: [], imports: scriptImportStatements(script) });
+        // Imported as a type: the events interface names it.
+        expect(dts).toContain("import type { CommandItem } from './command-types';");
+        // Exported once: by the script's own re-export, not again beside the import.
+        expect(dts.match(/export type \{[^}]*\bCommandItem\b[^}]*\}/g)).toEqual(["export type { CommandItem }"]);
+        expect(dts).toContain("export type { CommandItem } from './command-types';");
+        // The control: without the script's re-export, the declaration still exports what it names.
+        const bare = script.split('\n').filter((l) => !l.startsWith('export')).join('\n');
+        const b = analyzeScript(bare + '\n', 'probe.pdx');
+        expect(generateDts({ tag: 'pdx-probe', props: b.props, events: b.events, slots: [], imports: scriptImportStatements(bare) }))
+            .toContain('export type { CommandItem };');
+    });
+
     it('the control: an export of a value the script makes is still PDX_SCRIPT_EXPORT', () => {
         expect(reported('let n = $signal(0);\nexport const y = 1;')).toHaveLength(1);
         expect(reported('let n = $signal(0);\nconst a = 1;\nexport { a };')).toHaveLength(1);
