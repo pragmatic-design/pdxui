@@ -6134,7 +6134,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/chart/pdx-chart.ts",
+      "path": "src/chart/pdx-chart.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -6670,7 +6670,7 @@
           "name": "pdx-chart",
           "declaration": {
             "name": "PdxChart",
-            "module": "src/chart/pdx-chart.ts"
+            "module": "src/chart/pdx-chart.pdx"
           }
         }
       ]

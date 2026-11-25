@@ -133,7 +133,7 @@ import './edit-drawer/pdx-edit-drawer';
 import './entity-grid/pdx-entity-grid';
 import './json-editor/pdx-json-editor.pdx';
 import './relation-picker/pdx-relation-picker.pdx';
-import './chart/pdx-chart';
+import './chart/pdx-chart.pdx';
 import './chart/pdx-sparkline';
 import './rich-text/pdx-rich-text';
 

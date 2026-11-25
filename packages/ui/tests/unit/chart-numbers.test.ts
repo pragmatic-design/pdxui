@@ -22,7 +22,7 @@ vi.mock('../../src/chart/core/engine', () => ({
         getLegendItems() { return []; }
     },
 }));
-import '../../src/chart/pdx-chart';
+import '../../src/chart/pdx-chart.pdx';
 
 const theme: ChartTheme = {
     palette: ['#1d4ed8', '#f5c542', '#0f766e', '#e11d48', '#7c3aed'],

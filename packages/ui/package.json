@@ -244,11 +244,6 @@
       "types": "./dist/entity-grid/pdx-entity-grid.d.ts",
       "import": "./dist/entity-grid/pdx-entity-grid.js"
     },
-    "./chart": {
-      "development": "./src/chart/pdx-chart.ts",
-      "types": "./dist/chart/pdx-chart.d.ts",
-      "import": "./dist/chart/pdx-chart.js"
-    },
     "./sparkline": {
       "development": "./src/chart/pdx-sparkline.ts",
       "types": "./dist/chart/pdx-sparkline.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/filter-builder/pdx-filter-builder.pdx",
       "types": "./dist/filter-builder/pdx-filter-builder.d.ts",
       "import": "./dist/filter-builder/pdx-filter-builder.js"
+    },
+    "./chart": {
+      "development": "./src/chart/pdx-chart.pdx",
+      "types": "./dist/chart/pdx-chart.d.ts",
+      "import": "./dist/chart/pdx-chart.js"
     },
     "./package.json": "./package.json"
   },
