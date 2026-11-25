@@ -22,7 +22,7 @@ import '../../src/edit-drawer/pdx-edit-drawer';
 import '../../src/entity-grid/pdx-entity-grid';
 import '../../src/relation-picker/pdx-relation-picker.pdx';
 import '../../src/select/pdx-select';
-import '../../src/timeline/pdx-timeline';
+import '../../src/timeline/pdx-timeline.pdx';
 import '../../src/bottom-sheet/pdx-bottom-sheet';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/command/pdx-command';

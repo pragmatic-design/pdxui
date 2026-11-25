@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-timeline
  *
- * Contracts written by inspecting the source (packages/ui/src/timeline/pdx-timeline.ts)
+ * Contracts written by inspecting the source (packages/ui/src/timeline/pdx-timeline.pdx)
  * and the CSS (packages/design/src/components/timeline.css, the .pdx-tl* block).
  *
  * DOM structure (host vs inner):
