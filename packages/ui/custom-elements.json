@@ -17737,7 +17737,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/json-editor/pdx-json-editor.ts",
+      "path": "src/json-editor/pdx-json-editor.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -17812,7 +17812,7 @@
           "name": "pdx-json-editor",
           "declaration": {
             "name": "PdxJsonEditor",
-            "module": "src/json-editor/pdx-json-editor.ts"
+            "module": "src/json-editor/pdx-json-editor.pdx"
           }
         }
       ]

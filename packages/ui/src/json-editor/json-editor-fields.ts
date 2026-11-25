@@ -1,38 +1,27 @@
-// pdx-json-editor — schema-driven form editor for nested JSON (object / list-of-objects / 2-level dict).
+// The fields pdx-json-editor draws from a schema, and the sub-modal a branch opens. Plain functions of
+// the schema and the value, with no state of the component: a module of their own beside it, so its
+// setup does not make them again at every mount (#1210).
+//
 // Scalars render inline; each complex branch (object / objectList) is a "Edit…" button opening a sub-modal,
 // so the UI stays uncluttered. Recursive renderer: every control exposes { el, read() } — no DOM queries,
-// so repeaters/nesting compose unambiguously. Its model is `value` (#482): every edit writes it, and the
-// write dispatches `value-change` { value }.
-// Promoted from the hand-built profiler editor (UI-15h), generalized: enum options come from `values` (static)
-// or `options` (async () => {label,value}[]) — no app-specific lookup coupling.
-//
-// Usage:
-//   <pdx-json-editor :schema="schema" ::value="profile"></pdx-json-editor>
-//   el.addEventListener('value-change', e => save(e.detail.value));
+// so repeaters/nesting compose unambiguously.
+// Enum options come from `values` (static) or `options` (async () => {label,value}[]) — no app-specific
+// lookup coupling.
 
-import { component, html, focusTrap, focusFirst, generatedId, model, prop } from '@pdxui/core';
+import { focusTrap, focusFirst, generatedId } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-// This component's styles travel with it, so an app ships the CSS of what it renders
-// and no more.
-import '@pdxui/design/components/json-editor';
-import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
-import '../input/pdx-input.pdx'; // rendered by this component, and registered by nobody else
-import '../number-input/pdx-number-input.pdx'; // rendered by this component, and registered by nobody else
-import '../select/pdx-select'; // rendered by this component, and registered by nobody else
-import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
-import '../tag-input/pdx-tag-input.pdx'; // rendered by this component, and registered by nobody else
 
-type Ctrl = { el: HTMLElement; read: () => unknown };
+export type Ctrl = { el: HTMLElement; read: () => unknown };
 /**
  * Told when an edit changes the document outside a native input event: a sub-modal applied, a row
  * of a root-level list removed. It is a callback, not an event bubbling out of the host, so it is
  * not part of the component's API. Inside a sub-modal it does nothing: nothing there
  * is the document until Apply.
  */
-type OnEdit = () => void;
+export type OnEdit = () => void;
 const inModal: OnEdit = () => {};
 
-interface FieldDef {
+export interface FieldDef {
     k?: string;
     label: string;
     type?: 'object' | 'objectList' | 'taglist' | 'enum' | 'bool' | 'number' | 'date' | 'time' | string;
@@ -42,6 +31,9 @@ interface FieldDef {
     options?: (() => Promise<{ label: string; value: string }[]>) | { label: string; value: string }[];
 }
 
+/** The schema the component is given: an object of fields, or a list of rows of fields. */
+export type RootSchema = FieldDef & { kind?: 'object' | 'list'; item?: FieldDef[] };
+
 async function optionsFor(f: FieldDef): Promise<{ label: string; value: string }[]> {
     if (f.values) return f.values.map((v) => ({ label: v, value: v }));
     if (typeof f.options === 'function') return await f.options();
@@ -49,7 +41,7 @@ async function optionsFor(f: FieldDef): Promise<{ label: string; value: string }
     return [];
 }
 
-const isEmpty = (v: unknown): boolean =>
+export const isEmpty = (v: unknown): boolean =>
     v == null || v === '' || (Array.isArray(v) && v.length === 0) ||
     (typeof v === 'object' && !Array.isArray(v) && Object.keys(v as object).length === 0);
 
@@ -70,7 +62,7 @@ function labeled(text: string, req?: boolean, native = false): HTMLElement {
  * on `opener` when it closes. As a plain div, focus would stay behind it, Tab would reach the page,
  * and after Apply focus would fall to <body>. Escape, Cancel and the backdrop close it unapplied.
  */
-function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLElement): Promise<unknown> {
+function runModal(title: string, buildBody: () => Promise<Ctrl>, opener: HTMLElement): Promise<unknown> {
     return new Promise((resolve) => {
         const back = document.createElement('div'); back.className = 'jed-back';
         const box = document.createElement('div'); box.className = 'jed-box'; box.dataset.part = 'dialog';
@@ -107,7 +99,7 @@ function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLEle
         document.body.appendChild(back);
         // The dialog holds focus while its fields are built; then the first of them takes it.
         const releaseTrap = focusTrap(box, { initialFocus: box, restoreFocus: false, escapeDeactivates: false });
-        buildRoot().then((r) => {
+        buildBody().then((r) => {
             root = r;
             body.appendChild(r.el);
             if (!closed && document.activeElement === box) focusFirst(body);
@@ -225,95 +217,13 @@ async function makeField(f: FieldDef, val: unknown, onEdit: OnEdit): Promise<Ctr
     return { el: wrap, read: () => { const i = ip.querySelector('input'); const v = (i ? i.value : '') || ''; return v === '' ? null : v; } };
 }
 
-async function buildRoot(schema: FieldDef & { kind?: 'object' | 'list'; item?: FieldDef[] }, data: unknown, onEdit: OnEdit): Promise<Ctrl> {
+/** The root control of the editor: the schema's fields, or its rows of fields. */
+export async function buildRoot(schema: RootSchema, data: unknown, onEdit: OnEdit): Promise<Ctrl> {
     if (schema.kind === 'list') return makeListBody({ label: schema.label, fields: schema.item }, data, onEdit);
     return makeObjectBody({ label: schema.label, fields: schema.fields }, data, onEdit);
 }
 
-/**
- * A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each
- * object or list of objects in a sub-modal of its own.
- *
- * @csspart entry - One scalar field: its caption and its control.
- * @csspart branch - One object or list of objects: its caption, a summary and the button that opens it.
- * @csspart dialog - The sub-modal a branch opens, `role="dialog"`, appended to the page's body.
- *
- * @alphaevent pdx-change
- * @alphadetail value $event.detail.value
- */
-component('pdx-json-editor', {
-    // A form submits the document as JSON under the host's `name`, and resets it (#135).
-    models: { value: model<unknown>(null, { type: Object, form: true }) },
-    parts: ['entry', 'branch', 'dialog'],
-    props: {
-        schema: prop<Record<string, unknown> | null>(null),
-    },
-    setup(ctx) {
-        ctx.formValue?.(() => {
-            const v = ctx.value();
-            return v === null || v === undefined ? null : JSON.stringify(v);
-        });
-        let root: Ctrl | null = null;
-        // `value` is the live document: every edit writes it. The track below rebuilds
-        // the editor when `value` changes, so it must recognise its own reflection — rebuilding on
-        // every keystroke would replace the field being typed in.
-        let _reflected: unknown = undefined;
-        let _builtSchema: unknown = undefined;
-
-        // Every edit writes the model (#482), and the write dispatches `value-change`.
-        function emit(): void {
-            if (!root) return;
-            const v = root.read();
-            const value = isEmpty(v) ? null : v;
-            _reflected = value;
-            ctx.value.set(value);
-        }
-
-        // The build that is current: a later build, or the setup's destruction, moves it on. Not the
-        // track's cleanup, which also runs when the track re-runs on the editor's own edit and builds
-        // nothing — that marked the live build stale, and every edit after the first that came
-        // through onEdit (a sub-modal's apply, a removed row, a library control) was dropped (#481).
-        let _currentBuild = 0;
-        ctx.track(() => () => { _currentBuild++; });
-
-        ctx.track(() => {
-            const schema = ctx.schema() as (FieldDef & { kind?: 'object' | 'list'; item?: FieldDef[] }) | null;
-            const raw = ctx.value() as unknown;
-            if (!schema) return;
-            if (raw === _reflected && schema === _builtSchema) return;
-            _builtSchema = schema;
-            const data = typeof raw === 'string' ? safeParse(raw) : raw;
-            // ctx.frame: a setup a move destroyed does not build again; and the root is built
-            // asynchronously, so a build that is no longer current — a destroyed setup, or a later
-            // build — does not append its root next to the current one.
-            const build = ++_currentBuild;
-            const live = (): boolean => build === _currentBuild;
-            ctx.frame(() => {
-                ctx.el.innerHTML = '';
-                ctx.el.classList.add('pdx-json-editor-root');
-                buildRoot(schema, data, () => { if (live()) emit(); }).then((r) => {
-                    if (!live()) return;
-                    root = r;
-                    ctx.el.appendChild(r.el);
-                    // Recompute + emit on any edit within (native inputs); the library controls' model
-                    // events, sub-modal applies and root-list removals come through buildRoot's onEdit.
-                    r.el.addEventListener('input', emit);
-                    r.el.addEventListener('change', emit);
-                });
-            });
-        });
-
-        return { read: () => (root ? root.read() : null) };
-    },
-    // A group of fields, named by its schema's label (#133); inside a pdx-form-field the field's label
-    // names it instead (aria-labelledby outranks it). Written after `setup`, so its type is read.
-    host: {
-        role: 'group',
-        ':aria-label': (ctx) => (ctx.schema() as { label?: string } | null)?.label || null,
-    },
-    render: () => html``,
-});
-
-function safeParse(s: string): unknown {
+/** The value given as a JSON string, parsed; a string that is not JSON is no value. */
+export function safeParse(s: string): unknown {
     try { return s ? JSON.parse(s) : null; } catch { return null; }
 }

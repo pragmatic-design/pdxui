@@ -1,0 +1,105 @@
+<template></template>
+
+<script>
+/**
+ * A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each
+ * object or list of objects in a sub-modal of its own.
+ *
+ * @csspart entry - One scalar field: its caption and its control.
+ * @csspart branch - One object or list of objects: its caption, a summary and the button that opens it.
+ * @csspart dialog - The sub-modal a branch opens, `role="dialog"`, appended to the page's body.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ */
+// pdx-json-editor — schema-driven form editor for nested JSON (object / list-of-objects / 2-level dict).
+// Its model is `value` (#482): every edit writes it, and the write dispatches `value-change` { value }.
+// Promoted from the hand-built profiler editor (UI-15h), generalized.
+// The fields and the sub-modal are drawn by json-editor-fields.ts; this component holds the document
+// and builds the root a frame after a change, as the TypeScript version did.
+//
+// Usage:
+//   <pdx-json-editor :schema="schema" ::value="profile"></pdx-json-editor>
+//   el.addEventListener('value-change', e => save(e.detail.value));
+import { onDestroy } from '@pdxui/core';
+import { buildRoot, isEmpty, safeParse } from './json-editor-fields';
+import type { Ctrl, RootSchema } from './json-editor-fields';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/json-editor';
+import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
+import '../input/pdx-input.pdx'; // rendered by this component, and registered by nobody else
+import '../number-input/pdx-number-input.pdx'; // rendered by this component, and registered by nobody else
+import '../select/pdx-select'; // rendered by this component, and registered by nobody else
+import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
+import '../tag-input/pdx-tag-input.pdx'; // rendered by this component, and registered by nobody else
+
+// A form submits the document as JSON under the host's `name`, and resets it (#135).
+@model value: unknown = null { form: () => (value === null || value === undefined ? null : JSON.stringify(value)) };
+@prop schema: Record<string, unknown> | null = null;
+// Every element is built by the script.
+@part(external) entry, branch, dialog;
+// A group of fields, named by its schema's label (#133); inside a pdx-form-field the field's label
+// names it instead (aria-labelledby outranks it).
+@host host {
+  role="group"
+  :aria-label="groupName()"
+}
+
+/** The group's name: the schema's label, or none. */
+function groupName(): string | null {
+  return (schema as { label?: string } | null)?.label || null;
+}
+
+let root: Ctrl | null = null;
+// `value` is the live document: every edit writes it. The effect below rebuilds
+// the editor when `value` changes, so it must recognise its own reflection — rebuilding on
+// every keystroke would replace the field being typed in.
+let _reflected: unknown = undefined;
+let _builtSchema: unknown = undefined;
+
+// Every edit writes the model (#482), and the write dispatches `value-change`.
+function emit(): void {
+  if (!root) return;
+  const v = root.read();
+  const next = isEmpty(v) ? null : v;
+  _reflected = next;
+  value = next;
+}
+
+// The build that is current: a later build, or the setup's destruction, moves it on. Not an
+// effect's cleanup, which also runs when the effect re-runs on the editor's own edit and builds
+// nothing — that marked the live build stale, and every edit after the first that came
+// through onEdit (a sub-modal's apply, a removed row, a library control) was dropped (#481).
+let _currentBuild = 0;
+onDestroy(() => { _currentBuild++; });
+
+$effect(() => {
+  const given = schema as RootSchema | null;
+  const raw = value as unknown;
+  if (!given) return;
+  if (raw === _reflected && given === _builtSchema) return;
+  _builtSchema = given;
+  const data = typeof raw === 'string' ? safeParse(raw) : raw;
+  // A build that is no longer current — a destroyed setup, or a later build — does nothing: not in
+  // its frame, as `ctx.frame` did not run on a destroyed setup, and not when its root arrives, since
+  // the root is built asynchronously and would land next to the current one. A frame, not
+  // onNextFrame, which is for setup: this one is asked for at every change.
+  const build = ++_currentBuild;
+  const live = (): boolean => build === _currentBuild;
+  requestAnimationFrame(() => {
+    if (!live()) return;
+    host.innerHTML = '';
+    host.classList.add('pdx-json-editor-root');
+    buildRoot(given, data, () => { if (live()) emit(); }).then((r) => {
+      if (!live()) return;
+      root = r;
+      host.appendChild(r.el);
+      // Recompute + emit on any edit within (native inputs); the library controls' model
+      // events, sub-modal applies and root-list removals come through buildRoot's onEdit.
+      r.el.addEventListener('input', emit);
+      r.el.addEventListener('change', emit);
+    });
+  });
+});
+</script>

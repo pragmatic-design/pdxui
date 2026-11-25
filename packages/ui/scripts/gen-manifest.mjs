@@ -23,14 +23,14 @@
 // Usage: node scripts/gen-manifest.mjs   (writes packages/ui/custom-elements.json)
 
 import ts from 'typescript';
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs';
-import { join, relative, dirname } from 'path';
+import { readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { join, relative } from 'path';
 import { pathToFileURL } from 'url';
 import { componentTokens } from '../../design/scripts/component-tokens.mjs';
 import {
     UI_ROOT, normalizeEol, PROP_DESC, jsdocDescription, jsdocTags, splitNameDesc, scanRoles, withoutComments,
     scanSlots, scanExportedShapes, declaredFunction, functionParameters, describeProp, assembleModule,
-    scanContexts,
+    scanContexts, helperFiles,
 } from './manifest-shared.mjs';
 import { analyzePdxFile } from './manifest-pdx.mjs';
 import { declaresInternal } from '@pdxui/compiler';
@@ -455,19 +455,6 @@ function scanEmitDetails(node, sourceFile, into = new Map()) {
     return into;
 }
 
-/**
- * The non-component `.ts` files beside a component: where a component that grew split its logic
- * (pdx-data-grid emits `pdx-selection-change` from grid-selection.ts, not from pdx-data-grid.ts).
- */
-function helperFiles(file) {
-    const dir = dirname(file);
-    // analyzeFile is handed its text, and a test may hand it a path that exists nowhere
-    // (gen-manifest-eol.test.ts): no directory, no helpers.
-    if (!existsSync(dir)) return [];
-    return readdirSync(dir)
-        .filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts') && !/^pdx-/.test(f))
-        .map(f => join(dir, f));
-}
 
 /**
  * What `ctx.expose({ a, b, … })` puts on the element, reachable through a ref: each name, and

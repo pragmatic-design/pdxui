@@ -2,7 +2,7 @@
  * MANIFEST — pdx-json-editor
  *
  * A form drawn from a schema, for a nested JSON value. Derived from the source,
- * packages/ui/src/json-editor/pdx-json-editor.ts:
+ * packages/ui/src/json-editor/pdx-json-editor.pdx and json-editor-fields.ts:
  *   HOST <pdx-json-editor role="group" aria-label="{schema.label}">  (.pdx-json-editor-root)
  *     └── div.jobj-b                                   the root object's body, built asynchronously
  *           ├── div.jfld[data-part="entry"]            one scalar: its caption and a library field

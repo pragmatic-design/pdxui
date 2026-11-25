@@ -63,7 +63,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-inline-edit',
     'pdx-input',
     'pdx-input-group',
-    'pdx-json-editor',
     'pdx-kbd',
     'pdx-label',
     'pdx-link',

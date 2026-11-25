@@ -33,7 +33,7 @@ import '../../src/tag-input/pdx-tag-input.pdx';
 import '../../src/toggle/pdx-toggle.pdx';
 import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/inline-edit/pdx-inline-edit.pdx';
-import '../../src/json-editor/pdx-json-editor';
+import '../../src/json-editor/pdx-json-editor.pdx';
 import '../../src/calendar/pdx-calendar';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';

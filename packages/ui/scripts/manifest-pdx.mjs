@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describeComponent, internalViews } from '@pdxui/compiler';
 import {
     normalizeEol, PROP_DESC, readDocComment, describeProp, scanRoles, withoutComments, scanSlots,
-    scanExportedShapes, declaredFunction, functionParameters, assembleModule, scanContexts,
+    scanExportedShapes, declaredFunction, functionParameters, assembleModule, scanContexts, helperFiles,
 } from './manifest-shared.mjs';
 
 /** The library's tag prefix: `select.pdx` and `pdx-select.pdx` register `<pdx-select>`. */
@@ -111,7 +111,10 @@ export function analyzePdxFile(file, text, categories) {
     }
     // And the script's own `provide(…)` and `inject(…)` calls, read as a TypeScript component's are
     // (#1210): `pdx-provide` provides the token its prop carries, in an effect.
-    const called = scanContexts([body, ...a.effects.map((e, n) => ts.createSourceFile(`${file}.effect${n}.ts`, e, ts.ScriptTarget.Latest, true))], propNames);
+    // The TypeScript modules beside it are the component's too, as gen-manifest reads a TypeScript
+    // component's (#1210): what a moved component split out keeps the roles and contexts it had.
+    const helpers = helperFiles(file).map(f => ts.createSourceFile(f, normalizeEol(readFileSync(f, 'utf-8')), ts.ScriptTarget.Latest, true));
+    const called = scanContexts([body, ...a.effects.map((e, n) => ts.createSourceFile(`${file}.effect${n}.ts`, e, ts.ScriptTarget.Latest, true)), ...helpers], propNames);
     for (const token of called.provides) if (!provides.includes(token)) provides.push(token);
     for (const i of called.injects) if (!injects.some(x => x.token === i.token)) injects.push(i);
 
@@ -137,7 +140,7 @@ export function analyzePdxFile(file, text, categories) {
         emitted: new Map(),
         emittedNames: [],
         // The `$effect`s are out of the body in the analysis: a role one of them writes is read there (#1210).
-        roles: scanRoles([template, withoutComments(body), ...a.effects, ...viewRoles].join('\n')),
+        roles: scanRoles([template, withoutComments(body), ...a.effects, ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,
