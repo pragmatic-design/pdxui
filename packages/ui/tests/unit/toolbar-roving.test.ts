@@ -4,7 +4,7 @@
 // arrows itself keeps them — not one tab stop per control, and not every toolbar named "Toolbar".
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/toolbar/pdx-toolbar';
+import '../../src/toolbar/pdx-toolbar.pdx';
 import '../../src/button/pdx-button.pdx';
 import '../../src/select/pdx-select';
 import '../../src/toggle/pdx-toggle.pdx';
