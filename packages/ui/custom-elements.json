@@ -10779,7 +10779,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/description-list/pdx-description-list.ts",
+      "path": "src/description-list/pdx-description-list.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -10995,7 +10995,7 @@
           "name": "pdx-description-list",
           "declaration": {
             "name": "PdxDescriptionList",
-            "module": "src/description-list/pdx-description-list.ts"
+            "module": "src/description-list/pdx-description-list.pdx"
           }
         }
       ]

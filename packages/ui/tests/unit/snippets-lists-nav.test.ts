@@ -13,7 +13,7 @@ import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { cleanup, tick } from './helpers';
 import '../../src/breadcrumb/pdx-breadcrumb';
-import '../../src/description-list/pdx-description-list';
+import '../../src/description-list/pdx-description-list.pdx';
 import '../../src/list/pdx-list.pdx';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/pagination/pdx-pagination';

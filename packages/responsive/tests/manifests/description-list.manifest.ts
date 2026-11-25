@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-description-list
  *
- * Contracts written by inspecting the source (packages/ui/src/description-list/pdx-description-list.ts)
+ * Contracts written by inspecting the source (packages/ui/src/description-list/pdx-description-list.pdx)
  * and the CSS (packages/design/src/components/description-list.css, the .pdx-dl* block).
  *
  * DOM structure (host vs inner):
