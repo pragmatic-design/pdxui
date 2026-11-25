@@ -129,7 +129,7 @@ import './filter-builder/pdx-filter-builder.pdx';
 import './auto-form/pdx-auto-form.pdx';
 // CRUD primitives (compose data-grid + form-template + drawer)
 import './bulk-actions/pdx-bulk-actions';
-import './edit-drawer/pdx-edit-drawer';
+import './edit-drawer/pdx-edit-drawer.pdx';
 import './entity-grid/pdx-entity-grid.pdx';
 import './json-editor/pdx-json-editor.pdx';
 import './relation-picker/pdx-relation-picker.pdx';

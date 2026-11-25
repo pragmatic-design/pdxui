@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-edit-drawer (a drawer holding a schema-driven form)
  *
- * ── DOM (packages/ui/src/edit-drawer/pdx-edit-drawer.ts) ──
+ * ── DOM (packages/ui/src/edit-drawer/pdx-edit-drawer.pdx) ──
  *   <pdx-edit-drawer :open :schema>
  *     <pdx-drawer>                                         ← its own manifest measures the panel (drawer.manifest.ts)
  *       <div class="pdx-edit-drawer">

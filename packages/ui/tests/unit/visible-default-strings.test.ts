@@ -18,7 +18,7 @@ import '../../src/command/pdx-command';
 import '../../src/empty-state/pdx-empty-state.pdx';
 import '../../src/list/pdx-list.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
-import '../../src/edit-drawer/pdx-edit-drawer';
+import '../../src/edit-drawer/pdx-edit-drawer.pdx';
 import '../../src/field-group/pdx-field-group.pdx';
 import '../../src/data-grid/pdx-data-grid';
 import '../../src/infinite-scroll/pdx-infinite-scroll.pdx';

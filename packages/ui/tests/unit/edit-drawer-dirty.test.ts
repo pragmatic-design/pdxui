@@ -13,7 +13,7 @@
 //
 // The form itself carries `dirty` (`core/src/form/form.ts:402`); the drawer passes it on.
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import '../../src/edit-drawer/pdx-edit-drawer';
+import '../../src/edit-drawer/pdx-edit-drawer.pdx';
 
 type Drawer = HTMLElement & {
     open: boolean;

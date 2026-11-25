@@ -10,7 +10,7 @@
 // would be the console.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import type { FormSchema } from '@pdxui/core';
-import '../../src/edit-drawer/pdx-edit-drawer';
+import '../../src/edit-drawer/pdx-edit-drawer.pdx';
 import { tick, cleanup } from './helpers';
 
 const SCHEMA: FormSchema = {
