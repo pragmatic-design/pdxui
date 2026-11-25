@@ -1,0 +1,290 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxPagination",
+  "tagName": "pdx-pagination",
+  "category": "Navigation",
+  "order": 65,
+  "description": "Page navigation with numbered buttons, previous/next and first/last, collapsing large ranges\nbehind an ellipsis.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource instance — auto-binds total, page, pageSize",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "total",
+      "description": "Total number of items (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "total"
+    },
+    {
+      "kind": "field",
+      "name": "showEdges",
+      "description": "Show first/last buttons",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showedges"
+    },
+    {
+      "kind": "field",
+      "name": "showPageSize",
+      "description": "Show page size selector",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showpagesize"
+    },
+    {
+      "kind": "field",
+      "name": "pageSizes",
+      "description": "Page size options",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[10, 20, 50, 100]"
+    },
+    {
+      "kind": "field",
+      "name": "simple",
+      "description": "Simple mode (prev/next only, no page numbers)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "simple"
+    },
+    {
+      "kind": "field",
+      "name": "showTotal",
+      "description": "Show total info text",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showtotal"
+    },
+    {
+      "kind": "field",
+      "name": "page",
+      "description": "Current page 1-based (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "page"
+    },
+    {
+      "kind": "field",
+      "name": "pageSize",
+      "description": "Items per page (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "pagesize"
+    },
+    {
+      "kind": "method",
+      "name": "goTo",
+      "parameters": [
+        {
+          "name": "p",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Go to a page, clamped to 1..total. Writes `page`, and moves the bound DataSource with it."
+    },
+    {
+      "kind": "method",
+      "name": "next",
+      "parameters": [],
+      "description": "Advances to the next item."
+    },
+    {
+      "kind": "method",
+      "name": "prev",
+      "parameters": [],
+      "description": "Goes to the previous item."
+    },
+    {
+      "kind": "method",
+      "name": "first",
+      "parameters": [],
+      "description": "The first page, through the same path as `goTo`."
+    },
+    {
+      "kind": "method",
+      "name": "last",
+      "parameters": [],
+      "description": "The last page, through the same path as `goTo`."
+    }
+  ],
+  "models": [
+    "page",
+    "pageSize"
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "page": "$event.detail.value",
+    "pageSize": "$event.currentTarget.pageSize"
+  },
+  "events": [
+    {
+      "name": "page-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `page`. Does not bubble.",
+      "detail": "{ value: number }"
+    },
+    {
+      "name": "page-size-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `pageSize`. Does not bubble.",
+      "detail": "{ value: number }"
+    }
+  ],
+  "roles": [
+    "navigation"
+  ],
+  "attributes": [
+    {
+      "name": "total",
+      "fieldName": "total",
+      "description": "Total number of items (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "showedges",
+      "fieldName": "showEdges",
+      "description": "Show first/last buttons",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showpagesize",
+      "fieldName": "showPageSize",
+      "description": "Show page size selector",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "simple",
+      "fieldName": "simple",
+      "description": "Simple mode (prev/next only, no page numbers)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "showtotal",
+      "fieldName": "showTotal",
+      "description": "Show total info text",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "page",
+      "fieldName": "page",
+      "description": "Current page 1-based (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "pagesize",
+      "fieldName": "pageSize",
+      "description": "Items per page (overrides DataSource)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.",
+      "signature": "(page: number, active: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "nav",
+      "description": "The `role=\"navigation\"` element that holds the controls (`.pdx-pagination`)."
+    },
+    {
+      "name": "page",
+      "description": "A page button; the current one is `aria-current=\"page\"`."
+    },
+    {
+      "name": "first",
+      "description": "The button to the first page."
+    },
+    {
+      "name": "prev",
+      "description": "The button to the previous page."
+    },
+    {
+      "name": "next",
+      "description": "The button to the next page."
+    },
+    {
+      "name": "last",
+      "description": "The button to the last page."
+    },
+    {
+      "name": "ellipsis",
+      "description": "The gap drawn for the pages left out of a long range."
+    },
+    {
+      "name": "range",
+      "description": "The \"1–10 of 47\" text, with `show-total`."
+    },
+    {
+      "name": "position",
+      "description": "The \"3 / 10\" text of `simple`."
+    },
+    {
+      "name": "size",
+      "description": "The rows-per-page select, with `show-page-size`."
+    }
+  ],
+  "x-pdx-context": {
+    "injects": [
+      {
+        "token": "DataSourceContext",
+        "optional": true
+      }
+    ]
+  }
+}

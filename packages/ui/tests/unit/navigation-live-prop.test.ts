@@ -10,7 +10,7 @@ import { createDataSource } from '@pdxui/core';
 import { cleanup, tick, whenUpgraded } from './helpers';
 
 import '../../src/tabs/pdx-tabs';
-import '../../src/pagination/pdx-pagination';
+import '../../src/pagination/pdx-pagination.pdx';
 import '../../src/wizard/pdx-wizard';
 
 // The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test

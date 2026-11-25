@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-pagination
  *
- * Contracts written by inspecting the source (packages/ui/src/pagination/pdx-pagination.ts)
+ * Contracts written by inspecting the source (packages/ui/src/pagination/pdx-pagination.pdx)
  * and the CSS (packages/design/src/components/pagination.css).
  *
  * DOM structure (host vs inner):

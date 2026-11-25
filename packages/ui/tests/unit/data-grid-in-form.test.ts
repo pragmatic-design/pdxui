@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/data-grid/pdx-data-grid';
-import '../../src/pagination/pdx-pagination';
+import '../../src/pagination/pdx-pagination.pdx';
 
 type Grid = HTMLElement & Record<string, unknown> & {
     grid: { sort(field: string): void; source: { setFilter(f: unknown[]): void } };

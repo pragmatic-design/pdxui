@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/data-grid/pdx-data-grid';
-import '../../src/pagination/pdx-pagination';
+import '../../src/pagination/pdx-pagination.pdx';
 
 type Grid = HTMLElement & Record<string, unknown>;
 

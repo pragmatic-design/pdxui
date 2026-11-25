@@ -1,0 +1,379 @@
+<template></template>
+
+<script>
+/**
+ * Page navigation with numbered buttons, previous/next and first/last, collapsing large ranges
+ * behind an ellipsis.
+ *
+ * @slot item - Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.
+ *
+ * @csspart nav - The `role="navigation"` element that holds the controls (`.pdx-pagination`).
+ * @csspart page - A page button; the current one is `aria-current="page"`.
+ * @csspart first - The button to the first page.
+ * @csspart prev - The button to the previous page.
+ * @csspart next - The button to the next page.
+ * @csspart last - The button to the last page.
+ * @csspart ellipsis - The gap drawn for the pages left out of a long range.
+ * @csspart range - The "1–10 of 47" text, with `show-total`.
+ * @csspart position - The "3 / 10" text of `simple`.
+ * @csspart size - The rows-per-page select, with `show-page-size`.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail page $event.detail.value
+ * @alphadetail pageSize $event.currentTarget.pageSize
+ */
+// pdx-pagination — Page navigation with page numbers, prev/next, first/last.
+// Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
+// Priority: explicit props > :source prop > injected DataSource from context.
+//
+// Its controls are built by the script a frame after mount, as the TypeScript version built them.
+// The script's own names are not the parts' names (navEl, gapEl, a size `n`): a part's name read in
+// the script makes it a signal of the part's elements at every mount.
+import { inject } from '@pdxui/core';
+import type { DataSource } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
+import { uiString, format, uiAttr } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/pagination';
+
+type SizeSelect = HTMLElement & { options: { value: string; label: string }[]; value: string | null };
+/** What a DataSource offers for its page size, when it pages: not every source does. */
+type SizedSource = { pageSize?: () => number; setPageSize?: (size: number) => void };
+
+// The current page and the page size are positions the pager changes itself (#289): models, so a
+// click writes them and announces `page-change` / `page-size-change` { value }. -1 leaves each to
+// the DataSource, which then holds it and is not written.
+/** Current page 1-based (overrides DataSource) */
+@model page: number = -1;
+/** Items per page (overrides DataSource) */
+@model pageSize: number = -1;
+/** DataSource instance — auto-binds total, page, pageSize */
+@prop source: Record<string, unknown> | null = null;
+/** Total number of items (overrides DataSource) */
+@prop total: number = -1;
+/** Show first/last buttons */
+@prop showEdges: boolean = true;
+/** Show page size selector */
+@prop showPageSize: boolean = false;
+/** Page size options */
+@prop pageSizes: unknown[] = [10, 20, 50, 100];
+/** Simple mode (prev/next only, no page numbers) */
+@prop simple: boolean = false;
+/** Show total info text */
+@prop showTotal: boolean = false;
+// A parent's `@snippet` sets this, positional arguments; the alpha scoped slot is not read
+// (#492). The snippet is `item`, named apart from the `page` prop above.
+@slot item?: (page: number, active: boolean);
+// Every element is built by the script.
+@part(external) nav, page, first, prev, next, last, ellipsis, range, position, size;
+@host host;
+
+// The navigation verbs of the library (#289): `next()`, `prev()`, `goTo(n)`, and `first()` /
+// `last()`. The current page is the `page` model itself.
+@expose goTo, next, prev, first, last;
+
+// The page drawn now. Read only by the build and the verbs, never by an effect: a plain variable.
+let shownPage = 1;
+let _built = false;
+function getPageSlot() {
+  return item;
+}
+let _ds: DataSource<unknown> | null = null;
+
+// Resolve DataSource: explicit :source prop > context inject
+function resolveDS(): DataSource<unknown> | null {
+  const explicitSource = source as DataSource<unknown> | null;
+  if (explicitSource) return explicitSource;
+  // Try inject from pdx-data-source ancestor
+  if (!_ds) {
+    _ds = inject(DataSourceContext, host, null) as DataSource<unknown> | null;
+  }
+  return _ds;
+}
+
+// Read values: explicit props override DataSource values
+function getTotal(): number {
+  const given = total as number;
+  if (given >= 0) return given;
+  const ds = resolveDS();
+  return ds ? ds.total() : 0;
+}
+
+function getPageSize(): number {
+  const given = pageSize as number;
+  if (given >= 0) return given;
+  const ds = resolveDS() as SizedSource | null;
+  if (ds && typeof ds.pageSize === 'function') return ds.pageSize() || 10;
+  return 10;
+}
+
+function getPage(): number {
+  const given = page as number;
+  if (given >= 0) return given;
+  const ds = resolveDS();
+  return ds ? ds.page() : 1;
+}
+
+function totalPages(): number {
+  return Math.max(1, Math.ceil(getTotal() / getPageSize()));
+}
+
+/**
+ * Write the model, which announces it when it changed. Not while it is left to a DataSource
+ * (the -1 default with a source): there the source holds it, and writing it would pin it.
+ */
+function reflect(name: 'page' | 'pageSize', value: number): void {
+  if (name === 'page') {
+    if ((page.peek() as number) >= 0 || !resolveDS()) page = value;
+  } else if ((pageSize.peek() as number) >= 0 || !resolveDS()) {
+    pageSize = value;
+  }
+}
+
+/** Go to a page, clamped to 1..total. Writes `page`, and moves the bound DataSource with it. */
+function goTo(p: number): void {
+  const tp = totalPages();
+  const clamped = Math.max(1, Math.min(p, tp));
+  shownPage = clamped;
+  // If bound to DataSource, update it directly
+  const ds = resolveDS();
+  if (ds) ds.setPage(clamped);
+  reflect('page', clamped);
+  rebuild();
+}
+function next() { goTo(shownPage + 1); }
+function prev() { goTo(shownPage - 1); }
+/** The first page, through the same path as `goTo`. */
+function first() { goTo(1); }
+/** The last page, through the same path as `goTo`. */
+function last() { goTo(totalPages()); }
+
+// What the last build drew from. The effect below rebuilds only when it changed, so the
+// component's own reflection of `page` / `pageSize` does not rebuild the buttons a second time.
+let _builtFrom = '';
+function buildInputs(): string {
+  return [shownPage, getTotal(), getPageSize(), simple, showEdges, showTotal, showPageSize].join('|');
+}
+
+function rebuild(): void {
+  _builtFrom = buildInputs();
+  const navEl = host.querySelector('.pdx-pagination') || document.createElement('nav');
+  navEl.className = 'pdx-pagination';
+  navEl.setAttribute('data-part', 'nav');
+  navEl.setAttribute('role', 'navigation');
+  uiAttr(navEl, 'aria-label', () => uiString('pagination', 'label'));
+  // The control that had focus, by what it does: the rebuild replaces every button, and focus
+  // would fall to <body> on each page change. It goes back to the same control below.
+  const active = document.activeElement as HTMLElement | null;
+  const focusKey = active && navEl.contains(active) ? active.getAttribute('data-page-key') : null;
+  // Everything but the size select, which stays connected: a pdx-select taken out and put
+  // back is set up again, and would lose its focus and its open list with it.
+  for (const child of [...navEl.childNodes]) if (child !== sizeSelect) child.remove();
+
+  const current = shownPage;
+  const tp = totalPages();
+  const isSimple = simple as boolean;
+  const withEdges = showEdges as boolean;
+  const withTotal = showTotal as boolean;
+  const count = getTotal();
+  const perPage = getPageSize();
+
+  // Total info
+  if (withTotal) {
+    const info = document.createElement('span');
+    info.className = 'pdx-pagination-info';
+    info.setAttribute('data-part', 'range');
+    const start = (current - 1) * perPage + 1;
+    const end = Math.min(current * perPage, count);
+    // Nothing to show is "0 of 0", not "1–0 of 0".
+    info.textContent = count > 0
+      ? format(uiString('pagination', 'range'), { from: start, to: end, total: count })
+      : uiString('pagination', 'none');
+    // Before the size select, which may have stayed from the last build.
+    navEl.insertBefore(info, navEl.firstChild);
+  }
+
+  // Page size — `showPageSize` and `pageSizes`, the pair a reader looks for first on a pager.
+  const sizes = showPageSize as boolean && !isSimple ? (pageSizes as number[]) ?? [] : [];
+  if (sizes.length) {
+    if (!sizeSelect) navEl.appendChild(sizeSelect = createSizeSelect());
+    const options = sizes.map((n) => ({ value: String(n), label: String(n) }));
+    if (JSON.stringify(sizeSelect.options) !== JSON.stringify(options)) sizeSelect.options = options;
+    sizeSelect.value = sizes.includes(perPage) ? String(perPage) : null;
+  } else if (sizeSelect) {
+    sizeSelect.remove();
+    sizeSelect = null;
+  }
+
+  // First
+  if (withEdges && !isSimple) {
+    const firstBtn = makeBtn('«', () => goTo(1), current <= 1, uiString('pagination', 'first'), 'first');
+    firstBtn.setAttribute('data-part', 'first');
+    navEl.appendChild(firstBtn);
+  }
+
+  // Prev
+  const prevBtn = makeBtn('‹', () => goTo(current - 1), current <= 1, uiString('pagination', 'previous'), 'prev');
+  prevBtn.setAttribute('data-part', 'prev');
+  navEl.appendChild(prevBtn);
+
+  // Page numbers (not in simple mode) — none when there is nothing to page: an empty set does
+  // not show an active page "1".
+  if (!isSimple) {
+    const pages = count > 0 ? getPageRange(current, tp) : [];
+    for (const p of pages) {
+      if (p === -1) {
+        const gapEl = document.createElement('span');
+        gapEl.className = 'pdx-page-ellipsis';
+        gapEl.setAttribute('data-part', 'ellipsis');
+        gapEl.textContent = '…';
+        // Drawn, not read: a gap in the numbers, which the page names already say.
+        gapEl.setAttribute('aria-hidden', 'true');
+        navEl.appendChild(gapEl);
+      } else {
+        const pageSlot = getPageSlot();
+        if (typeof pageSlot === 'function') {
+          const content = (pageSlot as (p: number, active: boolean) => Node | null)(p, p === current);
+          const wrapper = document.createElement('span');
+          // The current page is its `aria-current`, which the CSS selects: no class.
+          wrapper.className = 'pdx-page-btn';
+          wrapper.setAttribute('data-part', 'page');
+          if (p === current) wrapper.setAttribute('aria-current', 'page');
+          wrapper.addEventListener('click', () => goTo(p));
+          if (content) wrapper.appendChild(content);
+          navEl.appendChild(wrapper);
+        } else {
+          // "Page 2", not the bare number.
+          const btn = makeBtn(String(p), () => goTo(p), false,
+            format(uiString('pagination', 'page'), { n: p }), `page:${p}`);
+          if (p === current) btn.setAttribute('aria-current', 'page');
+          navEl.appendChild(btn);
+        }
+      }
+    }
+  } else {
+    // Simple: show "Page X of Y"
+    const info = document.createElement('span');
+    info.className = 'pdx-pagination-simple-info';
+    info.setAttribute('data-part', 'position');
+    info.textContent = count > 0 ? `${current} / ${tp}` : '0 / 0';
+    navEl.appendChild(info);
+  }
+
+  // Next
+  const nextBtn = makeBtn('›', () => goTo(current + 1), current >= tp, uiString('pagination', 'next'), 'next');
+  nextBtn.setAttribute('data-part', 'next');
+  navEl.appendChild(nextBtn);
+
+  // Last
+  if (withEdges && !isSimple) {
+    const lastBtn = makeBtn('»', () => goTo(tp), current >= tp, uiString('pagination', 'last'), 'last');
+    lastBtn.setAttribute('data-part', 'last');
+    navEl.appendChild(lastBtn);
+  }
+
+  if (!host.contains(navEl)) host.appendChild(navEl);
+  if (focusKey) restoreFocus(navEl, focusKey);
+}
+
+/**
+ * The rows-per-page control: a pdx-select, never the browser's `<select>` — the one native
+ * dropdown on a list would break the rule that keeps them out.
+ */
+let sizeSelect: SizeSelect | null = null;
+function createSizeSelect(): SizeSelect {
+  // Loaded the first time a pager offers sizes: one that offers none never fetches it.
+  // The element is upgraded when it arrives, keeping what is set on it below.
+  if (!customElements.get('pdx-select')) void import('../select/pdx-select');
+  const select = document.createElement('pdx-select') as SizeSelect;
+  select.className = 'pdx-pagination-size';
+  select.setAttribute('data-part', 'size');
+  select.setAttribute('size', 'sm');
+  select.setAttribute('data-page-key', 'size');
+  uiAttr(select, 'label', () => uiString('pagination', 'pageSize'));
+  // The select's model event (#481), which does not bubble: the pager's own model events
+  // are the ones its listeners read.
+  select.addEventListener('value-change', (e) => {
+    const chosen = Number((e as CustomEvent<{ value: string | null }>).detail.value);
+    if (!chosen) return;
+    const ds = resolveDS() as SizedSource | null;
+    // Page 1: staying on page 9 of 20 while the size triples lands past the end.
+    if (ds && typeof ds.setPageSize === 'function') ds.setPageSize(chosen);
+    shownPage = 1;
+    // Without it the size does not stick: an explicit page-size prop, or none and
+    // no source, gives the rebuild the old size back.
+    reflect('pageSize', chosen);
+    reflect('page', 1);
+    rebuild();
+  });
+  return select;
+}
+
+/** The same control again; if it is gone or disabled (Next on the last page), the current page. */
+function restoreFocus(navEl: Element, key: string): void {
+  const same = navEl.querySelector<HTMLElement>(`[data-page-key="${key}"]`);
+  if (same && !(same as HTMLButtonElement).disabled) { same.focus(); return; }
+  const currentEl = navEl.querySelector<HTMLElement>('button[aria-current="page"]')
+    ?? navEl.querySelector<HTMLElement>('button:not(:disabled), select');
+  currentEl?.focus();
+}
+
+function makeBtn(text: string, onClick: () => void, disabled: boolean, label?: string, key?: string): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'pdx-page';
+  btn.textContent = text;
+  btn.disabled = disabled;
+  if (label) btn.setAttribute('aria-label', label);
+  if (key) {
+    btn.setAttribute('data-page-key', key);
+    // `page:3` is a page button. The others are named by what they do, where they are made: a part
+    // is written by its literal name, which the compiler checks against @part.
+    if (key.startsWith('page:')) btn.setAttribute('data-part', 'page');
+  }
+  btn.addEventListener('click', onClick);
+  return btn;
+}
+
+function getPageRange(current: number, count: number): number[] {
+  if (count <= 7) return Array.from({ length: count }, (_, i) => i + 1);
+  const pages: number[] = [];
+  pages.push(1);
+  if (current > 3) pages.push(-1); // ellipsis
+  const start = Math.max(2, current - 1);
+  const end = Math.min(count - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (current < count - 2) pages.push(-1); // ellipsis
+  pages.push(count);
+  return pages;
+}
+
+$effect(() => {
+  // Subscribe to explicit props
+  void page;
+  void total;
+  void pageSize;
+  void simple;
+  void showEdges;
+  void showTotal;
+  void source;
+  // Subscribe to DataSource signals if available
+  const ds = resolveDS();
+  if (ds) { void ds.page(); void ds.total(); }
+
+  const wanted = getPage();
+
+  if (!_built) {
+    _built = true;
+    shownPage = wanted || 1;
+    requestAnimationFrame(rebuild);
+    return;
+  }
+
+  shownPage = wanted || 1;
+  // Checked again in the frame: a click rebuilds at once, after its reflection ran this.
+  if (buildInputs() === _builtFrom) return;
+  requestAnimationFrame(() => { if (buildInputs() !== _builtFrom) rebuild(); });
+});
+</script>

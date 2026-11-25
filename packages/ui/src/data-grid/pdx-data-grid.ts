@@ -47,7 +47,7 @@ function loadIcon(): void {
 // The editors, the filter controls and the edit dialog are created only when someone edits or
 // filters: they load then (shared/lazy-tags.ts), or when the browser is idle in a grid that can.
 import { prefetchTags } from '../shared/lazy-tags';
-import '../pagination/pdx-pagination';
+import '../pagination/pdx-pagination.pdx';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/data-grid';
