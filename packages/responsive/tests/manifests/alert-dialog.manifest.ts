@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-alert-dialog (overlay, tier 2A)
  *
- * Contracts written by inspecting the source (packages/ui/src/alert-dialog/pdx-alert-dialog.ts) and
+ * Contracts written by inspecting the source (packages/ui/src/alert-dialog/pdx-alert-dialog.pdx) and
  * the CSS (packages/design/src/components/dialog.css — it reuses .pdx-dialog-backdrop /
  * .pdx-dialog-panel).
  *

@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { component, html, signal } from '@pdxui/core';
-import '../../src/alert-dialog/pdx-alert-dialog';
+import '../../src/alert-dialog/pdx-alert-dialog.pdx';
 
 let hostCount = 0;
 

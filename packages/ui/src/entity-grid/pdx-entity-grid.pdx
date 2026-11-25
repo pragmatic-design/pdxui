@@ -64,7 +64,7 @@ import type { PendingDelete, Row } from './entity-grid-rows';
 import '../data-grid/pdx-data-grid';
 import '../bulk-actions/pdx-bulk-actions';
 import '../edit-drawer/pdx-edit-drawer.pdx';
-import '../alert-dialog/pdx-alert-dialog';
+import '../alert-dialog/pdx-alert-dialog.pdx';
 import '../icon/pdx-icon.pdx';
 // The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
 import './entity-grid-icons';

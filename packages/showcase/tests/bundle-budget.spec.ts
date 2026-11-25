@@ -484,7 +484,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // the compiled template's code where html`` stays for the components not moved yet. Measured 478.7 KB in
 // CI and 478.5 locally, the gap of the moves before; the ceiling is held to CI's figure. Entry, css and
 // blocking unchanged.
-const BUDGET_KB = { entry: 43.6, js: 478.7, css: 67, blocking: 102.9 };
+// js 478.7 → 479.1 (the standing OK for #1210's moves): pdx-alert-dialog moves to .pdx, 1.03× alone
+// (2333 against 2256 B): its template is compiled, where the TypeScript version wired its two buttons
+// imperatively, and the showcase's CRUD pages draw it. Measured 478.9 KB locally; CI has read the
+// moves before 0.2 KB above the local figure, so the ceiling is held to that. Entry, css and blocking
+// unchanged.
+const BUDGET_KB = { entry: 43.6, js: 479.1, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
