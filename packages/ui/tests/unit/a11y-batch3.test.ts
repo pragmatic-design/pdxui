@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
 import '../../src/pagination/pdx-pagination.pdx';
-import '../../src/otp-input/pdx-otp-input';
+import '../../src/otp-input/pdx-otp-input.pdx';
 import '../../src/page-header/pdx-page-header';
 
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));

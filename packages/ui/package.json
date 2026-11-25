@@ -54,11 +54,6 @@
       "types": "./dist/form-template/pdx-form-template.d.ts",
       "import": "./dist/form-template/pdx-form-template.js"
     },
-    "./otp-input": {
-      "development": "./src/otp-input/pdx-otp-input.ts",
-      "types": "./dist/otp-input/pdx-otp-input.d.ts",
-      "import": "./dist/otp-input/pdx-otp-input.js"
-    },
     "./accordion": {
       "development": "./src/accordion/pdx-accordion.ts",
       "types": "./dist/accordion/pdx-accordion.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/time-picker/pdx-time-picker.pdx",
       "types": "./dist/time-picker/pdx-time-picker.d.ts",
       "import": "./dist/time-picker/pdx-time-picker.js"
+    },
+    "./otp-input": {
+      "development": "./src/otp-input/pdx-otp-input.pdx",
+      "types": "./dist/otp-input/pdx-otp-input.d.ts",
+      "import": "./dist/otp-input/pdx-otp-input.js"
     },
     "./package.json": "./package.json"
   },

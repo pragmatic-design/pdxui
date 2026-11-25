@@ -21501,7 +21501,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/otp-input/pdx-otp-input.ts",
+      "path": "src/otp-input/pdx-otp-input.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -21802,7 +21802,7 @@
           "name": "pdx-otp-input",
           "declaration": {
             "name": "PdxOtpInput",
-            "module": "src/otp-input/pdx-otp-input.ts"
+            "module": "src/otp-input/pdx-otp-input.pdx"
           }
         }
       ]
