@@ -13,7 +13,7 @@
  * number of samples one side ran second once more than the other, and its median landed on a slow one.
  */
 import { test, expect } from './fixture';
-import { portRatio, SAMPLES, type PairResult } from './port-ratio';
+import { portRatio, instancesFor, SAMPLES, INSTANCES, type PairResult } from './port-ratio';
 
 /**
  * Pairs of a component `truth`× its TypeScript version, read with the page opened first `opened`×
@@ -55,4 +55,19 @@ test('a pair of an odd number of samples is refused: one side would run second m
 test('the pairs must come in both orders, or no bias can cancel', () => {
     const oneOrder = planted(1, 1.06, 1, 8).map((p) => ({ ...p, oursFirst: true }));
     expect(() => portRatio(oneOrder)).toThrow(/both orders/);
+});
+
+// A tag whose instances take long to go still is measured at fewer of them, the same on both sides
+// (#1387): 1000 pdx-charts take ~1.8 s to settle, and 368 mounts of them did not fit in the timeout.
+test('a tag that settles fast is measured at INSTANCES', () => {
+    expect(INSTANCES).toBe(1000);
+    expect(instancesFor(40)).toBe(INSTANCES);
+    expect(instancesFor(250)).toBe(INSTANCES);
+});
+
+test('a tag that settles slowly is measured at fewer instances, by hundreds, never under 100', () => {
+    expect(instancesFor(500)).toBe(500);
+    expect(instancesFor(700)).toBe(300);
+    expect(instancesFor(1797)).toBe(100);
+    expect(instancesFor(60_000)).toBe(100);
 });

@@ -12,7 +12,8 @@
  * TypeScript version. `PDX_PORT_BASE` names another base for `main`'s side (a commit from before a move).
  *
  * The procedure, for each moved tag: COUPLES couples of fresh pairs of pages, one pair opened ours first
- * and one theirs first, each with WARM_UP mounts and SAMPLES alternated samples of INSTANCES tags; a
+ * and one theirs first, each with WARM_UP mounts and SAMPLES alternated samples of INSTANCES tags (fewer,
+ * the same on both sides, for a tag slow to go still: `instancesFor`, #1387); a
  * pair's ratio is the median of its turns (a sample of each order, which cancels a mount that is slower
  * for running second), a couple's the geometric mean of its two pairs', which cancels a page that is
  * slower for being opened first (#1277, `port-ratio.ts`), and the tag's the median of its couples. The bound is the runner's own spread: a CONTROL row measures one tag with this tree's
@@ -27,7 +28,7 @@ import type { AddressInfo } from 'node:net';
 import { cpus } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { scenarioDist, COMPONENT_MOUNT_MAIN } from './scenarios-build';
-import { portRatio, coupleRatios, SAMPLES, type PairResult } from './port-ratio';
+import { portRatio, coupleRatios, instancesFor, INSTANCES, SAMPLES, type PairResult } from './port-ratio';
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 
@@ -47,8 +48,6 @@ function serve(dir: string): Promise<{ url: string; server: Server }> {
 /** Couples of pairs, one opened in each order (#1277): eight fresh pairs, one more than the seven before. */
 const COUPLES = 4;
 const WARM_UP = 3;
-/** 1,000 and not the 100 of the budget spec: at 100 the 0.1 ms timer is several per cent of a mount. */
-const INSTANCES = 1000;
 /** The tag the control measures against itself: on both sides, the same in every tree. */
 const CONTROL_TAG = 'pdx-badge';
 /**
@@ -80,8 +79,20 @@ function movedTags(): string[] {
 
 const median = (xs: readonly number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
-const mount = (page: Page, tag: string) =>
-    page.evaluate(({ t, n }) => (window as unknown as { __mount(t: string, n: number): Promise<number> }).__mount(t, n), { t: tag, n: INSTANCES });
+const mount = (page: Page, tag: string, n: number) =>
+    page.evaluate(({ t, n }) => (window as unknown as { __mount(t: string, n: number): Promise<number> }).__mount(t, n), { t: tag, n });
+
+/**
+ * How many tags each sample of `tag` mounts (#1387): a warm mount of INSTANCES on a fresh page of ours,
+ * and how long it took to go still, `window.__drawnMs`. The same number is used on both sides.
+ */
+async function instancesOf(browser: Browser, ours: string, tag: string): Promise<number> {
+    const page = await open(browser, ours);
+    await mount(page, tag, INSTANCES);
+    const drawn = await page.evaluate(() => (window as unknown as { __drawnMs: number }).__drawnMs);
+    await page.close();
+    return instancesFor(drawn);
+}
 
 async function open(browser: Browser, url: string): Promise<Page> {
     const page = await browser.newPage();
@@ -95,19 +106,19 @@ async function open(browser: Browser, url: string): Promise<Page> {
  * the order the two are opened in; `portRatio` balances it, and the order of each sample's two mounts
  * (#1277).
  */
-async function pair(browser: Browser, ours: string, theirs: string, tag: string, oursFirst: boolean): Promise<RawPair> {
+async function pair(browser: Browser, ours: string, theirs: string, tag: string, oursFirst: boolean, n: number): Promise<RawPair> {
     let pa: Page;
     let pb: Page;
     if (oursFirst) { pa = await open(browser, ours); pb = await open(browser, theirs); }
     else { pb = await open(browser, theirs); pa = await open(browser, ours); }
     const warm: number[] = [];
-    for (let i = 0; i < WARM_UP; i++) { warm.push(await mount(pa, tag)); warm.push(await mount(pb, tag)); }
+    for (let i = 0; i < WARM_UP; i++) { warm.push(await mount(pa, tag, n)); warm.push(await mount(pb, tag, n)); }
     const a: number[] = [];
     const b: number[] = [];
     for (let i = 0; i < SAMPLES; i++) {
         // Sample i mounts `b` first when i is even, `a` first when odd: the order `pairRatio` reads.
-        if (i % 2) { a.push(await mount(pa, tag)); b.push(await mount(pb, tag)); }
-        else { b.push(await mount(pb, tag)); a.push(await mount(pa, tag)); }
+        if (i % 2) { a.push(await mount(pa, tag, n)); b.push(await mount(pb, tag, n)); }
+        else { b.push(await mount(pb, tag, n)); a.push(await mount(pa, tag, n)); }
     }
     await Promise.all([pa.close(), pb.close()]);
     return { a, b, oursFirst, warm };
@@ -130,11 +141,12 @@ const rawLine = (p: RawPair, i: number): string => {
  * first (`portRatio`, #1277). `pairs` are the couples' ratios; `a` and `b`, for the log, the median over
  * the pairs of each side's median sample.
  */
-async function ratioOf(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ ratio: number; a: number; b: number; pairs: number[]; raw: RawPair[] }> {
+async function ratioOf(browser: Browser, ours: string, theirs: string, tag: string): Promise<{ ratio: number; a: number; b: number; pairs: number[]; raw: RawPair[]; n: number }> {
+    const n = await instancesOf(browser, ours, tag);
     const results: RawPair[] = [];
-    for (let p = 0; p < COUPLES * 2; p++) results.push(await pair(browser, ours, theirs, tag, p % 2 === 0));
+    for (let p = 0; p < COUPLES * 2; p++) results.push(await pair(browser, ours, theirs, tag, p % 2 === 0, n));
     const pairs = coupleRatios(results).map((r) => Math.round(r * 100) / 100);
-    return { ratio: portRatio(results), a: median(results.map((r) => median(r.a))), b: median(results.map((r) => median(r.b))), pairs, raw: results };
+    return { ratio: portRatio(results), a: median(results.map((r) => median(r.a))), b: median(results.map((r) => median(r.b))), pairs, raw: results, n };
 }
 
 let site: { url: string; server: Server };
@@ -152,7 +164,7 @@ test.describe('a component moved to .pdx against its TypeScript version, on this
 
     test(`control: ${CONTROL_TAG} against itself reads within ${BAND} of 1.0`, async ({ browser }) => {
         const r = await ratioOf(browser, site.url, site.url, CONTROL_TAG);
-        console.log(`[port] control ${CONTROL_TAG} against itself: ${r.a.toFixed(2)} ms / ${r.b.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
+        console.log(`[port] control ${CONTROL_TAG} against itself (n=${r.n}): ${r.a.toFixed(2)} ms / ${r.b.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
         // The raw times, and the runner's cores, for #1277: always logged, so every run is a data point.
         console.log(`[port-raw] cores ${cpus().length} (${cpus()[0]?.model ?? '?'})`);
         r.raw.forEach((p, i) => console.log(rawLine(p, i)));
@@ -167,7 +179,7 @@ test.describe('a component moved to .pdx against its TypeScript version, on this
         test.skip(tags.length === 0, `no tag is .ts in main (${mainCommit()}) and .pdx here: nothing was measured`);
         for (const tag of tags) {
             const r = await ratioOf(browser, site.url, main.url, tag);
-            console.log(`[port] ${tag}: TS ${r.b.toFixed(2)} ms (main ${mainCommit()}), .pdx ${r.a.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
+            console.log(`[port] ${tag} (n=${r.n}): TS ${r.b.toFixed(2)} ms (main ${mainCommit()}), .pdx ${r.a.toFixed(2)} ms, ratio ${r.ratio} (pairs: ${r.pairs.join(' ')})`);
             expect.soft(r.ratio, `${tag} mounts ${r.ratio}× its TypeScript version, over 1 + ${BAND}`).toBeLessThanOrEqual(1 + BAND);
         }
     });
