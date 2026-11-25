@@ -18,7 +18,7 @@ import { escapeForRegExp } from './regexp-escape';
 import { bindingNames } from './codegen-prefix';
 import { stateExprIsNotBoolean } from './validate-state';
 import { invalidHostAttribute } from './host-block';
-import { checkParts, writesPart } from './validate-parts';
+import { checkParts, writesPart, withScriptSnippets } from './validate-parts';
 import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
@@ -589,7 +589,8 @@ export function validate(
     // The script's code as the analyzer split it: the setup body, the effects, the lifecycle bodies.
     const scriptWithStrings = maskComments([analysis.body, ...analysis.effects, ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy].join('\n'));
     const setupCode = maskNonCode(scriptWithStrings);
-    warnings.push(...checkParts(analysis.parts, ast, new Set(analysis.signals.map(s => s.name)), {
+    // The script's `@snippet` bodies draw the component's elements too (#1412).
+    warnings.push(...checkParts(analysis.parts, withScriptSnippets(ast, analysis.snippets), new Set(analysis.signals.map(s => s.name)), {
         internal: analysis.internal === true,
         drawnBy: options?.viewParts,
         // Match: the name as a whole identifier, not a member (`x.grid`) — strings and comments masked.

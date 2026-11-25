@@ -333,3 +333,27 @@ describe('the part diagnostics', () => {
         expect(codes('@raw { <div data-part="shown">x</div> }', 'let a = $signal(1);', 'PDX_PART_UNDECLARED')).toHaveLength(0);
     });
 });
+
+describe('a part drawn in a script @snippet (#1412)', () => {
+    // A script `@snippet` is a template the component renders with `@render`: its elements are the
+    // component's, and so are their parts.
+    const template = '<div role="listbox">@for (rows as r; track r) { @render optionRow(r) }</div>';
+    const snippet = '@snippet optionRow(r: string) { <div role="option" data-part="option">{{ r }}</div> }';
+
+    it('is on an element: no PDX_PART_MISSING', () => {
+        expect(codes(template, `@part option;\n@prop rows: string[] = [];\n${snippet}`, 'PDX_PART_MISSING')).toHaveLength(0);
+        // The control: with no snippet drawing it, the part is missing.
+        expect(codes(template.replace('@render optionRow(r)', ''), '@part option;\n@prop rows: string[] = [];', 'PDX_PART_MISSING')).toHaveLength(1);
+    });
+
+    it('a data-part in a snippet that names no part is PDX_PART_UNDECLARED', () => {
+        const found = codes(template, `@prop rows: string[] = [];\n${snippet}`, 'PDX_PART_UNDECLARED');
+        expect(found).toHaveLength(1);
+        expect(found[0].message).toContain(`'option'`);
+    });
+
+    it('drawn by a snippet, it can be there any number of times: the script reads the array', () => {
+        const { code } = compile(pdx(template, `@part option;\n@prop rows: string[] = [];\n${snippet}\nfunction first() { return option[0]; }`), 'test.pdx');
+        expect(code).toContain('const __option = signal([]');
+    });
+});

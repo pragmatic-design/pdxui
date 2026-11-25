@@ -564,7 +564,8 @@ The analyzer's form: `@part trigger, popup;`, and `data-part="popup"` on the ele
 #### Semantics
 
 A named, public element of the component. `@part popup;` in the script, and `data-part="popup"`
-written literally on the elements of the template it names. The attribute stays in the page, so a
+written literally on the elements of the template it names — the script's own `@snippet` bodies
+included, which the template renders with `@render` (#1412). The attribute stays in the page, so a
 theme or a test reaches the element as `pdx-menu [data-part="popup"]` — with the component's
 `:state()` and its tokens, the public styling surface; its internal classes are not. In the script the
 name is the element: a signal that holds it while it is rendered and `null` otherwise, as a `:ref`
