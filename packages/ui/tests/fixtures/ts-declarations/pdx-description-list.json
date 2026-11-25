@@ -1,0 +1,207 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDescriptionList",
+  "tagName": "pdx-description-list",
+  "category": "Data Display",
+  "order": 83,
+  "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
+  "generics": [
+    "T extends { label: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "columns",
+      "description": "Number of key/value columns to lay out.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "columns"
+    },
+    {
+      "kind": "field",
+      "name": "layout",
+      "description": "Layout: 'horizontal' (label beside value) or 'vertical'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "layout"
+    },
+    {
+      "kind": "field",
+      "name": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "bordered"
+    },
+    {
+      "kind": "field",
+      "name": "striped",
+      "description": "Alternates row backgrounds.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "striped"
+    },
+    {
+      "kind": "field",
+      "name": "labelWidth",
+      "description": "Fixed width for the label column.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "labelwidth"
+    },
+    {
+      "kind": "field",
+      "name": "colon",
+      "description": "Appends a colon after each label.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "colon"
+    },
+    {
+      "kind": "field",
+      "name": "renderValue",
+      "description": "Render function for a value.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-dl-md",
+        "sm": ".pdx-dl-sm",
+        "lg": ".pdx-dl-lg"
+      }
+    }
+  ],
+  "attributes": [
+    {
+      "name": "columns",
+      "fieldName": "columns",
+      "description": "Number of key/value columns to lay out.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "layout",
+      "fieldName": "layout",
+      "description": "Layout: 'horizontal' (label beside value) or 'vertical'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "bordered",
+      "fieldName": "bordered",
+      "description": "Adds a border.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "striped",
+      "fieldName": "striped",
+      "description": "Alternates row backgrounds.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "labelwidth",
+      "fieldName": "labelWidth",
+      "description": "Fixed width for the label column.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "colon",
+      "fieldName": "colon",
+      "description": "Appends a colon after each label.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "DescriptionListItem",
+      "fields": [
+        "label: string",
+        "value: string | HTMLElement",
+        "span?: number",
+        "icon?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "value",
+      "description": "Renders the value of one entry: a snippet `value(item, index)`.",
+      "signature": "(item: T, index: number)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<dl>`, with the classes a native list uses (`.pdx-dl`, `-bordered`, `-striped`…)."
+    }
+  ]
+}
