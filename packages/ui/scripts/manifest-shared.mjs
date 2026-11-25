@@ -5,7 +5,7 @@
 // .pdx's doc comments go through the same TypeScript JSDoc reading as a component()'s.
 
 import ts from 'typescript';
-import { readFileSync, readdirSync } from 'fs';
+import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join, relative, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -100,6 +100,22 @@ export function parseFires(text) {
 /** The event a model dispatches, as core names it: `selectedId` → `selected-id-change`. */
 export function modelEventName(name) {
     return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
+}
+
+/**
+ * The non-component `.ts` files beside a component: where a component that grew split its logic
+ * (pdx-data-grid emits `pdx-selection-change` from grid-selection.ts, not from pdx-data-grid.ts).
+ * Read for a TypeScript component and for a `.pdx` one alike (#1210): code moved out of a component
+ * into a module beside it is still the component's.
+ */
+export function helperFiles(file) {
+    const dir = dirname(file);
+    // A reader is handed its text, and a test may hand it a path that exists nowhere
+    // (gen-manifest-eol.test.ts): no directory, no helpers.
+    if (!existsSync(dir)) return [];
+    return readdirSync(dir)
+        .filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts') && !/^pdx-/.test(f))
+        .map(f => join(dir, f));
 }
 
 // ─── Scans over markup and code ─────────────────────────────────────

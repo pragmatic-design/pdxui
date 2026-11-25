@@ -274,11 +274,6 @@
       "types": "./dist/shared/filter-popover.d.ts",
       "import": "./dist/shared/filter-popover.js"
     },
-    "./json-editor": {
-      "development": "./src/json-editor/pdx-json-editor.ts",
-      "types": "./dist/json-editor/pdx-json-editor.d.ts",
-      "import": "./dist/json-editor/pdx-json-editor.js"
-    },
     "./page-header": {
       "development": "./src/page-header/pdx-page-header.ts",
       "types": "./dist/page-header/pdx-page-header.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/pagination/pdx-pagination.pdx",
       "types": "./dist/pagination/pdx-pagination.d.ts",
       "import": "./dist/pagination/pdx-pagination.js"
+    },
+    "./json-editor": {
+      "development": "./src/json-editor/pdx-json-editor.pdx",
+      "types": "./dist/json-editor/pdx-json-editor.d.ts",
+      "import": "./dist/json-editor/pdx-json-editor.js"
     },
     "./package.json": "./package.json"
   },

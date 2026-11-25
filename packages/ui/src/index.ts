@@ -131,7 +131,7 @@ import './auto-form/pdx-auto-form.pdx';
 import './bulk-actions/pdx-bulk-actions';
 import './edit-drawer/pdx-edit-drawer';
 import './entity-grid/pdx-entity-grid';
-import './json-editor/pdx-json-editor';
+import './json-editor/pdx-json-editor.pdx';
 import './relation-picker/pdx-relation-picker.pdx';
 import './chart/pdx-chart';
 import './chart/pdx-sparkline';

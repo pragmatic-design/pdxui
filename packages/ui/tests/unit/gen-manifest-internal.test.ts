@@ -72,6 +72,36 @@ describe('the roles a .pdx script writes', () => {
     });
 });
 
+// A module beside the component is part of it, as gen-manifest reads a TypeScript component's: the
+// roles and contexts of the code it moved there are the component's. pdx-json-editor's sub-modal
+// is a role="dialog" built in json-editor-fields.ts (#1210), and the manifest lost it.
+describe('the TypeScript modules in a .pdx component\'s folder', () => {
+    it('give it the roles they write and the contexts they read', () => {
+        write('w/pdx-w.pdx', '<template></template>\n<script>\nimport { openPanel } from \'./w-panel\';\n</script>');
+        write('w/w-panel.ts', [
+            "import { inject } from '@pdxui/core';",
+            'export function openPanel(host: HTMLElement): void {',
+            "    const box = document.createElement('div');",
+            "    box.setAttribute('role', 'dialog');",
+            '    inject(PanelContext, host, null);',
+            '}',
+        ].join('\n'));
+        const file = join(root, 'w/pdx-w.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect(mod.declarations[0].roles).toEqual(['dialog']);
+        expect(mod.declarations[0]['x-pdx-context']).toEqual({ injects: [{ token: 'PanelContext', optional: true }] });
+    });
+
+    it('a .d.ts beside it, and another component\'s file, are not', () => {
+        write('v/pdx-v.pdx', '<template></template>\n<script>\n</script>');
+        write('v/pdx-v.pdx.d.ts', "declare const x: 'role=\"alert\"';");
+        write('v/pdx-other.ts', "document.body.setAttribute('role', 'alert');");
+        const file = join(root, 'v/pdx-v.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect(mod.declarations[0].roles).toBeUndefined();
+    });
+});
+
 // `@prop(icon)` (#1317) is the .pdx form of `prop('inbox', { iconName: true })`: the manifest says the
 // prop names an icon, and the compiler imports the icon a consumer writes in it (icon-imports.ts).
 describe('a .pdx prop that names an icon', () => {

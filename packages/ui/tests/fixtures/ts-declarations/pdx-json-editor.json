@@ -1,0 +1,66 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxJsonEditor",
+  "tagName": "pdx-json-editor",
+  "category": "Data-bound",
+  "order": 112,
+  "description": "A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each\nobject or list of objects in a sub-modal of its own.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "schema",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "null"
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: unknown }"
+    }
+  ],
+  "roles": [
+    "dialog"
+  ],
+  "attributes": [],
+  "cssParts": [
+    {
+      "name": "entry",
+      "description": "One scalar field: its caption and its control."
+    },
+    {
+      "name": "branch",
+      "description": "One object or list of objects: its caption, a summary and the button that opens it."
+    },
+    {
+      "name": "dialog",
+      "description": "The sub-modal a branch opens, `role=\"dialog\"`, appended to the page's body."
+    }
+  ]
+}

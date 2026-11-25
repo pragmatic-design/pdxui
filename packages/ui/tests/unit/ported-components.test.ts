@@ -41,6 +41,7 @@ const PORTED: Record<string, string> = {
     'pdx-form-actions': 'src/form-actions/pdx-form-actions.pdx',
     'pdx-form-field': 'src/form-field/pdx-form-field.pdx',
     'pdx-input': 'src/input/pdx-input.pdx',
+    'pdx-json-editor': 'src/json-editor/pdx-json-editor.pdx',
     'pdx-inline-edit': 'src/inline-edit/pdx-inline-edit.pdx',
     'pdx-infinite-scroll': 'src/infinite-scroll/pdx-infinite-scroll.pdx',
     'pdx-sortable-list': 'src/sortable-list/pdx-sortable-list.pdx',
