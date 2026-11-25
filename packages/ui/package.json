@@ -115,7 +115,7 @@
       "import": "./dist/transfer/pdx-transfer.js"
     },
     "./mention": {
-      "development": "./src/mention/pdx-mention.ts",
+      "development": "./src/mention/pdx-mention.pdx",
       "types": "./dist/mention/pdx-mention.d.ts",
       "import": "./dist/mention/pdx-mention.js"
     },
@@ -677,6 +677,7 @@
     "dist/field-list/field-list-strings.js",
     "dist/icon/icon-setup.js",
     "dist/inline-edit/inline-edit-strings.js",
+    "dist/mention/mention-strings.js",
     "dist/search-input/search-input-icons.js",
     "dist/time-picker/time-picker-strings.js",
     "dist/toast/toast-icons.js",
@@ -692,6 +693,7 @@
     "src/field-list/field-list-strings.ts",
     "src/icon/icon-setup.ts",
     "src/inline-edit/inline-edit-strings.ts",
+    "src/mention/mention-strings.ts",
     "src/search-input/search-input-icons.ts",
     "src/time-picker/time-picker-strings.ts",
     "src/toast/toast-icons.ts",

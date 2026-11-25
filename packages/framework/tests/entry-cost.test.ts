@@ -122,7 +122,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 343.6; 1.03× alone, its template compiled where its buttons were wired imperatively). 343.9
     // after pdx-drawer (measured here: 343.8): 0.91× alone, but the moves before it left the entry
     // 0.1 KB from its ceiling, and its compiled template is laid out unlike the TypeScript file.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 343.9 },
+    // 344.3 after pdx-mention (measured here: 344.2): 0.89× alone with its four modules, the entry
+    // +0.3 KB; the cause of the difference is not isolated — the move splits one module into five.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 344.3 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -140,8 +142,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // here: 333.4). 333.8 after pdx-file-upload (measured here: 333.7). 334.0 after pdx-form-section,
     // pdx-col, pdx-bottom-nav, pdx-relative-time and pdx-scroll-spy (measured here: 333.9). 334.3
     // after pdx-banner (measured here: 334.2). 334.5 after the moves since, the last pdx-entity-grid
-    // (measured here: 334.4). 334.9 after pdx-alert-dialog (measured here: 334.8).
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 334.9 },
+    // (measured here: 334.4). 334.9 after pdx-alert-dialog (measured here: 334.8). 335.4 after
+    // pdx-mention (measured here: 335.3), as for the entry above.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 335.4 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

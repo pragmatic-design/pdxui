@@ -307,10 +307,10 @@ placeholders, filled at render: keep them in the translation.
 | `localized-input` | `languages` | `Languages` | `@pdxui/ui/src/shared/i18n.ts` |
 | `localized-input` | `missing` | `missing` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `label` | `Mentions` | `@pdxui/ui/src/shared/i18n.ts` |
-| `mention` | `loading` | `Loading...` | `@pdxui/ui/src/mention/pdx-mention.ts` |
-| `mention` | `noResults` | `No results` | `@pdxui/ui/src/mention/pdx-mention.ts` |
-| `mention` | `placeholder` | `Type @ to mention someone` | `@pdxui/ui/src/mention/pdx-mention.ts` |
-| `mention` | `suggestions` | `{n, plural, one {# suggestion} other {# suggestions}}` | `@pdxui/ui/src/mention/pdx-mention.ts` |
+| `mention` | `loading` | `Loading...` | `@pdxui/ui/src/mention/mention-strings.ts` |
+| `mention` | `noResults` | `No results` | `@pdxui/ui/src/mention/mention-strings.ts` |
+| `mention` | `placeholder` | `Type @ to mention someone` | `@pdxui/ui/src/mention/mention-strings.ts` |
+| `mention` | `suggestions` | `{n, plural, one {# suggestion} other {# suggestions}}` | `@pdxui/ui/src/mention/mention-strings.ts` |
 | `menubar` | `label` | `Menu` | `@pdxui/ui/src/shared/i18n.ts` |
 | `nav-menu` | `badge` | `{label}, {badge} new` | `@pdxui/ui/src/shared/i18n.ts` |
 | `nav-menu` | `label` | `Navigation` | `@pdxui/ui/src/shared/i18n.ts` |

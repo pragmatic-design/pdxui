@@ -1,0 +1,420 @@
+<template></template>
+
+<script>
+/**
+ * A textarea where typing a trigger such as @ opens floating suggestions, to insert a mention.
+ *
+ * @slot suggestion - Renders one suggestion: a snippet `suggestion(item, index, active)`.
+ *
+ * @csspart root - The frame around the textarea and its highlight layer.
+ * @csspart input - The native `<textarea>` the text is typed into.
+ * @csspart list - The floating suggestion list, `role="listbox"`.
+ * @csspart option - One suggestion, `role="option"`; the active one is `aria-selected="true"`.
+ *
+ * @cssstate disabled - `disabled` is set; the textarea is disabled.
+ * @cssstate readonly - `readonly` is set; the textarea is read-only.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail mentions $event.currentTarget.getMentions()
+ * @alphadetail markup $event.currentTarget.getMentionMarkup()
+ * @alphacommit pdx-change
+ */
+// pdx-mention — Textarea with @mention trigger, visual highlight, and floating suggestions.
+// Overlay pattern: transparent-text textarea + mirror div behind for highlighting.
+// Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
+// For persistence: getMentionMarkup() returns @[Label](id) format.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it
+// (mention-dom.ts); the text model is mention-text.ts, the suggestions' sources mention-source.ts.
+import { generatedId, getComponentString, computeFloatingPosition, autoUpdate, offset, flip, shift, onDestroy, onNextFrame } from '@pdxui/core';
+import type { VirtualElement } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { dispatchCommit } from '../shared/commit-change';
+import { shiftMentions, buildMirrorHTML, mentionMarkup, findTrigger, caretRect } from './mention-text';
+import type { MentionRange } from './mention-text';
+import { normalizeItem, sourceRows, remoteSource, remoteRows } from './mention-source';
+import { buildMentionFrame, suggestionRow } from './mention-dom';
+import type { MentionItem } from './mention-types';
+import './mention-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/mention';
+
+// The suggestion shape an app builds in TypeScript (`import type { MentionItem } from '@pdxui/ui/mention'`).
+export type { MentionItem } from './mention-types';
+
+// The text, clean of markup (#481). Typing and a picked mention write it, and the write dispatches
+// `value-change`, live. The commit is the textarea's native `change`, which bubbles to the host: on
+// blur after typing, and dispatched by the component when a mention is picked. A form submits the
+// markup, which keeps whom each mention names, and resets the text (#135).
+@model value: string = '' { form: () => markup || null };
+/** A suggestion was picked and inserted, after its `value-change`. */
+@event 'pdx-select': { item: MentionItem; trigger: string; query: string };
+// On the host as custom states (#132). The textarea draws them natively (`:disabled`).
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+// Every element is built by the script, a frame after mount (mention-dom.ts writes the parts).
+@part(external) root, input, list, option;
+/** Trigger character(s) — comma-separated for multiple (default: '@') */
+@prop trigger: string = '@';
+/** Static suggestions array */
+@prop items: unknown[] = [];
+/** DataSource or raw array for remote search */
+@prop source: Record<string, unknown> | null = null;
+/** Field for display label */
+@prop labelField: string = 'label';
+/** Field for value/id */
+@prop valueField: string = 'value';
+/** Field for description (optional) */
+@prop descriptionField: string = '';
+/** Minimum chars after trigger before searching (default: 0) */
+@prop minLength: number = 0;
+/** Debounce delay in ms for remote search (default: 300) */
+@prop debounce: number = 300;
+/** Max suggestions to show */
+@prop maxItems: number = 10;
+/** Textarea rows */
+@prop rows: number = 3;
+/** Placeholder text */
+@prop placeholder: string = '';
+/**
+ * The field's accessible name (aria-label on the textarea). A field needs one: give `label`,
+ * or put a visible label next to it. Without either, the placeholder stands in.
+ */
+@prop label: string = '';
+/** Disabled */
+@prop disabled: boolean = false;
+/** Readonly */
+@prop readonly: boolean = false;
+/** Form field name */
+@prop name: string = '';
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+@slot suggestion?: (item: { value: string; label: string; description?: string }, index: number, active: boolean);
+// The host is the one submitter, the markup, under its name (#133). No hidden input carries the
+// name: filled only by the suggestion list, it would send "" beside the value.
+@host el { :name="name || null" }
+
+@expose focus, blur, getMentionMarkup, getMentions;
+
+let open = $signal(false);
+let query = $signal('');
+let activeIndex = $signal(0);
+let loadingNow = $signal(false);
+let suggestions = $signal<MentionItem[]>([]);
+let activeTrigger = $signal('');
+let domReady = $signal(false);
+// The form value is the persistence markup (@[Label](id) form), not the text `value` holds
+// — so it stays its own signal.
+let markup = $signal<string>((value as string) || '');
+
+// Mention ranges tracked separately from text
+let mentions: MentionRange[] = [];
+let textareaEl: HTMLTextAreaElement | null = null;
+let mirrorEl: HTMLElement | null = null;
+let dropdownEl: HTMLElement | null = null;
+let statusEl: HTMLElement | null = null;
+const listId = `${generatedId('pdx-mention')}-list`;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+// Timers cancelled on destroy
+onDestroy(() => { if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; } });
+let triggerStart = -1;
+let prevLength = 0;
+
+/** The snippet a parent gave for one suggestion, read where it draws. */
+function suggestionSnippet(): ((item: MentionItem, index: number, active: boolean) => Node) | undefined {
+  const snippet = suggestion;
+  return typeof snippet === 'function' ? snippet as (item: MentionItem, index: number, active: boolean) => Node : undefined;
+}
+
+function getTriggers(): string[] {
+  const t = (trigger.peek() as string) || '@';
+  return t.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+/** One suggestion, by the field props as they are now. */
+function toItem(obj: unknown): MentionItem {
+  return normalizeItem(obj, { label: labelField.peek() as string, value: valueField.peek() as string, description: descriptionField.peek() as string });
+}
+
+async function searchSuggestions(text: string): Promise<void> {
+  if (text.length < (minLength.peek() as number)) { suggestions = []; return; }
+  const most = maxItems.peek() as number;
+  const q = text.toLowerCase();
+  const remote = remoteSource(source.peek());
+  if (remote) {
+    loadingNow = true;
+    try {
+      await remote.fetch({ search: text });
+      suggestions = remoteRows(remote).map(toItem).slice(0, most);
+    } catch {
+      // A failed search shows the empty list, as the TypeScript version did: the menu says
+      // "No results" rather than staying on the last ones.
+      suggestions = [];
+    } finally { loadingNow = false; }
+    return;
+  }
+  let all = ((items.peek() as unknown[]) || []).map(toItem);
+  if (all.length === 0) all = sourceRows(source.peek()).map(toItem);
+  const filtered = q ? all.filter(i => i.label.toLowerCase().includes(q) || i.value.toLowerCase().includes(q)) : all;
+  suggestions = filtered.slice(0, most);
+}
+
+function debouncedSearch(text: string): void {
+  if (debounceTimer) clearTimeout(debounceTimer);
+  const delay = remoteSource(source.peek()) ? (debounce.peek() as number) : 0;
+  if (delay > 0) debounceTimer = setTimeout(() => searchSuggestions(text), delay);
+  else void searchSuggestions(text);
+}
+
+function openDropdown(triggerChar: string, triggerPos: number): void {
+  activeTrigger = triggerChar;
+  triggerStart = triggerPos;
+  activeIndex = 0;
+  open = true;
+}
+
+function closeDropdown(): void {
+  open = false;
+  query = '';
+  suggestions = [];
+  triggerStart = -1;
+}
+
+function syncMirror(): void {
+  if (!mirrorEl || !textareaEl) return;
+  mirrorEl.innerHTML = buildMirrorHTML(textareaEl.value, mentions);
+  mirrorEl.scrollTop = textareaEl.scrollTop;
+}
+
+/** The text with each mention as `@[Label](id)`: the form to persist. */
+function getMentionMarkup(): string {
+  return textareaEl ? mentionMarkup(textareaEl.value, mentions) : '';
+}
+
+/** The mentions in the text: `{ value, label, trigger }` each. */
+function getMentions(): { value: string; label: string; trigger: string }[] {
+  return mentions.map(m => ({ value: m.value, label: m.label, trigger: m.trigger }));
+}
+
+function focus() { textareaEl?.focus(); }
+function blur() { textareaEl?.blur(); }
+
+function emitValues(): void {
+  if (!textareaEl) return;
+  markup = getMentionMarkup();
+  // The model is the live text. Equal to the textarea's, so the external-value
+  // effect sees no change and keeps the mention ranges.
+  value = textareaEl.value;
+}
+
+// ── Event handlers ──
+
+function selectItem(entry: MentionItem): void {
+  if (!textareaEl || triggerStart < 0) return;
+  const text = textareaEl.value;
+  const triggerChar = activeTrigger.peek();
+  const cursorPos = textareaEl.selectionStart;
+  const before = text.substring(0, triggerStart);
+  const afterCursor = text.substring(cursorPos);
+
+  // Clean insert: @Label (no markup in textarea)
+  const insertText = `${triggerChar}${entry.label} `;
+  const delta = insertText.length - (cursorPos - triggerStart);
+
+  textareaEl.value = before + insertText + afterCursor;
+  prevLength = textareaEl.value.length;
+  textareaEl.selectionStart = textareaEl.selectionEnd = triggerStart + insertText.length;
+  textareaEl.focus();
+
+  // Shift existing mentions after this position, then add the new one (trigger char included in
+  // display, the trailing space not)
+  mentions = shiftMentions(mentions, triggerStart, delta);
+  mentions.push({ start: triggerStart, end: triggerStart + insertText.length - 1, value: entry.value, label: entry.label, trigger: triggerChar });
+
+  syncMirror();
+  emitValues();
+  pdxSelect({ item: entry, trigger: triggerChar, query: query.peek() });
+  // A commit no typing produced: the text was set by script, so the browser fires no
+  // `change` for it on blur.
+  dispatchCommit(textareaEl);
+  closeDropdown();
+}
+
+function onInput(): void {
+  if (!textareaEl) return;
+  const text = textareaEl.value;
+  const pos = textareaEl.selectionStart;
+  const delta = text.length - prevLength;
+  prevLength = text.length;
+
+  // Adjust mention ranges for text edits
+  if (delta !== 0) mentions = shiftMentions(mentions, pos - Math.max(delta, 0), delta);
+
+  syncMirror();
+  emitValues();
+
+  // Detect trigger character
+  const found = findTrigger(text, pos, getTriggers(), mentions);
+  if (found) {
+    const typed = text.substring(found.at + 1, pos);
+    query = typed;
+    if (!open.peek()) openDropdown(found.trigger, found.at);
+    debouncedSearch(typed);
+  } else if (open.peek()) {
+    closeDropdown();
+  }
+}
+
+function onKeydown(e: KeyboardEvent): void {
+  if (!open.peek()) return;
+  const sugg = suggestions.peek();
+  const idx = activeIndex.peek();
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = sugg.length > 0 ? (idx + 1) % sugg.length : 0;
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = sugg.length > 0 ? (idx - 1 + sugg.length) % sugg.length : 0;
+  } else if (e.key === 'Enter' || e.key === 'Tab') {
+    if (sugg.length > 0) { e.preventDefault(); selectItem(sugg[idx]); }
+  } else if (e.key === 'Escape') {
+    e.preventDefault(); closeDropdown();
+  }
+}
+
+// The menu is `fixed` against the viewport and placed under the caret, so a scrolling
+// ancestor — a card, a table cell, a drawer body — cannot cut it. Not `absolute` inside the
+// wrap: any `overflow` box clips that.
+const caret: VirtualElement = { getBoundingClientRect: () => caretRect(textareaEl) };
+let stopFollowingFn: (() => void) | null = null;
+
+function placeDropdown(): void {
+  if (!dropdownEl || dropdownEl.style.display === 'none') return;
+  const { x, y } = computeFloatingPosition(caret, dropdownEl, { placement: 'bottom-start', strategy: 'fixed', middleware: [offset(4), flip(), shift()] });
+  dropdownEl.style.position = 'fixed';
+  dropdownEl.style.left = `${x}px`;
+  dropdownEl.style.top = `${y}px`;
+}
+
+/** Place the open menu now, and keep it placed while it stays open. */
+function followCaret(): void {
+  if (!dropdownEl) return;
+  if (stopFollowingFn) placeDropdown();
+  else stopFollowingFn = autoUpdate(caret, dropdownEl, placeDropdown);
+}
+
+function stopFollowing(): void {
+  stopFollowingFn?.();
+  stopFollowingFn = null;
+}
+onDestroy(stopFollowing);
+
+// ── Build DOM ── (a frame after mount: a setup a move destroyed does not build again)
+onNextFrame(() => {
+  const frame = buildMentionFrame({
+    placeholder: (placeholder.peek() as string) || getComponentString('mention', 'placeholder')(),
+    label: label.peek() as string,
+    rows: rows.peek() as number,
+    listId,
+    value: value.peek() as string,
+  });
+  mirrorEl = frame.mirror;
+  textareaEl = frame.textarea;
+  dropdownEl = frame.dropdown;
+  statusEl = frame.status;
+  const area = frame.textarea;
+  prevLength = area.value.length;
+  area.addEventListener('input', onInput);
+  area.addEventListener('keydown', onKeydown);
+  area.addEventListener('scroll', () => {
+    if (mirrorEl) mirrorEl.scrollTop = area.scrollTop;
+    // The caret moves with the textarea's own scroll, which autoUpdate does not watch:
+    // the textarea is not an ancestor of the menu.
+    placeDropdown();
+  });
+  area.addEventListener('blur', () => {
+    setTimeout(() => { if (open.peek()) closeDropdown(); }, 200);
+  });
+  el.appendChild(frame.wrap);
+  syncMirror();
+  domReady = true;
+});
+
+// Read on every change, not once at the build: a field disabled after mount was left editable.
+$effect(() => {
+  const isDisabled = !!disabled;
+  const isReadonly = !!readonly;
+  if (!domReady || !textareaEl) return;
+  textareaEl.disabled = isDisabled;
+  textareaEl.readOnly = isReadonly;
+});
+
+// Sync external value. With no mention left the markup is the text, or a form submits the text it
+// replaced: an outside write of the model, which this follows as the TypeScript version did.
+$effect(() => {
+  if (!domReady) return;
+  const val = value as string;
+  if (textareaEl && val !== undefined && val !== textareaEl.value) {
+    textareaEl.value = val;
+    prevLength = val.length;
+    mentions = []; // Reset mentions on external value change
+    markup = val;
+    syncMirror();
+  }
+});
+
+// Reactive: update dropdown
+$effect(() => {
+  if (!domReady) return;
+  const isOpen = open as boolean;
+  const sugg = suggestions as MentionItem[];
+  const idx = activeIndex as number;
+  const isLoading = loadingNow as boolean;
+  if (!dropdownEl) return;
+
+  // An empty result is shown and said, not a list that closes without a word.
+  // Below min-length there is no search yet, so no result to report.
+  const searched = (query as string).length >= (minLength as number);
+  if (!isOpen || (sugg.length === 0 && !isLoading && !searched)) {
+    dropdownEl.style.display = 'none';
+    stopFollowing();
+    syncActive(false, null);
+    return;
+  }
+  dropdownEl.style.display = '';
+  dropdownEl.innerHTML = '';
+  announce(isLoading ? '' : sugg.length
+    ? format(uiString('mention', 'suggestions'), { n: sugg.length })
+    : getComponentString('mention', 'noResults')());
+  // Placed once its content is in, so flip() measures the menu that will be shown.
+  // autoUpdate then follows scrolls, resizes and size changes until the menu closes.
+  if (isLoading || sugg.length === 0) {
+    const note = document.createElement('div');
+    note.className = isLoading ? 'pdx-mention-loading' : 'pdx-mention-empty';
+    note.textContent = getComponentString('mention', isLoading ? 'loading' : 'noResults')();
+    dropdownEl.appendChild(note);
+    followCaret();
+    syncActive(true, null);
+    return;
+  }
+  const rowOpts = { listId, query: query.peek(), snippet: suggestionSnippet(), onPick: selectItem };
+  sugg.forEach((entry, i) => dropdownEl!.appendChild(suggestionRow(entry, i, i === idx, rowOpts)));
+  followCaret();
+  syncActive(true, `${listId}-${Math.min(idx, sugg.length - 1)}`);
+});
+
+/** The textarea's side of the list: which option is active, none while it is closed. */
+function syncActive(isOpen: boolean, activeId: string | null): void {
+  if (!textareaEl) return;
+  if (activeId) textareaEl.setAttribute('aria-activedescendant', activeId);
+  else textareaEl.removeAttribute('aria-activedescendant');
+  if (!isOpen) announce('');
+}
+
+/** Say `text` in the live region, once: re-renders for the active option repeat nothing. */
+function announce(text: string): void {
+  if (statusEl && statusEl.textContent !== text) statusEl.textContent = text;
+}
+</script>

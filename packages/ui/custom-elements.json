@@ -19541,7 +19541,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/mention/pdx-mention.ts",
+      "path": "src/mention/pdx-mention.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -19953,7 +19953,7 @@
           "name": "pdx-mention",
           "declaration": {
             "name": "PdxMention",
-            "module": "src/mention/pdx-mention.ts"
+            "module": "src/mention/pdx-mention.pdx"
           }
         }
       ]

@@ -23,7 +23,7 @@ import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/radio/pdx-radio.pdx';
 import '../../src/slider/pdx-slider.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 import '../../src/select/pdx-select';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';

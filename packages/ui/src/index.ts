@@ -47,7 +47,7 @@ import './calendar/pdx-calendar';
 import './time-picker/pdx-time-picker.pdx';
 import './date-picker/pdx-date-picker';
 import './transfer/pdx-transfer';
-import './mention/pdx-mention';
+import './mention/pdx-mention.pdx';
 import './cascader/pdx-cascader';
 import './tree/pdx-tree';
 import './tree-select/pdx-tree-select';

@@ -20,7 +20,7 @@ import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/calendar/pdx-calendar';
