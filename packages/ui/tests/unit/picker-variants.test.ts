@@ -7,7 +7,7 @@ import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/date-picker/pdx-date-picker';
-import '../../src/time-picker/pdx-time-picker';
+import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/file-upload/pdx-file-upload.pdx';
 

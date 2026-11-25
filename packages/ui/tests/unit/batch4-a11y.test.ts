@@ -5,7 +5,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/time-picker/pdx-time-picker';
+import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/tabs/pdx-tabs';
 import '../../src/wizard/pdx-wizard';
 import '../../src/timeline/pdx-timeline.pdx';

@@ -44,7 +44,7 @@ import './segmented/pdx-segmented.pdx';
 import './toggle/pdx-toggle.pdx';
 import './toggle-group/pdx-toggle-group.pdx';
 import './calendar/pdx-calendar';
-import './time-picker/pdx-time-picker';
+import './time-picker/pdx-time-picker.pdx';
 import './date-picker/pdx-date-picker';
 import './transfer/pdx-transfer';
 import './mention/pdx-mention';

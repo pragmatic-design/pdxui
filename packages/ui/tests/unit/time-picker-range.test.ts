@@ -12,7 +12,7 @@
 // the USER can reach.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick, cleanup } from './helpers';
-import '../../src/time-picker/pdx-time-picker';
+import '../../src/time-picker/pdx-time-picker.pdx';
 
 async function mount(attrs: string): Promise<HTMLElement> {
     const host = document.createElement('div');

@@ -1,0 +1,320 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTimePicker",
+  "tagName": "pdx-time-picker",
+  "category": "Specialized Inputs",
+  "order": 37,
+  "description": "A segmented time input: the user sets the hour, minute, optional seconds and AM/PM with the\nkeyboard, the mouse wheel or typed digits, and the value is always `HH:mm` on the 24-hour clock.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "format",
+      "description": "Time format, e.g. '12h' or '24h'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "format"
+    },
+    {
+      "kind": "field",
+      "name": "showSeconds",
+      "description": "Includes a seconds field.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showseconds"
+    },
+    {
+      "kind": "field",
+      "name": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "step"
+    },
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the fields' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-time-picker-md",
+        "sm": ".pdx-time-picker-sm",
+        "lg": ".pdx-time-picker-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change",
+    "pdx-input"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when a segment loses the focus."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "group",
+    "spinbutton"
+  ],
+  "attributes": [
+    {
+      "name": "format",
+      "fieldName": "format",
+      "description": "Time format, e.g. '12h' or '24h'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "showseconds",
+      "fieldName": "showSeconds",
+      "description": "Includes a seconds field.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "step",
+      "fieldName": "step",
+      "description": "Increment step.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Minimum allowed value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum allowed value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the fields' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, a `role=\"group\"` that holds the segments."
+    },
+    {
+      "name": "segment",
+      "description": "A segment, a `role=\"spinbutton\"`: the hour, the minute, the second or AM/PM."
+    },
+    {
+      "name": "arrow",
+      "description": "An arrow above or below a segment, which steps it."
+    },
+    {
+      "name": "separator",
+      "description": "The `:` between two segments."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-time-picker-segment-bg-focus"
+    },
+    {
+      "name": "--pdx-time-picker-segment-color-focus"
+    }
+  ]
+}

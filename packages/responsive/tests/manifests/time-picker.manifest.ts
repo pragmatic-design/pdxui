@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-time-picker (tier 4, a SEGMENTED time input — NOT a dropdown)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/time-picker/pdx-time-picker.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/time-picker/pdx-time-picker.pdx)
  * and the CSS (packages/design/src/components/time-picker.css).
  *
  * ⚠️ NOT A DROPDOWN (CRITICAL — read this first):
