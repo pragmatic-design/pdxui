@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import type { Mock } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/filter-builder/pdx-filter-builder';
+import '../../src/filter-builder/pdx-filter-builder.pdx';
 
 /** What the author meant to write. */
 const GOOD = [

@@ -14441,7 +14441,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/filter-builder/pdx-filter-builder.ts",
+      "path": "src/filter-builder/pdx-filter-builder.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -14475,7 +14475,7 @@
               "name": "value",
               "description": "The current value.",
               "type": {
-                "text": "(FilterDescriptor | CompositeFilter)[]"
+                "text": "(import('@pdxui/core').FilterDescriptor | import('@pdxui/core').CompositeFilter)[]"
               },
               "default": "[]"
             },
@@ -14507,7 +14507,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: (FilterDescriptor | CompositeFilter)[] }"
+              "detail": "{ value: (import('@pdxui/core').FilterDescriptor | import('@pdxui/core').CompositeFilter)[] }"
             },
             {
               "name": "logic-change",
@@ -14562,7 +14562,7 @@
           "name": "pdx-filter-builder",
           "declaration": {
             "name": "PdxFilterBuilder",
-            "module": "src/filter-builder/pdx-filter-builder.ts"
+            "module": "src/filter-builder/pdx-filter-builder.pdx"
           }
         }
       ]

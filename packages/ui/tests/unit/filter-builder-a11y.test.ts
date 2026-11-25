@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/filter-builder/pdx-filter-builder';
+import '../../src/filter-builder/pdx-filter-builder.pdx';
 import '../../src/data-grid/pdx-data-grid';
 
 const FIELDS = [

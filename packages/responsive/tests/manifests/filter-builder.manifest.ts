@@ -10,7 +10,7 @@
  * field-select+operator+value-input" in the component's DOM: the real DOM is the chip bar plus a
  * transient popover.
  *
- * Source inspected: packages/ui/src/filter-builder/pdx-filter-builder.ts
+ * Source inspected: packages/ui/src/filter-builder/pdx-filter-builder.pdx
  * CSS:                  packages/design/src/components/filter-builder.css
  *
  * ── DETERMINISM: why the certified scenario is the EMPTY STATE (the Add button alone) ──
