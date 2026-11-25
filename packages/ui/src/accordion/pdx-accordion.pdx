@@ -1,0 +1,305 @@
+<template>
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * Expandable sections with animated height, opened one at a time or several together, and navigated
+ * with the arrow keys, Home and End.
+ *
+ * @csspart item - An item, `[data-accordion-item]`; open, it carries `data-open`.
+ * @csspart trigger - An item's header, `[data-accordion-trigger]`, `aria-expanded` while open.
+ * @csspart panel - An item's content, `[data-accordion-content]`, a `role="region"`.
+ * @cssstate loading - `loading` is set; the accordion is `aria-busy`.
+ * @cssstate disabled - `disabled` is set: no item opens or closes.
+ * @alphaevent pdx-change
+ * @alpharename pdx-change open-change
+ */
+// pdx-accordion — Expandable sections with animated height.
+// Covers both single collapsible and multi-item accordion.
+// Uses focusGroup for keyboard nav between triggers.
+// mode="single" (one open at a time) or mode="multiple" (free).
+import { focusGroup, generatedId, onDestroy } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/accordion';
+
+// It has no prop for its open items and gains none (#290): which are open is a read-only output,
+// announced as a model's event is, `{ value }`, and `::open` stays an error.
+/** An item opened or closed: the keys of the items open now (`data-accordion-item`, or the index). */
+@event 'open-change': { value: string[] };
+@state loading = !!loading;
+@state disabled = !!disabled;
+// Its parts are on the app's markup, written by the script as the ids and roles are (#290).
+@part(external) item, trigger, panel;
+/** "single" = one open at a time (default), "multiple" = any number open */
+@prop mode: string = 'single';
+/** Disable all items */
+@prop disabled: boolean = false;
+/** Show loading state */
+@prop loading: boolean = false;
+@host el;
+
+// Imperative API: el.expand(id)/collapse(id)/toggle(id) (id = data-accordion-item or index) + expandAll/collapseAll
+@expose expand, collapse, toggle, expandAll, collapseAll;
+
+// Generated ids carry a per-instance uid: an index inside ONE accordion alone would repeat
+// in a second accordion on the page, and its aria-controls would point into the first.
+// `seq` numbers items as they are wired, not by
+// position, so an item added later cannot reuse an id either.
+const uid = generatedId('pdx-acc');
+let seq = 0;
+const wired = new WeakSet<HTMLElement>();
+
+function getItems(): HTMLElement[] {
+  return Array.from(el.querySelectorAll('[data-accordion-item]'));
+}
+
+function isItemOpen(entry: HTMLElement): boolean {
+  return entry.hasAttribute('data-open');
+}
+
+function isItemDisabled(entry: HTMLElement): boolean {
+  return (disabled.peek() as boolean) || entry.hasAttribute('data-disabled');
+}
+
+/**
+ * A disabled item's trigger says so: `aria-disabled="true"`, removed when it is enabled again.
+ * It stays focusable, as the APG accordion keeps a disabled header discoverable — the arrow
+ * keys reach it, and it announces why Enter does nothing. Without aria-disabled it would read
+ * as an ordinary collapsed button.
+ */
+function syncDisabled(entry: HTMLElement): void {
+  const header = entry.querySelector('[data-accordion-trigger]');
+  if (!header) return;
+  if (isItemDisabled(entry)) header.setAttribute('aria-disabled', 'true');
+  else header.removeAttribute('aria-disabled');
+}
+
+// height + vertical padding are animated TOGETHER. The content has CSS padding
+// (var(--pdx-space-sm/md)); with box-sizing:border-box, height:0 clamps to that padding
+// height (~28px), so the visual collapse finished early at that "floor" and then snapped
+// to display:none only when the 250ms timer elapsed ("it does part of it and then jumps", translated). Animating
+// the padding to 0 too lets the content collapse to a TRUE zero, in sync with transitionend.
+const ANIM = 'height 0.25s ease, padding-top 0.25s ease, padding-bottom 0.25s ease';
+
+function animateOpen(content: HTMLElement) {
+  content.style.display = 'block';
+  content.style.overflow = 'hidden';
+  // Measure the natural full height (with CSS padding) before collapsing.
+  content.style.height = '';
+  content.style.paddingTop = '';
+  content.style.paddingBottom = '';
+  const cs = getComputedStyle(content);
+  const padTop = cs.paddingTop;
+  const padBottom = cs.paddingBottom;
+  const targetH = content.scrollHeight;
+  // Collapse to true zero (height + vertical padding).
+  content.style.height = '0px';
+  content.style.paddingTop = '0px';
+  content.style.paddingBottom = '0px';
+  content.style.transition = ANIM;
+  // double rAF so the browser commits the collapsed state before transitioning to target.
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    content.style.height = targetH + 'px';
+    content.style.paddingTop = padTop;
+    content.style.paddingBottom = padBottom;
+  }));
+  const onEnd = (e: TransitionEvent) => {
+    // transitionend BUBBLES — ignore a child's transition (e.g. a button), which would
+    // otherwise reset height mid-animation. Settle on the height end (padding ends with it).
+    if (e.target !== content || e.propertyName !== 'height') return;
+    content.style.height = '';
+    content.style.overflow = '';
+    content.style.transition = '';
+    content.style.paddingTop = '';
+    content.style.paddingBottom = '';
+    content.removeEventListener('transitionend', onEnd as EventListener);
+  };
+  content.addEventListener('transitionend', onEnd as EventListener);
+}
+
+function animateClose(content: HTMLElement) {
+  const cs = getComputedStyle(content);
+  const padTop = cs.paddingTop;
+  const padBottom = cs.paddingBottom;
+  const currentH = content.scrollHeight;
+  content.style.overflow = 'hidden';
+  content.style.height = currentH + 'px';
+  content.style.paddingTop = padTop;
+  content.style.paddingBottom = padBottom;
+  content.style.transition = ANIM;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    content.style.height = '0px';
+    content.style.paddingTop = '0px';
+    content.style.paddingBottom = '0px';
+  }));
+  const onEnd = (e: TransitionEvent) => {
+    if (e.target !== content || e.propertyName !== 'height') return;
+    content.style.display = 'none';
+    content.style.height = '';
+    content.style.overflow = '';
+    content.style.transition = '';
+    content.style.paddingTop = '';
+    content.style.paddingBottom = '';
+    content.removeEventListener('transitionend', onEnd as EventListener);
+  };
+  content.addEventListener('transitionend', onEnd as EventListener);
+}
+
+function toggleItem(entry: HTMLElement) {
+  if (isItemDisabled(entry)) return;
+  const content = entry.querySelector('[data-accordion-content]') as HTMLElement;
+  if (!content) return;
+  const header = entry.querySelector('[data-accordion-trigger]') as HTMLElement;
+  const wasOpen = isItemOpen(entry);
+
+  if (wasOpen) {
+    entry.removeAttribute('data-open');
+    if (header) header.setAttribute('aria-expanded', 'false');
+    animateClose(content);
+  } else {
+    // Single mode: close others first
+    if ((mode.peek() as string) === 'single') {
+      for (const other of getItems()) {
+        if (other !== entry && isItemOpen(other)) {
+          other.removeAttribute('data-open');
+          const otherTrigger = other.querySelector('[data-accordion-trigger]') as HTMLElement;
+          if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+          const otherContent = other.querySelector('[data-accordion-content]') as HTMLElement;
+          if (otherContent) animateClose(otherContent);
+        }
+      }
+    }
+    entry.setAttribute('data-open', '');
+    if (header) header.setAttribute('aria-expanded', 'true');
+    animateOpen(content);
+  }
+
+  openChange({ value: openKeys() });
+}
+
+/** The keys of the open items, in order: each one's `data-accordion-item`, or its index. */
+function openKeys(): string[] {
+  return getItems().flatMap((it, i) => isItemOpen(it) ? [it.getAttribute('data-accordion-item') || String(i)] : []);
+}
+
+/** ARIA links, roles and the closed state of one item — once per item, whenever it arrives. */
+function wireItem(entry: HTMLElement) {
+  if (wired.has(entry)) return;
+  const header = entry.querySelector('[data-accordion-trigger]') as HTMLElement | null;
+  const content = entry.querySelector('[data-accordion-content]') as HTMLElement | null;
+  if (!content) return; // its content may still be on the way: the next mutation retries
+  wired.add(entry);
+  // Its parts, on the app's markup as the ids and roles below are (#290).
+  entry.setAttribute('data-part', 'item');
+  header?.setAttribute('data-part', 'trigger');
+  content.setAttribute('data-part', 'panel');
+
+  const n = ++seq;
+  const contentId = content.id || `${uid}-content-${n}`;
+  const triggerId = header?.id || `${uid}-trigger-${n}`;
+  content.id = contentId;
+  if (header) {
+    header.id = triggerId;
+    header.setAttribute('aria-controls', contentId);
+    header.setAttribute('aria-expanded', String(isItemOpen(entry)));
+    if (!header.getAttribute('role')) header.setAttribute('role', 'button');
+    // One tab stop: focusGroup gives tabindex 0 to one trigger and -1 to the rest, but
+    // only to the triggers it saw at start. A trigger arriving later joins at -1.
+    if (!header.getAttribute('tabindex')) header.setAttribute('tabindex', hasTabStop(header) ? '-1' : '0');
+  }
+  content.setAttribute('role', 'region');
+  content.setAttribute('aria-labelledby', triggerId);
+  syncDisabled(entry);
+
+  if (!isItemOpen(entry)) {
+    content.style.display = 'none';
+  }
+}
+
+function hasTabStop(except: HTMLElement): boolean {
+  return Array.from(el.querySelectorAll('[data-accordion-trigger]'))
+    .some(t => t !== except && t.getAttribute('tabindex') === '0');
+}
+
+function onClick(e: MouseEvent) {
+  const header = (e.target as HTMLElement).closest('[data-accordion-trigger]') as HTMLElement;
+  if (!header) return;
+  const entry = header.closest('[data-accordion-item]') as HTMLElement;
+  if (entry) toggleItem(entry);
+}
+
+// Wired once per mount, at setup, as the TypeScript version's track did: it read nothing else
+// reactive the wiring depends on.
+el.addEventListener('click', onClick);
+
+// focusGroup for arrow key navigation between triggers
+const focusGroupDispose: Dispose = focusGroup(el, {
+  selector: '[data-accordion-trigger]',
+  orientation: 'vertical',
+  wrap: true,
+  // A disabled header stays in the arrow-key order and announces itself (aria-disabled),
+  // as in the APG accordion; toggleItem() ignores it. focusGroup would skip it.
+  skipDisabled: false,
+  onSelect: (triggerEl) => {
+    const entry = triggerEl.closest('[data-accordion-item]') as HTMLElement;
+    if (entry) toggleItem(entry);
+  },
+});
+
+// Initialize: set ARIA, hide closed content
+requestAnimationFrame(() => getItems().forEach(wireItem));
+
+// Items added later (history that arrives on scroll) are wired too: the init above
+// runs once, and without this they would get no id, no aria-expanded and no region, and
+// stay visible while closed. Subtree, because items may sit inside a wrapper — getItems()
+// finds them by selector at any depth.
+const observer = new MutationObserver((records) => {
+  if (records.some(r => [...r.addedNodes].some(n => n.nodeType === Node.ELEMENT_NODE))) {
+    getItems().forEach(wireItem);
+  }
+  // An item's own data-disabled, set or removed after it was wired.
+  for (const r of records) {
+    if (r.type === 'attributes' && (r.target as HTMLElement).hasAttribute('data-accordion-item')) {
+      syncDisabled(r.target as HTMLElement);
+    }
+  }
+});
+observer.observe(el, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-disabled'] });
+
+onDestroy(() => {
+  el.removeEventListener('click', onClick);
+  observer.disconnect();
+  focusGroupDispose();
+});
+
+// Busy while loading and not otherwise (A4), and the accordion's own `disabled` reaching every
+// trigger, both ways. One effect for the two, as the TypeScript version's two tracks were per mount:
+// each mount pays for its effects (#1287), and writing either again when the other changes is the
+// same write. Read synchronously, so the effect subscribes; the items may not be wired yet, which
+// wireItem covers.
+$effect(() => {
+  if (loading as boolean) el.setAttribute('aria-busy', 'true');
+  else el.removeAttribute('aria-busy');
+  disabled;
+  getItems().forEach(syncDisabled);
+});
+
+const resolveItem = (idOrIndex: string | number): HTMLElement | undefined => {
+  const entries = getItems();
+  if (typeof idOrIndex === 'number') return entries[idOrIndex];
+  return entries.find(it => it.getAttribute('data-accordion-item') === String(idOrIndex)) ?? entries[Number(idOrIndex)];
+};
+/** Open the item, by id or index. No-op if it is already open, disabled, or not found. */
+function expand(id: string | number) { const it = resolveItem(id); if (it && !isItemOpen(it)) toggleItem(it); }
+/** Close the item, by id or index. No-op if it is already closed, disabled, or not found. */
+function collapse(id: string | number) { const it = resolveItem(id); if (it && isItemOpen(it)) toggleItem(it); }
+/** Open the item if closed, close it if open. No-op if disabled or not found. */
+function toggle(id: string | number) { const it = resolveItem(id); if (it) toggleItem(it); }
+/** Open every item — but under `mode="single"` each one closes the previous, so only the last stays open. */
+function expandAll() { for (const it of getItems()) if (!isItemOpen(it)) toggleItem(it); }
+/** Close every item. */
+function collapseAll() { for (const it of getItems()) if (isItemOpen(it)) toggleItem(it); }
+</script>

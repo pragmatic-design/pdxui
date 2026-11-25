@@ -1,0 +1,184 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAccordion",
+  "tagName": "pdx-accordion",
+  "category": "Overlay + Containers",
+  "order": 98,
+  "description": "Expandable sections with animated height, opened one at a time or several together, and navigated\nwith the arrow keys, Home and End.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "mode",
+      "description": "\"single\" = one open at a time (default), \"multiple\" = any number open",
+      "type": {
+        "text": "string"
+      },
+      "default": "'single'",
+      "attribute": "mode"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disable all items",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "method",
+      "name": "expand",
+      "parameters": [
+        {
+          "name": "id",
+          "type": {
+            "text": "string | number"
+          }
+        }
+      ],
+      "description": "Open the item, by id or index. No-op if it is already open, disabled, or not found."
+    },
+    {
+      "kind": "method",
+      "name": "collapse",
+      "parameters": [
+        {
+          "name": "id",
+          "type": {
+            "text": "string | number"
+          }
+        }
+      ],
+      "description": "Close the item, by id or index. No-op if it is already closed, disabled, or not found."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [
+        {
+          "name": "id",
+          "type": {
+            "text": "string | number"
+          }
+        }
+      ],
+      "description": "Open the item if closed, close it if open. No-op if disabled or not found."
+    },
+    {
+      "kind": "method",
+      "name": "expandAll",
+      "parameters": [],
+      "description": "Open every item — but under `mode=\"single\"` each one closes the previous, so only the last stays open."
+    },
+    {
+      "kind": "method",
+      "name": "collapseAll",
+      "parameters": [],
+      "description": "Close every item."
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaRename": {
+    "pdx-change": "open-change"
+  },
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An item opened or closed: the keys of the items open now (`data-accordion-item`, or the index).",
+      "detail": "{ value: string[] }"
+    }
+  ],
+  "roles": [
+    "button",
+    "region"
+  ],
+  "attributes": [
+    {
+      "name": "mode",
+      "fieldName": "mode",
+      "description": "\"single\" = one open at a time (default), \"multiple\" = any number open",
+      "type": {
+        "text": "string"
+      },
+      "default": "'single'"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disable all items",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "item",
+      "description": "An item, `[data-accordion-item]`; open, it carries `data-open`."
+    },
+    {
+      "name": "trigger",
+      "description": "An item's header, `[data-accordion-trigger]`, `aria-expanded` while open."
+    },
+    {
+      "name": "panel",
+      "description": "An item's content, `[data-accordion-content]`, a `role=\"region\"`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "`loading` is set; the accordion is `aria-busy`."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set: no item opens or closes."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-accordion-glyph",
+      "default": "'+'"
+    },
+    {
+      "name": "--pdx-accordion-glyph-size",
+      "default": "var(--pdx-text-lg)"
+    },
+    {
+      "name": "--pdx-accordion-transform-open"
+    }
+  ]
+}

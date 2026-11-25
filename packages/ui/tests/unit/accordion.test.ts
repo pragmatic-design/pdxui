@@ -6,7 +6,7 @@
 // scroll) with no id, no aria-expanded, no region, and visible while closed.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/accordion/pdx-accordion';
+import '../../src/accordion/pdx-accordion.pdx';
 
 const ITEM = (label: string, open = false): string => `
     <div data-accordion-item${open ? ' data-open' : ''}>

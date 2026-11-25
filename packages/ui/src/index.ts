@@ -114,7 +114,7 @@ import './alert-dialog/pdx-alert-dialog.pdx';
 import './drawer/pdx-drawer';
 import './toast/pdx-toast.pdx';
 import './tabs/pdx-tabs';
-import './accordion/pdx-accordion';
+import './accordion/pdx-accordion.pdx';
 import './card/pdx-card.pdx';
 import './banner/pdx-banner.pdx';
 import './bottom-sheet/pdx-bottom-sheet';

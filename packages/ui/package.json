@@ -55,7 +55,7 @@
       "import": "./dist/form-template/pdx-form-template.js"
     },
     "./accordion": {
-      "development": "./src/accordion/pdx-accordion.ts",
+      "development": "./src/accordion/pdx-accordion.pdx",
       "types": "./dist/accordion/pdx-accordion.d.ts",
       "import": "./dist/accordion/pdx-accordion.js"
     },

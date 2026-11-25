@@ -4,7 +4,7 @@
   "modules": [
     {
       "kind": "javascript-module",
-      "path": "src/accordion/pdx-accordion.ts",
+      "path": "src/accordion/pdx-accordion.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -197,7 +197,7 @@
           "name": "pdx-accordion",
           "declaration": {
             "name": "PdxAccordion",
-            "module": "src/accordion/pdx-accordion.ts"
+            "module": "src/accordion/pdx-accordion.pdx"
           }
         }
       ]
