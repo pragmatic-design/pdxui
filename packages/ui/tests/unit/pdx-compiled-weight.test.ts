@@ -32,6 +32,9 @@
 // With #1346 a component's prop and a URL are core's binding too (`bindComponentProp`, `bindUrl`), no
 // longer an effect written out each: the select 7703 → 7389 B (its bindings on its own child components),
 // the switch 1258 → 1256 B.
+// With #1407 an `onDestroy` is core's hook, not an effect returning the callback as its cleanup: the
+// select 7389 → 7391 B, the name `onDestroy` imported and called where `ctx.track(() => () => …)` was
+// — two bytes, for one effect fewer created and run at each mount.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -49,7 +52,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1256,
-    'pilot/select.pdx': 7389,
+    'pilot/select.pdx': 7391,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

@@ -58,6 +58,8 @@ export function compileNewMode(
     if (analysis.head.title?.isDynamic) imports.add('useTitle');
     // Lifecycle hooks: onMount is used directly (not wrapped in ctx.track)
     if (analysis.lifecycle.onMount.length > 0) imports.add('onMount');
+    // onDestroy too: core's hook, not an effect (#1407)
+    if (analysis.lifecycle.onDestroy.length > 0 && !scriptOnly) imports.add('onDestroy');
     // keepAlive pages need onShow for resume lifecycle
     if (analysis.route.keepAlive) imports.add('onShow');
     // i18n: auto-import $t/$n/$d/$r when used, + initI18n/createI18nLoader when @i18n present
