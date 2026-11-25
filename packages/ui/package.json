@@ -75,7 +75,7 @@
       "import": "./dist/alert-dialog/pdx-alert-dialog.js"
     },
     "./overlay-outlet": {
-      "development": "./src/overlay/pdx-overlay-outlet.ts",
+      "development": "./src/overlay/pdx-overlay-outlet.pdx",
       "types": "./dist/overlay/pdx-overlay-outlet.d.ts",
       "import": "./dist/overlay/pdx-overlay-outlet.js"
     },

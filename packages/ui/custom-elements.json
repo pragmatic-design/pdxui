@@ -21823,7 +21823,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/overlay/pdx-overlay-outlet.ts",
+      "path": "src/overlay/pdx-overlay-outlet.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -21901,7 +21901,7 @@
           "name": "pdx-overlay-outlet",
           "declaration": {
             "name": "PdxOverlayOutlet",
-            "module": "src/overlay/pdx-overlay-outlet.ts"
+            "module": "src/overlay/pdx-overlay-outlet.pdx"
           }
         }
       ]

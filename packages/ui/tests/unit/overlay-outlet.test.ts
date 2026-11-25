@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import { dialog } from '../../src/dialog/dialog-service';
-import '../../src/overlay/pdx-overlay-outlet';
+import '../../src/overlay/pdx-overlay-outlet.pdx';
 
 describe('pdx-overlay-outlet', () => {
     beforeEach(cleanup);

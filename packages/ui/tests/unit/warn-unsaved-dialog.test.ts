@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { component, html, createForm, setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/overlay/pdx-overlay-outlet';
+import '../../src/overlay/pdx-overlay-outlet.pdx';
 
 type Guarded = HTMLElement & { _beforeLeaveCallbacks?: (() => boolean | 'destroy' | Promise<boolean>)[] };
 

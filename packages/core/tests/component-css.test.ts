@@ -90,7 +90,7 @@ describe('no component stylesheet is left with nobody to carry it', () => {
 
     /**
      * The dialog queue's outlet draws with the dialog's classes, and its file is not named after its
-     * directory (`overlay/pdx-overlay-outlet.ts`), so the scan above never sees it. Without its own
+     * directory (`overlay/pdx-overlay-outlet.pdx`), so the scan above never sees it. Without its own
      * import, its modal is styled only where some OTHER component has brought dialog.css — a grid, a
      * field group, a `pdx-dialog`. On a page holding the outlet alone: the backdrop `static`, 107px of
      * text and two buttons at the top of the page, nothing covered.
@@ -128,7 +128,7 @@ describe('no component stylesheet is left with nobody to carry it', () => {
     }
 
     it('the dialog queue\'s outlet carries the dialog\'s stylesheet', () => {
-        const outlet = readFileSync(join(UI_SRC, 'overlay', 'pdx-overlay-outlet.ts'), 'utf-8');
+        const outlet = readFileSync(join(UI_SRC, 'overlay', 'pdx-overlay-outlet.pdx'), 'utf-8');
         expect(outlet, 'pdx-overlay-outlet draws .pdx-dialog-* and does not import dialog.css')
             .toContain(`@pdxui/design/components/dialog'`);
     });

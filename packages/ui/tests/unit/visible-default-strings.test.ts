@@ -12,7 +12,7 @@ import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import '../../src/shared/i18n';
 import '../../src/data-grid/grid-i18n';
 import { dialog } from '../../src/dialog/dialog-service';
-import '../../src/overlay/pdx-overlay-outlet';
+import '../../src/overlay/pdx-overlay-outlet.pdx';
 import '../../src/alert-dialog/pdx-alert-dialog.pdx';
 import '../../src/command/pdx-command.pdx';
 import '../../src/empty-state/pdx-empty-state.pdx';
