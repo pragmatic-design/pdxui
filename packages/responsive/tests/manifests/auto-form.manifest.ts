@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-auto-form
  *
- * WHAT THE COMPONENT DOES (source: packages/ui/src/auto-form/pdx-auto-form.ts)
+ * WHAT THE COMPONENT DOES (source: packages/ui/src/auto-form/pdx-auto-form.pdx)
  * ─────────────────────────────────────────────────────────────────────────────
  * A form generated from DATA. It takes one of two equivalent declarations:
  *   - `:fields`  → FieldDefinition[] (the model shared by grid/form/filter); internally
@@ -37,7 +37,7 @@
  * `.pdx-auto-form` has NO dedicated CSS (grep in packages/design → no match): it is a plain div,
  * display:block, with a content-driven height (the template plus any actions). The fields' layout
  * (grid or stack) is <pdx-form-template>'s job, driven by the layout/columns props it
- * the auto-form copies into the resolved schema (resolveSchema, lines 36-48).
+ * the auto-form copies into the resolved schema (resolveSchema).
  *
  * HOW THIS IS MADE DETERMINISTIC
  * ─────────────────────────────────────────────────────────────────────────────

@@ -254,11 +254,6 @@
       "types": "./dist/filter-builder/pdx-filter-builder.d.ts",
       "import": "./dist/filter-builder/pdx-filter-builder.js"
     },
-    "./auto-form": {
-      "development": "./src/auto-form/pdx-auto-form.ts",
-      "types": "./dist/auto-form/pdx-auto-form.d.ts",
-      "import": "./dist/auto-form/pdx-auto-form.js"
-    },
     "./chart": {
       "development": "./src/chart/pdx-chart.ts",
       "types": "./dist/chart/pdx-chart.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/relation-picker/pdx-relation-picker.pdx",
       "types": "./dist/relation-picker/pdx-relation-picker.d.ts",
       "import": "./dist/relation-picker/pdx-relation-picker.js"
+    },
+    "./auto-form": {
+      "development": "./src/auto-form/pdx-auto-form.pdx",
+      "types": "./dist/auto-form/pdx-auto-form.d.ts",
+      "import": "./dist/auto-form/pdx-auto-form.js"
     },
     "./package.json": "./package.json"
   },

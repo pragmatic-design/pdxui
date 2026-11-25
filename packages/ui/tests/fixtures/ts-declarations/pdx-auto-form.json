@@ -1,0 +1,214 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAutoForm",
+  "tagName": "pdx-auto-form",
+  "category": "Data-bound",
+  "order": 108,
+  "description": "A form generated from field definitions or a form schema, so the same JSON that drives a data grid\nalso produces its edit form.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "fields",
+      "description": "Field definitions (FieldDefinition[]). Converted to FormSchema internally.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "schema",
+      "description": "FormSchema JSON (alternative to fields).",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource for auto-load/save.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "recordId",
+      "description": "Record ID to load from DataSource.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "recordid"
+    },
+    {
+      "kind": "field",
+      "name": "layout",
+      "description": "Form layout.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'stack'",
+      "attribute": "layout"
+    },
+    {
+      "kind": "field",
+      "name": "columns",
+      "description": "Grid columns (when layout='grid').",
+      "type": {
+        "text": "number"
+      },
+      "default": "12",
+      "attribute": "columns"
+    },
+    {
+      "kind": "field",
+      "name": "showActions",
+      "description": "Show submit/reset buttons.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showactions"
+    },
+    {
+      "kind": "field",
+      "name": "submitLabel",
+      "description": "Submit button label. Empty: the auto-form.submit component string, «Save».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "submitlabel"
+    },
+    {
+      "kind": "field",
+      "name": "resetLabel",
+      "description": "Reset button label. Empty: the auto-form.reset component string, «Reset».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "resetlabel"
+    },
+    {
+      "kind": "field",
+      "name": "form",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.form`."
+    },
+    {
+      "kind": "method",
+      "name": "getValues",
+      "parameters": [],
+      "description": "The form values now, undefined while the form is not built."
+    },
+    {
+      "kind": "method",
+      "name": "reset",
+      "parameters": [
+        {
+          "name": "values",
+          "type": {
+            "text": "Record<string, unknown>"
+          },
+          "optional": true
+        }
+      ],
+      "description": "Resets to the initial state."
+    },
+    {
+      "kind": "method",
+      "name": "validate",
+      "parameters": [],
+      "description": "Runs validation and returns the result."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-submit",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Save passed validation: the values (stored in the `source` when there is one).",
+      "detail": "{ values: Record<string, unknown>; valid: true }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "recordid",
+      "fieldName": "recordId",
+      "description": "Record ID to load from DataSource.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "layout",
+      "fieldName": "layout",
+      "description": "Form layout.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'stack'"
+    },
+    {
+      "name": "columns",
+      "fieldName": "columns",
+      "description": "Grid columns (when layout='grid').",
+      "type": {
+        "text": "number"
+      },
+      "default": "12"
+    },
+    {
+      "name": "showactions",
+      "fieldName": "showActions",
+      "description": "Show submit/reset buttons.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "submitlabel",
+      "fieldName": "submitLabel",
+      "description": "Submit button label. Empty: the auto-form.submit component string, «Save».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "resetlabel",
+      "fieldName": "resetLabel",
+      "description": "Reset button label. Empty: the auto-form.reset component string, «Reset».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The wrapper that holds the generated form and its actions."
+    },
+    {
+      "name": "actions",
+      "description": "The bar of the two buttons, with `show-actions`."
+    },
+    {
+      "name": "reset",
+      "description": "The reset button."
+    },
+    {
+      "name": "submit",
+      "description": "The save button."
+    }
+  ]
+}

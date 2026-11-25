@@ -8,7 +8,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-alert-dialog',
     'pdx-app-layout',
     'pdx-aspect-ratio',
-    'pdx-auto-form',
     'pdx-autocomplete',
     'pdx-avatar',
     'pdx-avatar-group',

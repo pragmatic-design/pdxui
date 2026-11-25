@@ -15,7 +15,7 @@ import { filterToState, filterField } from '../shared/filter-state';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/filter-builder';
-import '../auto-form/pdx-auto-form'; // rendered by this component, and registered by nobody else
+import '../auto-form/pdx-auto-form.pdx'; // rendered by this component, and registered by nobody else
 
 // ─── Per-field filter state ────────────────────────────────
 

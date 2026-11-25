@@ -5,7 +5,7 @@
 // print `<pdx-form> requires a "form" prop (from createForm()).` at every mount, then work once the
 // form arrived.
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import '../../src/auto-form/pdx-auto-form';
+import '../../src/auto-form/pdx-auto-form.pdx';
 import { tick, cleanup } from './helpers';
 
 const FIELDS = [
