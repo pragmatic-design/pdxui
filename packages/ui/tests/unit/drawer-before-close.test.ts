@@ -15,7 +15,7 @@
 // Chromium (responsive/…/drawer-beta-contract.spec.ts) — happy-dom has no custom states.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/drawer/pdx-drawer';
+import '../../src/drawer/pdx-drawer.pdx';
 
 type Drawer = HTMLElement & Record<string, any>;
 

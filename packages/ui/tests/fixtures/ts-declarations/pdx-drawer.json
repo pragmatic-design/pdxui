@@ -1,0 +1,309 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDrawer",
+  "tagName": "pdx-drawer",
+  "category": "Overlay + Containers",
+  "order": 95,
+  "description": "A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus\ntrap.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "position",
+      "description": "Position: left, right (default), top, bottom",
+      "type": {
+        "text": "'left' | 'right' | 'top' | 'bottom'"
+      },
+      "default": "'right'",
+      "attribute": "position"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. \"640px\").\nOpen-ended on purpose → NOT declared as a closed enum.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "mode",
+      "description": "Mode: overlay (default) or push (shifts page content)",
+      "type": {
+        "text": "'overlay' | 'push'"
+      },
+      "default": "'overlay'",
+      "attribute": "mode"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnBackdrop",
+      "description": "Close on backdrop click",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonbackdrop"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnEscape",
+      "description": "Close on Escape",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonescape"
+    },
+    {
+      "kind": "field",
+      "name": "showClose",
+      "description": "Show close button in header",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showclose"
+    },
+    {
+      "kind": "field",
+      "name": "resizable",
+      "description": "Show resize handle on edge",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "resizable"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Label for screen readers",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "pdx-before-close",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired (cancelable) before the drawer closes itself; call preventDefault() to keep it open."
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "position",
+      "fieldName": "position",
+      "description": "Position: left, right (default), top, bottom",
+      "type": {
+        "text": "'left' | 'right' | 'top' | 'bottom'"
+      },
+      "default": "'right'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. \"640px\").\nOpen-ended on purpose → NOT declared as a closed enum.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "mode",
+      "fieldName": "mode",
+      "description": "Mode: overlay (default) or push (shifts page content)",
+      "type": {
+        "text": "'overlay' | 'push'"
+      },
+      "default": "'overlay'"
+    },
+    {
+      "name": "closeonbackdrop",
+      "fieldName": "closeOnBackdrop",
+      "description": "Close on backdrop click",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonescape",
+      "fieldName": "closeOnEscape",
+      "description": "Close on Escape",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showclose",
+      "fieldName": "showClose",
+      "description": "Show close button in header",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "resizable",
+      "fieldName": "resizable",
+      "description": "Show resize handle on edge",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Label for screen readers",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "header",
+      "description": "Title area at the top of the panel, beside the close button."
+    },
+    {
+      "name": "footer",
+      "description": "Action area at the bottom of the panel (e.g. Save / Cancel)."
+    },
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "header",
+      "description": "The element reached as `[data-part=\"header\"]`."
+    },
+    {
+      "name": "close",
+      "description": "The element reached as `[data-part=\"close\"]`."
+    },
+    {
+      "name": "body",
+      "description": "The element reached as `[data-part=\"body\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    },
+    {
+      "name": "resize",
+      "description": "The element reached as `[data-part=\"resize\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    },
+    {
+      "name": "loading",
+      "description": "Matched with `:state(loading)`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-drawer-width"
+    }
+  ]
+}

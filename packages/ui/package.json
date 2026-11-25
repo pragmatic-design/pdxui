@@ -65,7 +65,7 @@
       "import": "./dist/tabs/pdx-tabs.js"
     },
     "./drawer": {
-      "development": "./src/drawer/pdx-drawer.ts",
+      "development": "./src/drawer/pdx-drawer.pdx",
       "types": "./dist/drawer/pdx-drawer.d.ts",
       "import": "./dist/drawer/pdx-drawer.js"
     },

@@ -119,8 +119,10 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // pdx-banner (measured here: 343.1; 1.07× alone with its icons module), for the same reason. 343.4
     // after the moves since, the last pdx-entity-grid (measured here: 343.3; 0.96× alone with its
     // icons and rows modules), for the same reason. 343.7 after pdx-alert-dialog (measured here:
-    // 343.6; 1.03× alone, its template compiled where its buttons were wired imperatively).
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 343.7 },
+    // 343.6; 1.03× alone, its template compiled where its buttons were wired imperatively). 343.9
+    // after pdx-drawer (measured here: 343.8): 0.91× alone, but the moves before it left the entry
+    // 0.1 KB from its ceiling, and its compiled template is laid out unlike the TypeScript file.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 343.9 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.

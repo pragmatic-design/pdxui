@@ -492,7 +492,9 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 479.1 → 479.2 (the standing OK for #1210's moves): pdx-command moves to .pdx, 0.93× alone (3456
 // against 3701 B), but its type module and its compiled snippet land in other chunks than the
 // TypeScript file did: 479.0 KB measured locally, held to CI's figure as above.
-const BUDGET_KB = { entry: 43.6, js: 479.2, css: 67, blocking: 102.9 };
+// js 479.2 → 479.3 (the same standing OK): pdx-drawer moves to .pdx, 0.91× alone (2526 against 2788
+// B); the total measured 479.1 KB locally, and CI has read about 0.2 KB above the local figure.
+const BUDGET_KB = { entry: 43.6, js: 479.3, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

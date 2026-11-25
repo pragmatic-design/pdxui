@@ -1,0 +1,353 @@
+<template>
+  <div class="pdx-drawer-backdrop" data-part="backdrop" @click="onBackdropClick"></div>
+  <div class="pdx-drawer" data-part="root" role="dialog" aria-modal="true"
+    :aria-label="label || uiString('drawer', 'label')"
+    :aria-busy="loading ? 'true' : null">
+    <div class="pdx-drawer-header" data-part="header">
+      <slot name="header"><span></span></slot>
+      @if (showClose) {
+        <button class="pdx-drawer-close pdx-dialog-close" data-part="close" type="button" :aria-label="uiString('drawer', 'close')" @click="close()">✕</button>
+      }
+    </div>
+    <div class="pdx-drawer-body" data-part="body">
+      <slot></slot>
+    </div>
+    <div class="pdx-drawer-footer" data-part="footer">
+      <slot name="footer"></slot>
+    </div>
+    @if (resizable) {
+      <div class="pdx-drawer-resize" data-part="resize"></div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus
+ * trap.
+ *
+ * @slot header - Title area at the top of the panel, beside the close button.
+ * @slot footer - Action area at the bottom of the panel (e.g. Save / Cancel).
+ */
+// pdx-drawer — Slide-in panel from any edge.
+// Uses overlayStack for z-index, focusTrap for keyboard, swipe-to-close on mobile.
+// Positions: left/right/top/bottom. Modes: overlay/push. Sizes: sm/md/lg/custom.
+// CSS classes from @pdxui/design (drawer.css). Resizable via drag handle.
+import { focusTrap, generatedId, overlayStack } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import { holdModalFocus } from '../shared/modal-focus';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/drawer';
+// Its ✕ is a `.pdx-dialog-close`, drawn by dialog.css — 24×28.8 instead of 32×32 without it.
+import '@pdxui/design/components/dialog';
+
+// `open` is a model (#288): the drawer closes itself — Escape, the ✕, the backdrop, a swipe — and
+// its own writes announce `open-change` `{ value }`, which `::open` follows. It replaced `pdx-close`.
+@model open: boolean = false;
+// On the host as custom states (#132, #288): drawer.css draws the panel and backdrop from them. The
+// one exception (the owner's decision A): moved under <body> (portalToBody), where a host state
+// cannot reach them, the panel and backdrop carry `data-open` while open. `open` is set a frame
+// after the model, once the panel is placed; the panel says it is busy (A4), in the template.
+@state open = shown;
+@state loading = !!loading;
+@part root, backdrop, header, close, body, footer, resize;
+/** Position: left, right (default), top, bottom */
+@prop position: 'left' | 'right' | 'top' | 'bottom' = 'right';
+/** Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. "640px").
+ *  Open-ended on purpose → NOT declared as a closed enum. */
+@prop size: string = 'md';
+/** Mode: overlay (default) or push (shifts page content) */
+@prop mode: 'overlay' | 'push' = 'overlay';
+/** Close on backdrop click */
+@prop closeOnBackdrop: boolean = true;
+/** Close on Escape */
+@prop closeOnEscape: boolean = true;
+/** Show close button in header */
+@prop showClose: boolean = true;
+/** Show resize handle on edge */
+@prop resizable: boolean = false;
+/** Label for screen readers */
+@prop label: string = '';
+/** Show loading state */
+@prop loading: boolean = false;
+/** Fired (cancelable) before the drawer closes itself; call preventDefault() to keep it open. */
+@event(cancelable) 'pdx-before-close': void;
+@host host;
+
+// Imperative API: el.show() / el.close() / el.toggle() / el.isOpen (`show` avoids the `open` prop).
+// Each writes the model, so each announces `open-change`.
+@expose show, close, toggle, isOpen;
+
+/** The `open` state: set a frame after the model, once the panel is placed. */
+let shown = $signal(false);
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(open as boolean);
+let trapDispose: Dispose | null = null;
+let dismissDispose: Dispose | null = null;
+let overlayId = '';
+let backdropEl: HTMLElement | null = null;
+let drawerEl: HTMLElement | null = null;
+let rafId = 0;
+let portaled = false;
+let restoreTimer = 0;
+
+// A position:fixed panel only needs to escape to <body> when some ANCESTOR establishes a containing
+// block / stacking context that would trap it (transform/filter/perspective/contain/will-change).
+// When nothing traps it (the common case) portaling is pure downside: it detaches the slotted content
+// from its scoped-style ancestor (styles stop matching) AND reconnects child components (pdx-button
+// double-renders, pdx-select loses imperatively-set props). So portal ONLY when actually needed.
+function needsPortal(): boolean {
+  let node: HTMLElement | null = host.parentElement;
+  while (node && node !== document.documentElement && node !== document.body) {
+    const cs = getComputedStyle(node);
+    if (cs.transform !== 'none' || cs.filter !== 'none' || cs.perspective !== 'none'
+      || cs.willChange.includes('transform') || cs.contain.includes('paint') || cs.contain.includes('layout')) {
+      return true;
+    }
+    node = node.parentElement;
+  }
+  return false;
+}
+// Move the overlay to <body> so its z-index escapes a trapping stacking context (a drawer opened from
+// deep in a positioned/transformed layout would otherwise sit UNDER siblings — uncovered + click-blocked).
+// Overlay mode only; push mode shifts page flow.
+function portalToBody(): void {
+  if (portaled || !backdropEl || !drawerEl) return;
+  if (!needsPortal()) return;   // nothing traps fixed positioning → keep in place (preserve scope + children)
+  document.body.appendChild(backdropEl);
+  document.body.appendChild(drawerEl);
+  portaled = true;
+}
+function restorePortal(): void {
+  if (!portaled || !backdropEl || !drawerEl) return;
+  host.appendChild(backdropEl);
+  host.appendChild(drawerEl);
+  portaled = false;
+}
+
+/*
+ * The drawer closing ITSELF — Escape, the ✕, the backdrop, a swipe.
+ *
+ * It asks first, and a host that says no keeps it open. Writing
+ * `el.open = false` straight away would destroy the host's own value: a host that
+ * declined — «you have unsaved changes», the thing a confirm exists for — would be left with
+ * a component that had shut itself and a binding that could not put it back, because the
+ * host's value never changed and a binding writes on change. The panel would keep
+ * `visibility: hidden` from losing `[data-open]`, so it would be out of the accessibility
+ * tree while `el.open` still read true.
+ *
+ * `pdx-dialog` has the same shape, and its reasoning holds here: the event
+ * fires either way, because an app that wants to ask needs to know the attempt happened.
+ *
+ * Closing through the PROP does not come here: the host setting `open = false` IS the
+ * answer, and asking would be asking it to confirm its own decision.
+ */
+function close() {
+  // It stays on the drawer, as no undeclared event bubbles (#138).
+  if (!pdxBeforeClose()) return;
+  open = false;
+}
+function show() { open = true; }
+function toggle() { if (open.peek()) close(); else open = true; }
+
+/** The element focused when the drawer opened — a button, a row, a menu item. */
+let openerEl: HTMLElement | null = null;
+/**
+ * Put focus back on the opener, when the user was in the drawer (Escape, the close button, a
+ * Cancel inside) or nowhere (a backdrop click, focus on <body>). Focus that has already moved
+ * on to something else on the page stays there.
+ */
+function returnFocus(focusWasInside: boolean): void {
+  const opener = openerEl;
+  openerEl = null;
+  if (!opener || !opener.isConnected) return;
+  const active = document.activeElement;
+  if (!focusWasInside && active && active !== document.body) return;
+  opener.focus();
+}
+
+function onBackdropClick() {
+  if (closeOnBackdrop.peek()) close();
+}
+
+// Swipe-to-close gesture
+function setupSwipe() {
+  if (!drawerEl) return;
+  const pos = position.peek() as string || 'right';
+  let startX = 0, startY = 0, dragging = false;
+
+  function onPointerDown(e: PointerEvent) {
+    // Only swipe from edge area (first 20px of the drawer edge)
+    const rect = drawerEl!.getBoundingClientRect();
+    const edgeThreshold = 30;
+    const isHorizontal = pos === 'left' || pos === 'right';
+    if (isHorizontal) {
+      const edgeX = pos === 'left' ? rect.right - edgeThreshold : rect.left + edgeThreshold;
+      if (pos === 'left' && e.clientX < edgeX) return;
+      if (pos === 'right' && e.clientX > edgeX) return;
+    }
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = true;
+    drawerEl!.style.transition = 'none';
+  }
+
+  function onPointerMove(e: PointerEvent) {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    let translate = '';
+    if (pos === 'right' && dx > 0) translate = `translateX(${dx}px)`;
+    else if (pos === 'left' && dx < 0) translate = `translateX(${dx}px)`;
+    else if (pos === 'bottom' && dy > 0) translate = `translateY(${dy}px)`;
+    else if (pos === 'top' && dy < 0) translate = `translateY(${dy}px)`;
+
+    if (translate) drawerEl!.style.transform = translate;
+  }
+
+  function onPointerUp(e: PointerEvent) {
+    if (!dragging) return;
+    dragging = false;
+    drawerEl!.style.transition = '';
+    drawerEl!.style.transform = '';
+
+    const dx = Math.abs(e.clientX - startX);
+    const dy = Math.abs(e.clientY - startY);
+    const threshold = 100;
+    const isHorizontal = pos === 'left' || pos === 'right';
+    const swipeDistance = isHorizontal ? dx : dy;
+
+    if (swipeDistance > threshold) close();
+  }
+
+  drawerEl.addEventListener('pointerdown', onPointerDown);
+  drawerEl.addEventListener('pointermove', onPointerMove);
+  drawerEl.addEventListener('pointerup', onPointerUp);
+
+  return () => {
+    drawerEl?.removeEventListener('pointerdown', onPointerDown);
+    drawerEl?.removeEventListener('pointermove', onPointerMove);
+    drawerEl?.removeEventListener('pointerup', onPointerUp);
+  };
+}
+
+let swipeDispose: Dispose | null = null;
+
+$effect(() => {
+  const isNowOpen = open as boolean;
+  const pos = position as string || 'right';
+  const sizeNow = size as string || 'md';
+  const modeNow = mode as string || 'overlay';
+
+  if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+  rafId = requestAnimationFrame(() => {
+    rafId = 0;
+    // Resolved in the frame, once the template is in the page: the panel and its backdrop.
+    if (!drawerEl) drawerEl = host.querySelector('.pdx-drawer');
+    if (!backdropEl) backdropEl = host.querySelector('.pdx-drawer-backdrop');
+    if (isNowOpen) {
+      // 1. Disable transitions while repositioning
+      if (drawerEl) {
+        drawerEl.style.transition = 'none';
+        drawerEl.setAttribute('position', pos);
+        if (['sm', 'md', 'lg'].includes(sizeNow)) {
+          drawerEl.setAttribute('size', sizeNow);
+          drawerEl.style.removeProperty('--pdx-drawer-width');
+        } else {
+          drawerEl.removeAttribute('size');
+          drawerEl.style.setProperty('--pdx-drawer-width', sizeNow);
+        }
+        if (modeNow === 'push') drawerEl.setAttribute('push', '');
+        else drawerEl.removeAttribute('push');
+      }
+      // The backdrop carries the mode itself: its CSS reads `.pdx-drawer-backdrop[push]`, and
+      // not a sibling combinator from the panel, which made Chromium keep the panel (#891).
+      backdropEl?.toggleAttribute('push', modeNow === 'push');
+
+      if (restoreTimer) { clearTimeout(restoreTimer); restoreTimer = 0; }
+      if (modeNow === 'overlay') portalToBody();
+
+      // Remember the opener, then blur it BEFORE the modal marks the background
+      // aria-hidden — otherwise the trigger stays focused inside a hidden subtree (AT users
+      // stranded). Focus moves into the drawer in the open rAF below, and back to the opener
+      // on close. The trap below cannot do that part: it records the focus it finds, which
+      // after this blur is <body>.
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && active !== document.body && !drawerEl?.contains(active)) {
+        openerEl = active;
+      }
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+
+      overlayId = generatedId('pdx-drawer');
+      const zIndex = overlayStack.push(overlayId, { modal: true });
+      if (backdropEl) backdropEl.style.zIndex = String(zIndex - 1);
+      if (drawerEl) drawerEl.style.zIndex = String(zIndex);
+
+      // 2. Next frame: re-enable transitions and open
+      requestAnimationFrame(() => {
+        if (drawerEl) drawerEl.style.transition = '';
+        shown = true;
+        // Moved under <body>, where `:state(open)` on the host cannot reach them: the
+        // panel and backdrop say it themselves (decision A, #288).
+        if (portaled) {
+          backdropEl?.setAttribute('data-open', '');
+          drawerEl?.setAttribute('data-open', '');
+        }
+        // Move focus INTO the drawer so the (now aria-hidden) background trigger doesn't
+        // retain focus — otherwise AT users are stranded on a hidden element. Focus the PANEL
+        // itself (tabindex=-1), NOT the first focusable: focusing the close button would paint a
+        // keyboard-focus ring on the X as if the user had tabbed to it. The focus trap handles Tab.
+        if (drawerEl) {
+          drawerEl.setAttribute('tabindex', '-1');
+          drawerEl.focus();
+        }
+      });
+
+      // Focus trap. The drawer restores focus itself (returnFocus), to the opener recorded
+      // above: the trap's own record would be <body>.
+      if (drawerEl) {
+        trapDispose = focusTrap(drawerEl, { restoreFocus: false, escapeDeactivates: false });
+        // A mousedown on the backdrop would move focus to the page before the click closed
+        // the drawer; pdx-dialog holds focus the same way.
+        if (backdropEl) holdModalFocus(backdropEl, drawerEl);
+      }
+
+      // Escape via overlay stack
+      if (closeOnEscape.peek()) {
+        dismissDispose = overlayStack.onDismissTop(close);
+      }
+
+      // Swipe gesture
+      swipeDispose = setupSwipe() || null;
+    } else {
+      // Close drawer
+      const focusWasInside = !!drawerEl && drawerEl.contains(document.activeElement);
+      shown = false;
+      if (backdropEl) backdropEl.removeAttribute('data-open');
+      if (drawerEl) {
+        drawerEl.removeAttribute('data-open');
+        drawerEl.style.transform = '';
+      }
+      if (trapDispose) { trapDispose(); trapDispose = null; }
+      returnFocus(focusWasInside);
+      if (dismissDispose) { dismissDispose(); dismissDispose = null; }
+      if (swipeDispose) { swipeDispose(); swipeDispose = null; }
+      if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+      // Restore the overlay to the host AFTER the exit transition (don't interrupt it).
+      if (portaled) { restoreTimer = window.setTimeout(restorePortal, 260); }
+    }
+  });
+
+  return () => {
+    if (trapDispose) { trapDispose(); trapDispose = null; }
+    if (dismissDispose) { dismissDispose(); dismissDispose = null; }
+    if (swipeDispose) { swipeDispose(); swipeDispose = null; }
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+    if (restoreTimer) { clearTimeout(restoreTimer); restoreTimer = 0; }
+    restorePortal();
+  };
+});
+</script>

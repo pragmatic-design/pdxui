@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-drawer (Tier 2A, overlay)
  *
- * Contracts written by inspecting the source (packages/ui/src/drawer/pdx-drawer.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/drawer/pdx-drawer.pdx) and the CSS
  * (packages/design/src/components/drawer.css).
  *
  * DOM structure (NOT portalled): the custom element <pdx-drawer> renders, inside its own host
