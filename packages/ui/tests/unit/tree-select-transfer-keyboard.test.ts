@@ -5,7 +5,7 @@
 // <body> after a click, and names its search fields.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';
 
 beforeEach(cleanup);

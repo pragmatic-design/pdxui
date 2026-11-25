@@ -37,7 +37,7 @@ import '../../src/json-editor/pdx-json-editor.pdx';
 import '../../src/calendar/pdx-calendar.pdx';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader.pdx';
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';
 import '../../src/otp-input/pdx-otp-input.pdx';
 

@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-tree-select (tier 3, a select with a tree dropdown)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/tree-select/pdx-tree-select.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/tree-select/pdx-tree-select.pdx)
  * and the CSS (packages/design/src/components/tree-select.css + cascader.css — the trigger reuses
  * the .pdx-cascader-* classes).
  *

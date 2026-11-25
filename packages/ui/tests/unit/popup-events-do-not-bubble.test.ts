@@ -101,19 +101,37 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
 // trade the pair for `open-change` (#287, #288), which is guarded too: it never says bubbles: true.
 describe('guard: pdx-open, pdx-close and pdx-toggle are emitted with { bubbles: false }', () => {
     const SRC = join(__dirname, '../../src');
-    const files = (dir: string, acc: string[] = []): string[] => {
+    const files = (dir: string, ext = '.ts', acc: string[] = []): string[] => {
         for (const e of readdirSync(dir)) {
             const p = join(dir, e);
-            if (statSync(p).isDirectory()) files(p, acc);
-            else if (e.endsWith('.ts')) acc.push(p);
+            if (statSync(p).isDirectory()) files(p, ext, acc);
+            else if (e.endsWith(ext)) acc.push(p);
         }
         return acc;
     };
+    // A component moved to .pdx (#1210) declares the event instead of emitting it by name: whether
+    // it bubbles is the declaration's, `@event(bubbles) 'pdx-close'`. Match: an `@event`, its options
+    // if any, then one of the four names. Groups: [1]=options [2]=name
+    const PDX_DECL = /@event(?:\(([^)]*)\))?\s+['"](pdx-open|pdx-close|pdx-toggle|open-change)['"]/g;
 
     it('finds emissions to check at all', () => {
-        const hits = files(SRC).flatMap((f) => readFileSync(f, 'utf8').match(/emit\(\s*'(pdx-open|pdx-close|pdx-toggle|open-change)'/g) ?? []);
-        // A zero here would make the assertion below pass by measuring nothing.
-        expect(hits.length).toBeGreaterThan(10);
+        const emitted = files(SRC).flatMap((f) => readFileSync(f, 'utf8').match(/emit\(\s*'(pdx-open|pdx-close|pdx-toggle|open-change)'/g) ?? []);
+        const declared = files(SRC, '.pdx').flatMap((f) => readFileSync(f, 'utf8').match(PDX_DECL) ?? []);
+        // A zero here would make the assertions below pass by measuring nothing. Counted across both
+        // forms, so a component moving from one to the other does not lower it.
+        expect(emitted.length + declared.length).toBeGreaterThan(10);
+        expect(declared.length, 'no .pdx declares the four names: the .pdx check below measures nothing').toBeGreaterThan(0);
+    });
+
+    it('no .pdx declares the four names as bubbling', () => {
+        const offenders: string[] = [];
+        for (const f of files(SRC, '.pdx')) {
+            const text = readFileSync(f, 'utf8');
+            for (const m of text.matchAll(PDX_DECL)) {
+                if (/\bbubbles\b/.test(m[1] ?? '')) offenders.push(`${relative(SRC, f)}:${text.slice(0, m.index).split('\n').length}  ${m[0]}`);
+            }
+        }
+        expect(offenders, 'these reach every ancestor, and an app would close the popup around them').toEqual([]);
     });
 
     it('no emission of the three names without bubbles: false', () => {

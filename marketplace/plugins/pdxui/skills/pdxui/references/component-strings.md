@@ -560,10 +560,10 @@ placeholders, filled at render: keep them in the translation.
 | `transfer` | `selectAll` | `Select all` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
 | `transfer` | `source` | `Source` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
 | `transfer` | `target` | `Target` | `@pdxui/ui/src/transfer/transfer-strings.ts` |
-| `tree-select` | `noData` | `No data` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
-| `tree-select` | `noMatch` | `No match` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
-| `tree-select` | `placeholder` | `Select...` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
-| `tree-select` | `search` | `Search...` | `@pdxui/ui/src/tree-select/pdx-tree-select.ts` |
+| `tree-select` | `noData` | `No data` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
+| `tree-select` | `noMatch` | `No match` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
+| `tree-select` | `placeholder` | `Select...` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
+| `tree-select` | `search` | `Search...` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
 | `wizard` | `back` | `Back` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
 | `wizard` | `complete` | `Complete` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
 | `wizard` | `navigation` | `Wizard navigation` | `@pdxui/ui/src/shared/i18n.ts` |

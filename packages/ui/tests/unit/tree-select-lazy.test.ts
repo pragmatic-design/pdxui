@@ -9,7 +9,7 @@
 // asked, a node that does not say so is asked once.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 
 /** Two roots with no children: one that admits it is a leaf, one that does not. */
 const LAZY_TREE = [

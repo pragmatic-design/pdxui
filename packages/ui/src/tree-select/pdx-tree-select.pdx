@@ -1,0 +1,649 @@
+<template></template>
+
+<script>
+/**
+ * A select whose dropdown is a tree the user can search and expand, picking one node or several,
+ * with children loaded lazily.
+ *
+ * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`.
+ *
+ * @csspart root - The trigger, the combobox: the frame, its border and background.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel that holds the tree.
+ * @csspart search - The search field atop the panel, while `searchable`.
+ * @csspart tree - The `role="tree"`.
+ * @csspart node - A node of the tree, a `role="treeitem"` row.
+ * @csspart toggle - A node's expand button; a leaf's is there, hidden, to keep the labels aligned.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - A branch's children are being fetched by `loadChildren`.
+ *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail label $event.currentTarget.getLabel()
+ */
+// pdx-tree-select — Select with tree dropdown.
+// Renders a hierarchical tree inside the dropdown panel.
+// Supports single/multi select, search filter, lazy children, checkboxes.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it
+// (tree-select-dom.ts draws the open tree).
+import { generatedId, getComponentString, usePopover, onNextFrame, onDestroy } from '@pdxui/core';
+import { onPressOutside } from '../shared/press-outside';
+import { renderNodes } from './tree-select-dom';
+import type { TreeView, VisibleRow } from './tree-select-dom';
+import type { TreeSelectNode } from './tree-select-types';
+import './tree-select-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/tree-select';
+
+// The node shape an app builds in TypeScript (`import type { TreeSelectNode } from '@pdxui/ui/tree-select'`).
+export type { TreeSelectNode } from './tree-select-types';
+
+// The selection (#481): one node's value, or the array of values when `multiple`. A click on the
+// tree, the clear button and clear() write it, and the write dispatches `value-change`; so does
+// setting `value`, the way to set it.
+// A form submits it, one entry per value when multiple, an empty entry with none as a native
+// select; and resets it (#135).
+/** The selected node's value, or the values when `multiple`. A form submits one entry per value under the name (#135). */
+@model value: string | string[] | null = null { attribute: json, form: () => (isMultiple() ? (Array.isArray(value) ? value : []) : (value ?? '')) };
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
+/** Fired when the clear button or `clear()` empties the selection, after its `value-change`. */
+@event 'pdx-clear': void;
+/** Fired when `loadChildren` rejects; the branch stays askable and can be reopened. */
+@event 'pdx-load-error': { node: TreeSelectNode; error: unknown };
+// The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+// from them. The trigger carries no state class.
+@state open = isOpen;
+@state disabled = !!disabled;
+@state loading = loadingSet.size > 0;
+// Every element is built by the script, a frame after mount (tree-select-dom.ts draws the rows).
+@part(external) root, clear, popup, search, tree, node, toggle;
+// The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+// The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
+@generic T extends { value: string; label: string };
+/** Tree of options */
+@prop options: T[] = [];
+/** Allow multiple selection */
+@prop multiple: boolean = false;
+/** Placeholder */
+@prop placeholder: string = '';
+/** Accessible name (aria-label) for the trigger; falls back to placeholder */
+@prop label: string = '';
+/** Show search filter */
+@prop searchable: boolean = false;
+/** Clearable */
+@prop clearable: boolean = true;
+/** Disabled */
+@prop disabled: boolean = false;
+/** Expand all nodes initially */
+@prop expandAll: boolean = false;
+/** Lazy load: (node) => Promise<TreeSelectNode[]> */
+@prop loadChildren: ((...args: unknown[]) => unknown) | null = null;
+/** Form field name */
+@prop name: string = '';
+// A parent's `@snippet` sets it, positional arguments; the alpha scoped slot is not read (#492).
+// A root, or a child or grandchild of one, written out because the editor pastes the
+// signature where no alias is in scope. A recursive node type collapses to `T`.
+@slot node?: (node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean);
+// The host is the one submitter (#135), in FormData under its `name` (#133).
+@host el { :name="name || null" }
+
+// Imperative API (#287): the popup is driven by the overlay verbs, which replace the undeclared
+// openTreeSelect/closeTreeSelect; the selection is the model, `el.value`, which replaces
+// getValue/setValue.
+@expose getLabel, clear, show, close, toggle;
+
+let isOpen = $signal(false);
+let searchText = $signal('');
+let expandedSet = $signal<Set<string>>(new Set());
+let domReady = $signal(false);
+
+const treeId = generatedId('pdx-tree-select-tree');
+let triggerEl: HTMLElement | null = null;
+let textEl: HTMLElement | null = null;
+let panelEl: HTMLElement | null = null;
+let treeContainerEl: HTMLElement | null = null;
+let searchInputEl: HTMLInputElement | null = null;
+let clearEl: HTMLButtonElement | null = null;
+let popover: ReturnType<typeof usePopover> | null = null;
+/** Removes the press-outside listener, added when the panel opens (#427). */
+let outsideDispose: (() => void) | null = null;
+
+// ─── Keyboard: the APG tree, driven from the trigger ──────
+// Focus stays on the trigger (or the search field), and aria-activedescendant names the
+// highlighted node. Once open, the tree takes every key the APG tree defines, not only
+// Enter/Space/Escape, and Enter selects the highlighted node.
+/** The rows the tree shows, in order, as of its last render. */
+let rows: VisibleRow[] = [];
+/** The highlighted node's value; null until a key moves into the tree. */
+let activeValue: string | null = null;
+const rowIds = new Map<string, string>();
+const rowId = (val: string): string => {
+  let id = rowIds.get(val);
+  if (!id) { id = `${treeId}-n${rowIds.size + 1}`; rowIds.set(val, id); }
+  return id;
+};
+let typeBuffer = '';
+let typeTimer: ReturnType<typeof setTimeout> | null = null;
+/** Opened by ↓/↑: the first render highlights the entry row. */
+let pendingEntry: 'first' | 'last' | null = null;
+
+function getOptions(): TreeSelectNode[] {
+  return (options as unknown as TreeSelectNode[]) || [];
+}
+
+/** The selection: the model, read where it is used. (The TypeScript version kept a copy that a null
+ *  value did not replace, so a parent emptying `value` left the old label on show.) */
+function getSelectedValues(): Set<string> {
+  const v = value as string | string[] | null;
+  if (!v) return new Set();
+  if (Array.isArray(v)) return new Set(v as string[]);
+  return new Set([String(v)]);
+}
+
+function isMultiple(): boolean {
+  return multiple as boolean;
+}
+
+function findNode(val: string, nodes?: TreeSelectNode[]): TreeSelectNode | null {
+  for (const n of (nodes || getOptions())) {
+    if (n.value === val) return n;
+    if (n.children) {
+      const found = findNode(val, n.children);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function displayText(): string {
+  const selected = getSelectedValues();
+  if (selected.size === 0) return '';
+  const labels: string[] = [];
+  for (const v of selected) {
+    const found = findNode(v);
+    if (found) labels.push(found.label);
+  }
+  return labels.join(', ');
+}
+
+function openPopover(): void {
+  if (disabled.peek()) return;
+  const wasOpen = isOpen.peek();
+  isOpen = true;
+  if (expandAll.peek()) {
+    const all = new Set<string>();
+    const walk = (nodes: TreeSelectNode[]) => {
+      for (const n of nodes) {
+        if (n.children && n.children.length > 0) {
+          all.add(n.value);
+          walk(n.children);
+        }
+      }
+    };
+    walk(getOptions());
+    expandedSet = all;
+  }
+  // Close on a press outside, listened for from now (#427). A reopen replaces the listener.
+  outsideDispose?.();
+  outsideDispose = onPressOutside({
+    inside: (t) => el.contains(t),
+    outside: () => closePopover(),
+  });
+  // Announced when it changes (#287): opening an open panel again only resets it.
+  if (!wasOpen) openChange({ value: true });
+}
+
+// Teardown on destroy: without it, an unmount with the popover open would leave the
+// mousedown on document orphaned forever.
+onDestroy(() => {
+  outsideDispose?.(); outsideDispose = null;
+  // Its scroll/resize listeners and ResizeObserver go with the component.
+  popover?.dispose();
+  popover = null;
+  if (typeTimer) { clearTimeout(typeTimer); typeTimer = null; }
+});
+
+function closePopover(): void {
+  const wasOpen = isOpen.peek();
+  isOpen = false;
+  searchText = '';
+  if (searchInputEl) searchInputEl.value = '';
+  outsideDispose?.(); outsideDispose = null;
+  activeValue = null;
+  applyActive();
+  // The search field goes away with the panel: focus back on the trigger, not <body>.
+  if (panelEl && panelEl.contains(document.activeElement)) triggerEl?.focus();
+  // Announced when it changes (#287): a press outside a closed panel announces nothing.
+  if (wasOpen) openChange({ value: false });
+}
+
+function togglePopover(): void {
+  if (isOpen.peek()) closePopover(); else openPopover();
+}
+
+/** Mark the highlighted row, and point aria-activedescendant at it while the tree is open. */
+function applyActive(scroll = false): void {
+  const entry = rows.find(r => r.node.value === activeValue) ?? null;
+  for (const r of rows) r.row.classList.toggle('active', r === entry);
+  const id = isOpen.peek() && entry ? entry.row.id : null;
+  for (const owner of [triggerEl, searchInputEl]) {
+    if (!owner) continue;
+    if (id) owner.setAttribute('aria-activedescendant', id);
+    else owner.removeAttribute('aria-activedescendant');
+  }
+  if (scroll && entry) entry.row.scrollIntoView?.({ block: 'nearest' });
+}
+
+function moveTo(index: number): void {
+  if (rows.length === 0) return;
+  const i = Math.max(0, Math.min(index, rows.length - 1));
+  activeValue = rows[i].node.value;
+  applyActive(true);
+}
+
+/** Where the first move lands: the selected node if it is showing, else the first (or last). */
+function entryIndex(fromEnd: boolean): number {
+  const selected = getSelectedValues();
+  const at = rows.findIndex(r => selected.has(r.node.value));
+  return at >= 0 ? at : (fromEnd ? rows.length - 1 : 0);
+}
+
+/** Next row whose label starts with what was typed, cycling on a repeated letter (APG). */
+function typeAhead(char: string): void {
+  typeBuffer += char.toLowerCase();
+  if (typeTimer) clearTimeout(typeTimer);
+  typeTimer = setTimeout(() => { typeBuffer = ''; typeTimer = null; }, 500);
+  const from = rows.findIndex(r => r.node.value === activeValue);
+  const find = (needle: string): number => {
+    for (let k = 1; k <= rows.length; k++) {
+      const i = (from + k + rows.length) % rows.length;
+      if (rows[i].node.label.toLowerCase().startsWith(needle)) return i;
+    }
+    return -1;
+  };
+  let i = find(typeBuffer);
+  if (i < 0 && [...typeBuffer].every(c => c === typeBuffer[0])) i = find(typeBuffer[0]);
+  if (i >= 0) moveTo(i);
+}
+
+/**
+ * The keys of the trigger and of the search field. Closed: ↓/↑/Enter/Space open it (↓/↑ also
+ * highlight). Open: ↑/↓ move, → expands or enters the first child, ← collapses or goes to the
+ * parent, Home/End, Enter (and Space on the trigger) choose, Escape closes, letters type ahead.
+ * In the search field ←/→/Home/End/Space stay the field's: they edit the query.
+ */
+function onKeydown(e: KeyboardEvent): void {
+  const inSearch = e.target === searchInputEl;
+  if (!isOpen.peek()) {
+    if (inSearch) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      // Set before opening: opening renders the tree synchronously.
+      pendingEntry = e.key === 'ArrowUp' ? 'last' : 'first';
+      openPopover();
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openPopover();
+    }
+    return;
+  }
+  const i = rows.findIndex(r => r.node.value === activeValue);
+  const cur = i >= 0 ? rows[i] : null;
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      moveTo(cur ? i + 1 : entryIndex(false));
+      return;
+    case 'ArrowUp':
+      e.preventDefault();
+      moveTo(cur ? i - 1 : entryIndex(true));
+      return;
+    case 'Home':
+    case 'End':
+      if (inSearch) return;
+      e.preventDefault();
+      moveTo(e.key === 'Home' ? 0 : rows.length - 1);
+      return;
+    case 'ArrowRight':
+      if (inSearch || !cur) return;
+      e.preventDefault();
+      if (cur.expandable && !cur.expanded) onToggle(cur.node);
+      else if (cur.expanded && rows[i + 1]?.depth > cur.depth) moveTo(i + 1);
+      return;
+    case 'ArrowLeft':
+      if (inSearch || !cur) return;
+      e.preventDefault();
+      if (cur.expandable && cur.expanded) onToggle(cur.node);
+      else if (cur.parent) { activeValue = cur.parent.value; applyActive(true); }
+      return;
+    case ' ':
+    case 'Enter':
+      // Space chooses like Enter, except in the search field, where it is a space.
+      if (e.key === ' ' && inSearch) return;
+      e.preventDefault();
+      if (cur) selectNode(cur.node);
+      return;
+    case 'Escape':
+      e.preventDefault();
+      closePopover();
+      triggerEl?.focus();
+      return;
+    default:
+      if (!inSearch && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        typeAhead(e.key);
+      }
+  }
+}
+
+function toggleExpand(val: string): void {
+  const set = new Set(expandedSet.peek());
+  if (set.has(val)) set.delete(val); else set.add(val);
+  expandedSet = set;
+}
+
+// ─── Lazy children ─────────────────────────────────
+// `loadChildren` is `(node) => Promise<TreeSelectNode[]>`: a node with no `children` gets a
+// toggle that asks for its branch. The contract is `isLeaf`, on TreeSelectNode — a node that
+// declares itself a leaf is never asked.
+
+/** Branches that came back, by node value. A failure is deliberately NOT stored here. */
+const loadedChildren = new Map<string, TreeSelectNode[]>();
+let loadingSet = $signal<Set<string>>(new Set());
+/** Bumped when a branch arrives: the Map above is not reactive, and the tree must redraw. */
+let branches = $signal(0);
+
+function loader(): ((n: TreeSelectNode) => Promise<TreeSelectNode[]>) | null {
+  return (loadChildren.peek() as ((n: TreeSelectNode) => Promise<TreeSelectNode[]>) | null) ?? null;
+}
+
+/** The children of a node, declared or fetched. */
+function childrenOf(n: TreeSelectNode): TreeSelectNode[] | undefined {
+  if (n.children && n.children.length > 0) return n.children;
+  return loadedChildren.get(n.value);
+}
+
+/** Whether the node can be opened at all — it has children, or a loader may yet find some. */
+function canExpand(n: TreeSelectNode): boolean {
+  const kids = childrenOf(n);
+  if (kids && kids.length > 0) return true;
+  return !!loader() && n.isLeaf !== true;
+}
+
+async function requestChildren(n: TreeSelectNode): Promise<void> {
+  const load = loader();
+  if (!load || loadedChildren.has(n.value) || loadingSet.peek().has(n.value)) return;
+  const busy = new Set(loadingSet.peek());
+  busy.add(n.value);
+  loadingSet = busy;
+  try {
+    const kids = await load(n);
+    loadedChildren.set(n.value, kids ?? []);
+    branches = branches.peek() + 1;
+  } catch (error) {
+    // Not cached, and not swallowed: an unreachable branch and an empty one look
+    // identical on screen, so the failure is announced and the node stays askable.
+    pdxLoadError({ node: n, error });
+  } finally {
+    const done = new Set(loadingSet.peek());
+    done.delete(n.value);
+    loadingSet = done;
+  }
+}
+
+/** Open or close a branch — and fetch it the first time, which is never a close. */
+function onToggle(n: TreeSelectNode): void {
+  const kids = childrenOf(n);
+  if ((!kids || kids.length === 0) && canExpand(n)) {
+    const set = new Set(expandedSet.peek());
+    set.add(n.value);
+    expandedSet = set;
+    void requestChildren(n);
+    return;
+  }
+  toggleExpand(n.value);
+}
+
+function selectNode(n: TreeSelectNode): void {
+  if (n.disabled) return;
+  // Clicking a branch opens it rather than selecting it — including a branch that has not
+  // been fetched yet, which before `loadChildren` was read could not be told from a leaf.
+  if (canExpand(n) && !isMultiple()) {
+    onToggle(n);
+    return;
+  }
+
+  if (isMultiple()) {
+    const newSet = new Set(getSelectedValues());
+    if (newSet.has(n.value)) newSet.delete(n.value);
+    else newSet.add(n.value);
+    value = [...newSet];
+  } else {
+    value = n.value;
+    closePopover();
+  }
+}
+
+function onClear(e: Event): void {
+  e.stopPropagation();
+  value = isMultiple() ? [] : '';
+  pdxClear();
+}
+
+/** The label of the selected node, or the labels joined with ', ' when `multiple`. */
+function getLabel(): string {
+  const v = value.peek();
+  const values = Array.isArray(v) ? v : v ? [v] : [];
+  return values.map((x) => findNode(x)?.label ?? x).join(', ');
+}
+function clear() {
+  value = Array.isArray(value.peek()) ? [] : null;
+  pdxClear();
+}
+/** Open the popup. */
+function show() { openPopover(); }
+/** Close the popup. */
+function close() { closePopover(); }
+/** Open the popup when closed, close it when open. */
+function toggle() { togglePopover(); }
+
+// Build DOM once, a frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  const isDisabled = disabled.peek() as boolean;
+  const isClearable = clearable.peek() as boolean;
+  const ph = (placeholder.peek() as string) || getComponentString('tree-select', 'placeholder')();
+
+  triggerEl = document.createElement('div');
+  // No state class: `disabled` is the host's :state(disabled) (#287).
+  triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap';
+  triggerEl.setAttribute('data-part', 'root');
+  triggerEl.setAttribute('role', 'combobox');
+  triggerEl.setAttribute('aria-expanded', 'false');
+  triggerEl.setAttribute('aria-haspopup', 'tree');
+  // An accessible name + aria-controls pointing at the tree (role=combobox requires it).
+  triggerEl.setAttribute('aria-label', (label.peek() as string) || ph);
+  triggerEl.setAttribute('aria-controls', treeId);
+  triggerEl.setAttribute('tabindex', isDisabled ? '-1' : '0');
+  triggerEl.addEventListener('click', () => {
+    if (isOpen.peek()) closePopover(); else openPopover();
+  });
+  triggerEl.addEventListener('keydown', onKeydown);
+
+  textEl = document.createElement('span');
+  textEl.className = 'pdx-cascader-text pdx-cascader-placeholder';
+  textEl.textContent = ph;
+  triggerEl.appendChild(textEl);
+
+  if (isClearable) {
+    clearEl = document.createElement('button') as HTMLButtonElement;
+    clearEl.type = 'button';
+    clearEl.className = 'pdx-input-clear';
+    clearEl.setAttribute('data-part', 'clear');
+    clearEl.textContent = '×';
+    clearEl.style.display = 'none';
+    clearEl.addEventListener('click', onClear);
+    triggerEl.appendChild(clearEl);
+  }
+
+  const icon = document.createElement('span');
+  icon.className = 'pdx-cascader-icon';
+  icon.textContent = '▾';
+  triggerEl.appendChild(icon);
+  el.appendChild(triggerEl);
+
+  panelEl = document.createElement('div');
+  panelEl.className = 'pdx-tree-select-panel';
+  panelEl.setAttribute('data-part', 'popup');
+  panelEl.style.display = 'none';
+
+  if (searchable.peek()) {
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'pdx-tree-select-search';
+    const input = document.createElement('input');
+    searchInputEl = input;
+    input.type = 'text';
+    input.setAttribute('data-part', 'search');
+    input.placeholder = getComponentString('tree-select', 'search')();
+    // Named, and tied to the tree it filters: the highlight is announced from here too.
+    input.setAttribute('aria-label', getComponentString('tree-select', 'search')());
+    input.setAttribute('aria-controls', treeId);
+    input.addEventListener('input', () => { searchText = input.value; });
+    input.addEventListener('keydown', onKeydown);
+    searchWrap.appendChild(input);
+    panelEl.appendChild(searchWrap);
+  }
+
+  treeContainerEl = document.createElement('div');
+  treeContainerEl.className = 'pdx-tree-select-tree';
+  treeContainerEl.id = treeId;
+  treeContainerEl.setAttribute('role', 'tree');
+  treeContainerEl.setAttribute('data-part', 'tree');
+  // The tree has the trigger's name; it had none.
+  treeContainerEl.setAttribute('aria-label', (label.peek() as string) || ph);
+  if (multiple.peek()) treeContainerEl.setAttribute('aria-multiselectable', 'true');
+  panelEl.appendChild(treeContainerEl);
+
+  el.appendChild(panelEl);
+
+  // Positioned by usePopover, `fixed` against the viewport — as pdx-select does — so a box
+  // that scrolls or clips (a table, a scroll area, a card, a drawer body) cannot cut the
+  // panel off. CSS `absolute` against the host would follow scroll via the containing
+  // block, but it also obeys that block's overflow, and a tree inside a scrolling table
+  // would be clipped.
+  // Positioning ONLY: opening, closing, outside clicks and Escape stay this component's.
+  popover = usePopover({
+    trigger: 'manual',
+    placement: 'bottom-start',
+    flip: true,
+    dismissOnOutside: false,
+    dismissOnEscape: false,
+    container: el,
+  });
+  popover.setTrigger(triggerEl);
+  popover.setContent(panelEl);
+
+  domReady = true;
+});
+
+let wasOpen = false;
+
+// Reactive update
+$effect(() => {
+  if (!domReady) return;
+  const openNow = isOpen as boolean;
+  const searchNow = searchText as string;
+  const expandedNow = expandedSet as Set<string>;
+  // Read so the tree redraws when a lazy branch starts loading and when it arrives.
+  const loadingNow = loadingSet as Set<string>;
+  void branches;
+  const selected = getSelectedValues();
+  const display = displayText();
+  const isClearable = clearable as boolean;
+  const isDisabled = disabled as boolean;
+  void searchable;
+  const multi = isMultiple();
+  const ph = (placeholder as string) || getComponentString('tree-select', 'placeholder')();
+
+  if (!triggerEl) return;
+
+  if (textEl) {
+    textEl.textContent = display || ph;
+    textEl.className = 'pdx-cascader-text' + (display ? '' : ' pdx-cascader-placeholder');
+  }
+  if (clearEl) {
+    clearEl.style.display = (isClearable && display && !isDisabled) ? '' : 'none';
+  }
+  triggerEl.setAttribute('aria-expanded', String(openNow));
+  // Out of the tab order while disabled — set after the mount too, as the state is.
+  triggerEl.setAttribute('tabindex', isDisabled ? '-1' : '0');
+
+  if (!panelEl || !treeContainerEl) return;
+  panelEl.style.display = openNow ? '' : 'none';
+  if (openNow) popover?.open(); else popover?.close();
+  const justOpened = openNow && !wasOpen;
+  wasOpen = openNow;
+  if (!openNow) { rows = []; return; }
+
+  // Focus search input when panel opens (only then: the tree redraws on every expand)
+  if (searchInputEl && justOpened) {
+    const input = searchInputEl;
+    setTimeout(() => input.focus(), 0);
+  }
+
+  // A4 (#287): the tree is busy while a branch of it is being fetched; the row is, too.
+  if (loadingNow.size > 0) treeContainerEl.setAttribute('aria-busy', 'true');
+  else treeContainerEl.removeAttribute('aria-busy');
+
+  // Rebuild only the tree content (search input is persistent)
+  treeContainerEl.innerHTML = '';
+  rows = [];
+  const opts = getOptions();
+  if (opts.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'pdx-tree-select-empty';
+    empty.textContent = getComponentString('tree-select', 'noData')();
+    treeContainerEl.appendChild(empty);
+  } else {
+    const snippet = node;
+    const view: TreeView = {
+      rows,
+      expanded: expandedNow,
+      selected,
+      multi,
+      search: searchNow.toLowerCase(),
+      loading: loadingNow,
+      rowId,
+      childrenOf,
+      canExpand,
+      nodeSnippet: snippet ? (n, level, open) => snippet(n as unknown as T, level, open) : undefined,
+      onToggle,
+      onRowClick: (n) => { activeValue = n.value; selectNode(n); },
+    };
+    renderNodes(treeContainerEl, opts, 0, null, view);
+  }
+  // The highlight survives the redraw; a node that is no longer showing takes it with it.
+  if (pendingEntry) {
+    const fromEnd = pendingEntry === 'last';
+    pendingEntry = null;
+    if (rows.length) activeValue = rows[entryIndex(fromEnd)].node.value;
+  }
+  if (activeValue && !rows.some(r => r.node.value === activeValue)) activeValue = null;
+  applyActive(true);
+});
+</script>
