@@ -55,16 +55,16 @@ placeholders, filled at render: keep them in the translation.
 | `bulk-actions` | `label` | `Bulk actions` | `@pdxui/ui/src/shared/i18n.ts` |
 | `bulk-actions` | `selected` | `{count} selected` | `@pdxui/ui/src/shared/i18n.ts` |
 | `calendar` | `label` | `Calendar` | `@pdxui/ui/src/shared/i18n.ts` |
-| `calendar` | `nextMonth` | `Next month` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `nextYear` | `Next year` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `nextYears` | `Next years` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `prevMonth` | `Previous month` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `prevYear` | `Previous year` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `prevYears` | `Previous years` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `selectMonth` | `Select month` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `selectYear` | `Select year` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `today` | `Today` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
-| `calendar` | `weekNumber` | `W` | `@pdxui/ui/src/calendar/pdx-calendar.ts` |
+| `calendar` | `nextMonth` | `Next month` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `nextYear` | `Next year` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `nextYears` | `Next years` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `prevMonth` | `Previous month` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `prevYear` | `Previous year` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `prevYears` | `Previous years` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `selectMonth` | `Select month` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `selectYear` | `Select year` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `today` | `Today` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
+| `calendar` | `weekNumber` | `W` | `@pdxui/ui/src/calendar/calendar-strings.ts` |
 | `carousel` | `goToSlide` | `Go to slide {n}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `carousel` | `label` | `Carousel` | `@pdxui/ui/src/shared/i18n.ts` |
 | `carousel` | `next` | `Next slide` | `@pdxui/ui/src/shared/i18n.ts` |

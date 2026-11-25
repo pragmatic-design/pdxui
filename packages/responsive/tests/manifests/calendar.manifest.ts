@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-calendar (standalone ARIA calendar grid, month view + date selection)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/calendar/pdx-calendar.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/calendar/pdx-calendar.pdx)
  * and the CSS (packages/design/src/components/calendar.css).
  *
  * ──────────────────────────────────────────────────────────────────────────

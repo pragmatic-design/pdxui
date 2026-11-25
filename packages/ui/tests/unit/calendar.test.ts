@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
-import '../../src/calendar/pdx-calendar';
+import '../../src/calendar/pdx-calendar.pdx';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/date-picker/pdx-date-picker';
 

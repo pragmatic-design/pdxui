@@ -1,0 +1,489 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCalendar",
+  "tagName": "pdx-calendar",
+  "category": "Specialized Inputs",
+  "order": 36,
+  "description": "A standalone calendar grid in which the user selects a date, a range of dates or several dates,\nalso from the keyboard alone.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "rangeStart",
+      "description": "Range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rangestart"
+    },
+    {
+      "kind": "field",
+      "name": "rangeEnd",
+      "description": "Range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rangeend"
+    },
+    {
+      "kind": "field",
+      "name": "mode",
+      "description": "Selection mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'date'",
+      "attribute": "mode"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale for month/day names. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "calendar",
+      "description": "Calendar system for display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'gregory'",
+      "attribute": "calendar"
+    },
+    {
+      "kind": "field",
+      "name": "numberOfMonths",
+      "description": "Number of months to display (1-3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "numberofmonths"
+    },
+    {
+      "kind": "field",
+      "name": "fixedWeeks",
+      "description": "Always show 6 weeks per month.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "fixedweeks"
+    },
+    {
+      "kind": "field",
+      "name": "weekNumbers",
+      "description": "Show ISO week numbers.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "weeknumbers"
+    },
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Minimum selectable date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum selectable date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "disabledDates",
+      "description": "Function returning true if date should be disabled.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "highlightedDates",
+      "description": "Function returning highlight label or false.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "fiscalStartMonth",
+      "description": "Fiscal year start month (1-12).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "fiscalstartmonth"
+    },
+    {
+      "kind": "field",
+      "name": "compareStart",
+      "description": "Compare range start (ISO) for analytics overlay.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "comparestart"
+    },
+    {
+      "kind": "field",
+      "name": "compareEnd",
+      "description": "Compare range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "compareend"
+    },
+    {
+      "kind": "field",
+      "name": "firstDay",
+      "description": "First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "firstday"
+    },
+    {
+      "kind": "field",
+      "name": "inline",
+      "description": "Inline mode (no external popover wrapper).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "inline"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Name for form participation: with one, a form submits the value under it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string | string[]"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focusView",
+      "parameters": [],
+      "description": "Focus the active day (or the month / year shown), now or once the view is drawn."
+    },
+    {
+      "kind": "method",
+      "name": "getRange",
+      "parameters": [],
+      "description": "The range the selection covers, `[start, end]` as ISO dates: the range itself, or the\nweek, month, quarter or year chosen; `['', '']` when the mode covers none."
+    },
+    {
+      "kind": "method",
+      "name": "getQuarter",
+      "parameters": [],
+      "description": "The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "values": "$event.detail.value",
+    "rangeStart": "$event.currentTarget.getRange()[0]",
+    "rangeEnd": "$event.currentTarget.getRange()[1]",
+    "quarter": "$event.currentTarget.getQuarter()?.quarter",
+    "fiscalYear": "$event.currentTarget.getQuarter()?.fiscalYear"
+  },
+  "events": [
+    {
+      "name": "pdx-navigate",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired on navigation.",
+      "detail": "{ year: number; month: number }"
+    },
+    {
+      "name": "pdx-view-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the view changes.",
+      "detail": "{ view: 'days' | 'months' | 'years' }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string | string[] }"
+    }
+  ],
+  "roles": [
+    "columnheader",
+    "grid",
+    "gridcell",
+    "group",
+    "row"
+  ],
+  "attributes": [
+    {
+      "name": "rangestart",
+      "fieldName": "rangeStart",
+      "description": "Range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "rangeend",
+      "fieldName": "rangeEnd",
+      "description": "Range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "mode",
+      "fieldName": "mode",
+      "description": "Selection mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'date'"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale for month/day names. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "calendar",
+      "fieldName": "calendar",
+      "description": "Calendar system for display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'gregory'"
+    },
+    {
+      "name": "numberofmonths",
+      "fieldName": "numberOfMonths",
+      "description": "Number of months to display (1-3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "fixedweeks",
+      "fieldName": "fixedWeeks",
+      "description": "Always show 6 weeks per month.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "weeknumbers",
+      "fieldName": "weekNumbers",
+      "description": "Show ISO week numbers.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Minimum selectable date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum selectable date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "fiscalstartmonth",
+      "fieldName": "fiscalStartMonth",
+      "description": "Fiscal year start month (1-12).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "comparestart",
+      "fieldName": "compareStart",
+      "description": "Compare range start (ISO) for analytics overlay.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "compareend",
+      "fieldName": "compareEnd",
+      "description": "Compare range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "firstday",
+      "fieldName": "firstDay",
+      "description": "First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "inline",
+      "fieldName": "inline",
+      "description": "Inline mode (no external popover wrapper).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Name for form participation: with one, a form submits the value under it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string | string[]"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame, a `role=\"group\"`: the navigation above the grid."
+    },
+    {
+      "name": "nav",
+      "description": "The navigation bar: the two arrows and the title."
+    },
+    {
+      "name": "prev",
+      "description": "The arrow to the previous month, year or twelve years."
+    },
+    {
+      "name": "title",
+      "description": "The month or year shown; in the day view, the button that opens the month view."
+    },
+    {
+      "name": "next",
+      "description": "The arrow to the next month, year or twelve years."
+    },
+    {
+      "name": "grid",
+      "description": "A month's grid of days (`role=\"grid\"`), or the months or years to pick from."
+    },
+    {
+      "name": "cell",
+      "description": "A day, a month or a year to pick."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-calendar-cell-bg-in-range"
+    },
+    {
+      "name": "--pdx-calendar-cell-bg-selected"
+    },
+    {
+      "name": "--pdx-calendar-cell-color-selected"
+    },
+    {
+      "name": "--pdx-calendar-cell-color-today"
+    }
+  ]
+}

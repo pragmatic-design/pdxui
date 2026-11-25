@@ -10,7 +10,7 @@ import type { CalendarSystem } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 import { setOwnProp } from '../shared/own-prop';
 import { parseTypedDateTime, formatTypedDate, dateAllowed } from './typed-date';
-import '../calendar/pdx-calendar';
+import '../calendar/pdx-calendar.pdx';
 import '../time-picker/pdx-time-picker.pdx';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.

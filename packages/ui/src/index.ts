@@ -43,7 +43,7 @@ import './signature-pad/pdx-signature-pad.pdx';
 import './segmented/pdx-segmented.pdx';
 import './toggle/pdx-toggle.pdx';
 import './toggle-group/pdx-toggle-group.pdx';
-import './calendar/pdx-calendar';
+import './calendar/pdx-calendar.pdx';
 import './time-picker/pdx-time-picker.pdx';
 import './date-picker/pdx-date-picker';
 import './transfer/pdx-transfer.pdx';

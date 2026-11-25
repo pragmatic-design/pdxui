@@ -16,7 +16,7 @@ import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer.pdx';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';
-import '../../src/calendar/pdx-calendar';
+import '../../src/calendar/pdx-calendar.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/file-upload/pdx-file-upload.pdx';
 
