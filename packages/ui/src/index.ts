@@ -108,7 +108,7 @@ import './infinite-scroll/pdx-infinite-scroll.pdx';
 import './relative-time/pdx-relative-time.pdx';
 // Tier 2: Overlay + Containers
 import './tooltip/pdx-tooltip';
-import './popover/pdx-popover';
+import './popover/pdx-popover.pdx';
 import './dialog/pdx-dialog.pdx';
 import './alert-dialog/pdx-alert-dialog';
 import './drawer/pdx-drawer';

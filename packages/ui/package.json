@@ -79,11 +79,6 @@
       "types": "./dist/tooltip/pdx-tooltip.d.ts",
       "import": "./dist/tooltip/pdx-tooltip.js"
     },
-    "./popover": {
-      "development": "./src/popover/pdx-popover.ts",
-      "types": "./dist/popover/pdx-popover.d.ts",
-      "import": "./dist/popover/pdx-popover.js"
-    },
     "./overlay-outlet": {
       "development": "./src/overlay/pdx-overlay-outlet.ts",
       "types": "./dist/overlay/pdx-overlay-outlet.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/chart/pdx-sparkline.pdx",
       "types": "./dist/chart/pdx-sparkline.d.ts",
       "import": "./dist/chart/pdx-sparkline.js"
+    },
+    "./popover": {
+      "development": "./src/popover/pdx-popover.pdx",
+      "types": "./dist/popover/pdx-popover.d.ts",
+      "import": "./dist/popover/pdx-popover.js"
     },
     "./package.json": "./package.json"
   },

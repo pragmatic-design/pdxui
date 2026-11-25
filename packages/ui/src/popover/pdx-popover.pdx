@@ -1,0 +1,199 @@
+<template>
+  <div class="pdx-popover-float" data-part="root" role="dialog" tabindex="-1" :id="floatId"
+    :style="open ? '' : 'display:none'">
+    <slot></slot>
+  </div>
+</template>
+
+<script>
+/**
+ * A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click
+ * outside or Escape.
+ */
+// pdx-popover — Thin wrapper over usePopover() headless composable.
+// Provides: click/hover/manual trigger, positioning, hover relay, outside click, Escape.
+// Uses core primitive for all logic — no reimplementation.
+//
+// The script's names are not the props' names: the trigger element is `control`, the open flag
+// usePopover reports is `isNowOpen`.
+import { effect, generatedId, usePopover, overlayStack, focusFirst } from '@pdxui/core';
+import type { PopoverTrigger, PopoverPlacement } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { anchorControl } from '../shared/anchor-control';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/popover';
+
+// `open` is a model (#288): the popover opens and closes itself — its trigger, Escape, a click
+// outside — and its own writes announce `open-change` `{ value }`, which `::open` follows. Setting
+// it opens and closes the popover in every trigger mode, not in `manual` alone.
+@model open: boolean = false;
+// On the host as a custom state (#132, #288).
+@state open = !!open;
+// The floating panel. The trigger is the page's own element, not one the popover renders.
+@part root;
+@prop trigger: string = 'click';
+@prop placement: string = 'bottom';
+/** The dialog's name. Empty: its first heading, else the popover.label component string. */
+@prop ariaLabel: string = '';
+@prop closeOnOutside: boolean = true;
+@prop closeOnEscape: boolean = true;
+// null, not 8: a numeric default is always passed, and a value that is always passed
+// means `--pdx-float-offset` can never be reached. The sentinel is what makes the
+// token the default and this prop the override.
+@prop offsetPx: number | null = null;
+@host host;
+
+// Imperative API: el.show() / el.close() / el.toggle() / el.isOpen. Each writes the model, so
+// each announces `open-change`. `hide()` is `close()`, the overlay verb (#288).
+@expose show, close, toggle, isOpen;
+
+/** Read-only, via a ref: `el.isOpen`. */
+const isOpen = $derived(open as boolean);
+
+let overlayId = '';
+let popover: ReturnType<typeof usePopover> | null = null;
+const floatId = generatedId('pdx-popover-float');
+
+function getTrigger(): HTMLElement | null {
+  const parent = host.parentElement;
+  if (parent) {
+    const explicit = parent.querySelector('[data-pdx-trigger]') as HTMLElement;
+    if (explicit) return explicit;
+  }
+  return host.previousElementSibling as HTMLElement ?? null;
+}
+
+const floating = () => host.querySelector('.pdx-popover-float') as HTMLElement | null;
+
+/**
+ * The dialog's name: the aria-label prop, else its first heading, else the generic string,
+ * so not every popover is "Popover".
+ */
+function nameDialog(): void {
+  const float = floating();
+  if (!float) return;
+  const own = ariaLabel.peek() as string;
+  const heading = own ? null : float.querySelector<HTMLElement>('h1, h2, h3, h4, h5, h6, [role="heading"]');
+  if (heading) {
+    if (!heading.id) heading.id = floatId + '-title';
+    float.setAttribute('aria-labelledby', heading.id);
+    float.removeAttribute('aria-label');
+  } else {
+    uiAttr(float, 'aria-label', () => own || uiString('popover', 'label'));
+    float.removeAttribute('aria-labelledby');
+  }
+}
+
+$effect(() => {
+  const anchor = getTrigger();
+  if (!anchor) return;
+  // The relation and the focus go on the control that takes focus: the inner <button> of a
+  // pdx-button, not the host.
+  const control = anchorControl(anchor);
+  const triggerMode = trigger as PopoverTrigger;
+
+  const made = usePopover({
+    trigger: triggerMode,
+    placement: placement as PopoverPlacement,
+    offset: (offsetPx as number | null) ?? undefined,
+    dismissOnOutside: closeOnOutside as boolean,
+    dismissOnEscape: closeOnEscape as boolean,
+    hoverDelay: { open: 0, close: 150 },
+    onOpenChange: (isNowOpen) => {
+      // Its own open or close writes the model, which announces it; a value the parent
+      // set is already there, and announces nothing.
+      open = isNowOpen;
+      if (isNowOpen) {
+        overlayId = generatedId('pdx-popover');
+        const zIndex = overlayStack.push(overlayId);
+        const floatingEl = floating();
+        if (floatingEl) floatingEl.style.zIndex = String(zIndex);
+        nameDialog();
+        // Opened by a click: into the dialog, so its content can be reached. It stayed
+        // on the trigger and the next Tab went on down the page. A hover popover keeps
+        // focus where it is.
+        if (triggerMode === 'click') {
+          requestAnimationFrame(() => {
+            const f = floating();
+            if (f && !focusFirst(f)) f.focus();
+          });
+        }
+      } else {
+        if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+      }
+    },
+  });
+  popover = made;
+
+  // Apply ARIA: a dialog pops up, this one, open or not.
+  control.setAttribute('aria-haspopup', 'dialog');
+  control.setAttribute('aria-controls', floatId);
+
+  // Sync aria-expanded reactively from popover open state
+  const ariaDispose = effect(() => {
+    control.setAttribute('aria-expanded', String(made.isOpen()));
+  });
+
+  // A hover popover opens on keyboard focus too, and closes when focus leaves — unless it
+  // moved into the popover. It opened on the mouse only.
+  const onFocusIn = () => { if (!made.isOpen()) made.open(); };
+  const onFocusOut = (e: FocusEvent) => {
+    const to = e.relatedTarget as Node | null;
+    if (to && (floating()?.contains(to) || control.contains(to))) return;
+    made.close();
+  };
+  if (triggerMode === 'hover') {
+    control.addEventListener('focusin', onFocusIn);
+    control.addEventListener('focusout', onFocusOut);
+  }
+
+  // Bind trigger and content
+  made.setTrigger(control);
+  const bindContent = () => {
+    const floatingEl = floating();
+    if (floatingEl && popover === made) {
+      made.setContent(floatingEl);
+      // Open as the model says once the content is bound, in every mode: an `open`
+      // attribute, or a popover rebuilt while open (its trigger mode changed).
+      if (open.peek()) made.open();
+    }
+  };
+  if (floating()) bindContent();
+  else requestAnimationFrame(bindContent);
+
+  return () => {
+    ariaDispose();
+    control.removeEventListener('focusin', onFocusIn);
+    control.removeEventListener('focusout', onFocusOut);
+    control.removeAttribute('aria-haspopup');
+    control.removeAttribute('aria-expanded');
+    control.removeAttribute('aria-controls');
+    made.dispose();
+    if (popover === made) popover = null;
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+  };
+});
+
+// Named with or without a trigger (a popover opened by show() has none): once the slot is
+// projected, after setup, and again on each open.
+$effect(() => {
+  void ariaLabel;
+  nameDialog();
+  requestAnimationFrame(nameDialog);
+});
+
+// The model drives the popover, in every trigger mode: a value the parent set (`::open`, the
+// property, the attribute) opens or closes it. The popover's own changes come back here with
+// the value already equal, and do nothing. Before its content is bound, binding it applies the
+// model (above).
+$effect(() => {
+  const want = open as boolean;
+  if (!popover || popover.isOpen.peek() === want) return;
+  if (want) popover.open(); else popover.close();
+});
+
+function show() { open = true; }
+function close() { open = false; }
+function toggle() { open = !open.peek(); }
+</script>

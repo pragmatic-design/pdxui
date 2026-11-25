@@ -6,7 +6,7 @@
  * but here the trigger is ACTIVATED with a CLICK (not a hover).
  *
  * ── The REAL floating selector: '.pdx-popover-float' ──
- * Confirmed in the source, packages/ui/src/popover/pdx-popover.ts:
+ * Confirmed in the source, packages/ui/src/popover/pdx-popover.pdx:
  *   - render(): <div class="pdx-popover-float" role="dialog">…<slot></slot></div>
  *   - setup(): ctx.el.querySelector('.pdx-popover-float') for the binding and the z-index.
  * Confermato in CSS packages/design/src/components/popover.css: `.pdx-popover-float`.
@@ -66,8 +66,8 @@ export const popover: ComponentManifest = {
             // A change to the panel's gap, or to the token that governs it, would leave the visual
             // dimension green.
             //
-            // Opened through the component's own imperative API (`ctx.expose({ show() })`,
-            // `pdx-popover.ts:106`) rather than by a click:
+            // Opened through the component's own imperative API (`@expose show`,
+            // `pdx-popover.pdx`) rather than by a click:
             // a `setup` bolted onto the scenario that carries the positioning contract would make
             // that contract's `waitFor({state:'visible'})` resolve whether or not the click did
             // anything. A separate scenario keeps the contract honest.

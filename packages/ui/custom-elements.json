@@ -22691,7 +22691,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/popover/pdx-popover.ts",
+      "path": "src/popover/pdx-popover.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -22904,7 +22904,7 @@
           "name": "pdx-popover",
           "declaration": {
             "name": "PdxPopover",
-            "module": "src/popover/pdx-popover.ts"
+            "module": "src/popover/pdx-popover.pdx"
           }
         }
       ]

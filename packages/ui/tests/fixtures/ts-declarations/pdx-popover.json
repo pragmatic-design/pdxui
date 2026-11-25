@@ -1,0 +1,204 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxPopover",
+  "tagName": "pdx-popover",
+  "category": "Overlay + Containers",
+  "order": 92,
+  "description": "A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click\noutside or Escape.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "trigger",
+      "description": "How it opens: 'click', 'hover', 'focus' or 'manual'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'click'",
+      "attribute": "trigger"
+    },
+    {
+      "kind": "field",
+      "name": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom'",
+      "attribute": "placement"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "The dialog's name. Empty: its first heading, else the popover.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnOutside",
+      "description": "Close when clicking outside.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonoutside"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonescape"
+    },
+    {
+      "kind": "field",
+      "name": "offsetPx",
+      "description": "Gap in px between the popover and its anchor.",
+      "type": {
+        "text": "number | null"
+      },
+      "default": "null",
+      "attribute": "offsetpx"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "trigger",
+      "fieldName": "trigger",
+      "description": "How it opens: 'click', 'hover', 'focus' or 'manual'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'click'"
+    },
+    {
+      "name": "placement",
+      "fieldName": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'bottom'"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "The dialog's name. Empty: its first heading, else the popover.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "closeonoutside",
+      "fieldName": "closeOnOutside",
+      "description": "Close when clicking outside.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonescape",
+      "fieldName": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "offsetpx",
+      "fieldName": "offsetPx",
+      "description": "Gap in px between the popover and its anchor.",
+      "type": {
+        "text": "number | null"
+      },
+      "default": "null"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    }
+  ]
+}
