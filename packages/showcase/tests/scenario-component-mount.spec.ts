@@ -55,6 +55,16 @@ const SAMPLES = 7;
 /** A row fails when this tree's mount is more than this many times `main`'s, beside it. */
 const SLACK = 2.5;
 
+/**
+ * Rows given Playwright's tripled timeout (`test.slow()`), each with why (#1389). A row's time is its
+ * tag's: pdx-scheduler's row takes 18.1 s on a runner at the usual speed, a whole calendar view mounted
+ * 100 times on two pages, and on one 3.5× slower (the port control at 61.5 ms against 17.4) it ran out
+ * of the 30 s. The next heaviest, pdx-chart at 6.1 s, stays within 30 s at that speed.
+ */
+const SLOW_ROWS: Record<string, string> = {
+    'pdx-scheduler': 'the heaviest tag: 18.1 s at the usual speed, past 30 s on a runner 3.5× slower (#1389)',
+};
+
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
 const mount = (page: Page, tag: string) =>
@@ -73,6 +83,7 @@ test.afterAll(async () => { await Promise.all([site, main].map((s) => new Promis
 test.describe('a component mounts within its budget', () => {
     for (const tag of TAGS) {
         test(`${tag} within ${SLACK}× main's mount, beside it`, async ({ browser }) => {
+            test.slow(tag in SLOW_ROWS, SLOW_ROWS[tag]);
             const [here, there] = await Promise.all([browser.newPage(), browser.newPage()]);
             for (const [page, url] of [[here, site.url], [there, main.url]] as const) {
                 await page.goto(url);
