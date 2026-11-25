@@ -1,0 +1,221 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTooltip",
+  "tagName": "pdx-tooltip",
+  "category": "Overlay + Containers",
+  "order": 91,
+  "description": "A tooltip that describes its trigger on hover or focus, in one of 12 placements, with show and\nhide delays.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "text",
+      "description": "The tooltip text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "text"
+    },
+    {
+      "kind": "field",
+      "name": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'",
+      "attribute": "placement"
+    },
+    {
+      "kind": "field",
+      "name": "delay",
+      "description": "Delay (ms) before showing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "delay"
+    },
+    {
+      "kind": "field",
+      "name": "hideDelay",
+      "description": "Delay (ms) before hiding.",
+      "type": {
+        "text": "number"
+      },
+      "default": "100",
+      "attribute": "hidedelay"
+    },
+    {
+      "kind": "field",
+      "name": "arrow",
+      "description": "Shows the pointer arrow.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "arrow"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "overflowOnly",
+      "description": "Only show when the target text is truncated.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "overflowonly"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The tooltip showed (`true`) or hid (`false`): its open state, read-only (#288). The parent\nnever writes it, so it is not a model, and `::open` on it is an error.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "tooltip"
+  ],
+  "attributes": [
+    {
+      "name": "text",
+      "fieldName": "text",
+      "description": "The tooltip text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "placement",
+      "fieldName": "placement",
+      "description": "Position relative to the anchor element.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'"
+    },
+    {
+      "name": "delay",
+      "fieldName": "delay",
+      "description": "Delay (ms) before showing.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    },
+    {
+      "name": "hidedelay",
+      "fieldName": "hideDelay",
+      "description": "Delay (ms) before hiding.",
+      "type": {
+        "text": "number"
+      },
+      "default": "100"
+    },
+    {
+      "name": "arrow",
+      "fieldName": "arrow",
+      "description": "Shows the pointer arrow.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "overflowonly",
+      "fieldName": "overflowOnly",
+      "description": "Only show when the target text is truncated.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "arrow",
+      "description": "The element reached as `[data-part=\"arrow\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    },
+    {
+      "name": "placed-top",
+      "description": "Matched with `:state(placed-top)`."
+    },
+    {
+      "name": "placed-bottom",
+      "description": "Matched with `:state(placed-bottom)`."
+    },
+    {
+      "name": "placed-left",
+      "description": "Matched with `:state(placed-left)`."
+    },
+    {
+      "name": "placed-right",
+      "description": "Matched with `:state(placed-right)`."
+    }
+  ]
+}

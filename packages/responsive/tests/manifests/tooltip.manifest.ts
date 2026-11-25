@@ -62,8 +62,8 @@ export const tooltip: ComponentManifest = {
             // that moves every tooltip 4px. Measured: the
             // `.pdx-tooltip-float` in that scenario is present at 0x0 with `display: none`.
             //
-            // Opened through the component's own imperative API (`ctx.expose({ show() })`,
-            // `pdx-tooltip.ts:156`), which is the shape `select-open` and `date-picker-open`
+            // Opened through the component's own imperative API (`@expose show`,
+            // `pdx-tooltip.pdx`), which is the shape `select-open` and `date-picker-open`
             // already use. The runner does not hover: that would change what a resting screenshot
             // means for all 117 visual scenarios to fix one.
             //
