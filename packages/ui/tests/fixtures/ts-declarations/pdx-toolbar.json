@@ -1,0 +1,112 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxToolbar",
+  "tagName": "pdx-toolbar",
+  "category": "Navigation",
+  "order": 64,
+  "description": "A toolbar of buttons, separators, groups and spacers that is one tab stop: the arrow keys, Home\nand End move between its controls.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "compact",
+      "description": "Compact mode (less padding)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "compact"
+    },
+    {
+      "kind": "field",
+      "name": "bordered",
+      "description": "Show border",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "bordered"
+    },
+    {
+      "kind": "field",
+      "name": "vertical",
+      "description": "Vertical orientation: ↑/↓ move between the controls instead of ←/→",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "vertical"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The toolbar's accessible name (\"Text formatting\"). Empty: the toolbar.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    }
+  ],
+  "roles": [
+    "toolbar"
+  ],
+  "attributes": [
+    {
+      "name": "compact",
+      "fieldName": "compact",
+      "description": "Compact mode (less padding)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "bordered",
+      "fieldName": "bordered",
+      "description": "Show border",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "vertical",
+      "fieldName": "vertical",
+      "description": "Vertical orientation: ↑/↓ move between the controls instead of ←/→",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The toolbar's accessible name (\"Text formatting\"). Empty: the toolbar.label component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "compact",
+      "description": "`compact` is set: less padding, a tighter gap."
+    },
+    {
+      "name": "bordered",
+      "description": "`bordered` is set: a border and a background."
+    },
+    {
+      "name": "vertical",
+      "description": "`vertical` is set: the controls in a column, ↑/↓ between them."
+    }
+  ]
+}

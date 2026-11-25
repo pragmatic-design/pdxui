@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source + CSS:
  *
- *   - Source: packages/ui/src/toolbar/pdx-toolbar.ts
+ *   - Source: packages/ui/src/toolbar/pdx-toolbar.pdx
  *       · render() = <slot></slot>: the children (native buttons, separators, spacers, groups)
  *         are projected as direct children of the <pdx-toolbar> HOST (light DOM).
  *       · In a rAF the host receives: role="toolbar", aria-label = the `label` prop (default the

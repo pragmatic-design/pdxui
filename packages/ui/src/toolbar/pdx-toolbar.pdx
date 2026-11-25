@@ -1,0 +1,135 @@
+<template>
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * A toolbar of buttons, separators, groups and spacers that is one tab stop: the arrow keys, Home
+ * and End move between its controls.
+ *
+ * @cssstate compact - `compact` is set: less padding, a tighter gap.
+ * @cssstate bordered - `bordered` is set: a border and a background.
+ * @cssstate vertical - `vertical` is set: the controls in a column, ↑/↓ between them.
+ */
+// pdx-toolbar — Horizontal toolbar with buttons, separators, groups, spacer.
+// One tab stop: the arrow keys (and Home/End) move between its controls, as the WAI-ARIA toolbar
+// pattern asks. A control that uses those keys itself — a text field, a select — keeps them.
+//
+// Its controls are the app's markup, so it has no parts; it holds no value, so no model (#289).
+// toolbar.css lays it out from its tag, as it does `.pdx-toolbar` in CSS-only markup. Which of its
+// descendants are stops is toolbar-controls.ts, beside it.
+import { focusGroup, DEV } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { hasAccessibleName } from '../shared/accessible-name';
+import { CONTROL, COMPOSITE, NAV_KEYS, TEXT, findControls, isDisabled } from './toolbar-controls';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/toolbar';
+
+// States, not classes (#289).
+@state compact = !!compact;
+@state bordered = !!bordered;
+@state vertical = !!vertical;
+/** Compact mode (less padding) */
+@prop compact: boolean = false;
+/** Show border */
+@prop bordered: boolean = false;
+/** Vertical orientation: ↑/↓ move between the controls instead of ←/→ */
+@prop vertical: boolean = false;
+/** The toolbar's accessible name ("Text formatting"). Empty: the toolbar.label component string. */
+@prop label: string = '';
+@host host;
+
+// The role, the name and the orientation, set a frame after a change, as the TypeScript version set
+// them: a mount pays for none of it synchronously. The name is a component string a locale can reach
+// when `label` is empty.
+$effect(() => {
+  const own = label as string;
+  const upright = !!vertical;
+  requestAnimationFrame(() => {
+    host.setAttribute('role', 'toolbar');
+    uiAttr(host, 'aria-label', () => own || uiString('toolbar', 'label'));
+    if (upright) host.setAttribute('aria-orientation', 'vertical');
+    else host.removeAttribute('aria-orientation');
+  });
+});
+
+// ── One tab stop ──
+// The toolbar is one tab stop and the arrows move inside it, not a tab stop per control.
+/** The roving tab stop: `stop` takes it, every other control gives it up. */
+function setStop(controls: HTMLElement[], stop: HTMLElement): void {
+  for (const c of controls) c.setAttribute('tabindex', c === stop ? '0' : '-1');
+}
+
+/** Find the controls (new ones too) and keep exactly one tab stop among them. */
+function refresh(): HTMLElement[] {
+  const controls = findControls(host);
+  const enabled = controls.filter(c => !isDisabled(c));
+  const current = enabled.find(c => c.getAttribute('tabindex') === '0');
+  const stop = current ?? enabled[0];
+  if (stop) setStop(controls, stop);
+  return controls;
+}
+
+/**
+ * A key the focused control handles itself does not move the toolbar: it was already handled
+ * (`defaultPrevented` — a select opening on Enter would otherwise be clicked shut), or the
+ * control is text entry, or a widget that navigates with the arrows. ←/→ still leave a
+ * select-only combobox, which has no use for them. Registered before focusGroup's listener,
+ * so stopping here keeps the event from it.
+ */
+function guard(e: KeyboardEvent): void {
+  if (!NAV_KEYS.has(e.key)) return;
+  const target = e.target as HTMLElement;
+  const inside = (sel: string): boolean => {
+    const hit = target.closest?.(sel);
+    return !!hit && host.contains(hit);
+  };
+  const across = vertical.peek() ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
+  const combobox = inside('[role="combobox"]') && !across.includes(e.key);
+  if (e.defaultPrevented || inside(TEXT) || inside(COMPOSITE) || combobox) e.stopImmediatePropagation();
+}
+
+/** The control that takes focus — by click, Tab or code — is the one Tab comes back to. */
+function onFocusIn(e: FocusEvent): void {
+  const controls = findControls(host);
+  const hit = controls.find(c => c === e.target || c.contains(e.target as Node));
+  if (hit) setStop(controls, hit);
+}
+
+$effect(() => {
+  const upright = vertical as boolean;
+  let disposeGroup: (() => void) | null = null;
+  let observer: MutationObserver | null = null;
+  let alive = true;
+  host.addEventListener('keydown', guard);
+  host.addEventListener('focusin', onFocusIn);
+  // After the first frame: the controls of the components inside are rendered by then. A frame of
+  // its own at every run, cancelled by the cleanup through `alive`.
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    const controls = refresh();
+    disposeGroup = focusGroup(host, {
+      selector: `[${CONTROL}]`,
+      orientation: upright ? 'vertical' : 'horizontal',
+      wrap: true,
+    });
+    observer = new MutationObserver(() => { refresh(); });
+    observer.observe(host, { childList: true, subtree: true });
+    // An icon-only button with no name renders fine and is announced "button": say so
+    // once per toolbar. The site's third demo had seven.
+    const unnamed = controls.filter(c => c.matches('button, a[href], [role="button"]') && !hasAccessibleName(c));
+    if (DEV && unnamed.length) {
+      console.warn(`[pdx-toolbar] ${unnamed.length} control(s) with no accessible name are announced "button" alone: `
+        + `give each an aria-label (pdx-button: aria-label or label). ${host.outerHTML.slice(0, 120)}`);
+    }
+  });
+  return () => {
+    alive = false;
+    host.removeEventListener('keydown', guard);
+    host.removeEventListener('focusin', onFocusIn);
+    disposeGroup?.();
+    observer?.disconnect();
+  };
+});
+</script>

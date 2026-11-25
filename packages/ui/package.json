@@ -154,11 +154,6 @@
       "types": "./dist/breadcrumb/pdx-breadcrumb.d.ts",
       "import": "./dist/breadcrumb/pdx-breadcrumb.js"
     },
-    "./toolbar": {
-      "development": "./src/toolbar/pdx-toolbar.ts",
-      "types": "./dist/toolbar/pdx-toolbar.d.ts",
-      "import": "./dist/toolbar/pdx-toolbar.js"
-    },
     "./context-menu": {
       "development": "./src/context-menu/pdx-context-menu.ts",
       "types": "./dist/context-menu/pdx-context-menu.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/tooltip/pdx-tooltip.pdx",
       "types": "./dist/tooltip/pdx-tooltip.d.ts",
       "import": "./dist/tooltip/pdx-tooltip.js"
+    },
+    "./toolbar": {
+      "development": "./src/toolbar/pdx-toolbar.pdx",
+      "types": "./dist/toolbar/pdx-toolbar.d.ts",
+      "import": "./dist/toolbar/pdx-toolbar.js"
     },
     "./package.json": "./package.json"
   },
