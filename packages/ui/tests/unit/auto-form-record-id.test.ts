@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/auto-form/pdx-auto-form';
+import '../../src/auto-form/pdx-auto-form.pdx';
 
 const FIELDS = [
     { field: 'name', label: 'Name', type: 'text' },

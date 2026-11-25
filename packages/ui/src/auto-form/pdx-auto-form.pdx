@@ -1,0 +1,210 @@
+<template></template>
+
+<script>
+/**
+ * A form generated from field definitions or a form schema, so the same JSON that drives a data grid
+ * also produces its edit form.
+ *
+ * @csspart root - The wrapper that holds the generated form and its actions.
+ * @csspart actions - The bar of the two buttons, with `show-actions`.
+ * @csspart reset - The reset button.
+ * @csspart submit - The save button.
+ */
+// pdx-auto-form — JSON-driven form that accepts FieldDefinition[] or FormSchema.
+// Wraps pdx-form-template with DataSource integration for load/save.
+//
+// Its elements are built by the script a frame after mount, as the TypeScript version built them.
+import { isDataSource, createFormFromSchema, toFormFields, onNextFrame } from '@pdxui/core';
+import type { DataSource, FormSchema, Form, FieldDefinition } from '@pdxui/core';
+import { uiString } from '../shared/i18n';
+import { findRecord } from '../shared/find-record';
+import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
+import '../form-template/pdx-form-template'; // rendered by this component, and registered by nobody else
+
+/** Field definitions (FieldDefinition[]). Converted to FormSchema internally. */
+@prop fields: unknown[] | null = null;
+/** FormSchema JSON (alternative to fields). */
+@prop schema: Record<string, unknown> | null = null;
+/** DataSource for auto-load/save. */
+@prop source: Record<string, unknown> | null = null;
+/** Record ID to load from DataSource. */
+@prop recordId: string = '';
+/** Form layout. */
+@prop layout: string = 'stack';
+/** Grid columns (when layout='grid'). */
+@prop columns: number = 12;
+/** Show submit/reset buttons. */
+@prop showActions: boolean = true;
+/** Submit button label. Empty: the auto-form.submit component string, «Save». */
+@prop submitLabel: string = '';
+/** Reset button label. Empty: the auto-form.reset component string, «Reset». */
+@prop resetLabel: string = '';
+// Declared (#138): it stays on the host, which the parent listens on.
+/** Save passed validation: the values (stored in the `source` when there is one). */
+@event 'pdx-submit': { values: Record<string, unknown>; valid: true };
+// Its states are its form's, on the pdx-form the generated template holds (#293).
+// Every element is built by the script.
+@part(external) root, actions, reset, submit;
+@host host;
+
+@expose form, getValues, reset, validate;
+
+let _built = false;
+let _formEl: HTMLElement | null = null;
+let _submitBtn: HTMLElement | null = null;
+let _resetBtn: HTMLElement | null = null;
+// The form the template edits, made by buildForm(): `form` reads it, live.
+let currentForm = $signal<Form<Record<string, unknown>> | null>(null);
+
+/** Read-only, via a ref: `el.form`. */
+const form = $derived(currentForm);
+
+/** The form values now, undefined while the form is not built. */
+function getValues() { return currentForm?.getValues(); }
+function reset(values?: Record<string, unknown>) { currentForm?.reset(values); }
+function validate() { return currentForm?.validate(); }
+
+/** The prop when set, else the component string — which a locale can reach. */
+const submitText = (): string => (submitLabel as string) || uiString('auto-form', 'submit');
+const resetText = (): string => (resetLabel as string) || uiString('auto-form', 'reset');
+$effect(() => {
+  const submitNow = submitText();
+  const resetNow = resetText();
+  // The `label` prop, not textContent: on a rendered pdx-button that would replace its
+  // <button> with bare text, and Save and Reset would lose their role and their tab stop.
+  if (_submitBtn) _submitBtn.setAttribute('label', submitNow);
+  if (_resetBtn) _resetBtn.setAttribute('label', resetNow);
+});
+
+/** Build FormSchema from fields or use provided schema. */
+function resolveSchema(): FormSchema | null {
+  const defs = fields as FieldDefinition[] | null;
+  if (defs && defs.length) {
+    return {
+      fields: toFormFields(defs),
+      layout: ((layout as string) || 'stack') as 'stack' | 'grid' | 'horizontal',
+      columns: (columns as number) || 12,
+    };
+  }
+  const given = schema as FormSchema | null;
+  if (given) return given;
+  return null;
+}
+
+/** Load record from DataSource if available. */
+function loadRecord(): Record<string, unknown> | null {
+  const src = source;
+  const id = recordId as string;
+  if (!src || !isDataSource(src) || !id) return null;
+  return findRecord(src as DataSource<Record<string, unknown>>, id) ?? null;
+}
+
+function buildForm(): void {
+  if (!_formEl) return;
+  _formEl.innerHTML = '';
+
+  const resolved = resolveSchema();
+  if (!resolved) return;
+
+  // Create form
+  currentForm?.dispose();
+  const made = createFormFromSchema(resolved);
+  currentForm = made;
+
+  // Load initial values from DataSource
+  const record = loadRecord();
+  if (record) {
+    made.reset(record);
+  }
+
+  // Create pdx-form-template
+  // Every prop is set BEFORE the element is attached, as pdx-edit-drawer does:
+  // set a frame after the append, the template's <pdx-form> would set up with no form and
+  // every instance would print `<pdx-form> requires a "form" prop`.
+  const tmpl = document.createElement('pdx-form-template') as HTMLElement & { form: unknown; showActions: boolean; schema: unknown };
+  tmpl.form = made;
+  tmpl.showActions = false; // we render our own
+  tmpl.schema = resolved;
+  _formEl.appendChild(tmpl);
+
+  // Action buttons
+  if (showActions) {
+    const bar = document.createElement('div');
+    bar.dataset.part = 'actions';
+    bar.style.display = 'flex';
+    bar.style.gap = 'var(--pdx-space-sm)';
+    bar.style.justifyContent = 'flex-end';
+    bar.style.marginTop = 'var(--pdx-space-lg)';
+
+    const resetBtn = document.createElement('pdx-button');
+    resetBtn.dataset.part = 'reset';
+    resetBtn.setAttribute('variant', 'ghost');
+    resetBtn.setAttribute('label', resetText());
+    _resetBtn = resetBtn;
+    resetBtn.addEventListener('click', () => {
+      const loaded = loadRecord();
+      currentForm?.reset(loaded ?? undefined);
+    });
+
+    const submitBtn = document.createElement('pdx-button');
+    submitBtn.dataset.part = 'submit';
+    submitBtn.setAttribute('variant', 'primary');
+    submitBtn.setAttribute('label', submitText());
+    _submitBtn = submitBtn;
+    submitBtn.addEventListener('click', async () => {
+      const editing = currentForm;
+      if (!editing) return;
+      const isValid = await editing.validate();
+      if (!isValid) return;
+
+      const values = editing.getValues();
+      const src = source;
+
+      if (src && isDataSource(src)) {
+        const ds = src as DataSource<Record<string, unknown>>;
+        const id = recordId as string;
+        if (id) {
+          const existing = findRecord(ds, id);
+          if (existing) {
+            ds.update({ ...existing, ...values });
+          }
+        } else {
+          ds.add(values);
+        }
+        ds.sync();
+      }
+
+      pdxSubmit({ values, valid: true });
+    });
+
+    bar.appendChild(resetBtn);
+    bar.appendChild(submitBtn);
+    _formEl.appendChild(bar);
+  }
+}
+
+$effect(() => {
+  void fields;
+  void schema;
+  void source;
+  void recordId;
+  void layout;
+  void columns;
+  void showActions;
+
+  if (!_built) {
+    _built = true;
+    // onNextFrame: a setup a move destroyed does not build again.
+    onNextFrame(() => {
+      _formEl = document.createElement('div');
+      _formEl.className = 'pdx-auto-form';
+      _formEl.dataset.part = 'root';
+      host.appendChild(_formEl);
+      buildForm();
+    });
+    return;
+  }
+
+  requestAnimationFrame(() => buildForm());
+});
+</script>

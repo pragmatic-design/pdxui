@@ -1366,7 +1366,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/auto-form/pdx-auto-form.ts",
+      "path": "src/auto-form/pdx-auto-form.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -1589,7 +1589,7 @@
           "name": "pdx-auto-form",
           "declaration": {
             "name": "PdxAutoForm",
-            "module": "src/auto-form/pdx-auto-form.ts"
+            "module": "src/auto-form/pdx-auto-form.pdx"
           }
         }
       ]
