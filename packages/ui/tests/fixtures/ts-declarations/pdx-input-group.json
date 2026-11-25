@@ -28,6 +28,9 @@
       "attribute": "disabled"
     }
   ],
+  "roles": [
+    "group"
+  ],
   "attributes": [
     {
       "name": "size",

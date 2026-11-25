@@ -7,6 +7,8 @@ Inputs joined with addons and buttons.
 | `size` | `size` | string | `''` | A size its children take; the group draws none of its own, so it is not a variant axis. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 
+**Renders:** roles `group`
+
 **States:** `:state(disabled)` — `disabled`: the group and its children are disabled.
 
 

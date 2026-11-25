@@ -99,6 +99,9 @@
       "detail": "{ value: string }"
     }
   ],
+  "roles": [
+    "group"
+  ],
   "attributes": [
     {
       "name": "size",

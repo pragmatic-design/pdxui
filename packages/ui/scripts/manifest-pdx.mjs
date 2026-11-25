@@ -125,6 +125,9 @@ export function analyzePdxFile(file, text, categories) {
     const readSource = (f) => existsSync(f) ? normalizeEol(readFileSync(f, 'utf-8')) : null;
     const viewRoles = internalViews(d.script, file, readSource).map(v => withoutHtmlComments(v.template) + '\n'
         + withoutComments(ts.createSourceFile(`${v.file}.ts`, v.script, ts.ScriptTarget.Latest, true)));
+    // The host's own attributes, `@host { role="toolbar" }` or `:role="…"`, written back as markup: the
+    // analysis takes the declaration out of the body, and the role on the host is the component's (#1210).
+    const hostAttrs = (a.host ?? []).filter(h => h.value !== undefined).map(h => `${h.name}="${h.value}"`).join('\n');
     return [assembleModule({
         file, tag, category: categories[tag] || { category: 'Other', order: 999 },
         tags, description: component.description, props,
@@ -140,7 +143,7 @@ export function analyzePdxFile(file, text, categories) {
         emitted: new Map(),
         emittedNames: [],
         // The `$effect`s are out of the body in the analysis: a role one of them writes is read there (#1210).
-        roles: scanRoles([template, withoutComments(body), ...a.effects, ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
+        roles: scanRoles([template, hostAttrs, withoutComments(body), ...a.effects, ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,

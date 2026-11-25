@@ -15,6 +15,8 @@ Exclusive or multi-select set of toggles.
 
 **Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
+**Renders:** roles `group` · `radiogroup`
+
 **States:** `:state(disabled)` — `disabled` is set; the group is aria-disabled and every toggle disabled.
 
 **Form:** form-associated — inside a `<form>` it submits its value under its `name`, `form.reset()` restores the value it mounted with, and `required` / `error` set its validity.
