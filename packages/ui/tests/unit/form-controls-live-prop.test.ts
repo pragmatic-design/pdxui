@@ -39,7 +39,7 @@ import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer';
-import '../../src/otp-input/pdx-otp-input';
+import '../../src/otp-input/pdx-otp-input.pdx';
 
 type Detail = Record<string, unknown>;
 

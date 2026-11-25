@@ -1,0 +1,292 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxOtpInput",
+  "tagName": "pdx-otp-input",
+  "category": "Specialized Inputs",
+  "order": 23,
+  "description": "A one-time code input, one character per cell, that advances as the user types, spreads a pasted\ncode across the cells and steps back on Backspace.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "length",
+      "description": "Number of code cells.",
+      "type": {
+        "text": "number"
+      },
+      "default": "6",
+      "attribute": "length"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "numeric",
+      "description": "Restrict input to digits.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "numeric"
+    },
+    {
+      "kind": "field",
+      "name": "mask",
+      "description": "Cells shown as dots, for a PIN: the label and autocomplete defaults become the PIN ones.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "mask"
+    },
+    {
+      "kind": "field",
+      "name": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "separator"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The cells' group name. Empty: the otp-input.label component string, «Verification code»; with\n`mask`, otp-input.maskedLabel, «PIN».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "autocomplete",
+      "description": "The cells' autocomplete. Empty: 'one-time-code', which lets the browser offer a code it received\nby SMS; with `mask`, 'off' — a PIN is not a code the browser has.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "autocomplete"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the cells' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-otp-md",
+        "sm": ".pdx-otp-sm",
+        "lg": ".pdx-otp-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value"
+  },
+  "events": [
+    {
+      "name": "pdx-complete",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Every cell is filled: the whole code.",
+      "detail": "{ value: string }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "group"
+  ],
+  "attributes": [
+    {
+      "name": "length",
+      "fieldName": "length",
+      "description": "Number of code cells.",
+      "type": {
+        "text": "number"
+      },
+      "default": "6"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "numeric",
+      "fieldName": "numeric",
+      "description": "Restrict input to digits.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "mask",
+      "fieldName": "mask",
+      "description": "Cells shown as dots, for a PIN: the label and autocomplete defaults become the PIN ones.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "separator",
+      "fieldName": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The cells' group name. Empty: the otp-input.label component string, «Verification code»; with\n`mask`, otp-input.maskedLabel, «PIN».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "autocomplete",
+      "fieldName": "autocomplete",
+      "description": "The cells' autocomplete. Empty: 'one-time-code', which lets the browser offer a code it received\nby SMS; with `mask`, 'off' — a PIN is not a code the browser has.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the cells' size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The cells' group, `role=\"group\"`."
+    },
+    {
+      "name": "cell",
+      "description": "One cell: a native `<input>`, one per character."
+    },
+    {
+      "name": "separator",
+      "description": "The dash between groups of cells, with `separator`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "invalid",
+      "description": "`error` is set; each cell is aria-invalid."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set; each cell is disabled."
+    }
+  ]
+}

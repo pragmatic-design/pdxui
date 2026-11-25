@@ -19,7 +19,7 @@ import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/password-input/pdx-password-input.pdx';
 import '../../src/search-input/pdx-search-input.pdx';
 import '../../src/masked-input/pdx-masked-input.pdx';
-import '../../src/otp-input/pdx-otp-input';
+import '../../src/otp-input/pdx-otp-input.pdx';
 
 const TAGS = ['pdx-input', 'pdx-textarea', 'pdx-number-input', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input', 'pdx-otp-input'];
 const ALPHA = ['pdx-change', 'change', 'valuechange', 'pressedchange', 'pdx-pressed-change', 'pdx-input'];

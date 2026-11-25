@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/otp-input/pdx-otp-input';
+import '../../src/otp-input/pdx-otp-input.pdx';
 
 async function mountOtp(length: number): Promise<HTMLElement> {
     const el = document.createElement('pdx-otp-input');

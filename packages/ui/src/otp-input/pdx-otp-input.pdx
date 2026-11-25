@@ -1,0 +1,231 @@
+<template>
+  <div class="pdx-otp-container pdx-otp-wrap" data-part="root"></div>
+</template>
+
+<script>
+/**
+ * A one-time code input, one character per cell, that advances as the user types, spreads a pasted
+ * code across the cells and steps back on Backspace.
+ *
+ * @csspart root - The cells' group, `role="group"`.
+ * @csspart cell - One cell: a native `<input>`, one per character.
+ * @csspart separator - The dash between groups of cells, with `separator`.
+ *
+ * @cssstate invalid - `error` is set; each cell is aria-invalid.
+ * @cssstate disabled - `disabled` is set; each cell is disabled.
+ *
+ * @alphaevent pdx-input
+ * @alphadetail value $event.currentTarget.value
+ */
+// pdx-otp-input — N-cell code input with auto-advance, paste spread, backspace nav.
+// Uses imperative DOM for dynamic cell count. Each cell is a native <input>.
+//
+// The cells are built by the script a frame after a change, as the TypeScript version built them: their
+// count is a prop. The script's own names are not the parts' names (a cell's input is `cellEl`): a
+// part's name read in the script makes it a signal of the part's elements at every mount.
+import { uiString, format, uiAttr } from '../shared/i18n';
+
+// Every digit writes it (#479), and the write dispatches `value-change`. `pdx-complete` stays: it is
+// the moment every cell is filled, not the value.
+@model value: string = '' { form };
+/** Every cell is filled: the whole code. */
+@event 'pdx-complete': { value: string };
+// The visual states, on the host as custom states (#132), as pdx-input's: the container carries
+// no state class of its own.
+@state invalid = !!error;
+@state disabled = !!disabled;
+@part root;
+// Built by the script, one per character and one per group.
+@part(external) cell, separator;
+// The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+// the same cells on native markup. `md` is the base look, which no class adds to.
+@variants {
+  /** sm, md (the default) or lg: the cells' size. */
+  size: { md: '.pdx-otp-md', sm: '.pdx-otp-sm', lg: '.pdx-otp-lg' } = md;
+}
+@prop length: number = 6;
+@prop disabled: boolean = false;
+@prop error: boolean = false;
+@prop numeric: boolean = true;
+/** Cells shown as dots, for a PIN: the label and autocomplete defaults become the PIN ones. */
+@prop mask: boolean = false;
+@prop separator: number = 0;
+/**
+ * The cells' group name. Empty: the otp-input.label component string, «Verification code»; with
+ * `mask`, otp-input.maskedLabel, «PIN».
+ */
+@prop label: string = '';
+/**
+ * The cells' autocomplete. Empty: 'one-time-code', which lets the browser offer a code it received
+ * by SMS; with `mask`, 'off' — a PIN is not a code the browser has.
+ */
+@prop autocomplete: string = '';
+@host host;
+
+// Imperative API: focus/blur/clear
+@expose focus, blur, clear;
+
+let cells: string[] = [];
+let inputs: HTMLInputElement[] = [];
+// `value` is the live code: every digit writes it. The effect below rebuilds
+// the cells when `value` changes, so it skips its own reflection — rebuilding would drop
+// focus after every digit.
+let _reflected: string | null = null;
+let _builtShape = '';
+
+function emitValue() {
+  const val = cells.join('');
+  _reflected = val;
+  value = val;
+  // Completion = every slot filled. Not `val.indexOf('') === -1`, which is always false
+  // (indexOf('') returns 0), so pdx-complete would never fire.
+  const len = length as number;
+  if (cells.length === len && cells.every(c => c !== '')) {
+    pdxComplete({ value: val });
+  }
+}
+
+function handleInput(idx: number, e: Event) {
+  const cellEl = e.target as HTMLInputElement;
+  const char = cellEl.value.slice(-1);
+  if (numeric && char && !/^\d$/.test(char)) {
+    cellEl.value = cells[idx] || '';
+    return;
+  }
+  cells[idx] = char;
+  cellEl.value = char;
+  emitValue();
+  // Auto-advance
+  if (char && idx < inputs.length - 1) {
+    inputs[idx + 1].focus();
+    inputs[idx + 1].select();
+  }
+}
+
+function handleKeydown(idx: number, e: KeyboardEvent) {
+  if (e.key === 'Backspace') {
+    e.preventDefault();
+    const cellEl = inputs[idx];
+    if (cells[idx]) {
+      cells[idx] = '';
+      cellEl.value = '';
+      emitValue();
+    } else if (idx > 0) {
+      cells[idx - 1] = '';
+      inputs[idx - 1].value = '';
+      inputs[idx - 1].focus();
+      emitValue();
+    }
+  } else if (e.key === 'ArrowLeft' && idx > 0) {
+    e.preventDefault();
+    inputs[idx - 1].focus();
+  } else if (e.key === 'ArrowRight' && idx < inputs.length - 1) {
+    e.preventDefault();
+    inputs[idx + 1].focus();
+  }
+}
+
+function handlePaste(e: ClipboardEvent) {
+  e.preventDefault();
+  const paste = (e.clipboardData?.getData('text') || '').trim();
+  const chars = numeric ? paste.replace(/\D/g, '') : paste;
+  const startIdx = inputs.indexOf(e.target as HTMLInputElement);
+  if (startIdx < 0) return;
+
+  for (let i = 0; i < chars.length && startIdx + i < cells.length; i++) {
+    cells[startIdx + i] = chars[i];
+    inputs[startIdx + i].value = chars[i];
+  }
+  emitValue();
+  const lastIdx = Math.min(startIdx + chars.length, inputs.length) - 1;
+  if (inputs[lastIdx]) inputs[lastIdx].focus();
+}
+
+function handleFocus(e: FocusEvent) {
+  (e.target as HTMLInputElement).select();
+}
+
+// Build cells imperatively (after render)
+$effect(() => {
+  // Read all reactive props to subscribe
+  const len = length as number;
+  const groupEvery = separator as number;
+  const val = value as string;
+  const off = !!disabled;
+  const isError = !!error;
+  const isMask = !!mask;
+  const isNumeric = !!numeric;
+  // The PIN defaults under `mask` (#286): what pdx-pin-input, removed, set on this element.
+  const groupName = (label as string) || uiString('otp-input', isMask ? 'maskedLabel' : 'label');
+  const fill = (autocomplete as string) || (isMask ? 'off' : 'one-time-code');
+  const shape = JSON.stringify([len, groupEvery, off, isError, isMask, isNumeric, groupName, fill]);
+  if (val === _reflected && shape === _builtShape) return;
+  _builtShape = shape;
+
+  requestAnimationFrame(() => {
+    // Found by its part, which the classes below do not touch (#659).
+    const container = host.querySelector<HTMLElement>(':scope > [data-part="root"]');
+    if (!container) return;
+
+    // Its own two classes; the states are the host's (#286).
+    container.className = 'pdx-otp-container pdx-otp-wrap';
+    // One named group around the cells: without it a screen reader hears "Digit 1, edit text"
+    // with no idea what code it is entering.
+    container.setAttribute('role', 'group');
+    container.setAttribute('aria-label', groupName);
+
+    // Clear and rebuild
+    container.innerHTML = '';
+    cells = [];
+    inputs = [];
+
+    for (let i = 0; i < len; i++) {
+      // Separator
+      if (groupEvery > 0 && i > 0 && i % groupEvery === 0) {
+        const sepEl = document.createElement('span');
+        sepEl.className = 'pdx-otp-separator';
+        sepEl.setAttribute('data-part', 'separator');
+        sepEl.textContent = '-';
+        container.appendChild(sepEl);
+      }
+
+      const cellEl = document.createElement('input');
+      cellEl.className = 'pdx-otp-cell';
+      cellEl.setAttribute('data-part', 'cell');
+      cellEl.type = isMask ? 'password' : 'text';
+      cellEl.inputMode = isNumeric ? 'numeric' : 'text';
+      cellEl.maxLength = 2; // Allow typing to trigger input event
+      cellEl.setAttribute('autocomplete', fill);
+      // "Digit 1 of 6": the position and the length.
+      uiAttr(cellEl, 'aria-label', () => format(uiString('otp-input', 'digit'), { n: i + 1, total: len })); // an accessible name per cell (axe label)
+      cellEl.value = val[i] || '';
+      if (off) cellEl.disabled = true;
+      // A2: the element with the role is the cell; the group may not carry aria-invalid.
+      if (isError) cellEl.setAttribute('aria-invalid', 'true');
+
+      cells.push(val[i] || '');
+      inputs.push(cellEl);
+
+      const idx = i;
+      cellEl.addEventListener('input', (e) => handleInput(idx, e));
+      cellEl.addEventListener('keydown', (e) => handleKeydown(idx, e));
+      cellEl.addEventListener('focus', handleFocus);
+
+      container.appendChild(cellEl);
+    }
+
+    // Paste handler on container — remove-then-add: the effect re-runs on
+    // prop changes, and the handler would pile up.
+    container.removeEventListener('paste', handlePaste);
+    container.addEventListener('paste', handlePaste);
+  });
+});
+
+function focus() { (host.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); }
+function blur() { (host.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); }
+function clear() {
+  for (let i = 0; i < cells.length; i++) { cells[i] = ''; if (inputs[i]) inputs[i].value = ''; }
+  _reflected = '';
+  value = '';
+}
+</script>

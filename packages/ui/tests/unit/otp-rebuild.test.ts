@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/otp-input/pdx-otp-input';
+import '../../src/otp-input/pdx-otp-input.pdx';
 
 type Otp = HTMLElement & { value: string };
 
