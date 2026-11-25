@@ -8,10 +8,10 @@ Build complex filters visually.
 |---|---|---|---|---|
 | `fields` | — | unknown[] | `[]` | Field definitions (FieldDefinition[] or FilterField[]). |
 | `source` | — | Record<string, unknown> \| null | `null` | DataSource to auto-bind filters. |
-| `value` | — | (FilterDescriptor \| CompositeFilter)[] | `[]` | The current value. |
+| `value` | — | (import('@pdxui/core').FilterDescriptor \| import('@pdxui/core').CompositeFilter)[] | `[]` | The current value. |
 | `logic` | `logic` | 'and' \| 'or' | `'and'` |  |
 
-**Events:** `logic-change` → `detail: { value: 'and' | 'or' }` — Fired when the component writes `logic`. Does not bubble.; `value-change` → `detail: { value: (FilterDescriptor | CompositeFilter)[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `logic-change` → `detail: { value: 'and' | 'or' }` — Fired when the component writes `logic`. Does not bubble.; `value-change` → `detail: { value: (import('@pdxui/core').FilterDescriptor | import('@pdxui/core').CompositeFilter)[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Parts:** `[data-part="root"]` — The bar that holds the chips and its buttons.; `[data-part="chip"]` — One filter: its label and its remove button.; `[data-part="label"]` — A chip's label, the button that opens its editor.; `[data-part="remove"]` — A chip's remove button.; `[data-part="add"]` — The "+ Add Filter" button.; `[data-part="clear"]` — The "Clear all" button, while there is a filter.
 

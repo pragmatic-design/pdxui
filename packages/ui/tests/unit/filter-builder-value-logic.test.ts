@@ -8,7 +8,7 @@
 // core/data/data-utils.ts): OR has to be expressed as a CompositeFilter, which the builder builds.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/filter-builder/pdx-filter-builder';
+import '../../src/filter-builder/pdx-filter-builder.pdx';
 
 const FIELDS = [
     { field: 'name', label: 'Name', type: 'string' },

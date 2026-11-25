@@ -1,0 +1,112 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxFilterBuilder",
+  "tagName": "pdx-filter-builder",
+  "category": "Data-bound",
+  "order": 107,
+  "description": "A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "fields",
+      "description": "Field definitions (FieldDefinition[] or FilterField[]).",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource to auto-bind filters.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "(import('@pdxui/core').FilterDescriptor | import('@pdxui/core').CompositeFilter)[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "logic",
+      "type": {
+        "text": "'and' | 'or'"
+      },
+      "default": "'and'",
+      "attribute": "logic"
+    }
+  ],
+  "models": [
+    "value",
+    "logic"
+  ],
+  "alphaEvents": [
+    "pdx-filter-change"
+  ],
+  "alphaDetail": {
+    "filters": "$event.detail.value",
+    "logic": "$event.currentTarget.logic"
+  },
+  "events": [
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: (import('@pdxui/core').FilterDescriptor | import('@pdxui/core').CompositeFilter)[] }"
+    },
+    {
+      "name": "logic-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `logic`. Does not bubble.",
+      "detail": "{ value: 'and' | 'or' }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "logic",
+      "fieldName": "logic",
+      "type": {
+        "text": "'and' | 'or'"
+      },
+      "default": "'and'"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The bar that holds the chips and its buttons."
+    },
+    {
+      "name": "chip",
+      "description": "One filter: its label and its remove button."
+    },
+    {
+      "name": "label",
+      "description": "A chip's label, the button that opens its editor."
+    },
+    {
+      "name": "remove",
+      "description": "A chip's remove button."
+    },
+    {
+      "name": "add",
+      "description": "The \"+ Add Filter\" button."
+    },
+    {
+      "name": "clear",
+      "description": "The \"Clear all\" button, while there is a filter."
+    }
+  ]
+}
