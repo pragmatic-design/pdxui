@@ -74,11 +74,6 @@
       "types": "./dist/alert-dialog/pdx-alert-dialog.d.ts",
       "import": "./dist/alert-dialog/pdx-alert-dialog.js"
     },
-    "./tooltip": {
-      "development": "./src/tooltip/pdx-tooltip.ts",
-      "types": "./dist/tooltip/pdx-tooltip.d.ts",
-      "import": "./dist/tooltip/pdx-tooltip.js"
-    },
     "./overlay-outlet": {
       "development": "./src/overlay/pdx-overlay-outlet.ts",
       "types": "./dist/overlay/pdx-overlay-outlet.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/popover/pdx-popover.pdx",
       "types": "./dist/popover/pdx-popover.d.ts",
       "import": "./dist/popover/pdx-popover.js"
+    },
+    "./tooltip": {
+      "development": "./src/tooltip/pdx-tooltip.pdx",
+      "types": "./dist/tooltip/pdx-tooltip.d.ts",
+      "import": "./dist/tooltip/pdx-tooltip.js"
     },
     "./package.json": "./package.json"
   },

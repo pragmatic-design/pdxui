@@ -32682,7 +32682,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tooltip/pdx-tooltip.ts",
+      "path": "src/tooltip/pdx-tooltip.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -32912,7 +32912,7 @@
           "name": "pdx-tooltip",
           "declaration": {
             "name": "PdxTooltip",
-            "module": "src/tooltip/pdx-tooltip.ts"
+            "module": "src/tooltip/pdx-tooltip.pdx"
           }
         }
       ]
