@@ -67,7 +67,7 @@ import '@pdxui/design/components/statistic';
 
 /** `pdx-icon` the first time the statistic has an icon or a trend to draw: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 function formatValue(val: string, prec: number, sep: string): string {

@@ -103,7 +103,7 @@ function getOptions(): SegmentOption[] {
 
 /** An option's icon, loading `pdx-icon` the first time one is named: a control of labels never pays for the set. */
 function optionIcon(icon: string): Node {
-  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
   const node = document.createElement('pdx-icon') as HTMLElement & { name: string };
   node.setAttribute('name', icon);
   return node;

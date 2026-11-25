@@ -11,7 +11,7 @@ import type { Dispose } from '@pdxui/core';
 
 /** `pdx-icon` the first time a menu item names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 export interface GridMenuItem {

@@ -11,7 +11,7 @@ import { format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/carousel';
-import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+import '../icon/pdx-icon.pdx'; // rendered by this component, and registered by nobody else
 // The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
 import { defineIcons } from '../icon/icon-map';
 import iconChevronLeft from '../icon/pragmatic/chevron-left';

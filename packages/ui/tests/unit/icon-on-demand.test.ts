@@ -12,10 +12,10 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import { defineIcons } from '../../src/icon/pdx-icon';
+import '../../src/icon/pdx-icon.pdx';
 import check from '../../src/icon/pragmatic/check';
 import { PRAGMATIC_LOADERS } from '../../src/icon/pragmatic-loaders';
-import { definedIcon } from '../../src/icon/icon-map';
+import { defineIcons, definedIcon } from '../../src/icon/icon-map';
 
 // What the compiler emits for `<pdx-icon name="check">`: the icon's module, handed to defineIcons.
 defineIcons({ check });

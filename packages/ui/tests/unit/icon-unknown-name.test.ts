@@ -11,7 +11,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi, type MockInstance } from 'vitest';
 import { registerIconSet } from '@pdxui/core';
 import { cleanup } from './helpers';
-import { defineIcons } from '../../src/icon/pdx-icon';
+import '../../src/icon/pdx-icon.pdx';
+import { defineIcons } from '../../src/icon/icon-map';
 import check from '../../src/icon/pragmatic/check';
 
 defineIcons({ check });

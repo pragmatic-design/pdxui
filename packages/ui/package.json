@@ -35,7 +35,7 @@
     },
     "./manifest": "./custom-elements.json",
     "./icon/pdx-icon": {
-      "development": "./src/icon/pdx-icon.ts",
+      "development": "./src/icon/pdx-icon.pdx",
       "types": "./dist/icon/pdx-icon.d.ts",
       "import": "./dist/icon/pdx-icon.js"
     },
@@ -674,6 +674,7 @@
     "dist/empty-state/empty-state-icons.js",
     "dist/fab/fab-icons.js",
     "dist/field-list/field-list-strings.js",
+    "dist/icon/icon-setup.js",
     "dist/inline-edit/inline-edit-strings.js",
     "dist/search-input/search-input-icons.js",
     "dist/time-picker/time-picker-strings.js",
@@ -687,6 +688,7 @@
     "src/empty-state/empty-state-icons.ts",
     "src/fab/fab-icons.ts",
     "src/field-list/field-list-strings.ts",
+    "src/icon/icon-setup.ts",
     "src/inline-edit/inline-edit-strings.ts",
     "src/search-input/search-input-icons.ts",
     "src/time-picker/time-picker-strings.ts",

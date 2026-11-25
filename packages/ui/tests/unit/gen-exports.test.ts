@@ -79,6 +79,26 @@ describe('gen-exports adds what the manifest has and the exports map does not', 
         expect(removed).toEqual(['./pin-input ← ./src/pin-input/pdx-pin-input.ts']);
     });
 
+    it('keeps the subpath of a component moved from .ts to .pdx (#1210)', () => {
+        // `./icon/pdx-icon` is not the tag's name: dropped with the .ts and added again from the tag,
+        // it became `./icon`, and `@pdxui/ui/icon/pdx-icon` — what the compiler emits for every icon
+        // a template names — resolved to nothing.
+        const exists = (p: string) => p !== './src/icon/pdx-icon.ts';
+        const { exports, added, removed } = computeExports(
+            { './icon/pdx-icon': { development: './src/icon/pdx-icon.ts' } },
+            [mod('src/icon/pdx-icon.pdx', 'pdx-icon')],
+            exists,
+        );
+        expect(removed).toEqual([]);
+        expect(added).toEqual([]);
+        expect(exports['./icon/pdx-icon']).toEqual({
+            development: './src/icon/pdx-icon.pdx',
+            types: './dist/icon/pdx-icon.d.ts',
+            import: './dist/icon/pdx-icon.js',
+        });
+        expect(exports['./icon']).toBeUndefined();
+    });
+
     it('keeps ./package.json last so the manifest stays resolvable', () => {
         const { exports } = computeExports({ './package.json': './package.json', './a': './dist/a.js' }, []);
         expect(Object.keys(exports).at(-1)).toBe('./package.json');

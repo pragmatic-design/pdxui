@@ -11,7 +11,7 @@ import type { SlotFunction } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 /** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 export interface BreadcrumbItem {

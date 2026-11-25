@@ -172,7 +172,7 @@ function buildMenu(list: MenuItem[], isSubmenu = false): HTMLElement {
           icon.innerHTML = sanitizeSVG(entry.icon);
           btn.appendChild(icon);
         } else {
-          if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+          if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
           const icon = document.createElement('pdx-icon');
           icon.className = 'pdx-menu-icon';
           icon.setAttribute('name', entry.icon);

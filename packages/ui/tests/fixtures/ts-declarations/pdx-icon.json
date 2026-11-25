@@ -1,0 +1,208 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxIcon",
+  "tagName": "pdx-icon",
+  "category": "Atoms",
+  "order": 0,
+  "description": "An icon drawn as SVG from a registered set, inline markup or a URL, with accessibility built in.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "set",
+      "description": "Icon set to draw from (registered sets).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "set"
+    },
+    {
+      "kind": "field",
+      "name": "svg",
+      "description": "Raw inline SVG markup to render.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "svg"
+    },
+    {
+      "kind": "field",
+      "name": "src",
+      "description": "URL of an external SVG to load.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "src"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "weight",
+      "description": "Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'.",
+      "type": {
+        "text": "'' | 'thin' | 'light' | 'regular' | 'bold'"
+      },
+      "default": "''",
+      "attribute": "weight"
+    },
+    {
+      "kind": "field",
+      "name": "rtl",
+      "description": "RTL behavior: 'mirror' flips in RTL context, 'none' keeps as-is. Default: 'none'.",
+      "type": {
+        "text": "'none' | 'mirror'"
+      },
+      "default": "'none'",
+      "attribute": "rtl"
+    },
+    {
+      "kind": "field",
+      "name": "spin",
+      "description": "Spin animation for loading indicators.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "spin"
+    }
+  ],
+  "roles": [
+    "img"
+  ],
+  "attributes": [
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "set",
+      "fieldName": "set",
+      "description": "Icon set to draw from (registered sets).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "svg",
+      "fieldName": "svg",
+      "description": "Raw inline SVG markup to render.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "src",
+      "fieldName": "src",
+      "description": "URL of an external SVG to load.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Size of the control (e.g. sm, md, lg).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "weight",
+      "fieldName": "weight",
+      "description": "Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'.",
+      "type": {
+        "text": "'' | 'thin' | 'light' | 'regular' | 'bold'"
+      },
+      "default": "''"
+    },
+    {
+      "name": "rtl",
+      "fieldName": "rtl",
+      "description": "RTL behavior: 'mirror' flips in RTL context, 'none' keeps as-is. Default: 'none'.",
+      "type": {
+        "text": "'none' | 'mirror'"
+      },
+      "default": "'none'"
+    },
+    {
+      "name": "spin",
+      "fieldName": "spin",
+      "description": "Spin animation for loading indicators.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The box the SVG fills, `--pdx-icon-size` square."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "spin",
+      "description": "`spin` is set: the icon turns."
+    },
+    {
+      "name": "mirror",
+      "description": "`rtl=\"mirror\"`: in a right-to-left context the icon is drawn flipped."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-icon-size"
+    }
+  ]
+}

@@ -14,7 +14,7 @@ import '../data-grid/pdx-data-grid';
 import '../bulk-actions/pdx-bulk-actions';
 import '../edit-drawer/pdx-edit-drawer';
 import '../alert-dialog/pdx-alert-dialog';
-import '../icon/pdx-icon';
+import '../icon/pdx-icon.pdx';
 // The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).
 import { defineIcons } from '../icon/icon-map';
 import iconPlus from '../icon/pragmatic/plus';

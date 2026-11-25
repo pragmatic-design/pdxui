@@ -96,7 +96,7 @@ describe('a component registers the tags it renders', () => {
                 const target = owner.get(tag);
                 if (!target) continue;                       // not a component of this package
                 const imported = relative(dirname(file), target.file).replace(/\\/g, '/').replace(/\.ts$/, '');
-                // Static, or DYNAMIC: `import('../icon/pdx-icon')` done the first time the tag is
+                // Static, or DYNAMIC: `import('../icon/pdx-icon.pdx')` done the first time the tag is
                 // rendered is still the component bringing what it renders — and it is how a menu
                 // with no named icon avoids paying for the icon set.
                 const byPath = new RegExp(`import(?:\\s+|\\(\\s*)'[^']*${imported.replace(/^\.\.\//, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}'`);

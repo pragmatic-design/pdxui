@@ -55,7 +55,7 @@ let listEl: HTMLElement | null = null;
 
 /** `pdx-icon` the first time a term names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 // Read where it draws: a snippet set after mount is the one drawn

@@ -80,7 +80,7 @@ let _shown: TimelineItem[] = [];
 
 /** `pdx-icon` the first time an event names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 /** The pending row's text: pendingLabel, else timeline.pending. */
