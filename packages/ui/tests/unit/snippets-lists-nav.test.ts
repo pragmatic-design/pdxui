@@ -12,7 +12,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { cleanup, tick } from './helpers';
-import '../../src/breadcrumb/pdx-breadcrumb';
+import '../../src/breadcrumb/pdx-breadcrumb.pdx';
 import '../../src/description-list/pdx-description-list.pdx';
 import '../../src/list/pdx-list.pdx';
 import '../../src/nav-menu/pdx-nav-menu';

@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { setRouteTrail, clearRouteTrail } from '@pdxui/core';
-import '../../src/breadcrumb/pdx-breadcrumb';
+import '../../src/breadcrumb/pdx-breadcrumb.pdx';
 
 const frame = () => new Promise((r) => requestAnimationFrame(() => r(null)));
 

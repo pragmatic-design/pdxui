@@ -73,7 +73,7 @@ import './menubar/pdx-menubar';
 import './menu/pdx-menu.pdx';
 import './dropdown-menu/pdx-dropdown-menu.pdx';
 import './context-menu/pdx-context-menu';
-import './breadcrumb/pdx-breadcrumb';
+import './breadcrumb/pdx-breadcrumb.pdx';
 import './page-header/pdx-page-header';
 import './toolbar/pdx-toolbar.pdx';
 import './pagination/pdx-pagination.pdx';

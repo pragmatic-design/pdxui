@@ -1,0 +1,130 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBreadcrumb",
+  "tagName": "pdx-breadcrumb",
+  "category": "Navigation",
+  "order": 62,
+  "description": "Navigation breadcrumbs, with overflow collapse and custom separators.",
+  "generics": [
+    "T extends { key: string; label: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "separator"
+    },
+    {
+      "kind": "field",
+      "name": "maxItems",
+      "description": "Collapse to this many items with an ellipsis.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "maxitems"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A crumb was chosen: its `key` and the item.",
+      "detail": "{ key: string; item: T }"
+    }
+  ],
+  "roles": [
+    "list"
+  ],
+  "attributes": [
+    {
+      "name": "separator",
+      "fieldName": "separator",
+      "description": "The separator between items.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "maxitems",
+      "fieldName": "maxItems",
+      "description": "Collapse to this many items with an ellipsis.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "BreadcrumbItem",
+      "fields": [
+        "key: string",
+        "label: string",
+        "href?: string",
+        "icon?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one crumb: a snippet `item(item, index, isLast)`.",
+      "signature": "(item: T, index: number, isLast: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "nav",
+      "description": "The `<nav>` that names the trail (`.pdx-breadcrumb`)."
+    },
+    {
+      "name": "list",
+      "description": "The `<ol>` of the crumbs."
+    },
+    {
+      "name": "item",
+      "description": "One crumb, an `<li>`; the last is `aria-current=\"page\"` when a snippet draws it."
+    },
+    {
+      "name": "link",
+      "description": "A crumb that leads somewhere: a link with an `href`, a button without one."
+    },
+    {
+      "name": "current",
+      "description": "The page you are on, the last crumb, `aria-current=\"page\"`."
+    },
+    {
+      "name": "separator",
+      "description": "The glyph between two crumbs, hidden from assistive technology."
+    },
+    {
+      "name": "ellipsis",
+      "description": "The button that stands for the crumbs `max-items` collapsed."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-breadcrumb-separator",
+      "default": "'/'"
+    }
+  ]
+}
