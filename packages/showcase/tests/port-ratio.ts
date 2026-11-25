@@ -25,6 +25,31 @@
  */
 export const SAMPLES = 20;
 
+/** 1,000 and not the 100 of the budget spec: at 100 the 0.1 ms timer is several per cent of a mount. */
+export const INSTANCES = 1000;
+
+/**
+ * How long a warm mount of INSTANCES tags may take to go still before the tag is measured at fewer
+ * (#1387). Each mount waits until its subtree is still, and a tag is mounted 368 times (eight pairs of
+ * two pages, three warm-ups and twenty samples each): 1,000 pdx-charts take ~1.8 s to settle, the
+ * TypeScript version as long, and the test ran out of its ten minutes before its first pair ended.
+ */
+export const SETTLE_MS = 250;
+
+/** Never fewer than this: a component slow to settle is not cheap, 100 charts mount in ~11 ms. */
+const MIN_INSTANCES = 100;
+
+/**
+ * How many tags a sample mounts, from how long a warm mount of INSTANCES took to go still: INSTANCES
+ * while that is within SETTLE_MS, else fewer in proportion, by hundreds, never under MIN_INSTANCES.
+ * The same number on both sides, so the ratio compares like with like.
+ */
+export function instancesFor(drawnMs: number): number {
+    if (drawnMs <= SETTLE_MS) return INSTANCES;
+    const scaled = Math.floor((INSTANCES * SETTLE_MS) / drawnMs / 100) * 100;
+    return Math.max(MIN_INSTANCES, scaled);
+}
+
 /**
  * One pair of fresh pages: each side's samples in the order they were taken (see SAMPLES), and which
  * side's page was opened first.
