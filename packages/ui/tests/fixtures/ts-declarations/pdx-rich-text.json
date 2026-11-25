@@ -1,0 +1,451 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxRichText",
+  "tagName": "pdx-rich-text",
+  "category": "Data-bound",
+  "order": 116,
+  "description": "A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "output",
+      "description": "Output format: 'html' or 'json'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'json'",
+      "attribute": "output"
+    },
+    {
+      "kind": "field",
+      "name": "extensions",
+      "description": "Editor extensions to enable.",
+      "type": {
+        "text": "unknown[] | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "preset",
+      "description": "A named toolbar/feature preset.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'starter'",
+      "attribute": "preset"
+    },
+    {
+      "kind": "field",
+      "name": "toolbar",
+      "description": "A preset ('full', 'standard', 'compact', 'minimal'), button names with '|' between groups, or 'false' for none.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'standard'",
+      "attribute": "toolbar"
+    },
+    {
+      "kind": "field",
+      "name": "toolbarMode",
+      "description": "Toolbar layout: 'top' (a bar above the text) or 'bubble' (floating over the selection).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'",
+      "attribute": "toolbarmode"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "autofocus",
+      "description": "Focuses the editor on mount.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "autofocus"
+    },
+    {
+      "kind": "field",
+      "name": "height",
+      "description": "Fixed editor height.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "height"
+    },
+    {
+      "kind": "field",
+      "name": "minHeight",
+      "description": "Minimum editor height.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'120px'",
+      "attribute": "minheight"
+    },
+    {
+      "kind": "field",
+      "name": "maxHeight",
+      "description": "Maximum editor height before scrolling.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'",
+      "attribute": "maxheight"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "A DataSource whose record `record-id` names: the editor edits that record's `field`, follows\nit when the source changes it, and writes each edit back through the source.\nWith all three given, the record is the document and `value` only reflects it.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "field",
+      "description": "The field of the `source` record that holds the document.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "field"
+    },
+    {
+      "kind": "field",
+      "name": "recordId",
+      "description": "The id of the `source` record to edit, as pdx-form's `record-id`: `\"1\"` finds `{ id: 1 }`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "recordid"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name of the editing area. Empty → the `rich-text.label` component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "editor",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.editor`."
+    },
+    {
+      "kind": "method",
+      "name": "getJSON",
+      "parameters": [],
+      "description": "The document as JSON, or null while the editor is still being built."
+    },
+    {
+      "kind": "method",
+      "name": "getHTML",
+      "parameters": [],
+      "description": "The document as HTML — what a copy to the clipboard carries — or '' before the editor is built."
+    },
+    {
+      "kind": "method",
+      "name": "getText",
+      "parameters": [],
+      "description": "The document as plain text, or '' before the editor is built."
+    },
+    {
+      "kind": "method",
+      "name": "getWordCount",
+      "parameters": [],
+      "description": "How many words the document holds; 0 before the editor is built."
+    },
+    {
+      "kind": "field",
+      "name": "isEmpty",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isEmpty`."
+    },
+    {
+      "kind": "method",
+      "name": "execCommand",
+      "parameters": [
+        {
+          "name": "name",
+          "type": {
+            "text": "string"
+          }
+        }
+      ],
+      "description": "Run one editor command by name, the same ones the toolbar runs. Does nothing before the editor is built."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "setJSON",
+      "parameters": [
+        {
+          "name": "json",
+          "type": {
+            "text": "unknown"
+          }
+        }
+      ],
+      "description": "Replace the document with this JSON, waiting for the editor when it is not built yet."
+    },
+    {
+      "kind": "method",
+      "name": "setHTML",
+      "parameters": [
+        {
+          "name": "markup",
+          "type": {
+            "text": "string"
+          }
+        }
+      ],
+      "description": "Replace the document with this HTML, waiting for the editor when it is not built yet."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "doc": "$event.detail.value",
+    "html": "$event.detail.value",
+    "text": "$event.detail.value",
+    "wordCount": "$event.currentTarget.getWordCount()"
+  },
+  "events": [
+    {
+      "name": "pdx-focus",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The editing area received focus."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The editing area lost focus."
+    },
+    {
+      "name": "pdx-ready",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The editor is built; the imperative API has been there since setup.",
+      "detail": "{ editor: EditorView }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: unknown }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "output",
+      "fieldName": "output",
+      "description": "Output format: 'html' or 'json'.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'json'"
+    },
+    {
+      "name": "preset",
+      "fieldName": "preset",
+      "description": "A named toolbar/feature preset.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'starter'"
+    },
+    {
+      "name": "toolbar",
+      "fieldName": "toolbar",
+      "description": "A preset ('full', 'standard', 'compact', 'minimal'), button names with '|' between groups, or 'false' for none.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'standard'"
+    },
+    {
+      "name": "toolbarmode",
+      "fieldName": "toolbarMode",
+      "description": "Toolbar layout: 'top' (a bar above the text) or 'bubble' (floating over the selection).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'top'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "autofocus",
+      "fieldName": "autofocus",
+      "description": "Focuses the editor on mount.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "height",
+      "fieldName": "height",
+      "description": "Fixed editor height.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "minheight",
+      "fieldName": "minHeight",
+      "description": "Minimum editor height.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'120px'"
+    },
+    {
+      "name": "maxheight",
+      "fieldName": "maxHeight",
+      "description": "Maximum editor height before scrolling.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'none'"
+    },
+    {
+      "name": "field",
+      "fieldName": "field",
+      "description": "The field of the `source` record that holds the document.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "recordid",
+      "fieldName": "recordId",
+      "description": "The id of the `source` record to edit, as pdx-form's `record-id`: `\"1\"` finds `{ id: 1 }`.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name of the editing area. Empty → the `rich-text.label` component string.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "toolbar",
+      "description": "The formatting toolbar, with `toolbar-mode=\"top\"`."
+    },
+    {
+      "name": "field",
+      "description": "The frame around the text: its height and scrolling."
+    },
+    {
+      "name": "input",
+      "description": "The editing area, a contenteditable `role=\"textbox\"`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "readonly",
+      "description": "`readonly` is set; the text is not editable and the textbox is aria-readonly."
+    }
+  ]
+}

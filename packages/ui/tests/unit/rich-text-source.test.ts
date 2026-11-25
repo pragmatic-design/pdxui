@@ -8,7 +8,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 type RichText = HTMLElement & { value: unknown; source: unknown; getText(): string; setJSON(json: unknown): void };
 

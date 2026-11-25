@@ -1,0 +1,361 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.
+ *
+ * @csspart toolbar - The formatting toolbar, with `toolbar-mode="top"`.
+ * @csspart field - The frame around the text: its height and scrolling.
+ * @csspart input - The editing area, a contenteditable `role="textbox"`.
+ *
+ * @cssstate readonly - `readonly` is set; the text is not editable and the textbox is aria-readonly.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail doc $event.detail.value
+ * @alphadetail html $event.detail.value
+ * @alphadetail text $event.detail.value
+ * @alphadetail wordCount $event.currentTarget.getWordCount()
+ */
+// ── pdx-rich-text Web Component ───────────────────────────────────
+// Zero-dependency rich text editor. Design-token native.
+//
+// The value contract is the one every input in the library keeps: the content goes in
+// through `value`, parsed per `output` (HTML for `output="html"`, JSON otherwise); it comes out
+// through `value`, the model (#482), whose write after every change dispatches `value-change`; and a
+// later `value` from outside replaces the document without rebuilding the editor. The imperative API is attached at
+// setup — before `pdx-ready` and before anything can call it — so it shadows the platform's own
+// Element.prototype.setHTML from the start; calls made before the editor exists are queued.
+import { untracked, DEV, isDataSource } from '@pdxui/core';
+import type { DataSource } from '@pdxui/core';
+import { findRecord } from '../shared/find-record';
+import { EditorView, type EditorViewConfig } from './view/view.js';
+import { StarterKit, MinimalKit, DocumentKit } from './extensions/starter-kit.js';
+import { parseToolbarConfig, renderToolbar, updateToolbarState } from './toolbar/toolbar.js';
+import { BubbleToolbar } from './toolbar/bubble.js';
+import { toJSON, fromJSON, type JSONNode } from './format/json.js';
+import { serializeToClipboardHTML, parseClipboardHTML } from './view/clipboard.js';
+import type { Extension } from './state/plugin.js';
+import type { DocNode } from './model/types.js';
+import { textContent, textLength, createNode, createText } from './model/node.js';
+import { uiString, uiAttr } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/rich-text';
+// The toolbar's heading and list menus are drawn with the menu's classes (#417).
+import '@pdxui/design/components/menu';
+
+// A form submits it under the host's `name` — HTML or text as it is, a JSON document as JSON — and
+// resets it (#135).
+@model value: unknown = null { form: () => (value !== null && typeof value === 'object' ? JSON.stringify(value) : value) };
+// Declared, so they do not bubble (#138): a listener goes on the element.
+/** The editing area received focus. */
+@event 'pdx-focus': void;
+/** The editing area lost focus. */
+@event 'pdx-blur': void;
+/** The editor is built; the imperative API has been there since setup. */
+@event 'pdx-ready': { editor: EditorView };
+// On the host as a custom state (#132); the editing area carries no class for it.
+@state readonly = !!readonly;
+// Every element is built by the script, a frame after mount.
+@part(external) toolbar, field, input;
+@prop output: string = 'json';
+@prop extensions: unknown[] | null = null;
+@prop preset: string = 'starter';
+@prop toolbar: string = 'standard';
+@prop toolbarMode: string = 'top';
+@prop placeholder: string = '';
+@prop readonly: boolean = false;
+@prop autofocus: boolean = false;
+@prop height: string = 'auto';
+@prop minHeight: string = '120px';
+@prop maxHeight: string = 'none';
+/**
+ * A DataSource whose record `record-id` names: the editor edits that record's `field`, follows
+ * it when the source changes it, and writes each edit back through the source.
+ * With all three given, the record is the document and `value` only reflects it.
+ */
+@prop source: Record<string, unknown> | null = null;
+/** The field of the `source` record that holds the document. */
+@prop field: string = '';
+/** The id of the `source` record to edit, as pdx-form's `record-id`: `"1"` finds `{ id: 1 }`. */
+@prop recordId: string = '';
+/** Accessible name of the editing area. Empty → the `rich-text.label` component string. */
+@prop label: string = '';
+@host el;
+
+// ── Imperative API, attached now: before pdx-ready, before the editor exists ──
+@expose editor, getJSON, getHTML, getText, getWordCount, isEmpty, execCommand, focus, blur, setJSON, setHTML, clear;
+
+// The editor, once built: a signal, so `el.editor` and `el.isEmpty` read it.
+let editorView = $signal<EditorView | null>(null);
+// Counts the editor's updates, so `el.isEmpty` reads the document it has now.
+let docVersion = $signal(0);
+let toolbarEl: HTMLElement | null = null;
+let wrapperEl: HTMLElement | null = null;
+let bubbleToolbar: BubbleToolbar | null = null;
+
+// The last value THIS component wrote to `value`. An inbound value equal to it is our own
+// reflection coming back, not a new document — skipping it is what keeps the round trip from
+// looping (write value → value track → replaceDoc → onUpdate → write value …).
+let reflected: unknown = undefined;
+// API calls made before the editor exists (setup runs before the frame that builds it).
+const pending: Array<(view: EditorView) => void> = [];
+const whenBuilt = (fn: (view: EditorView) => void) => {
+  const view = editorView.peek();
+  if (view) fn(view); else pending.push(fn);
+};
+
+/** Read-only, via a ref: `el.editor`. */
+const editor = $derived(editorView);
+/** Read-only, via a ref: `el.isEmpty`. */
+const isEmpty = $derived(() => {
+  void docVersion;
+  const view = editorView;
+  return view ? textLength(view.state.doc) === 0 : true;
+});
+
+function getExtensions(): Extension[] {
+  const exts = extensions.peek();
+  // Default prop is [] (empty array, truthy) — must check length
+  if (exts && Array.isArray(exts) && exts.length > 0) return exts as Extension[];
+  switch (preset.peek() || 'starter') {
+    case 'minimal': return [MinimalKit];
+    case 'document': return [DocumentKit];
+    default: return [StarterKit];
+  }
+}
+
+const emptyDoc = () => createNode('doc', {}, [createNode('paragraph', {}, [createText('')])]);
+
+function htmlToDoc(markup: string, view: EditorView): DocNode {
+  const nodes = parseClipboardHTML(String(markup ?? ''), view.state.schema);
+  return createNode('doc', {}, nodes.length ? nodes : [createNode('paragraph', {}, [createText('')])]);
+}
+
+let warnedUnparseable = false;
+/** A value as a document, per `output`: HTML for `html`, JSON (string or object) otherwise.
+ *  HTML needs the view's schema: without a view it returns undefined. */
+function valueToDoc(raw: unknown, fmt: string, view?: EditorView): DocNode | undefined {
+  if (raw === null || raw === undefined || raw === '') return undefined;
+  if (typeof raw === 'string') {
+    if (fmt === 'html') return view ? htmlToDoc(raw, view) : undefined;
+    try { return fromJSON(JSON.parse(raw) as JSONNode); } catch (err) {
+      if (DEV && !warnedUnparseable) {
+        warnedUnparseable = true;
+        console.warn(`[pdx-rich-text] value is not a JSON document (output="${fmt}"): "${raw.slice(0, 80)}". `
+          + 'For HTML, set output="html". The editor starts empty.', err);
+      }
+      return undefined;
+    }
+  }
+  if (typeof raw === 'object' && (raw as { type?: unknown }).type) return fromJSON(raw as JSONNode);
+  return undefined;
+}
+
+type Row = Record<string, unknown>;
+/** The record the editor is bound to — `source`, `field` and `record-id` all given — or null. */
+function binding(): { source: DataSource<Row>; field: string; record: Row | undefined } | null {
+  const src = source as unknown;
+  const fieldName = (field as string) ?? '';
+  const id = String(recordId ?? '');
+  if (!isDataSource<Row>(src) || !fieldName || !id) return null;
+  return { source: src, field: fieldName, record: findRecord(src, id) };
+}
+
+const replaceDoc = (view: EditorView, d: DocNode) => {
+  const tr = view.createTransaction();
+  tr.setMeta('replaceDoc', d);
+  view.dispatch(tr);
+};
+
+/** The document as JSON, or null while the editor is still being built. */
+function getJSON() { const view = editorView.peek(); return view ? toJSON(view.state.doc) : null; }
+/** The document as HTML — what a copy to the clipboard carries — or '' before the editor is built. */
+function getHTML() { const view = editorView.peek(); return view ? serializeToClipboardHTML(view.state.doc.content) : ''; }
+/** The document as plain text, or '' before the editor is built. */
+function getText() { const view = editorView.peek(); return view ? textContent(view.state.doc) : ''; }
+/** How many words the document holds; 0 before the editor is built. */
+function getWordCount() { const view = editorView.peek(); return view ? countWords(view.state.doc) : 0; }
+/** Run one editor command by name, the same ones the toolbar runs. Does nothing before the editor is built. */
+function execCommand(name: string) { return editorView.peek()?.execCommand(name); }
+function focus() { return editorView.peek()?.focus(); }
+function blur() { return editorView.peek()?.blur(); }
+/** Replace the document with this JSON, waiting for the editor when it is not built yet. */
+function setJSON(json: unknown) {
+  whenBuilt(view => {
+    const d = valueToDoc(json, 'json', view);
+    if (d) replaceDoc(view, d);
+  });
+}
+/** Replace the document with this HTML, waiting for the editor when it is not built yet. */
+function setHTML(markup: string) { whenBuilt(view => replaceDoc(view, htmlToDoc(markup, view))); }
+function clear() { whenBuilt(view => replaceDoc(view, emptyDoc())); }
+
+function countWords(doc: DocNode): number {
+  const text = textContent(doc);
+  return text.split(/\s+/).filter(w => w.length > 0).length;
+}
+
+// ── Build: the editor and its DOM, rebuilt when a configuration prop changes ──
+$effect(() => {
+  // Read the configuration props to subscribe. `value` is NOT read here: it has its own effect
+  // below, so a new value replaces the document instead of rebuilding the editor.
+  const toolbarCfg = toolbar ?? 'standard';
+  const toolbarModeCfg = toolbarMode ?? 'top';
+  const placeholderCfg = placeholder ?? '';
+  const readonlyCfg = readonly ?? false;
+  const heightCfg = height ?? 'auto';
+  const minHeightCfg = minHeight ?? '120px';
+  const maxHeightCfg = maxHeight ?? 'none';
+  const outputCfg = output ?? 'json';
+  const autofocusCfg = autofocus ?? false;
+  const labelCfg = (label as string) ?? '';
+
+  let cancelled = false;
+  requestAnimationFrame(() => {
+    if (cancelled || editorView.peek()) return;
+
+    el.classList.add('pdx-rich-text');
+
+    // Create wrapper
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('pdx-rt-wrapper');
+    wrapper.dataset.part = 'field';
+    if (heightCfg !== 'auto') wrapper.style.height = heightCfg;
+    if (minHeightCfg) wrapper.style.minHeight = minHeightCfg;
+    if (maxHeightCfg !== 'none') {
+      wrapper.style.maxHeight = maxHeightCfg;
+      wrapper.style.overflowY = 'auto';
+    }
+    wrapperEl = wrapper;
+
+    // Top toolbar
+    if (toolbarModeCfg === 'top' && toolbarCfg !== 'false' && (toolbarCfg as unknown) !== false) {
+      toolbarEl = document.createElement('div');
+      toolbarEl.dataset.part = 'toolbar';
+      el.appendChild(toolbarEl);
+    }
+
+    el.appendChild(wrapper);
+
+    // The initial value: JSON is handed to the view as its doc, as before; HTML needs the view's
+    // schema, so it is applied right after the view exists, before anything observes it.
+    // Bound to a record, the record's field is the document; otherwise `value` is.
+    const initialValue = untracked(() => {
+      const b = binding();
+      return b ? b.record?.[b.field] : value;
+    });
+    const initialIsHtml = typeof initialValue === 'string' && outputCfg === 'html';
+    let building = true;
+
+    const config: EditorViewConfig = {
+      element: wrapper,
+      doc: initialIsHtml ? undefined : valueToDoc(initialValue, outputCfg),
+      extensions: getExtensions(),
+      onUpdate: (state) => {
+        if (toolbarEl) updateToolbarState(toolbarEl, state);
+        if (bubbleToolbar) bubbleToolbar.update(state);
+
+        const empty = textLength(state.doc) === 0;
+        wrapper.classList.toggle('pdx-rt-empty', empty);
+        docVersion = docVersion.peek() + 1;
+
+        // Loading the initial value is not a change the user made: no event, no reflection.
+        if (building) return;
+
+        const out = outputCfg === 'html' ? serializeToClipboardHTML(state.doc.content)
+          : outputCfg === 'text' ? textContent(state.doc) : toJSON(state.doc);
+
+        // Bound: the edit goes back into the record, through the source, as an unsaved change.
+        const b = untracked(binding);
+        if (b?.record) b.source.update({ ...b.record, [b.field]: out });
+
+        // The model: the write dispatches `value-change` with the content.
+        reflected = out;
+        value = out;
+      },
+      onFocus: () => pdxFocus(),
+      onBlur: () => pdxBlur(),
+    };
+
+    const view = new EditorView(config);
+    editorView = view;
+
+    if (initialIsHtml) replaceDoc(view, htmlToDoc(initialValue as string, view));
+    reflected = initialValue;
+    building = false;
+
+    // The accessible name of the editable area (role=textbox): the placeholder does not count as a label
+    // for axe (aria-input-field-name / WCAG 4.1.2). Order: label, placeholder, registered string.
+    const contentEl = view.contentDOM;
+    contentEl.dataset.part = 'input';
+    uiAttr(contentEl, 'aria-label', () => labelCfg || placeholderCfg || uiString('rich-text', 'label'));
+
+    // Render toolbar
+    if (toolbarEl) {
+      const groups = parseToolbarConfig(toolbarCfg);
+      renderToolbar(groups, view, toolbarEl);
+    }
+
+    // Bubble toolbar
+    if (toolbarModeCfg === 'bubble') {
+      bubbleToolbar = new BubbleToolbar(view, wrapper);
+    }
+
+    // Placeholder
+    if (placeholderCfg) {
+      wrapper.dataset.placeholder = placeholderCfg;
+      wrapper.classList.toggle('pdx-rt-empty', textLength(view.state.doc) === 0);
+    }
+
+    // Readonly: not editable, and said so — a textbox with no contenteditable is still heard as one
+    // a person could type into.
+    if (readonlyCfg) {
+      view.contentDOM.removeAttribute('contenteditable');
+      view.contentDOM.setAttribute('aria-readonly', 'true');
+    }
+
+    // Autofocus
+    if (autofocusCfg && !readonlyCfg) {
+      requestAnimationFrame(() => editorView.peek()?.focus());
+    }
+
+    // Calls made before the editor existed, in order.
+    for (const fn of pending.splice(0)) fn(view);
+
+    // Ready: the API has been there since setup, and the editor exists now.
+    pdxReady({ editor: view });
+  });
+
+  // Cleanup: a configuration change (or a disconnect) tears the editor AND its DOM down —
+  // leaving the old wrapper and toolbar in place would stack a second editor on every rebuild.
+  return () => {
+    cancelled = true;
+    bubbleToolbar?.destroy();
+    bubbleToolbar = null;
+    editorView.peek()?.destroy();
+    editorView = null;
+    toolbarEl?.remove();
+    toolbarEl = null;
+    wrapperEl?.remove();
+    wrapperEl = null;
+  };
+});
+
+// ── Value in: a `value` set from outside replaces the document, without a rebuild ──
+// Bound to a record, the record is the value: a reload or another writer's change replaces the
+// document. `data()` is read to subscribe — the lookup itself does not.
+$effect(() => {
+  const b = binding();
+  if (b) b.source.data();
+  const incoming = b ? b.record?.[b.field] : value;
+  const outputCfg = untracked(() => output ?? 'json');
+  if (Object.is(incoming, reflected)) return; // our own reflection, or the value the editor was built from
+  whenBuilt(view => {
+    if (Object.is(incoming, reflected)) return;
+    const d = valueToDoc(incoming, outputCfg, view) ?? emptyDoc();
+    reflected = incoming;
+    replaceDoc(view, d);
+  });
+});
+</script>

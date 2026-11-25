@@ -5,7 +5,7 @@
 // and `full` presets could not make an H2, an H3, an ordered list or a task list. The unit test that
 // counted buttons could not see it: a dropdown drawn as a button counts as one.
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 const settle = (ms = 100): Promise<void> => new Promise(r => setTimeout(r, ms));
 

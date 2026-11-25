@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
 import { EditorView } from '../../src/rich-text/view/view';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 const settle = (): Promise<void> => new Promise(r => setTimeout(r, 50));
 

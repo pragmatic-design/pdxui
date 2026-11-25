@@ -12,7 +12,7 @@
 // damage: the test then fails on the count instead of hanging the run.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 const LIMIT = 100;
 let moves = 0;
