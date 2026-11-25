@@ -128,6 +128,9 @@ export function analyzePdxFile(file, text, categories) {
     // The host's own attributes, `@host { role="toolbar" }` or `:role="…"`, written back as markup: the
     // analysis takes the declaration out of the body, and the role on the host is the component's (#1210).
     const hostAttrs = (a.host ?? []).filter(h => h.value !== undefined).map(h => `${h.name}="${h.value}"`).join('\n');
+    // The `$effect` bodies without their comments, as the body is read: a comment that quotes a
+    // role is not one the component draws (#1425).
+    const effectsCode = a.effects.map((e, n) => withoutComments(ts.createSourceFile(`${file}.effect${n}.ts`, e, ts.ScriptTarget.Latest, true)));
     return [assembleModule({
         file, tag, category: categories[tag] || { category: 'Other', order: 999 },
         tags, description: component.description, props,
@@ -144,7 +147,7 @@ export function analyzePdxFile(file, text, categories) {
         emittedNames: [],
         // The `$effect`s are out of the body in the analysis: a role one of them writes is read there (#1210).
         // So are the script's `@snippet` bodies, templates the component renders with `@render` (#1412).
-        roles: scanRoles([template, hostAttrs, withoutComments(body), ...a.effects, ...a.snippets.map(s => withoutHtmlComments(s.body)), ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
+        roles: scanRoles([template, hostAttrs, withoutComments(body), ...effectsCode, ...a.snippets.map(s => withoutHtmlComments(s.body)), ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,

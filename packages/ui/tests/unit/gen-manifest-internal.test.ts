@@ -71,6 +71,26 @@ describe('the roles a .pdx script writes', () => {
         expect((mod.declarations[0].roles as string[]).sort()).toEqual(['button', 'note']);
     });
 
+    // A comment is not a rendered role, in a $effect as in the body: pdx-calendar's structure
+    // effect says why its frame is a group, quoting a role it does not draw, and the manifest published
+    // `application` as a role the calendar draws (#1425).
+    it('are not read from a comment inside a $effect', () => {
+        write('c/pdx-c.pdx', [
+            '<template></template>',
+            '<script>',
+            '@host el;',
+            '$effect(() => {',
+            '  // A group, not role="application", which switches browse mode off.',
+            '  /* Nor role="note", in a block comment. */',
+            "  el.setAttribute('role', 'group');",
+            '});',
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 'c/pdx-c.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        expect((mod.declarations[0].roles as string[]).sort()).toEqual(['group']);
+    });
+
     // `@host { role="x" }` is where a .pdx names its host's role; the analysis takes it out of the
     // body, so the manifest lost every one: pdx-sparkline's `img`, pdx-button-group's `group`,
     // pdx-radio-group's `radiogroup` (#1397). A bound `:role` is read as the template's is.
