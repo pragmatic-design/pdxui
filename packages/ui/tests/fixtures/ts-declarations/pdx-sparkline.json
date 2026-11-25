@@ -78,6 +78,9 @@
       "attribute": "label"
     }
   ],
+  "roles": [
+    "img"
+  ],
   "attributes": [
     {
       "name": "data",

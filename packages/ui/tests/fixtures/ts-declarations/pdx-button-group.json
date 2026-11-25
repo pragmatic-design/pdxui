@@ -58,6 +58,9 @@
       "attribute": "label"
     }
   ],
+  "roles": [
+    "group"
+  ],
   "attributes": [
     {
       "name": "orientation",

@@ -4110,6 +4110,9 @@
               "attribute": "label"
             }
           ],
+          "roles": [
+            "group"
+          ],
           "attributes": [
             {
               "name": "orientation",
@@ -6415,6 +6418,7 @@
             }
           ],
           "roles": [
+            "figure",
             "group"
           ],
           "attributes": [
@@ -6759,6 +6763,9 @@
               "attribute": "label"
             }
           ],
+          "roles": [
+            "img"
+          ],
           "attributes": [
             {
               "name": "data",
@@ -6947,6 +6954,9 @@
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
             }
+          ],
+          "roles": [
+            "group"
           ],
           "attributes": [
             {
@@ -17074,6 +17084,9 @@
               "attribute": "disabled"
             }
           ],
+          "roles": [
+            "group"
+          ],
           "attributes": [
             {
               "name": "size",
@@ -17787,7 +17800,8 @@
             }
           ],
           "roles": [
-            "dialog"
+            "dialog",
+            "group"
           ],
           "attributes": [],
           "cssParts": [
@@ -23325,6 +23339,9 @@
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
             }
+          ],
+          "roles": [
+            "radiogroup"
           ],
           "attributes": [
             {
@@ -32204,6 +32221,10 @@
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
             }
+          ],
+          "roles": [
+            "group",
+            "radiogroup"
           ],
           "attributes": [
             {

@@ -70,6 +70,34 @@ describe('the roles a .pdx script writes', () => {
         const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
         expect((mod.declarations[0].roles as string[]).sort()).toEqual(['button', 'note']);
     });
+
+    // `@host { role="x" }` is where a .pdx names its host's role; the analysis takes it out of the
+    // body, so the manifest lost every one: pdx-sparkline's `img`, pdx-button-group's `group`,
+    // pdx-radio-group's `radiogroup` (#1397). A bound `:role` is read as the template's is.
+    it('are read on @host, static or bound', () => {
+        write('h/pdx-h.pdx', [
+            '<template><slot></slot></template>',
+            '<script>',
+            '@prop mode: string = \'a\';',
+            '@host el {',
+            '  role="toolbar"',
+            '}',
+            '</script>',
+        ].join('\n'));
+        write('k/pdx-k.pdx', [
+            '<template><slot></slot></template>',
+            '<script>',
+            '@prop single: boolean = false;',
+            '@host el { :role="single ? \'radiogroup\' : \'group\'" }',
+            '</script>',
+        ].join('\n'));
+        const roles = (rel: string) => {
+            const file = join(root, rel);
+            return (analyzePdxFile(file, readFileSync(file, 'utf-8'), {})[0].declarations[0].roles as string[]).sort();
+        };
+        expect(roles('h/pdx-h.pdx')).toEqual(['toolbar']);
+        expect(roles('k/pdx-k.pdx')).toEqual(['group', 'radiogroup']);
+    });
 });
 
 // A module beside the component is part of it, as gen-manifest reads a TypeScript component's: the

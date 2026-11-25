@@ -118,6 +118,10 @@
       "detail": "{ value: string }"
     }
   ],
+  "roles": [
+    "group",
+    "radiogroup"
+  ],
   "attributes": [
     {
       "name": "type",

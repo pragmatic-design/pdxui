@@ -108,6 +108,9 @@
       "detail": "{ value: string }"
     }
   ],
+  "roles": [
+    "radiogroup"
+  ],
   "attributes": [
     {
       "name": "name",

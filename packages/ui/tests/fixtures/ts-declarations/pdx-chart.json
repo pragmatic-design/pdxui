@@ -277,6 +277,7 @@
     }
   ],
   "roles": [
+    "figure",
     "group"
   ],
   "attributes": [
