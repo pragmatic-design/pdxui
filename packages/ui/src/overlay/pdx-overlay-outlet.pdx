@@ -1,0 +1,336 @@
+<template>
+  <div class="pdx-overlay-container" data-part="root"></div>
+</template>
+
+<script>
+/**
+ * Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog
+ * above the last, trapping focus inside and closing the top one on Escape.
+ */
+// pdx-overlay-outlet — Container for programmatic dialogs (confirm/alert/dialog).
+// Watches dialogQueue.items() via effect() and imperatively creates/removes DOM.
+// Pattern: identical to pdx-toast's rendering (effect + imperative DOM).
+// The queue lives in core (dialog-service.ts re-exports it): imported from there, the outlet does
+// not depend on the service module, which a bundler would otherwise split into a chunk of its own.
+import { effect, overlayStack, focusTrap, getDialogQueue, onDestroy, onNextFrame } from '@pdxui/core';
+import type { DialogInstance, Dispose } from '@pdxui/core';
+import { uiString, aroundPlaceholder, uiAttr } from '../shared/i18n';
+import { holdModalFocus } from '../shared/modal-focus';
+// The modals it draws are the dialog's — `.pdx-dialog-backdrop`, `-panel`, `-header` — so the dialog's
+// stylesheet travels with it. Without it they are styled only where another component has brought
+// dialog.css; with the outlet alone, the modal is plain text at the top of the page.
+import '@pdxui/design/components/dialog';
+
+// The stack, and each dialog drawn from code with its pieces (#288). A dialog's own state stays on
+// it — `data-open` while it shows — since the outlet holds many and opens none itself: it has no
+// open state, no `open-change` and no overlay verbs. The service opens and closes them.
+@part root;
+@part(external) backdrop, panel, header, title, close, body, message, confirm-input, footer, cancel, confirm, ok;
+@host host;
+
+const queue = getDialogQueue();
+let containerEl: HTMLElement | null = null;
+const trapDisposers = new Map<string, Dispose>();
+const dismissDisposers = new Map<string, Dispose>();
+// Where focus goes when dialogs close. Not each trap recording, at creation, what had focus:
+// a dialog created while focus is not yet inside the one under it — two opened in the same
+// tick — would record the page, behind the modal still open, and closeAll() would return
+// focus into a dialog it had just closed. The outlet decides instead:
+// into the dialog now on top, at what last had focus in it; with none left, to what opened
+// the first.
+const openers = new Map<string, HTMLElement | null>();
+const lastFocused = new Map<string, HTMLElement>();
+
+/** Read from the queue, not the DOM: a dialog that closed stays in the DOM for its exit. */
+function isOpen(id: string): boolean {
+  return queue.items.peek().some(d => d.id === id);
+}
+
+function isTop(id: string): boolean {
+  const entries = queue.items.peek();
+  return entries[entries.length - 1]?.id === id;
+}
+
+function refocusAfterClose(entries: DialogInstance[], removed: HTMLElement[]): void {
+  const top = entries[entries.length - 1];
+  if (top) {
+    const topEl = containerEl?.querySelector(`[data-dialog-id="${top.id}"]`);
+    if (!topEl) return;
+    const last = lastFocused.get(top.id);
+    const target = last && last.isConnected && topEl.contains(last) ? last : focusTargetOf(topEl, top.type);
+    target?.focus();
+    return;
+  }
+  // None left: what opened the bottom-most of those that closed.
+  const opener = openers.get(removed[0]?.dataset.dialogId ?? '');
+  if (opener?.isConnected && !removed.some(r => r.contains(opener))) opener.focus();
+}
+
+function renderDialogs(entries: DialogInstance[]) {
+  if (!containerEl) return;
+  const currentIds = new Set(entries.map(d => d.id));
+
+  // Remove stale dialogs
+  const removed: HTMLElement[] = [];
+  const active = document.activeElement;
+  for (const child of Array.from(containerEl.children) as HTMLElement[]) {
+    const id = child.dataset.dialogId;
+    if (id && !currentIds.has(id)) {
+      child.removeAttribute('data-open');
+      cleanupDialog(id);
+      removed.push(child);
+      setTimeout(() => child.remove(), 200);
+    }
+  }
+  // Focus was in a dialog that closed (or is lost): it moves now, not when the element goes.
+  if (removed.length && (!active || active === document.body || removed.some(r => r.contains(active)))) {
+    refocusAfterClose(entries, removed);
+  }
+  for (const r of removed) {
+    const id = r.dataset.dialogId ?? '';
+    openers.delete(id);
+    lastFocused.delete(id);
+  }
+
+  // Add new dialogs
+  const existingIds = new Set<string>();
+  for (const child of Array.from(containerEl.children)) {
+    const id = (child as HTMLElement).dataset.dialogId;
+    if (id) existingIds.add(id);
+  }
+
+  for (const entry of entries) {
+    if (existingIds.has(entry.id)) continue;
+    openers.set(entry.id, document.activeElement as HTMLElement | null);
+    const el = addDialog(entry);
+    requestAnimationFrame(() => {
+      // Closed before its first frame (Escape, closeAll): a trap opened now would never
+      // be disposed, and would hide the dialogs still open from screen readers.
+      if (!isOpen(entry.id)) return;
+      el.setAttribute('data-open', '');
+      // Focus trap. It does not restore focus: refocusAfterClose does.
+      const panelEl = el.querySelector('.pdx-dialog-panel') as HTMLElement;
+      if (panelEl) {
+        panelEl.addEventListener('focusin', (e) => lastFocused.set(entry.id, e.target as HTMLElement));
+        trapDisposers.set(entry.id, focusTrap(panelEl, { restoreFocus: false, escapeDeactivates: false }));
+      }
+      // Auto-focus: cancel for confirm, OK for alert, close for dialog. Only if it is still
+      // the dialog on top when the timer runs: closed by then, focus would land in a dialog
+      // that is leaving; covered by another, behind the one on top.
+      const focusTarget = focusTargetOf(el, entry.type);
+      if (focusTarget) setTimeout(() => { if (isTop(entry.id)) focusTarget.focus(); }, 0);
+    });
+  }
+}
+
+/** Build one dialog, place it, and register its Escape under its own id. */
+function addDialog(entry: DialogInstance): HTMLElement {
+  const { wrapper, panel: panelEl } = createDialogElement(entry, (result) => closeDialog(entry, result));
+  containerEl!.appendChild(wrapper);
+  // A click on the backdrop or on the dialog's text keeps focus inside.
+  holdModalFocus(wrapper, panelEl);
+  // Escape dismissal via overlayStack, registered under this dialog's own id: the queue
+  // pushed it with that id, and with two opened in one batch the one on top when this runs
+  // is the other one.
+  dismissDisposers.set(entry.id, overlayStack.onDismiss(entry.id, () => {
+    if (entry.type === 'confirm') closeDialog(entry, false);
+    else closeDialog(entry, undefined);
+  }));
+  return wrapper;
+}
+
+function cleanupDialog(id: string) {
+  const trap = trapDisposers.get(id);
+  if (trap) { trap(); trapDisposers.delete(id); }
+  const dismiss = dismissDisposers.get(id);
+  if (dismiss) { dismiss(); dismissDisposers.delete(id); }
+}
+
+function closeDialog(entry: DialogInstance, result: unknown) {
+  cleanupDialog(entry.id);
+  queue.close(entry.id, result);
+}
+
+let disposeEffect: (() => void) | null = null;
+
+// A frame after mount, as the TypeScript version did: the container is in the page, and the queue
+// is followed from there.
+onNextFrame(() => {
+  containerEl = host.querySelector('.pdx-overlay-container');
+  disposeEffect = effect(() => {
+    renderDialogs(queue.items());
+  });
+});
+
+onDestroy(() => {
+  if (disposeEffect) disposeEffect();
+  for (const [id] of trapDisposers) cleanupDialog(id);
+});
+
+/** The element a dialog focuses first: Cancel for a confirm, OK for an alert, Close for a dialog. */
+function focusTargetOf(dialogEl: Element, type: DialogInstance['type']): HTMLElement | null {
+  return dialogEl.querySelector(
+    type === 'confirm' ? '.pdx-alert-cancel' : type === 'alert' ? '.pdx-alert-ok' : '.pdx-dialog-close',
+  ) as HTMLElement | null;
+}
+
+/** One dialog's element, from its queue entry; `onClose(result)` is what its buttons call. */
+function createDialogElement(entry: DialogInstance, onClose: (result: unknown) => void): { wrapper: HTMLElement; panel: HTMLElement } {
+  const wrapper = document.createElement('div');
+  wrapper.dataset.dialogId = entry.id;
+  wrapper.className = 'pdx-dialog-backdrop';
+  wrapper.dataset.part = 'backdrop';
+  wrapper.style.zIndex = String(entry.zIndex);
+
+  const sizeClass = entry.size ? `pdx-dialog-${entry.size}` : 'pdx-dialog-sm';
+  const panelEl = document.createElement('div');
+  panelEl.className = `pdx-dialog-panel ${sizeClass}`;
+  panelEl.dataset.part = 'panel';
+  // confirm/alert = alertdialog (requires user action), dialog = dialog
+  panelEl.setAttribute('role', entry.type === 'dialog' ? 'dialog' : 'alertdialog');
+  panelEl.setAttribute('aria-modal', 'true');
+  panelEl.setAttribute('aria-label', entry.title);
+
+  // Header
+  const headerEl = document.createElement('div');
+  headerEl.className = 'pdx-dialog-header';
+  headerEl.dataset.part = 'header';
+  const titleSpan = document.createElement('span');
+  titleSpan.textContent = entry.title;
+  titleSpan.dataset.part = 'title';
+  headerEl.appendChild(titleSpan);
+
+  if (entry.type === 'dialog') {
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'pdx-dialog-close';
+    closeBtn.dataset.part = 'close';
+    uiAttr(closeBtn, 'aria-label', () => uiString('overlay', 'close'));
+    closeBtn.textContent = '×';
+    closeBtn.onclick = () => onClose(undefined);
+    headerEl.appendChild(closeBtn);
+  }
+
+  panelEl.appendChild(headerEl);
+
+  // Body
+  const bodyEl = document.createElement('div');
+  bodyEl.className = 'pdx-dialog-body';
+  bodyEl.dataset.part = 'body';
+
+  if (entry.message) {
+    const msg = document.createElement('p');
+    msg.style.cssText = 'margin:0 0 var(--pdx-space-md);color:var(--pdx-color-muted)';
+    msg.textContent = entry.message;
+    msg.dataset.part = 'message';
+    // The message is the dialog's description, read with its title.
+    msg.id = `pdx-outlet-msg-${entry.id}`;
+    panelEl.setAttribute('aria-describedby', msg.id);
+    bodyEl.appendChild(msg);
+  }
+
+  // Type-to-confirm input
+  let typeInput: HTMLInputElement | null = null;
+  if (entry.type === 'confirm' && entry.confirmText) {
+    const typeBlock = document.createElement('div');
+    typeBlock.style.marginTop = 'var(--pdx-space-md)';
+    const typeLabel = document.createElement('p');
+    typeLabel.className = 'pdx-txt-small pdx-ink-muted';
+    typeLabel.style.marginBottom = 'var(--pdx-space-xs)';
+    // Build label safely — no innerHTML with user content. The sentence is a string with a
+    // `{text}` placeholder, split around the <strong> that shows it.
+    const [before, after] = aroundPlaceholder(uiString('alert-dialog', 'typeToConfirm'), 'text');
+    typeLabel.appendChild(document.createTextNode(before));
+    const strong = document.createElement('strong');
+    strong.textContent = entry.confirmText;
+    typeLabel.appendChild(strong);
+    typeLabel.appendChild(document.createTextNode(after));
+    typeBlock.appendChild(typeLabel);
+    typeInput = document.createElement('input');
+    typeInput.className = 'pdx-input';
+    typeInput.dataset.part = 'confirm-input';
+    typeInput.type = 'text';
+    typeBlock.appendChild(typeInput);
+    bodyEl.appendChild(typeBlock);
+  }
+
+  panelEl.appendChild(bodyEl);
+
+  // Footer
+  const footerEl = document.createElement('div');
+  footerEl.className = 'pdx-dialog-footer';
+  footerEl.dataset.part = 'footer';
+
+  if (entry.type === 'confirm') {
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'pdx-alert-cancel pdx-ghost';
+    cancelBtn.dataset.part = 'cancel';
+    cancelBtn.type = 'button';
+    cancelBtn.textContent = entry.cancelLabel || uiString('alert-dialog', 'cancel');
+    cancelBtn.onclick = () => onClose(false);
+    footerEl.appendChild(cancelBtn);
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.className = `pdx-alert-confirm ${entry.variant === 'danger' ? 'pdx-danger' : 'pdx-primary'}`;
+    confirmBtn.dataset.part = 'confirm';
+    confirmBtn.type = 'button';
+    footerEl.appendChild(confirmBtn);
+
+    // Timer-gated + type-to-confirm logic
+    let countdown = entry.confirmDelay || 0;
+    let countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+    const updateConfirmState = (): void => {
+      let enabled = true;
+      let text = entry.confirmLabel || uiString('alert-dialog', 'confirm');
+
+      if (countdown > 0) {
+        enabled = false;
+        text = `${text} (${countdown}s)`;
+      }
+      if (entry.confirmText && typeInput && typeInput.value !== entry.confirmText) {
+        enabled = false;
+      }
+
+      confirmBtn.disabled = !enabled;
+      confirmBtn.textContent = text;
+    };
+
+    if (countdown > 0) {
+      countdownInterval = setInterval(() => {
+        countdown--;
+        updateConfirmState();
+        if (countdown <= 0 && countdownInterval) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+      }, 1000);
+    }
+
+    if (typeInput) {
+      typeInput.addEventListener('input', updateConfirmState);
+    }
+
+    updateConfirmState();
+    confirmBtn.onclick = () => {
+      if (confirmBtn.disabled) return;
+      if (countdownInterval) clearInterval(countdownInterval);
+      onClose(true);
+    };
+  } else if (entry.type === 'alert') {
+    const okBtn = document.createElement('button');
+    okBtn.className = 'pdx-alert-ok pdx-primary';
+    okBtn.dataset.part = 'ok';
+    okBtn.type = 'button';
+    okBtn.textContent = uiString('overlay', 'ok');
+    okBtn.onclick = () => onClose(undefined);
+    footerEl.appendChild(okBtn);
+  }
+
+  if (footerEl.children.length > 0) {
+    panelEl.appendChild(footerEl);
+  }
+
+  wrapper.appendChild(panelEl);
+  return { wrapper, panel: panelEl };
+}
+</script>

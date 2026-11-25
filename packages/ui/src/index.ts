@@ -140,7 +140,7 @@ import './rich-text/pdx-rich-text';
 // Infrastructure components (non-rendering / utility)
 import './provide/pdx-provide.pdx';
 import './error-boundary/pdx-error-boundary.pdx';
-import './overlay/pdx-overlay-outlet';
+import './overlay/pdx-overlay-outlet.pdx';
 
 // Utilities (functions, not components)
 export { autoPageSize } from './data-grid/auto-page-size';

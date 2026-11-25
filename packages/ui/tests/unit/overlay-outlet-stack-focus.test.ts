@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { batch } from '@pdxui/core';
 import { cleanup, mount, tick } from './helpers';
 import { dialog } from '../../src/dialog/dialog-service';
-import '../../src/overlay/pdx-overlay-outlet';
+import '../../src/overlay/pdx-overlay-outlet.pdx';
 
 const panelOf = (title: string) =>
     [...document.querySelectorAll<HTMLElement>('[data-dialog-id] .pdx-dialog-panel')].find(p => p.getAttribute('aria-label') === title)!;

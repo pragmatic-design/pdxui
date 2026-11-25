@@ -1,0 +1,69 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxOverlayOutlet",
+  "tagName": "pdx-overlay-outlet",
+  "category": "Infrastructure",
+  "order": 119,
+  "description": "Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog\nabove the last, trapping focus inside and closing the top one on Escape.",
+  "members": [],
+  "roles": [
+    "alertdialog",
+    "dialog"
+  ],
+  "attributes": [],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "panel",
+      "description": "The element reached as `[data-part=\"panel\"]`."
+    },
+    {
+      "name": "header",
+      "description": "The element reached as `[data-part=\"header\"]`."
+    },
+    {
+      "name": "title",
+      "description": "The element reached as `[data-part=\"title\"]`."
+    },
+    {
+      "name": "close",
+      "description": "The element reached as `[data-part=\"close\"]`."
+    },
+    {
+      "name": "body",
+      "description": "The element reached as `[data-part=\"body\"]`."
+    },
+    {
+      "name": "message",
+      "description": "The element reached as `[data-part=\"message\"]`."
+    },
+    {
+      "name": "confirm-input",
+      "description": "The element reached as `[data-part=\"confirm-input\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    },
+    {
+      "name": "cancel",
+      "description": "The element reached as `[data-part=\"cancel\"]`."
+    },
+    {
+      "name": "confirm",
+      "description": "The element reached as `[data-part=\"confirm\"]`."
+    },
+    {
+      "name": "ok",
+      "description": "The element reached as `[data-part=\"ok\"]`."
+    }
+  ]
+}

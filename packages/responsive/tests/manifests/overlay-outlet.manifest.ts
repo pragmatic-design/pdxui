@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-overlay-outlet (overlay holder, tier 2A)
  *
- * Contracts written by inspecting the source (packages/ui/src/overlay/pdx-overlay-outlet.ts), the
+ * Contracts written by inspecting the source (packages/ui/src/overlay/pdx-overlay-outlet.pdx), the
  * service that feeds it (packages/ui/src/dialog/dialog-service.ts) and the CSS it borrows
  * (packages/design/src/components/dialog.css).
  *
