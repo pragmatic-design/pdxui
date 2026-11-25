@@ -489,7 +489,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // imperatively, and the showcase's CRUD pages draw it. Measured 478.9 KB locally; CI has read the
 // moves before 0.2 KB above the local figure, so the ceiling is held to that. Entry, css and blocking
 // unchanged.
-const BUDGET_KB = { entry: 43.6, js: 479.1, css: 67, blocking: 102.9 };
+// js 479.1 → 479.2 (the standing OK for #1210's moves): pdx-command moves to .pdx, 0.93× alone (3456
+// against 3701 B), but its type module and its compiled snippet land in other chunks than the
+// TypeScript file did: 479.0 KB measured locally, held to CI's figure as above.
+const BUDGET_KB = { entry: 43.6, js: 479.2, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

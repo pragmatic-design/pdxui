@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { html } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
-import '../../src/command/pdx-command';
+import '../../src/command/pdx-command.pdx';
 
 type Cmd = HTMLElement & { show(): void; items: unknown[] };
 

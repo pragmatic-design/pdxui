@@ -1,10 +1,10 @@
 /**
  * MANIFEST — pdx-command (command palette ⌘K, tier 3, overlay modale)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/command/pdx-command.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/command/pdx-command.pdx)
  * and the CSS (packages/design/src/components/command.css).
  *
- * ── DOM structure (light DOM, render() in pdx-command.ts:175) ──
+ * ── DOM structure (light DOM, the template of pdx-command.pdx) ──
  *   <pdx-command>                                          ← host
  *     <div class="pdx-command-backdrop"                    ← BACKDROP, part "backdrop": position:fixed, inset:0,
  *          data-part="backdrop" @click=close>                  blur, opacity 0 → 1 under the host's :state(open)
@@ -209,7 +209,7 @@ export const command: ComponentManifest = {
 
     // ── Dim. 4: keyboard (WAI-ARIA combobox/listbox) ──
     // The initial focus is on the input (the focusTrap and input.focus() in the component's setup, and show() in the scenario).
-    // onKeydown on the input (pdx-command.ts:88): ArrowDown/ArrowUp move _activeIndex (aria-selected="true"
+    // onKeydown on the input (pdx-command.pdx): ArrowDown/ArrowUp move activeIndex (aria-selected="true"
     // on the active option, render:220), Enter selects and closes, Escape closes. The navigation is checked through
     // aria-selected (deterministic and readable from the DOM); the initial active one is index 0.
     // Note: Escape→close is NOT asserted here: the trap check runs after the last step, on an open palette.

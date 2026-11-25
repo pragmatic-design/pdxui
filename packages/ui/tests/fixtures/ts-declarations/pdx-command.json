@@ -1,0 +1,216 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCommand",
+  "tagName": "pdx-command",
+  "category": "Overlay + Containers",
+  "order": 102,
+  "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
+  "generics": [
+    "T extends { label: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "The search input's placeholder. Empty: the command.placeholder component string, «Type a command...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "emptyText",
+      "description": "The message when nothing matches. Empty: the command.empty component string, «No results found.».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "emptytext"
+    },
+    {
+      "kind": "field",
+      "name": "hotkey",
+      "description": "Global keyboard shortcut to open (default: Ctrl+K / Cmd+K)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "hotkey"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the palette, clearing the query and highlighting the first command that is not disabled."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The chosen item itself, after its own `action` (if any) has run.",
+      "detail": "CommandItem"
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "combobox",
+    "dialog",
+    "group",
+    "listbox",
+    "option",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "The search input's placeholder. Empty: the command.placeholder component string, «Type a command...».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "emptytext",
+      "fieldName": "emptyText",
+      "description": "The message when nothing matches. Empty: the command.empty component string, «No results found.».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "hotkey",
+      "fieldName": "hotkey",
+      "description": "Global keyboard shortcut to open (default: Ctrl+K / Cmd+K)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "CommandItem",
+      "fields": [
+        "id: string",
+        "label: string",
+        "group?: string",
+        "icon?: string",
+        "shortcut?: string",
+        "action?: () => void",
+        "keywords?: string",
+        "disabled?: boolean"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one command: a snippet `item(item, index, active)`.",
+      "signature": "(item: T, index: number, active: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "input",
+      "description": "The element reached as `[data-part=\"input\"]`."
+    },
+    {
+      "name": "list",
+      "description": "The element reached as `[data-part=\"list\"]`."
+    },
+    {
+      "name": "group",
+      "description": "The element reached as `[data-part=\"group\"]`."
+    },
+    {
+      "name": "option",
+      "description": "The element reached as `[data-part=\"option\"]`."
+    },
+    {
+      "name": "empty",
+      "description": "The element reached as `[data-part=\"empty\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    }
+  ]
+}

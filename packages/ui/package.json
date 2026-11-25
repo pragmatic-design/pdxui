@@ -190,7 +190,7 @@
       "import": "./dist/carousel/pdx-carousel.js"
     },
     "./command": {
-      "development": "./src/command/pdx-command.ts",
+      "development": "./src/command/pdx-command.pdx",
       "types": "./dist/command/pdx-command.d.ts",
       "import": "./dist/command/pdx-command.js"
     },

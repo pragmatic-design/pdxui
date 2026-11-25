@@ -143,7 +143,8 @@ export function analyzePdxFile(file, text, categories) {
         emitted: new Map(),
         emittedNames: [],
         // The `$effect`s are out of the body in the analysis: a role one of them writes is read there (#1210).
-        roles: scanRoles([template, hostAttrs, withoutComments(body), ...a.effects, ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
+        // So are the script's `@snippet` bodies, templates the component renders with `@render` (#1412).
+        roles: scanRoles([template, hostAttrs, withoutComments(body), ...a.effects, ...a.snippets.map(s => withoutHtmlComments(s.body)), ...viewRoles, ...helpers.map(h => withoutComments(h))].join('\n')),
         renderedSlots: scanSlots(template),
         slotSignatures: new Map(a.slots.filter(s => s.signature !== undefined).map(s => [s.name, qualify(s.signature)])),
         parts: a.parts,
