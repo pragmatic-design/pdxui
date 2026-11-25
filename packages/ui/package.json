@@ -70,7 +70,7 @@
       "import": "./dist/drawer/pdx-drawer.js"
     },
     "./alert-dialog": {
-      "development": "./src/alert-dialog/pdx-alert-dialog.ts",
+      "development": "./src/alert-dialog/pdx-alert-dialog.pdx",
       "types": "./dist/alert-dialog/pdx-alert-dialog.d.ts",
       "import": "./dist/alert-dialog/pdx-alert-dialog.js"
     },

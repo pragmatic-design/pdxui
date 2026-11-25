@@ -1,0 +1,319 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAlertDialog",
+  "tagName": "pdx-alert-dialog",
+  "category": "Overlay + Containers",
+  "order": 94,
+  "description": "A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and\nCancel takes the focus first.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "The dialog's title. Empty: the alert-dialog.title component string, «Are you sure?».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "message",
+      "description": "The body message.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "message"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'default'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "confirmLabel",
+      "description": "Label of the confirm button. Empty: the alert-dialog.confirm component string, «Confirm».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "confirmlabel"
+    },
+    {
+      "kind": "field",
+      "name": "cancelLabel",
+      "description": "Label of the cancel button. Empty: the alert-dialog.cancel component string, «Cancel».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "cancellabel"
+    },
+    {
+      "kind": "field",
+      "name": "confirmText",
+      "description": "If set, the user must type this text to enable confirm.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "confirmtext"
+    },
+    {
+      "kind": "field",
+      "name": "confirmDelay",
+      "description": "Seconds the confirm button stays disabled (accidental-click guard).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "confirmdelay"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "closeonescape"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    },
+    {
+      "kind": "method",
+      "name": "confirm",
+      "parameters": [],
+      "description": "Confirm and close, as the confirm button does. Does nothing while that button is held back — loading, a countdown running, or a confirmation phrase not yet typed."
+    },
+    {
+      "kind": "method",
+      "name": "cancel",
+      "parameters": [],
+      "description": "Close and emit `pdx-cancel`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "pdx-confirm",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The user confirmed; the dialog has closed."
+    },
+    {
+      "name": "pdx-cancel",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The user cancelled — Cancel, or Escape with `close-on-escape`; the dialog has closed."
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "alertdialog"
+  ],
+  "attributes": [
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "The dialog's title. Empty: the alert-dialog.title component string, «Are you sure?».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "message",
+      "fieldName": "message",
+      "description": "The body message.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Visual variant.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'default'"
+    },
+    {
+      "name": "confirmlabel",
+      "fieldName": "confirmLabel",
+      "description": "Label of the confirm button. Empty: the alert-dialog.confirm component string, «Confirm».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "cancellabel",
+      "fieldName": "cancelLabel",
+      "description": "Label of the cancel button. Empty: the alert-dialog.cancel component string, «Cancel».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "confirmtext",
+      "fieldName": "confirmText",
+      "description": "If set, the user must type this text to enable confirm.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "confirmdelay",
+      "fieldName": "confirmDelay",
+      "description": "Seconds the confirm button stays disabled (accidental-click guard).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "closeonescape",
+      "fieldName": "closeOnEscape",
+      "description": "Close when the Escape key is pressed.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "header",
+      "description": "The element reached as `[data-part=\"header\"]`."
+    },
+    {
+      "name": "body",
+      "description": "The element reached as `[data-part=\"body\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    },
+    {
+      "name": "cancel",
+      "description": "The element reached as `[data-part=\"cancel\"]`."
+    },
+    {
+      "name": "confirm",
+      "description": "The element reached as `[data-part=\"confirm\"]`."
+    },
+    {
+      "name": "confirm-input",
+      "description": "The element reached as `[data-part=\"confirm-input\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    },
+    {
+      "name": "loading",
+      "description": "Matched with `:state(loading)`."
+    }
+  ]
+}

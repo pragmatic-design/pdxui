@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/alert-dialog/pdx-alert-dialog';
+import '../../src/alert-dialog/pdx-alert-dialog.pdx';
 
 // Open is the model `open` (#288). The state it draws, the host's :state(open), is measured in Chromium
 // (responsive/…/alert-dialog-beta-contract.spec.ts): happy-dom has no custom states.

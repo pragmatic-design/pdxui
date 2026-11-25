@@ -6,7 +6,7 @@
 // closed; visible as a doubled DOM count, duplicated ids, doubled handlers.
 import { describe, it, expect, afterEach } from 'vitest';
 import { component, html } from '@pdxui/core';
-import '../../src/alert-dialog/pdx-alert-dialog';
+import '../../src/alert-dialog/pdx-alert-dialog.pdx';
 import { uniqueTag, tick, cleanup } from './helpers';
 
 afterEach(() => cleanup());

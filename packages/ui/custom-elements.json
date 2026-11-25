@@ -321,7 +321,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/alert-dialog/pdx-alert-dialog.ts",
+      "path": "src/alert-dialog/pdx-alert-dialog.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -649,7 +649,7 @@
           "name": "pdx-alert-dialog",
           "declaration": {
             "name": "PdxAlertDialog",
-            "module": "src/alert-dialog/pdx-alert-dialog.ts"
+            "module": "src/alert-dialog/pdx-alert-dialog.pdx"
           }
         }
       ]
