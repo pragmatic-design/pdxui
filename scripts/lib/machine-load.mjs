@@ -53,6 +53,20 @@ export async function cpuInUse(ms = 1000) {
     return total > 0 ? (after.busy - before.busy) / total : 0;
 }
 
+/**
+ * The Windows process table from what `ConvertTo-Json -Compress` wrote for it. Windows PowerShell
+ * leaves some control characters raw inside a string, and JSON.parse refuses them: a process whose
+ * command line held one broke the pre-push line (#1409). Compressed, none of them is structural once
+ * the trailing line break is trimmed, so each is written as the `\u00XX` escape JSON reads.
+ * @param {string} json
+ * @returns {{ pid: number, ppid: number, name: string, command: string }[]}
+ */
+export function parseWindowsProcessTable(json) {
+    // Match: one raw character U+0000–U+001F
+    const escaped = json.trim().replace(/[\u0000-\u001f]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
+    return JSON.parse(escaped).map((p) => ({ pid: p.ProcessId, ppid: p.ParentProcessId, name: p.Name ?? '', command: p.CommandLine ?? '' }));
+}
+
 /** The process table: `{ pid, ppid, name, command }`. */
 function processTable() {
     if (process.platform === 'win32') {
@@ -60,7 +74,7 @@ function processTable() {
             '-NoProfile', '-Command',
             'Get-CimInstance Win32_Process | Select-Object ProcessId, ParentProcessId, Name, CommandLine | ConvertTo-Json -Compress',
         ], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-        return JSON.parse(json).map((p) => ({ pid: p.ProcessId, ppid: p.ParentProcessId, name: p.Name ?? '', command: p.CommandLine ?? '' }));
+        return parseWindowsProcessTable(json);
     }
     const out = execFileSync('ps', ['-eo', 'pid=,ppid=,comm=,args='], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     return out.split('\n').map((l) => l.trim().match(/^(\d+)\s+(\d+)\s+(\S+)\s*(.*)$/)).filter(Boolean)
