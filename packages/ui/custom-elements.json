@@ -31688,7 +31688,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/timeline/pdx-timeline.ts",
+      "path": "src/timeline/pdx-timeline.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -31968,7 +31968,7 @@
           "name": "pdx-timeline",
           "declaration": {
             "name": "PdxTimeline",
-            "module": "src/timeline/pdx-timeline.ts"
+            "module": "src/timeline/pdx-timeline.pdx"
           }
         }
       ]

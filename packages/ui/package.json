@@ -209,11 +209,6 @@
       "types": "./dist/affix/pdx-affix.d.ts",
       "import": "./dist/affix/pdx-affix.js"
     },
-    "./timeline": {
-      "development": "./src/timeline/pdx-timeline.ts",
-      "types": "./dist/timeline/pdx-timeline.d.ts",
-      "import": "./dist/timeline/pdx-timeline.js"
-    },
     "./carousel": {
       "development": "./src/carousel/pdx-carousel.ts",
       "types": "./dist/carousel/pdx-carousel.d.ts",
@@ -663,6 +658,11 @@
       "development": "./src/chart/pdx-chart.pdx",
       "types": "./dist/chart/pdx-chart.d.ts",
       "import": "./dist/chart/pdx-chart.js"
+    },
+    "./timeline": {
+      "development": "./src/timeline/pdx-timeline.pdx",
+      "types": "./dist/timeline/pdx-timeline.d.ts",
+      "import": "./dist/timeline/pdx-timeline.js"
     },
     "./package.json": "./package.json"
   },

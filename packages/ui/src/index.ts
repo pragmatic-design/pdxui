@@ -99,7 +99,7 @@ import './sortable-list/pdx-sortable-list.pdx';
 import './kanban/pdx-kanban.pdx';
 import './scheduler/pdx-scheduler.pdx';
 import './description-list/pdx-description-list.pdx';
-import './timeline/pdx-timeline';
+import './timeline/pdx-timeline.pdx';
 import './statistic/pdx-statistic.pdx';
 import './empty-state/pdx-empty-state.pdx';
 import './image/pdx-image.pdx';

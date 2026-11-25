@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/timeline/pdx-timeline';
+import '../../src/timeline/pdx-timeline.pdx';
 
 async function mount(items: unknown[]): Promise<HTMLElement> {
     const el = document.createElement('pdx-timeline');

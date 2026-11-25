@@ -18,7 +18,7 @@ import '../../src/list/pdx-list.pdx';
 import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/pagination/pdx-pagination.pdx';
 import '../../src/sortable-list/pdx-sortable-list.pdx';
-import '../../src/timeline/pdx-timeline';
+import '../../src/timeline/pdx-timeline.pdx';
 import '../../src/tree/pdx-tree';
 
 type Scope = Record<string, unknown>;
