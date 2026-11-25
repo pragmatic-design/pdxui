@@ -109,9 +109,6 @@ let targetChecked = $signal<Set<string>>(new Set());
 let sourceSearch = $signal('');
 let targetSearch = $signal('');
 let domReady = $signal(false);
-// Internal value state — updated on move, synced from prop
-let internalValue = $signal<string[]>([]);
-let valueSyncedFromProp = false;
 
 // DOM refs
 let sourceListEl: HTMLElement | null = null;
@@ -196,7 +193,10 @@ function getTargetValues(): Set<string> {
     }
     return base;
   }
-  return new Set(internalValue);
+  // Simple mode: the target list is the model, read where it is used. (The TypeScript version
+  // copied it into a second signal through an effect, one more of each at every mount.)
+  const current = value as string[];
+  return new Set(Array.isArray(current) ? current : []);
 }
 
 function sourceItems(): TransferItem[] {
@@ -254,7 +254,6 @@ function applyMove(movedValues: string[], direction: 'right' | 'left'): void {
   } else {
     lastChanges = [];
     lastDirection = direction;
-    internalValue = newTarget;
     // The target list is the model. In DataSource mode above the
     // partition comes from the source and `value` is not read.
     value = [...newTarget];
@@ -365,24 +364,6 @@ const listContext: ListContext = {
   onDragStart,
   onDragEnd,
 };
-
-// (In DataSource mode the partition is derived live from
-// computeTargetFromSource + the overlay — see getTargetValues.)
-$effect(() => {
-  if (isDataSourceMode()) return;
-  const externalVal = value as string[];
-  if (!externalVal || !Array.isArray(externalVal)) return;
-  if (!valueSyncedFromProp) {
-    valueSyncedFromProp = true;
-    internalValue = [...externalVal];
-    return;
-  }
-  const current = internalValue.peek();
-  const curSet = new Set(current);
-  if (externalVal.length !== current.length || externalVal.some(v => !curSet.has(v))) {
-    internalValue = [...externalVal];
-  }
-});
 
 // ── Build DOM once, a frame after mount: a setup a move destroyed does not build again ──
 onNextFrame(() => {
@@ -502,7 +483,6 @@ $effect(() => {
 function clear() {
   localOverrides.clear();
   overridesVersion = overridesVersion.peek() + 1;
-  internalValue = [];
   value = [];
   pdxClear();
 }
