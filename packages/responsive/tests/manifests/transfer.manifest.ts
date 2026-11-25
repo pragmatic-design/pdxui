@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-transfer (dual-list shuttle / transfer)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/transfer/pdx-transfer.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/transfer/pdx-transfer.pdx)
  * and the CSS (packages/design/src/components/transfer.css). An INLINE component: always
  * visible (no overlay), its DOM is built once in a requestAnimationFrame and
  * updated reactively. There is NO real render() (render: () => html``).

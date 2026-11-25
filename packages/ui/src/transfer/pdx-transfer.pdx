@@ -1,0 +1,513 @@
+<template></template>
+
+<script>
+/**
+ * A dual-list shuttle: the user moves items between a source list and a target list, with search,
+ * select-all and disabled items, and the chosen values take part in a form.
+ *
+ * @csspart root - The frame, a `role="group"` holding the two panels and the move buttons.
+ * @csspart panel - A side, the source or the target: its header, its filter and its list.
+ * @csspart search - A side's filter, while `searchable`; it filters, it is not the value.
+ * @csspart list - A side's `role="listbox"`.
+ * @csspart option - An item of a list.
+ * @csspart move - A button that moves the chosen items, or all of them, to the other side.
+ *
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail targetValues $event.detail.value
+ * @alphadetail changes $event.currentTarget.getChanges()
+ * @alphadetail direction $event.currentTarget.getDirection()
+ */
+// pdx-transfer — Dual-list shuttle component.
+// Move items between "source" (left) and "target" (right) panels.
+//
+// Three data models:
+// 1. Simple: items[] + value[] (value = target keys)
+// 2. DataSource + assignedField (boolean): single dataset, field determines panel
+// 3. DataSource + assignedField + assignedValue: field === value determines panel
+//
+// Modes:
+// - checkbox (default): checkboxes on each item, bulk move via buttons
+// - simple: click to select (highlight), buttons to move selected
+// - direct: click item to move it immediately (no selection step)
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it
+// (transfer-dom.ts builds the panels and the rows).
+import { getComponentString, onNextFrame } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { buildPanel, makeBtn, renderList } from './transfer-dom';
+import type { ListContext, Side } from './transfer-dom';
+import type { TransferItem } from './transfer-types';
+import './transfer-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/transfer';
+
+// The item shape an app builds in TypeScript (`import type { TransferItem } from '@pdxui/ui/transfer'`).
+export type { TransferItem } from './transfer-types';
+
+// The values on the target (right) side (#481). A move and clear() write it, and the write
+// dispatches `value-change`; setting `value` is the way to set it (#287). In DataSource mode the
+// partition comes from the source, and a move writes the target values it leaves; the diff to
+// persist is getChanges(). A form submits the target values, one entry each, and resets them (#135).
+/** The values of the items in the target list. A form submits one entry per value under the name (#135). */
+@model value: string[] = [] { form: () => [...getTargetValues()] };
+@event 'pdx-clear': void;
+// sm, md (the default) or lg (#748): the design CSS's `@variant` rules size the rows, the headers
+// and the move buttons from the host's `size`; the search fields are native `.pdx-input`s that
+// take the text fields' own size class, so they match a pdx-input of the same size.
+@variants {
+  /** sm, md (the default) or lg: the rows, the search fields and the move buttons. */
+  size: { md: '.pdx-transfer-md', sm: '.pdx-transfer-sm', lg: '.pdx-transfer-lg' } = md;
+}
+// The visual state, on the host as a custom state (#132, #287): the frame carries no class for it.
+@state disabled = !!disabled;
+// Every element is built by the script, a frame after mount (transfer-dom.ts writes the parts).
+@part(external) root, panel, search, list, option, move;
+// ── Model 1: Simple (items + value) ──
+/** All items — array of { value, label, disabled? } */
+@prop items: unknown[] = [];
+// ── Model 2/3: DataSource ──
+/** DataSource or raw array of objects */
+@prop source: Record<string, unknown> | null = null;
+/** Field to use as item label (default: 'label') */
+@prop labelField: string = 'label';
+/** Field to use as item value/id (default: 'value') */
+@prop valueField: string = 'value';
+/** Field that determines left vs right panel (boolean or matched value) */
+@prop assignedField: string = '';
+/** Value to match against assignedField for target panel (if omitted, treats as boolean) */
+@prop assignedValue: string = '';
+// ── UI Options ──
+/** Selection mode: 'checkbox' (default) | 'simple' (click highlight) | 'direct' (click to move) */
+@prop mode: string = 'checkbox';
+/** Show search input in panels */
+@prop searchable: boolean = false;
+/** Left panel title */
+@prop sourceTitle: string = '';
+/** Right panel title */
+@prop targetTitle: string = '';
+/** Disabled state */
+@prop disabled: boolean = false;
+/** Show "move all" buttons */
+@prop showAllButtons: boolean = false;
+/** Enable drag and drop */
+@prop draggable: boolean = false;
+/** Form field name */
+@prop name: string = '';
+// The host is the one submitter (#135), in FormData under its `name` (#133).
+@host el { :name="name || null" }
+
+// Imperative API (#287): the target values are the model, `el.value`, which replaces
+// getValue/setValue.
+@expose clear, getChanges, getDirection;
+
+let sourceChecked = $signal<Set<string>>(new Set());
+let targetChecked = $signal<Set<string>>(new Set());
+let sourceSearch = $signal('');
+let targetSearch = $signal('');
+let domReady = $signal(false);
+// Internal value state — updated on move, synced from prop
+let internalValue = $signal<string[]>([]);
+let valueSyncedFromProp = false;
+
+// DOM refs
+let sourceListEl: HTMLElement | null = null;
+let targetListEl: HTMLElement | null = null;
+let sourceCountEl: HTMLElement | null = null;
+let targetCountEl: HTMLElement | null = null;
+let sourceAllCb: HTMLInputElement | null = null;
+let targetAllCb: HTMLInputElement | null = null;
+let moveRightBtn: HTMLButtonElement | null = null;
+let moveLeftBtn: HTMLButtonElement | null = null;
+let moveAllRightBtn: HTMLButtonElement | null = null;
+let moveAllLeftBtn: HTMLButtonElement | null = null;
+
+// Drag state
+let dragValue: string | null = null;
+let dragSide: Side | null = null;
+
+// ── Data resolution: normalize all 3 models to TransferItem[] ──
+
+function isDataSourceMode(): boolean {
+  return !!(assignedField as string);
+}
+
+function resolveSourceData(): any[] {
+  const src = source as any;
+  if (!src) return [];
+  if (typeof src === 'object' && typeof src.data === 'function') return src.data() || [];
+  if (Array.isArray(src)) return src;
+  return [];
+}
+
+function normalizeItem(obj: any): TransferItem {
+  const lf = (labelField as string) || 'label';
+  const vf = (valueField as string) || 'value';
+  return {
+    value: String(obj[vf] ?? ''),
+    label: String(obj[lf] ?? obj[vf] ?? ''),
+    disabled: !!obj.disabled,
+    _raw: obj,
+  };
+}
+
+function isAssigned(obj: any): boolean {
+  const af = assignedField as string;
+  if (!af) return false;
+  const av = assignedValue as string;
+  const fieldVal = obj[af];
+  if (av) return String(fieldVal) === av;
+  return !!fieldVal;
+}
+
+function getAllItems(): TransferItem[] {
+  if (isDataSourceMode()) {
+    return resolveSourceData().map(normalizeItem);
+  }
+  return ((items as TransferItem[]) || []).map(i => ({
+    value: i.value, label: i.label, disabled: !!i.disabled,
+  }));
+}
+
+/** Compute target values from DataSource (used for initialization) */
+function computeTargetFromSource(): string[] {
+  const data = resolveSourceData();
+  const vf = (valueField as string) || 'value';
+  return data.filter(isAssigned).map((o: any) => String(o[vf] ?? ''));
+}
+
+// Local overrides of the moves (for DataSource mode): the base partition
+// ALWAYS derives from the assigned field of the current dataset — a reload of the DS
+// repartitions the new rows correctly — and the local moves
+// not yet persisted stay applied as an overlay.
+const localOverrides = new Map<string, boolean>();
+let overridesVersion = $signal(0);
+
+function getTargetValues(): Set<string> {
+  if (isDataSourceMode()) {
+    void overridesVersion;
+    const base = new Set(computeTargetFromSource());
+    for (const [v, inTarget] of localOverrides) {
+      if (inTarget) base.add(v);
+      else base.delete(v);
+    }
+    return base;
+  }
+  return new Set(internalValue);
+}
+
+function sourceItems(): TransferItem[] {
+  const targetVals = getTargetValues();
+  let entries = getAllItems().filter(i => !targetVals.has(i.value));
+  const q = sourceSearch.trim().toLowerCase();
+  if (q) entries = entries.filter(i => i.label.toLowerCase().includes(q));
+  return entries;
+}
+
+function targetItems(): TransferItem[] {
+  const targetVals = getTargetValues();
+  let entries = getAllItems().filter(i => targetVals.has(i.value));
+  const q = targetSearch.trim().toLowerCase();
+  if (q) entries = entries.filter(i => i.label.toLowerCase().includes(q));
+  return entries;
+}
+
+function getMode(): string {
+  return (mode as string) || 'checkbox';
+}
+
+// ── Move operations ──
+
+// The last move: in DataSource mode, the diff to persist, one `{ value, [assignedField] }` per
+// item moved (getChanges()); its direction in either mode (getDirection()).
+let lastChanges: Record<string, unknown>[] = [];
+let lastDirection: 'right' | 'left' | null = null;
+
+function applyMove(movedValues: string[], direction: 'right' | 'left'): void {
+  const targetVals = getTargetValues();
+  let newTargetSet: Set<string>;
+  if (direction === 'right') {
+    newTargetSet = new Set([...targetVals, ...movedValues]);
+  } else {
+    const removeSet = new Set(movedValues);
+    newTargetSet = new Set([...targetVals].filter(v => !removeSet.has(v)));
+  }
+  const newTarget = [...newTargetSet];
+
+  if (isDataSourceMode()) {
+    // A local overlay + an event: NO direct mutation of the row
+    // objects — mutating the original would break the computeDiff of whoever persists
+    // through ds.update() (an empty diff → the PATCH never sent).
+    for (const v of movedValues) localOverrides.set(v, direction === 'right');
+    overridesVersion = overridesVersion.peek() + 1;
+
+    const af = assignedField.peek() as string;
+    const av = assignedValue.peek() as string;
+    const assignedTrue = av || true;
+    const assignedFalse = av ? '' : false;
+    lastChanges = movedValues.map(v => ({ value: v, [af]: direction === 'right' ? assignedTrue : assignedFalse }));
+    lastDirection = direction;
+    value = [...getTargetValues()];
+  } else {
+    lastChanges = [];
+    lastDirection = direction;
+    internalValue = newTarget;
+    // The target list is the model. In DataSource mode above the
+    // partition comes from the source and `value` is not read.
+    value = [...newTarget];
+  }
+}
+
+/** The enabled items among `values`. */
+function movable(values: Set<string>): string[] {
+  return [...values].filter(v => {
+    const entry = getAllItems().find(i => i.value === v);
+    return entry && !entry.disabled;
+  });
+}
+
+function moveRight(): void {
+  const chosen = sourceChecked.peek();
+  if (chosen.size === 0) return;
+  const vals = movable(chosen);
+  sourceChecked = new Set();
+  if (vals.length > 0) applyMove(vals, 'right');
+}
+
+function moveLeft(): void {
+  const chosen = targetChecked.peek();
+  if (chosen.size === 0) return;
+  const vals = movable(chosen);
+  targetChecked = new Set();
+  if (vals.length > 0) applyMove(vals, 'left');
+}
+
+function moveAllRight(): void {
+  const vals = sourceItems().filter(i => !i.disabled).map(i => i.value);
+  sourceChecked = new Set();
+  if (vals.length > 0) applyMove(vals, 'right');
+}
+
+function moveAllLeft(): void {
+  const vals = targetItems().filter(i => !i.disabled).map(i => i.value);
+  targetChecked = new Set();
+  if (vals.length > 0) applyMove(vals, 'left');
+}
+
+function moveSingleItem(val: string, direction: 'right' | 'left'): void {
+  const entry = getAllItems().find(i => i.value === val);
+  if (!entry || entry.disabled) return;
+  applyMove([val], direction);
+}
+
+function toggleChecked(side: Side, val: string): void {
+  if (disabled.peek() as boolean) return;
+  if (getMode() === 'direct') {
+    // Click = move immediately
+    moveSingleItem(val, side === 'source' ? 'right' : 'left');
+    return;
+  }
+  // Checkbox and simple modes toggle the same way; only the row's look differs.
+  const set = new Set(side === 'source' ? sourceChecked.peek() : targetChecked.peek());
+  if (set.has(val)) set.delete(val); else set.add(val);
+  if (side === 'source') sourceChecked = set; else targetChecked = set;
+}
+
+function toggleAll(side: Side): void {
+  const entries = side === 'source' ? sourceItems() : targetItems();
+  const chosen = side === 'source' ? sourceChecked.peek() : targetChecked.peek();
+  const enabled = entries.filter(i => !i.disabled);
+  const allChecked = enabled.length > 0 && enabled.every(i => chosen.has(i.value));
+  const next = allChecked ? new Set<string>() : new Set(enabled.map(i => i.value));
+  if (side === 'source') sourceChecked = next; else targetChecked = next;
+}
+
+// ── Drag and drop ──
+
+function onDragStart(e: DragEvent, val: string, side: Side): void {
+  dragValue = val;
+  dragSide = side;
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', val);
+  }
+  (e.currentTarget as HTMLElement).classList.add('dragging');
+}
+
+function onDragEnd(e: DragEvent): void {
+  dragValue = null;
+  dragSide = null;
+  (e.currentTarget as HTMLElement).classList.remove('dragging');
+}
+
+function onDragOver(e: DragEvent, side: Side): void {
+  if (dragSide === side) return; // same panel, ignore
+  e.preventDefault();
+  if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+}
+
+function onDrop(e: DragEvent, side: Side): void {
+  e.preventDefault();
+  if (!dragValue || dragSide === side) return;
+  moveSingleItem(dragValue, side === 'target' ? 'right' : 'left');
+  dragValue = null;
+  dragSide = null;
+}
+
+// What each list's rows need from here; `stop` is each list's tab stop, kept across rebuilds.
+const listContext: ListContext = {
+  stop: { source: null, target: null },
+  searchText: (side) => (side === 'source' ? sourceSearch.peek() : targetSearch.peek()),
+  onToggle: toggleChecked,
+  onDragStart,
+  onDragEnd,
+};
+
+// (In DataSource mode the partition is derived live from
+// computeTargetFromSource + the overlay — see getTargetValues.)
+$effect(() => {
+  if (isDataSourceMode()) return;
+  const externalVal = value as string[];
+  if (!externalVal || !Array.isArray(externalVal)) return;
+  if (!valueSyncedFromProp) {
+    valueSyncedFromProp = true;
+    internalValue = [...externalVal];
+    return;
+  }
+  const current = internalValue.peek();
+  const curSet = new Set(current);
+  if (externalVal.length !== current.length || externalVal.some(v => !curSet.has(v))) {
+    internalValue = [...externalVal];
+  }
+});
+
+// ── Build DOM once, a frame after mount: a setup a move destroyed does not build again ──
+onNextFrame(() => {
+  const isSearchable = searchable.peek() as boolean;
+  const showAll = showAllButtons.peek() as boolean;
+  const modeNow = getMode();
+  const isDraggable = draggable.peek() as boolean;
+  const srcTitle = (sourceTitle.peek() as string) || getComponentString('transfer', 'source')();
+  const tgtTitle = (targetTitle.peek() as string) || getComponentString('transfer', 'target')();
+  const panelHandlers = {
+    onToggleAll: toggleAll,
+    onSearch: (side: Side, text: string) => { if (side === 'source') sourceSearch = text; else targetSearch = text; },
+  };
+
+  const frameEl = document.createElement('div');
+  // No state class: `disabled` is the host's :state(disabled) (#287).
+  frameEl.className = 'pdx-transfer' + (isDraggable ? ' pdx-transfer-draggable' : '');
+  frameEl.setAttribute('role', 'group');
+  frameEl.setAttribute('data-part', 'root');
+  uiAttr(frameEl, 'aria-label', () => uiString('transfer', 'label'));
+
+  // Source panel
+  const srcPanel = buildPanel('source', srcTitle, isSearchable, modeNow, panelHandlers);
+  sourceListEl = srcPanel.querySelector('.pdx-transfer-list')!;
+  sourceCountEl = srcPanel.querySelector('.pdx-transfer-count')!;
+  sourceAllCb = srcPanel.querySelector('.pdx-transfer-select-all') as HTMLInputElement;
+  if (isDraggable) {
+    sourceListEl.addEventListener('dragover', (e) => onDragOver(e, 'source'));
+    sourceListEl.addEventListener('drop', (e) => onDrop(e, 'source'));
+  }
+  frameEl.appendChild(srcPanel);
+
+  // Action buttons (hide in direct mode)
+  if (modeNow !== 'direct') {
+    const actions = document.createElement('div');
+    actions.className = 'pdx-transfer-actions';
+    if (showAll) {
+      moveAllRightBtn = makeBtn('»', getComponentString('transfer', 'moveAllRight')());
+      moveAllRightBtn.addEventListener('click', moveAllRight);
+      actions.appendChild(moveAllRightBtn);
+    }
+    moveRightBtn = makeBtn('›', getComponentString('transfer', 'moveRight')());
+    moveRightBtn.addEventListener('click', moveRight);
+    actions.appendChild(moveRightBtn);
+    moveLeftBtn = makeBtn('‹', getComponentString('transfer', 'moveLeft')());
+    moveLeftBtn.addEventListener('click', moveLeft);
+    actions.appendChild(moveLeftBtn);
+    if (showAll) {
+      moveAllLeftBtn = makeBtn('«', getComponentString('transfer', 'moveAllLeft')());
+      moveAllLeftBtn.addEventListener('click', moveAllLeft);
+      actions.appendChild(moveAllLeftBtn);
+    }
+    frameEl.appendChild(actions);
+  }
+
+  // Target panel
+  const tgtPanel = buildPanel('target', tgtTitle, isSearchable, modeNow, panelHandlers);
+  targetListEl = tgtPanel.querySelector('.pdx-transfer-list')!;
+  targetCountEl = tgtPanel.querySelector('.pdx-transfer-count')!;
+  targetAllCb = tgtPanel.querySelector('.pdx-transfer-select-all') as HTMLInputElement;
+  if (isDraggable) {
+    targetListEl.addEventListener('dragover', (e) => onDragOver(e, 'target'));
+    targetListEl.addEventListener('drop', (e) => onDrop(e, 'target'));
+  }
+  frameEl.appendChild(tgtPanel);
+
+  el.appendChild(frameEl);
+  domReady = true;
+});
+
+// The search fields are native text fields of the transfer's size (#748): `.pdx-input`, and the
+// native size class away from md, which the text fields' own `@variant` rule draws.
+$effect(() => {
+  const sizeNow = size as string;
+  if (!domReady) return;
+  const cls = sizeNow && sizeNow !== 'md' ? `pdx-input pdx-input-${sizeNow}` : 'pdx-input';
+  for (const field of el.querySelectorAll<HTMLInputElement>(':scope > [data-part="root"] [data-part="search"]')) field.className = cls;
+});
+
+// ── Reactive update ──
+$effect(() => {
+  if (!domReady) return;
+  const src = sourceItems();
+  const tgt = targetItems();
+  const srcChecked = sourceChecked as Set<string>;
+  const tgtChecked = targetChecked as Set<string>;
+  const modeNow = getMode();
+  const isDraggable = draggable as boolean;
+
+  renderList(sourceListEl!, src, srcChecked, 'source', modeNow, isDraggable, listContext);
+  renderList(targetListEl!, tgt, tgtChecked, 'target', modeNow, isDraggable, listContext);
+
+  const allItems = getAllItems();
+  const targetVals = getTargetValues();
+  const allSrcCount = allItems.filter(i => !targetVals.has(i.value)).length;
+  const allTgtCount = allItems.filter(i => targetVals.has(i.value)).length;
+  if (sourceCountEl) sourceCountEl.textContent = `${srcChecked.size}/${allSrcCount}`;
+  if (targetCountEl) targetCountEl.textContent = `${tgtChecked.size}/${allTgtCount}`;
+
+  if (sourceAllCb) {
+    const enabled = src.filter(i => !i.disabled);
+    sourceAllCb.checked = enabled.length > 0 && enabled.every(i => srcChecked.has(i.value));
+    sourceAllCb.indeterminate = !sourceAllCb.checked && enabled.some(i => srcChecked.has(i.value));
+  }
+  if (targetAllCb) {
+    const enabled = tgt.filter(i => !i.disabled);
+    targetAllCb.checked = enabled.length > 0 && enabled.every(i => tgtChecked.has(i.value));
+    targetAllCb.indeterminate = !targetAllCb.checked && enabled.some(i => tgtChecked.has(i.value));
+  }
+
+  if (moveRightBtn) moveRightBtn.disabled = srcChecked.size === 0;
+  if (moveLeftBtn) moveLeftBtn.disabled = tgtChecked.size === 0;
+  if (moveAllRightBtn) moveAllRightBtn.disabled = allSrcCount === 0;
+  if (moveAllLeftBtn) moveAllLeftBtn.disabled = allTgtCount === 0;
+});
+
+function clear() {
+  localOverrides.clear();
+  overridesVersion = overridesVersion.peek() + 1;
+  internalValue = [];
+  value = [];
+  pdxClear();
+}
+/** In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []. */
+function getChanges(): Record<string, unknown>[] { return lastChanges; }
+/** The last move's direction, 'right' (to the target) or 'left'; null before any move. */
+function getDirection(): 'right' | 'left' | null { return lastDirection; }
+</script>
