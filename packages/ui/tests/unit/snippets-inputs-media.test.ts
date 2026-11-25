@@ -13,7 +13,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/carousel/pdx-carousel';
 import '../../src/field-list/pdx-field-list.pdx';
 import '../../src/file-upload/pdx-file-upload.pdx';
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
 
 type Scope = Record<string, unknown>;

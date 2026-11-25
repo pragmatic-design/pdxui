@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 
 describe('pdx-mention', () => {
     beforeEach(cleanup);

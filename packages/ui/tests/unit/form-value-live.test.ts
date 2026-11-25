@@ -13,7 +13,7 @@ import '../../src/radio/pdx-radio.pdx';
 import '../../src/number-input/pdx-number-input.pdx';
 import '../../src/slider/pdx-slider.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 
 // ── Polyfill ElementInternals.setFormValue capture ──────────────────────────
 if (!(HTMLElement.prototype as unknown as { attachInternals?: unknown }).attachInternals) {

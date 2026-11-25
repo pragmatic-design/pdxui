@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/mention/pdx-mention';
+import '../../src/mention/pdx-mention.pdx';
 
 const ITEMS = [
     { value: 'alice', label: 'Alice Johnson' },

@@ -1,0 +1,403 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxMention",
+  "tagName": "pdx-mention",
+  "category": "Specialized Inputs",
+  "order": 40,
+  "description": "A textarea where typing a trigger such as @ opens floating suggestions, to insert a mention.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "trigger",
+      "description": "Trigger character(s) — comma-separated for multiple (default: '@')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'@'",
+      "attribute": "trigger"
+    },
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "Static suggestions array",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource or raw array for remote search",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "Field for display label",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "valueField",
+      "description": "Field for value/id",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'",
+      "attribute": "valuefield"
+    },
+    {
+      "kind": "field",
+      "name": "descriptionField",
+      "description": "Field for description (optional)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "descriptionfield"
+    },
+    {
+      "kind": "field",
+      "name": "minLength",
+      "description": "Minimum chars after trigger before searching (default: 0)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "minlength"
+    },
+    {
+      "kind": "field",
+      "name": "debounce",
+      "description": "Debounce delay in ms for remote search (default: 300)",
+      "type": {
+        "text": "number"
+      },
+      "default": "300",
+      "attribute": "debounce"
+    },
+    {
+      "kind": "field",
+      "name": "maxItems",
+      "description": "Max suggestions to show",
+      "type": {
+        "text": "number"
+      },
+      "default": "10",
+      "attribute": "maxitems"
+    },
+    {
+      "kind": "field",
+      "name": "rows",
+      "description": "Textarea rows",
+      "type": {
+        "text": "number"
+      },
+      "default": "3",
+      "attribute": "rows"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The field's accessible name (aria-label on the textarea). A field needs one: give `label`,\nor put a visible label next to it. Without either, the placeholder stands in.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Readonly",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "getMentionMarkup",
+      "parameters": [],
+      "description": "The text with each mention as `@[Label](id)`: the form to persist."
+    },
+    {
+      "kind": "method",
+      "name": "getMentions",
+      "parameters": [],
+      "description": "The mentions in the text: `{ value, label, trigger }` each."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.value",
+    "mentions": "$event.currentTarget.getMentions()",
+    "markup": "$event.currentTarget.getMentionMarkup()"
+  },
+  "alphaCommit": "pdx-change",
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A suggestion was picked and inserted, after its `value-change`.",
+      "detail": "{ item: MentionItem; trigger: string; query: string }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "listbox",
+    "option",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "trigger",
+      "fieldName": "trigger",
+      "description": "Trigger character(s) — comma-separated for multiple (default: '@')",
+      "type": {
+        "text": "string"
+      },
+      "default": "'@'"
+    },
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "Field for display label",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "valuefield",
+      "fieldName": "valueField",
+      "description": "Field for value/id",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'"
+    },
+    {
+      "name": "descriptionfield",
+      "fieldName": "descriptionField",
+      "description": "Field for description (optional)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "minlength",
+      "fieldName": "minLength",
+      "description": "Minimum chars after trigger before searching (default: 0)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "debounce",
+      "fieldName": "debounce",
+      "description": "Debounce delay in ms for remote search (default: 300)",
+      "type": {
+        "text": "number"
+      },
+      "default": "300"
+    },
+    {
+      "name": "maxitems",
+      "fieldName": "maxItems",
+      "description": "Max suggestions to show",
+      "type": {
+        "text": "number"
+      },
+      "default": "10"
+    },
+    {
+      "name": "rows",
+      "fieldName": "rows",
+      "description": "Textarea rows",
+      "type": {
+        "text": "number"
+      },
+      "default": "3"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The field's accessible name (aria-label on the textarea). A field needs one: give `label`,\nor put a visible label next to it. Without either, the placeholder stands in.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Readonly",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "MentionItem",
+      "fields": [
+        "value: string",
+        "label: string",
+        "description?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "suggestion",
+      "description": "Renders one suggestion: a snippet `suggestion(item, index, active)`.",
+      "signature": "(item: { value: string; label: string; description?: string }, index: number, active: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame around the textarea and its highlight layer."
+    },
+    {
+      "name": "input",
+      "description": "The native `<textarea>` the text is typed into."
+    },
+    {
+      "name": "list",
+      "description": "The floating suggestion list, `role=\"listbox\"`."
+    },
+    {
+      "name": "option",
+      "description": "One suggestion, `role=\"option\"`; the active one is `aria-selected=\"true\"`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "disabled",
+      "description": "`disabled` is set; the textarea is disabled."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set; the textarea is read-only."
+    }
+  ]
+}

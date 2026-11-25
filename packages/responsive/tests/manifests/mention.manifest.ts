@@ -1,12 +1,12 @@
 /**
  * MANIFEST — pdx-mention (tier 2, textarea with @-mention trigger + floating suggestions)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/mention/pdx-mention.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/mention/pdx-mention.pdx)
  * and the CSS (packages/design/src/components/mention.css). Verified: the export in
  * packages/ui/package.json ("./mention", line 214) and the import in packages/ui/src/index.ts
  * (line 53). Registration OK.
  *
- * ── DOM structure (light DOM, BUILT in a requestAnimationFrame, pdx-mention.ts:361) ──
+ * ── DOM structure (light DOM, BUILT in a requestAnimationFrame, buildMentionFrame in mention-dom.ts) ──
  *   <pdx-mention>                                  ← host, display:block, position:relative (mention.css:3)
  *     <div class="pdx-mention-wrap">               ← wrap, position:relative, display:block (mention.css:8)
  *       <div class="pdx-mention-mirror">           ← a mirror behind the textarea: it highlights the mentions,
