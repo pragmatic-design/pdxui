@@ -121,7 +121,7 @@ function refresh(): void {
 function showEmpty(show: boolean): void {
   if (!emptyEl) return;
   emptyEl.style.display = show ? '' : 'none';
-  if (show && emptyEl.querySelector('pdx-icon') && !customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (show && emptyEl.querySelector('pdx-icon') && !customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 /**

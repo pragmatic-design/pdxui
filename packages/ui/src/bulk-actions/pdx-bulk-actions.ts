@@ -6,7 +6,7 @@ import { component, html, generatedId, event, prop } from '@pdxui/core';
 
 /** An action's icon, loading `pdx-icon` the first time one is named: a bar of labels never pays for the set. */
 function actionIcon(name: string) {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
     return html`<pdx-icon name="${name}" size="15"></pdx-icon>`;
 }
 import { uiString, format } from '../shared/i18n';

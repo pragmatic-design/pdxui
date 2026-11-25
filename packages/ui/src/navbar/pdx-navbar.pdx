@@ -70,7 +70,7 @@ const menuId = `${generatedId('pdx-navbar')}-menu`;
 
 /** `pdx-icon` the first time the brand or an item names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 function setMobile(open: boolean): void {

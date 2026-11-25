@@ -8,7 +8,7 @@ import type { Dispose, SlotFunction } from '@pdxui/core';
 
 /** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
 function commandIcon(name: string) {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
     return html`<span class="pdx-command-item-icon"><pdx-icon name="${name}" size="15"></pdx-icon></span>`;
 }
 import { uiString, format } from '../shared/i18n';

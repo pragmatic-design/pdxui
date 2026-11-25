@@ -5,7 +5,7 @@
 // The barrel is every component, for a page with no compiler: it puts the whole «pragmatic» icon set on
 // the page first, so no icon loads on demand. pdx-icon alone registers only the set's resolver (#47).
 import './icon/pragmatic-all';
-import './icon/pdx-icon';
+import './icon/pdx-icon.pdx';
 import './button/pdx-button.pdx';
 import './button-group/pdx-button-group.pdx';
 import './progress/pdx-progress.pdx';

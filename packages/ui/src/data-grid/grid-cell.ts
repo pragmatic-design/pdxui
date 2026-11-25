@@ -11,7 +11,7 @@ import iconMoreHorizontal from '../icon/pragmatic/more-horizontal';
 
 /** `pdx-icon` the first time a cell action names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 // One-time notice per column when `format` returns markup, which is shown as text (#292).

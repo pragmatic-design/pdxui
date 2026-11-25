@@ -310,7 +310,7 @@ test('and the components that chunk imports, which is the same wave', () => {
     // `pdx-icon` is the opposite claim: the dashboard's `pdx-list` draws one icon, its empty
     // state's, and imported statically the whole set would be 16.3 KB of a first paint whose list
     // has rows. It is loaded when an icon is drawn, so it is NOT preloaded.
-    expect(modules.some((source) => source.endsWith('ui/src/icon/pdx-icon.ts')),
+    expect(modules.some((source) => source.endsWith('ui/src/icon/pdx-icon.pdx')),
         'the icon set is preloaded again: something on the landing route imports pdx-icon statically').toBe(false);
     // `pdx-spinner` the same (#963): `pdx-list` draws it only while it loads. Imported statically, it
     // and the stylesheet it draws from since #821 were in the first wave, and the route waited for

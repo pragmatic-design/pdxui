@@ -19,7 +19,7 @@ import { goToScenario, openPage } from './contracts/measure';
  * measured"* — which is the sentence a probe should say when it has stopped probing. `tier-1a`
  * holds the `icon-sizes` scenario, so this is its icon.
  */
-const UI_ENTRY = '**/ui/src/icon/pdx-icon.ts*';
+const UI_ENTRY = '**/ui/src/icon/pdx-icon.pdx*';
 /**
  * What `touch-targets.html?c=input` loads for its case. The hand-written pages import no barrel
  * either. pdx-input is a .pdx since #1210, served under its own name.
@@ -43,7 +43,7 @@ test('a module the server answers with an error status is named in the timeout',
     const err = await goToScenario(page, 'icon-sizes', 'neutral', { page: 'tier-1a', readyTimeout: 3000 })
         .then(() => null, (e: Error) => e);
     expect(err).not.toBeNull();
-    expect(err!.message).toMatch(/HTTP 504 .*pdx-icon\.ts/);
+    expect(err!.message).toMatch(/HTTP 504 .*pdx-icon\.pdx/);
 });
 
 // The specs that open their own pages (gotchas, touch targets, behavior) wait through `openPage`, and

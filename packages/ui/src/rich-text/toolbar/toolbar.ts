@@ -10,7 +10,7 @@ import { openGridMenu } from '../../data-grid/grid-menu';
 // Every button is a <pdx-icon>, so the toolbar registers it: nothing else in the editor did, and on a
 // page where the editor drew the only icons every button stayed empty. With it, the icons of the
 // buttons below, which are on screen with the editor (#47).
-import '../../icon/pdx-icon';
+import '../../icon/pdx-icon.pdx';
 import { defineIcons } from '../../icon/icon-map';
 import iconBold from '../../icon/pragmatic/bold';
 import iconItalic from '../../icon/pragmatic/italic';

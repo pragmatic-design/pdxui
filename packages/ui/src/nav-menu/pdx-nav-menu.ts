@@ -335,7 +335,7 @@ component('pdx-nav-menu', {
                         } else {
                             // An icon NAME: `pdx-icon` is loaded the first time one is met, so a
                             // menu of SVG icons never pays for the icon set.
-                            if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+                            if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
                             const icon = document.createElement('pdx-icon');
                             icon.className = 'pdx-nav-icon';
                             icon.setAttribute('name', item.icon);

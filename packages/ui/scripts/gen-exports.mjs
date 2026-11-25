@@ -79,15 +79,21 @@ export function computeExports(currentExports, manifestModules, exists = () => t
     let rewritten = 0;
     const out = {};
     const removed = [];
+    const manifestPaths = new Set(manifestModules.filter((m) => m?.path).map((m) => normalizeModulePath(m.path)));
     for (const [key, value] of Object.entries(currentExports)) {
         if (key === './package.json') continue; // re-added last, so it stays at the end
         if (key === '.' || key === './all') { out[key] = BARREL; rewritten++; continue; }
         // Find a ./src/*.ts or ./src/*.pdx target in the current entry (string or any condition value).
         const targets = typeof value === 'string' ? [value] : Object.values(value);
-        const src = targets.find((t) => typeof t === 'string' && /^\.\/src\/.*\.(ts|pdx)$/.test(t));
+        let src = targets.find((t) => typeof t === 'string' && /^\.\/src\/.*\.(ts|pdx)$/.test(t));
+        // A component moved from .ts to .pdx keeps its subpath (#1210): `./icon/pdx-icon` is not its
+        // tag's name, and dropped and added again from the tag it became `./icon`, which nothing imports.
+        // Moved means its .pdx is there and is a component of the manifest.
+        const moved = src && src.endsWith('.ts') && !src.includes('*') && !exists(src) ? src.replace(/\.ts$/, '.pdx') : null;
+        if (moved && exists(moved) && manifestPaths.has(normalizeModulePath(moved))) src = moved;
         // A source that is gone was removed with its component: the export would resolve to nothing.
         // The icon pattern is a pattern, not a file, and is re-added below.
-        if (src && !src.includes('*') && !exists(src)) { removed.push(`${key} ← ${src}`); continue; }
+        else if (src && !src.includes('*') && !exists(src)) { removed.push(`${key} ← ${src}`); continue; }
         if (src) { out[key] = distConditions(src); rewritten++; }
         else out[key] = value; // ./manifest and any already-dist entry pass through
     }

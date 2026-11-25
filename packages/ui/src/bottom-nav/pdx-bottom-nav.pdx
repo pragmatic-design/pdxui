@@ -20,7 +20,7 @@ import type { BottomNavItem } from './bottom-nav-types';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/bottom-nav';
-import '../icon/pdx-icon'; // rendered by this component, and registered by nobody else
+import '../icon/pdx-icon.pdx'; // rendered by this component, and registered by nobody else
 
 // `activeKey` is the app's to write, never the bar's: a prop, not a model (#289).
 /** An item was chosen: its `key` and its item. */

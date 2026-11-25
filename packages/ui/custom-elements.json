@@ -15809,7 +15809,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/icon/pdx-icon.ts",
+      "path": "src/icon/pdx-icon.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -16026,7 +16026,7 @@
           "name": "pdx-icon",
           "declaration": {
             "name": "PdxIcon",
-            "module": "src/icon/pdx-icon.ts"
+            "module": "src/icon/pdx-icon.pdx"
           }
         }
       ]

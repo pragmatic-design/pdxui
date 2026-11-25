@@ -56,7 +56,7 @@ import { onNextFrame, onDestroy } from '@pdxui/core';
 // The search glyph is a <pdx-icon> in this component's own template, so it is registered
 // here: on a page that does not import the whole library the tag would never upgrade and the
 // prefix would measure 0x0.
-import '../icon/pdx-icon';
+import '../icon/pdx-icon.pdx';
 import './search-input-icons';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';

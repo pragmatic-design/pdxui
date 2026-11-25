@@ -15,7 +15,7 @@ import { onPressOutside } from '../shared/press-outside';
 import '@pdxui/design/components/menu';
 /** `pdx-icon` the first time an item names an icon: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 
 /**

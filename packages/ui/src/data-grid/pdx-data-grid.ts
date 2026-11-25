@@ -42,7 +42,7 @@ import iconInbox from '../icon/pragmatic/inbox';
 import '../button/pdx-button.pdx';
 /** `pdx-icon` the first time the empty state shows: a use that draws none never pays for the icon set. */
 function loadIcon(): void {
-    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
+    if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
 }
 // The editors, the filter controls and the edit dialog are created only when someone edits or
 // filters: they load then (shared/lazy-tags.ts), or when the browser is idle in a grid that can.

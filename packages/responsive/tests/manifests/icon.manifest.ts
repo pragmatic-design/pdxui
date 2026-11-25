@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-icon
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/icon/pdx-icon.ts).
+ * Contracts DERIVED by inspecting the source (packages/ui/src/icon/pdx-icon.pdx).
  *
  * DOM STRUCTURE (light DOM, no shadow):
  *   <pdx-icon> (host) > <span data-part="root" class="pdx-icon-container"> > <svg>

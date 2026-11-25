@@ -1,0 +1,118 @@
+<template>
+  <span :ref="containerEl" class="pdx-icon-container" data-part="root"></span>
+</template>
+
+<script>
+/**
+ * An icon drawn as SVG from a registered set, inline markup or a URL, with accessibility built in.
+ *
+ * @csspart root - The box the SVG fills, `--pdx-icon-size` square.
+ * @cssstate spin - `spin` is set: the icon turns.
+ * @cssstate mirror - `rtl="mirror"`: in a right-to-left context the icon is drawn flipped.
+ */
+// pdx-icon — agnostic icon component with theme-reactive weight,
+// optical size compensation, RTL mirroring, and accessibility.
+// Renders SVG from registered icon sets, inline SVG, or URL.
+//
+// The pragmatic set's resolver is registered by icon-setup.ts, imported first, so before the define;
+// how an icon is sized, warned about and given its attributes is icon-draw.ts, beside it.
+import './icon-setup';
+import { resolveIcon } from '@pdxui/core';
+import { sanitizeSVG } from '../shared/sanitize';
+import { applySvgAttrs, iconSizePx, warnUnknown } from './icon-draw';
+// Its styles travel with it: the root's layout and size, the spin and the mirror (#291).
+import '@pdxui/design/components/icon';
+
+// How an imported icon reaches the page: `import check from '@pdxui/ui/icons/check'` is the SVG, and
+// this adds it. The compiler emits the pair for every icon a template names (#47).
+export { defineIcons } from './icon-map';
+
+// icon.css draws the root at its size, turns it and mirrors it from the states.
+@state spin = !!spin;
+@state mirror = rtl === 'mirror';
+@part root;
+@prop name: string = '';
+@prop set: string = '';
+@prop svg: string = '';
+@prop src: string = '';
+@prop size: string = 'md';
+@prop label: string = '';
+/** Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'. */
+@prop weight: '' | 'thin' | 'light' | 'regular' | 'bold' = '';
+/** RTL behavior: 'mirror' flips in RTL context, 'none' keeps as-is. Default: 'none'. */
+@prop rtl: 'none' | 'mirror' = 'none';
+/** Spin animation for loading indicators. */
+@prop spin: boolean = false;
+
+let containerEl = $signal<HTMLElement | null>(null);
+// Which run of the effect drew last. An icon that arrives after the name changed — loaded on
+// demand, or fetched — belongs to a run that is no longer the current one and draws nothing.
+let drawRun = 0;
+
+$effect(() => {
+  const run = ++drawRun;
+  const el = containerEl as HTMLElement | null;
+  if (!el) return;
+
+  const svgProp = svg as string;
+  const srcProp = src as string;
+  const nameProp = name as string;
+  const setProp = set as string;
+  const sizePx = iconSizePx((size as string) || 'md');
+  const labelVal = label as string;
+  const weightVal = weight as string;
+
+  el.style.setProperty('--pdx-icon-size', `${sizePx}px`);
+
+  // ARIA
+  if (labelVal) {
+    el.setAttribute('role', 'img');
+    el.setAttribute('aria-label', labelVal);
+    el.removeAttribute('aria-hidden');
+  } else {
+    el.removeAttribute('role');
+    el.removeAttribute('aria-label');
+    el.setAttribute('aria-hidden', 'true');
+  }
+
+  // Resolve SVG source
+  if (svgProp) {
+    el.innerHTML = sanitizeSVG(svgProp);
+    applySvgAttrs(el, sizePx, weightVal);
+    return;
+  }
+
+  if (srcProp) {
+    fetch(srcProp)
+      .then(r => r.text())
+      .then(text => {
+        if (run !== drawRun) return;
+        el.innerHTML = sanitizeSVG(text);
+        applySvgAttrs(el, sizePx, weightVal);
+      })
+      .catch(() => { if (run === drawRun) el.innerHTML = ''; });
+    return;
+  }
+
+  if (nameProp) {
+    resolveIcon(nameProp, setProp || undefined).then(result => {
+      if (run !== drawRun) return;
+      if (!result) {
+        el.innerHTML = '';
+        warnUnknown(nameProp, setProp);
+        return;
+      }
+      if (typeof result === 'string') {
+        el.innerHTML = sanitizeSVG(result);
+      } else {
+        el.innerHTML = '';
+        el.appendChild(result.cloneNode(true));
+      }
+      applySvgAttrs(el, sizePx, weightVal);
+    });
+    return;
+  }
+
+  el.innerHTML = '';
+});
+</script>
