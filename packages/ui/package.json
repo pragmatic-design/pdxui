@@ -205,7 +205,7 @@
       "import": "./dist/bulk-actions/pdx-bulk-actions.js"
     },
     "./edit-drawer": {
-      "development": "./src/edit-drawer/pdx-edit-drawer.ts",
+      "development": "./src/edit-drawer/pdx-edit-drawer.pdx",
       "types": "./dist/edit-drawer/pdx-edit-drawer.d.ts",
       "import": "./dist/edit-drawer/pdx-edit-drawer.js"
     },

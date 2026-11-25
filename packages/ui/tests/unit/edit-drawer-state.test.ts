@@ -7,7 +7,7 @@
 // tell a keyboard or screen-reader user nothing about where the error is.
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { FormSchema } from '@pdxui/core';
-import '../../src/edit-drawer/pdx-edit-drawer';
+import '../../src/edit-drawer/pdx-edit-drawer.pdx';
 import { tick, cleanup } from './helpers';
 
 const SCHEMA: FormSchema = {

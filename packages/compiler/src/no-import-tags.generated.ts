@@ -42,7 +42,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-divider',
     'pdx-drawer',
     'pdx-dropdown-menu',
-    'pdx-edit-drawer',
     'pdx-empty-state',
     'pdx-fab',
     'pdx-field-group',

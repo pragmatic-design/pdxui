@@ -1,0 +1,225 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxEditDrawer",
+  "tagName": "pdx-edit-drawer",
+  "category": "Data-bound",
+  "order": 110,
+  "description": "A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits\n`pdx-save` with the values.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Open state (controlled).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "field",
+      "name": "schema",
+      "description": "FormSchema describing the entity fields.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Entity to edit, or null to create a new one.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "title",
+      "description": "Drawer title; defaults to \"Edit\"/\"New\" by mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "position",
+      "type": {
+        "text": "'left' | 'right'"
+      },
+      "default": "'right'",
+      "attribute": "position"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "Forwarded to pdx-drawer — named preset (sm/md/lg) or a custom CSS width.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "saveLabel",
+      "description": "Label of the save button. Empty: the edit-drawer.save component string, «Save».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "savelabel"
+    },
+    {
+      "kind": "field",
+      "name": "cancelLabel",
+      "description": "Label of the cancel button. Empty: the edit-drawer.cancel component string, «Cancel».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "cancellabel"
+    },
+    {
+      "kind": "field",
+      "name": "busy",
+      "description": "Disable the footer buttons while the parent is persisting.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "busy"
+    },
+    {
+      "kind": "method",
+      "name": "getValues",
+      "parameters": [],
+      "description": "The form values now, `{}` while the form is not built."
+    },
+    {
+      "kind": "method",
+      "name": "validate",
+      "parameters": [],
+      "description": "Runs validation and returns the result."
+    },
+    {
+      "kind": "method",
+      "name": "isDirty",
+      "parameters": [],
+      "description": "Whether anything in the form was changed since it opened.\n\nA drawer is not a modal — Escape and the ✕ close it, and both are easy to hit by\naccident — so a host has to ask before discarding, and only when there is something to\ndiscard. The host cannot work this out for itself: the panel is re-parented to\n<body>, so a query under the host finds no form, and comparing `getValues()` with the\nrecord races the keystroke that has not reached the form model yet. The form carries\nthis itself."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-save",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Save, with a valid form: the values, and whether the drawer was editing or creating.",
+      "detail": "{ values: Record<string, unknown>; mode: 'edit' | 'create' }"
+    },
+    {
+      "name": "pdx-cancel",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Cancel, Escape, the ✕, the backdrop: the host decides, and closes by setting `open`."
+    }
+  ],
+  "attributes": [
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Open state (controlled).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "title",
+      "fieldName": "title",
+      "description": "Drawer title; defaults to \"Edit\"/\"New\" by mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "position",
+      "fieldName": "position",
+      "type": {
+        "text": "'left' | 'right'"
+      },
+      "default": "'right'"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "Forwarded to pdx-drawer — named preset (sm/md/lg) or a custom CSS width.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "savelabel",
+      "fieldName": "saveLabel",
+      "description": "Label of the save button. Empty: the edit-drawer.save component string, «Save».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "cancellabel",
+      "fieldName": "cancelLabel",
+      "description": "Label of the cancel button. Empty: the edit-drawer.cancel component string, «Cancel».",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "busy",
+      "fieldName": "busy",
+      "description": "Disable the footer buttons while the parent is persisting.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "header",
+      "description": "The title above the form."
+    },
+    {
+      "name": "body",
+      "description": "The form, built from `schema`."
+    },
+    {
+      "name": "actions",
+      "description": "The footer row of Cancel and Save."
+    },
+    {
+      "name": "cancel",
+      "description": "The Cancel button."
+    },
+    {
+      "name": "save",
+      "description": "The Save button."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "busy",
+      "description": "`busy`: the parent is saving, and the footer buttons are disabled."
+    }
+  ]
+}

@@ -63,7 +63,7 @@ import type { PendingDelete, Row } from './entity-grid-rows';
 // (e.g. @pdxui/ui/entity-grid), not only via the @pdxui/ui barrel.
 import '../data-grid/pdx-data-grid';
 import '../bulk-actions/pdx-bulk-actions';
-import '../edit-drawer/pdx-edit-drawer';
+import '../edit-drawer/pdx-edit-drawer.pdx';
 import '../alert-dialog/pdx-alert-dialog';
 import '../icon/pdx-icon.pdx';
 // The icons it draws whatever its data, on the page with it rather than loaded a frame late (#47).

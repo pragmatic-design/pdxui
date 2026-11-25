@@ -18,7 +18,7 @@ import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/alert-dialog/pdx-alert-dialog';
 import '../../src/auto-form/pdx-auto-form.pdx';
-import '../../src/edit-drawer/pdx-edit-drawer';
+import '../../src/edit-drawer/pdx-edit-drawer.pdx';
 import '../../src/entity-grid/pdx-entity-grid.pdx';
 import '../../src/relation-picker/pdx-relation-picker.pdx';
 import '../../src/select/pdx-select';

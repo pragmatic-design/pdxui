@@ -12090,7 +12090,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/edit-drawer/pdx-edit-drawer.ts",
+      "path": "src/edit-drawer/pdx-edit-drawer.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -12324,7 +12324,7 @@
           "name": "pdx-edit-drawer",
           "declaration": {
             "name": "PdxEditDrawer",
-            "module": "src/edit-drawer/pdx-edit-drawer.ts"
+            "module": "src/edit-drawer/pdx-edit-drawer.pdx"
           }
         }
       ]
