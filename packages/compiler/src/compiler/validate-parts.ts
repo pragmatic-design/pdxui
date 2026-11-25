@@ -3,7 +3,8 @@
 // (#988), as the platform's `part` attribute is: when the template can render at most one of them at
 // a time, the script's name is that element; otherwise it is the array of the rendered ones.
 
-import type { TemplateNode } from '../parser/template';
+import { parseTemplate, type TemplateNode } from '../parser/template';
+import type { ScriptSnippet } from './script-analyzer-types';
 import type { ValidationWarning } from './validate';
 import { openingTagTexts } from '../text-scan';
 
@@ -96,6 +97,27 @@ function sequenceCounts(nodes: readonly TemplateNode[]): Counts {
  */
 export function dataPartCounts(ast: readonly TemplateNode[]): Map<string, number> {
     return sequenceCounts(ast);
+}
+
+/**
+ * The template and the script's `@snippet` bodies (#1412): a script snippet is a template the
+ * component renders with `@render`, so its elements' parts are the component's. Each body is a
+ * `snippet` node, rendered any number of times, as a template `@snippet` counts. A body that does not
+ * parse yet — the editor validates a file as it is typed, and the compile reports the parse error
+ * itself — is read as markup text, as the counts read any html node.
+ */
+export function withScriptSnippets(ast: readonly TemplateNode[], snippets: readonly ScriptSnippet[]): TemplateNode[] {
+    const out = [...ast];
+    for (const s of snippets) {
+        let body: TemplateNode[];
+        try {
+            body = parseTemplate(s.body);
+        } catch {
+            body = [{ type: 'html', content: s.body }];
+        }
+        out.push({ type: 'snippet', name: s.name, params: s.params, body });
+    }
+    return out;
 }
 
 /** The declared parts whose script name is an array: those the template can render more than once. */
