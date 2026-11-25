@@ -5318,7 +5318,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/carousel/pdx-carousel.ts",
+      "path": "src/carousel/pdx-carousel.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -5715,7 +5715,7 @@
           "name": "pdx-carousel",
           "declaration": {
             "name": "PdxCarousel",
-            "module": "src/carousel/pdx-carousel.ts"
+            "module": "src/carousel/pdx-carousel.pdx"
           }
         }
       ]

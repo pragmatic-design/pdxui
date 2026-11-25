@@ -1,0 +1,388 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxCarousel",
+  "tagName": "pdx-carousel",
+  "category": "Data Display",
+  "order": 88,
+  "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "The data items to render.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "renderSlide",
+      "description": "Render function for each slide.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "autoplay",
+      "description": "Advances slides automatically.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "autoplay"
+    },
+    {
+      "kind": "field",
+      "name": "interval",
+      "description": "Autoplay interval in milliseconds.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5000",
+      "attribute": "interval"
+    },
+    {
+      "kind": "field",
+      "name": "loop",
+      "description": "Wraps around from the last slide to the first.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "loop"
+    },
+    {
+      "kind": "field",
+      "name": "showArrows",
+      "description": "Shows previous/next arrows.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showarrows"
+    },
+    {
+      "kind": "field",
+      "name": "showDots",
+      "description": "Shows the slide-position dots.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showdots"
+    },
+    {
+      "kind": "field",
+      "name": "slidesPerView",
+      "description": "How many slides are visible at once.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "slidesperview"
+    },
+    {
+      "kind": "field",
+      "name": "gap",
+      "description": "Gap between slides in px.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "gap"
+    },
+    {
+      "kind": "field",
+      "name": "swipeable",
+      "description": "Enables touch/drag swiping.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "swipeable"
+    },
+    {
+      "kind": "field",
+      "name": "pauseOnHover",
+      "description": "Pauses autoplay while hovered.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "pauseonhover"
+    },
+    {
+      "kind": "field",
+      "name": "animation",
+      "description": "Transition style between slides.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'slide'",
+      "attribute": "animation"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The region's accessible name. Empty: the component string `carousel.label` (\"Carousel\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "index",
+      "description": "The slide on show, 0-based.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "index"
+    },
+    {
+      "kind": "method",
+      "name": "next",
+      "parameters": [],
+      "description": "Advances to the next item."
+    },
+    {
+      "kind": "method",
+      "name": "prev",
+      "parameters": [],
+      "description": "Goes to the previous item."
+    },
+    {
+      "kind": "method",
+      "name": "goTo",
+      "parameters": [
+        {
+          "name": "index",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Go to a slide by index — wrapped around when `loop` is set, clamped otherwise. Ignored while a transition is running."
+    },
+    {
+      "kind": "method",
+      "name": "play",
+      "parameters": [],
+      "description": "Start autoplay. Does nothing when `interval` is 0 or less."
+    },
+    {
+      "kind": "method",
+      "name": "pause",
+      "parameters": [],
+      "description": "Stop autoplay, leaving the slide where it is."
+    }
+  ],
+  "models": [
+    "index"
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "index": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pdx-autoplay-start",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Autoplay started: on mount with `autoplay`, from `play()`, the rotation control, or the pointer leaving."
+    },
+    {
+      "name": "pdx-autoplay-stop",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Autoplay stopped: from `pause()`, the rotation control, keyboard focus moving in, or the pointer over it."
+    },
+    {
+      "name": "index-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `index`. Does not bubble.",
+      "detail": "{ value: number }"
+    }
+  ],
+  "roles": [
+    "group",
+    "region",
+    "tab",
+    "tablist"
+  ],
+  "attributes": [
+    {
+      "name": "autoplay",
+      "fieldName": "autoplay",
+      "description": "Advances slides automatically.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "interval",
+      "fieldName": "interval",
+      "description": "Autoplay interval in milliseconds.",
+      "type": {
+        "text": "number"
+      },
+      "default": "5000"
+    },
+    {
+      "name": "loop",
+      "fieldName": "loop",
+      "description": "Wraps around from the last slide to the first.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showarrows",
+      "fieldName": "showArrows",
+      "description": "Shows previous/next arrows.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showdots",
+      "fieldName": "showDots",
+      "description": "Shows the slide-position dots.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "slidesperview",
+      "fieldName": "slidesPerView",
+      "description": "How many slides are visible at once.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "gap",
+      "fieldName": "gap",
+      "description": "Gap between slides in px.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "swipeable",
+      "fieldName": "swipeable",
+      "description": "Enables touch/drag swiping.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "pauseonhover",
+      "fieldName": "pauseOnHover",
+      "description": "Pauses autoplay while hovered.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "animation",
+      "fieldName": "animation",
+      "description": "Transition style between slides.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'slide'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The region's accessible name. Empty: the component string `carousel.label` (\"Carousel\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "index",
+      "fieldName": "index",
+      "description": "The slide on show, 0-based.",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "CarouselItem",
+      "fields": [
+        "src?: string",
+        "alt?: string",
+        "content?: string",
+        "caption?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "slide",
+      "description": "Renders one slide: a snippet `slide(slide, index, active)`.",
+      "signature": "(slide: T, index: number, active: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The carousel region (`role=\"region\"`), which clips the slides and takes the focus."
+    },
+    {
+      "name": "track",
+      "description": "The strip the slides sit in, moved to bring a slide on show."
+    },
+    {
+      "name": "slide",
+      "description": "A slide; the one on show is `aria-current=\"true\"`."
+    },
+    {
+      "name": "control",
+      "description": "A button over the slides: the previous and next arrows, the rotation stop/start."
+    },
+    {
+      "name": "dots",
+      "description": "The tablist of dots under the slides."
+    },
+    {
+      "name": "dot",
+      "description": "A dot; the one of the slide on show is `aria-selected=\"true\"`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "fade",
+      "description": "`animation=\"fade\"`: the slides cross-fade in place instead of sliding."
+    }
+  ]
+}

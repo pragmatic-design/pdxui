@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS:
  *
- *   - Source: packages/ui/src/carousel/pdx-carousel.ts
+ *   - Source: packages/ui/src/carousel/pdx-carousel.pdx
  *       · the custom element <pdx-carousel> has render() = html`` (empty): in an rAF (the track, lines 418-422)
  *         it creates an inner <div class="pdx-carousel-root"> inside the host and calls buildCarousel().
  *       · buildCarousel() (line 255) builds:

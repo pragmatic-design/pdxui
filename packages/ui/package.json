@@ -185,7 +185,7 @@
       "import": "./dist/affix/pdx-affix.js"
     },
     "./carousel": {
-      "development": "./src/carousel/pdx-carousel.ts",
+      "development": "./src/carousel/pdx-carousel.pdx",
       "types": "./dist/carousel/pdx-carousel.d.ts",
       "import": "./dist/carousel/pdx-carousel.js"
     },
@@ -671,6 +671,7 @@
     "dist/**/pdx-*.js",
     "dist/banner/banner-icons.js",
     "dist/calendar/calendar-strings.js",
+    "dist/carousel/carousel-icons.js",
     "dist/data-grid/grid-i18n.js",
     "dist/empty-state/empty-state-icons.js",
     "dist/entity-grid/entity-grid-icons.js",
@@ -689,6 +690,7 @@
     "src/**/pdx-*.ts",
     "src/banner/banner-icons.ts",
     "src/calendar/calendar-strings.ts",
+    "src/carousel/carousel-icons.ts",
     "src/data-grid/grid-i18n.ts",
     "src/empty-state/empty-state-icons.ts",
     "src/entity-grid/entity-grid-icons.ts",

@@ -103,7 +103,7 @@ import './timeline/pdx-timeline.pdx';
 import './statistic/pdx-statistic.pdx';
 import './empty-state/pdx-empty-state.pdx';
 import './image/pdx-image.pdx';
-import './carousel/pdx-carousel';
+import './carousel/pdx-carousel.pdx';
 import './infinite-scroll/pdx-infinite-scroll.pdx';
 import './relative-time/pdx-relative-time.pdx';
 // Tier 2: Overlay + Containers
