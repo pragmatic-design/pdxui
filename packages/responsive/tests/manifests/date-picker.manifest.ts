@@ -2,7 +2,7 @@
  * MANIFEST — pdx-date-picker (tier 3, input trigger + popover calendar)
  *
  * Contracts DERIVED by inspecting the source (packages/ui/src/date-picker/pdx-date-picker.ts),
- * the child calendar (packages/ui/src/calendar/pdx-calendar.ts) and the CSS
+ * the child calendar (packages/ui/src/calendar/pdx-calendar.pdx) and the CSS
  * (packages/design/src/components/date-picker.css).
  *
  * ── DOM structure (light DOM, built imperatively in an rAF, pdx-date-picker.ts:325) ──

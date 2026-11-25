@@ -4503,7 +4503,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/calendar/pdx-calendar.ts",
+      "path": "src/calendar/pdx-calendar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -4748,20 +4748,12 @@
           },
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string | string[] }"
-            },
-            {
               "name": "pdx-navigate",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired on navigation.",
-              "detail": "{ year, month }"
+              "detail": "{ year: number; month: number }"
             },
             {
               "name": "pdx-view-change",
@@ -4769,7 +4761,15 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the view changes.",
-              "detail": "{ view }"
+              "detail": "{ view: 'days' | 'months' | 'years' }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string | string[] }"
             }
           ],
           "roles": [
@@ -5001,7 +5001,7 @@
           "name": "pdx-calendar",
           "declaration": {
             "name": "PdxCalendar",
-            "module": "src/calendar/pdx-calendar.ts"
+            "module": "src/calendar/pdx-calendar.pdx"
           }
         }
       ]

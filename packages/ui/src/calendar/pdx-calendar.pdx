@@ -1,0 +1,580 @@
+<template></template>
+
+<script>
+/**
+ * A standalone calendar grid in which the user selects a date, a range of dates or several dates,
+ * also from the keyboard alone.
+ *
+ * @csspart root - The frame, a `role="group"`: the navigation above the grid.
+ * @csspart nav - The navigation bar: the two arrows and the title.
+ * @csspart prev - The arrow to the previous month, year or twelve years.
+ * @csspart title - The month or year shown; in the day view, the button that opens the month view.
+ * @csspart next - The arrow to the next month, year or twelve years.
+ * @csspart grid - A month's grid of days (`role="grid"`), or the months or years to pick from.
+ * @csspart cell - A day, a month or a year to pick.
+ *
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value
+ * @alphadetail rangeStart $event.currentTarget.getRange()[0]
+ * @alphadetail rangeEnd $event.currentTarget.getRange()[1]
+ * @alphadetail quarter $event.currentTarget.getQuarter()?.quarter
+ * @alphadetail fiscalYear $event.currentTarget.getQuarter()?.fiscalYear
+ */
+// pdx-calendar — Standalone ARIA calendar grid.
+// Supports: date/range/multi/week/month/year/quarter selection modes,
+// 13 calendar systems (display via Intl), week numbers, fiscal year, highlighted dates.
+// Keyboard: Arrow (day), PageUp/Down (month), Shift+PageUp/Down (year), Home/End (week), Enter/Space (select).
+//
+// Its DOM is built by the script, a frame after each structural change, as the TypeScript version
+// built it (calendar-dom.ts builds the three views).
+import {
+    addMonths, addYears, addDays, getFirstDayOfWeek, isSameDay, isInRange, today, parseISO, clampDate,
+    dayOfWeek, getFiscalQuarter, getFiscalYear, getMonthRange, getQuarterRange, getYearRange, getWeekRange,
+} from '@pdxui/core';
+import type { CalendarCell, CalendarSystem } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+import { resolveLocale } from '../shared/locale';
+import { setOwnProp } from '../shared/own-prop';
+import { renderDayView, renderMonthView, renderYearView } from './calendar-dom';
+import type { CalendarViews, SelectionMode, ViewMode } from './calendar-dom';
+import './calendar-strings';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/calendar';
+
+// The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
+// mode; `[start, end]` in `range` and `week` mode (`end` is '' while a range is being built); the
+// array of ISO dates in `multi` mode. A choice writes it, and the write dispatches `value-change`.
+// With a `name`, a form submits it, a range or several dates one entry each, and resets it (#135,
+// #287); without one it submits nothing — the date picker's own calendar has none.
+@model value: string | string[] = '' { attribute: string, form };
+/** Fired on navigation. */
+@event 'pdx-navigate': { year: number; month: number };
+/** Fired when the view changes. */
+@event 'pdx-view-change': { view: 'days' | 'months' | 'years' };
+// The visual state, on the host as a custom state (#132, #287): the design CSS draws the frame from
+// it, and it needs no rebuild of the grid. The frame carries no state class. It has no popup, so no `open`.
+@state disabled = !!disabled;
+// Every element is built by the script, a frame after each structural change (calendar-dom.ts).
+@part(external) root, nav, prev, title, next, grid, cell;
+/** Range start (ISO). */
+@prop rangeStart: string = '';
+/** Range end (ISO). */
+@prop rangeEnd: string = '';
+/** Selection mode. */
+@prop mode: string = 'date';
+/** Locale for month/day names. Empty: the page's language (`lang`), then the browser's. */
+@prop locale: string = '';
+/** Calendar system for display. */
+@prop calendar: string = 'gregory';
+/** Number of months to display (1-3). */
+@prop numberOfMonths: number = 1;
+/** Always show 6 weeks per month. */
+@prop fixedWeeks: boolean = true;
+/** Show ISO week numbers. */
+@prop weekNumbers: boolean = false;
+/** Minimum selectable date (ISO). */
+@prop min: string = '';
+/** Maximum selectable date (ISO). */
+@prop max: string = '';
+/** Function returning true if date should be disabled. */
+@prop disabledDates: Record<string, unknown> | null = null;
+/** Function returning highlight label or false. */
+@prop highlightedDates: Record<string, unknown> | null = null;
+/** Fiscal year start month (1-12). */
+@prop fiscalStartMonth: number = 1;
+/** Compare range start (ISO) for analytics overlay. */
+@prop compareStart: string = '';
+/** Compare range end (ISO). */
+@prop compareEnd: string = '';
+/** First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1. */
+@prop firstDay: number = -1;
+/** Inline mode (no external popover wrapper). */
+@prop inline: boolean = false;
+/** Disabled state. */
+@prop disabled: boolean = false;
+/** Name for form participation: with one, a form submits the value under it. */
+@prop name: string = '';
+// The host is the one submitter (#135), in FormData under its `name` (#133).
+@host el { :name="name || null" }
+
+@expose focusView, getRange, getQuarter;
+
+let viewYear = $signal(0);
+let viewMonth = $signal(0);
+let viewMode = $signal<ViewMode>('days');
+let focusedDate = $signal('');
+let hoverDate = $signal('');
+// Multi-select: list of selected ISO dates
+let multiSelected = $signal<string[]>([]);
+// Range building: partial range
+let rangeBuilding = $signal(false);
+// The start of the range being built — authoritative, it does not depend on the parent's echo
+let pendingRangeStart = $signal('');
+
+// The prop, then the page's lang, then the browser.
+const localeNow = () => resolveLocale(el, locale as string);
+const calSys = () => calendar as CalendarSystem;
+const selMode = () => mode as SelectionMode;
+const firstDayOfWeek = () => {
+  const fd = firstDay as number;
+  return fd >= 0 ? fd : getFirstDayOfWeek(localeNow());
+};
+/** The model as one date: '' when the mode holds an array (range, week, multi). */
+const singleValue = (): string => {
+  const v = value;
+  return typeof v === 'string' ? v : '';
+};
+/** The quarter last chosen in `quarter` mode. */
+let lastQuarter: { quarter: number; fiscalYear: number } | null = null;
+
+// ─── Focus into the view ───────────────────────────
+// A popup that opens on the calendar puts focus on the day it holds its tab stop on (or the
+// month / year shown). The picker may open it before the calendar has drawn its first view, so
+// a request made early is kept and honoured by the first draw after initView, or by initView
+// itself when no draw follows.
+let viewReady = false;
+let focusPending = false;
+/** Draws the structure effect has scheduled and not yet run. */
+let drawsQueued = 0;
+function focusActiveCell(): boolean {
+  const target = el.querySelector<HTMLElement>(
+    '.pdx-cal-grid [tabindex="0"], .pdx-cal-month-cell.pdx-cal-selected, .pdx-cal-year-cell.pdx-cal-selected');
+  if (!target) return false;
+  target.focus();
+  return true;
+}
+/** Focus the active day (or the month / year shown), now or once the view is drawn. */
+function focusView(): void {
+  focusPending = !(viewReady && focusActiveCell());
+}
+/** The range the selection covers, `[start, end]` as ISO dates: the range itself, or the
+ *  week, month, quarter or year chosen; `['', '']` when the mode covers none. */
+function getRange(): [string, string] {
+  return [(rangeStart.peek() as string) || '', (rangeEnd.peek() as string) || ''];
+}
+/** The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise. */
+function getQuarter(): { quarter: number; fiscalYear: number } | null { return lastQuarter; }
+
+// The view opens on the selection: `value`, then `rangeStart`, then today — a range opened on
+// today's month would show nothing selected until the user paged back to it.
+// Today is clamped into [min, max]: otherwise "2024 only" would open on today's month with
+// every day disabled, months away from the first one that can be picked.
+function initView(): void {
+  const lo = (min as string) || undefined;
+  const hi = (max as string) || undefined;
+  const start = singleValue() || (rangeStart as string) || clampDate(today(), lo, hi);
+  const d = parseISO(start);
+  viewYear = d.year;
+  viewMonth = d.month;
+  focusedDate = start;
+  // Open directly to the appropriate view for non-day modes
+  const m = selMode();
+  if (m === 'month' || m === 'quarter') viewMode = 'months';
+  else if (m === 'year') viewMode = 'years';
+  else viewMode = 'days';
+  viewReady = true;
+  // A focus request made before now waits for a draw. When the view set here is the one
+  // already drawn (the picker handed over the month first), no draw follows: honour it on
+  // that view, whose tab stop the style effect has just moved (#737).
+  if (focusPending && drawsQueued === 0) focusPending = !focusActiveCell();
+}
+setTimeout(initView, 0);
+
+function isDateDisabled(iso: string): boolean {
+  const lo = min as string;
+  const hi = max as string;
+  if (lo && iso < lo) return true;
+  if (hi && iso > hi) return true;
+  const fn = disabledDates as unknown as ((iso: string) => boolean) | null;
+  return fn ? fn(iso) : false;
+}
+
+function getHighlight(iso: string): string | false {
+  const fn = highlightedDates as unknown as ((iso: string) => string | false) | null;
+  return fn ? fn(iso) : false;
+}
+
+// ─── Navigation ────────────────────────────────────
+
+function navigate(delta: number, unit: 'month' | 'year'): void {
+  if (unit === 'month') {
+    let m = viewMonth.peek() + delta;
+    let y = viewYear.peek();
+    while (m > 12) { m -= 12; y++; }
+    while (m < 1) { m += 12; y--; }
+    viewMonth = m;
+    viewYear = y;
+  } else {
+    viewYear = viewYear.peek() + delta;
+  }
+  pdxNavigate({ year: viewYear.peek(), month: viewMonth.peek() });
+}
+
+function switchView(to: ViewMode): void {
+  viewMode = to;
+  pdxViewChange({ view: to });
+}
+
+// ─── Selection ─────────────────────────────────────
+
+/** A choice: the range it covers is written to the host's own props first, since the cells
+ *  are styled from `rangeStart` / `rangeEnd`; then the model, which dispatches `value-change`. */
+function choose(chosen: string | string[], range?: { start: string; end: string }, quarter?: { quarter: number; fiscalYear: number }): void {
+  if (range) {
+    setOwnProp(el, 'rangeStart', range.start);
+    setOwnProp(el, 'rangeEnd', range.end);
+  }
+  lastQuarter = quarter ?? null;
+  value = chosen;
+}
+
+function selectDate(iso: string): void {
+  if (isDateDisabled(iso)) return;
+  const m = selMode();
+
+  if (m === 'date') {
+    choose(iso);
+  } else if (m === 'range') {
+    // The start being built lives in an INTERNAL authoritative state:
+    // reading it from the prop would require the parent's echo (standalone the
+    // range would never complete; with an echo through a rAF there is a race on a fast
+    // second click).
+    const start = pendingRangeStart.peek() || (rangeStart as string);
+    if (!start || rangeBuilding.peek() === false) {
+      // Start new range
+      rangeBuilding = true;
+      pendingRangeStart = iso;
+      choose([iso, ''], { start: iso, end: '' });
+    } else {
+      // Complete range
+      rangeBuilding = false;
+      pendingRangeStart = '';
+      const [s, e] = iso < start ? [iso, start] : [start, iso];
+      choose([s, e], { start: s, end: e });
+    }
+  } else if (m === 'multi') {
+    const current = multiSelected.peek().slice();
+    const idx = current.indexOf(iso);
+    if (idx >= 0) current.splice(idx, 1);
+    else current.push(iso);
+    multiSelected = current;
+    choose(current);
+  } else if (m === 'week') {
+    const range = getWeekRange(iso, firstDayOfWeek());
+    choose([range.start, range.end], range);
+  } else if (m === 'month') {
+    const d = parseISO(iso);
+    choose(iso, getMonthRange(d.year, d.month));
+  } else if (m === 'year') {
+    const d = parseISO(iso);
+    choose(iso, getYearRange(d.year));
+  } else if (m === 'quarter') {
+    const d = parseISO(iso);
+    const fiscal = fiscalStartMonth as number;
+    const q = getFiscalQuarter(d.month, fiscal);
+    const fy = getFiscalYear(d.year, d.month, fiscal);
+    choose(iso, getQuarterRange(fy, q, fiscal), { quarter: q, fiscalYear: fy });
+  }
+}
+
+function selectMonth(month: number): void {
+  const m = selMode();
+  if (m === 'month') {
+    // Month selection mode: emit and stay in months view
+    const range = getMonthRange(viewYear.peek(), month);
+    choose(range.start, range);
+    return;
+  }
+  if (m === 'quarter') {
+    // Quarter selection: compute quarter from month clicked
+    const fiscal = fiscalStartMonth as number;
+    const q = getFiscalQuarter(month, fiscal);
+    const fy = getFiscalYear(viewYear.peek(), month, fiscal);
+    const range = getQuarterRange(fy, q, fiscal);
+    choose(range.start, range, { quarter: q, fiscalYear: fy });
+    return;
+  }
+  // Normal drill-down to days
+  viewMonth = month;
+  viewMode = 'days';
+}
+
+function selectYear(year: number): void {
+  const m = selMode();
+  if (m === 'year') {
+    // Year selection mode: emit and stay in years view
+    const range = getYearRange(year);
+    choose(range.start, range);
+    return;
+  }
+  // Drill-down to months
+  viewYear = year;
+  viewMode = 'months';
+}
+
+// ─── Cell State ────────────────────────────────────
+
+function cellClass(cell: CalendarCell): string {
+  const iso = cell.iso;
+  let cls = 'pdx-cal-cell';
+  if (cell.outside) cls += ' pdx-cal-outside';
+  if (cell.today) cls += ' pdx-cal-today';
+  if (isDateDisabled(iso)) cls += ' pdx-cal-disabled';
+
+  const val = singleValue();
+  const rStart = pendingRangeStart || (rangeStart as string);
+  const rEnd = rangeEnd as string;
+  const cStart = compareStart as string;
+  const cEnd = compareEnd as string;
+  const hover = hoverDate as string;
+
+  // Single selection
+  if (val && isSameDay(iso, val)) cls += ' pdx-cal-selected';
+
+  // Multi selection
+  if (selMode() === 'multi' && (multiSelected as string[]).includes(iso)) cls += ' pdx-cal-selected';
+
+  // Range
+  if (rStart) {
+    if (isSameDay(iso, rStart)) cls += ' pdx-cal-selected pdx-cal-range-start';
+    if (rEnd) {
+      if (isSameDay(iso, rEnd)) cls += ' pdx-cal-selected pdx-cal-range-end';
+      if (isInRange(iso, rStart, rEnd)) cls += ' pdx-cal-in-range';
+    }
+  }
+
+  // Range preview (hover while building range)
+  if (rStart && !rEnd && hover && rangeBuilding) {
+    const [ps, pe] = hover < rStart ? [hover, rStart] : [rStart, hover];
+    if (isInRange(iso, ps, pe)) cls += ' pdx-cal-range-preview';
+  }
+
+  // Week mode: highlight entire week on hover
+  if (selMode() === 'week' && hover) {
+    const weekRange = getWeekRange(hover, firstDayOfWeek());
+    if (isInRange(iso, weekRange.start, weekRange.end)) cls += ' pdx-cal-range-preview';
+  }
+
+  // Comparison range overlay
+  if (cStart && cEnd && isInRange(iso, cStart, cEnd)) {
+    cls += ' pdx-cal-compare';
+    if (isSameDay(iso, cStart)) cls += ' pdx-cal-compare-start';
+    if (isSameDay(iso, cEnd)) cls += ' pdx-cal-compare-end';
+  }
+
+  // Highlighted dates
+  const hl = getHighlight(iso);
+  if (hl) cls += ' pdx-cal-highlighted';
+
+  // Focused
+  if (isSameDay(iso, focusedDate as string)) cls += ' pdx-cal-focused';
+
+  return cls;
+}
+
+// ─── Keyboard ──────────────────────────────────────
+
+function onKeydown(e: KeyboardEvent): void {
+  if (disabled.peek()) return;
+  const view = viewMode.peek();
+  if (view !== 'days') return; // keyboard only in day view for now
+
+  const focused = focusedDate.peek();
+  if (!focused) return;
+
+  let newDate = focused;
+  let handled = true;
+
+  switch (e.key) {
+    case 'ArrowLeft': newDate = addDays(focused, -1); break;
+    case 'ArrowRight': newDate = addDays(focused, 1); break;
+    case 'ArrowUp': newDate = addDays(focused, -7); break;
+    case 'ArrowDown': newDate = addDays(focused, 7); break;
+    case 'PageUp':
+      newDate = e.shiftKey ? addYears(focused, -1) : addMonths(focused, -1);
+      break;
+    case 'PageDown':
+      newDate = e.shiftKey ? addYears(focused, 1) : addMonths(focused, 1);
+      break;
+    case 'Home': {
+      const d = parseISO(focused);
+      const dow = dayOfWeek(d.year, d.month, d.day);
+      const offset = ((dow - firstDayOfWeek()) % 7 + 7) % 7;
+      newDate = addDays(focused, -offset);
+      break;
+    }
+    case 'End': {
+      const d = parseISO(focused);
+      const dow = dayOfWeek(d.year, d.month, d.day);
+      const offset = ((dow - firstDayOfWeek()) % 7 + 7) % 7;
+      newDate = addDays(focused, 6 - offset);
+      break;
+    }
+    case 'Enter':
+    case ' ':
+      e.preventDefault();
+      selectDate(focused);
+      return;
+    default:
+      handled = false;
+  }
+
+  if (handled) {
+    e.preventDefault();
+    const lo = min.peek() as string;
+    const hi = max.peek() as string;
+    newDate = clampDate(newDate, lo || undefined, hi || undefined);
+    focusedDate = newDate;
+    // Ensure viewed month follows focus
+    const nd = parseISO(newDate);
+    if (nd.year !== viewYear.peek() || nd.month !== viewMonth.peek()) {
+      viewYear = nd.year;
+      viewMonth = nd.month;
+    }
+    // WAI-ARIA roving tabindex: besides updating the tabindexes (the style effect), the REAL
+    // focus must follow the active cell, otherwise arrow navigation does not move
+    // the focus for whoever uses a keyboard or a screen reader. rAF: it waits for the grid to re-render.
+    requestAnimationFrame(() => cellMap.get(newDate)?.focus());
+  }
+}
+
+// ─── Imperative Render ─────────────────────────────
+// Effect 1: Structure — rebuilds grid when nav/view/locale changes
+// Effect 2: Style — updates CSS classes on existing cells (no DOM recreation)
+
+const cellMap = new Map<string, HTMLElement>(); // iso → button element
+
+// What the three views read and call back into (calendar-dom.ts).
+const views: CalendarViews = {
+  cellMap,
+  cellClass,
+  isDateDisabled,
+  getHighlight,
+  focusedDate: () => focusedDate.peek(),
+  viewMonth: () => viewMonth.peek(),
+  viewYear: () => viewYear.peek(),
+  selMode,
+  fixedWeeks: () => fixedWeeks as boolean,
+  navigate,
+  switchView,
+  setViewYear: (year) => { viewYear = year; },
+  selectDate,
+  selectMonth,
+  selectYear,
+  hover: (iso) => { hoverDate = iso; },
+  focus: (iso) => { focusedDate = iso; },
+};
+
+function updateCellStyles(): void {
+  const val = singleValue();
+  const rStart = pendingRangeStart || (rangeStart as string);
+  const rEnd = rangeEnd as string;
+  const m = selMode();
+
+  for (const [iso, cellEl] of cellMap) {
+    const cell = { iso, outside: false, today: false, day: 0, month: 0, year: 0 } as CalendarCell;
+    cell.outside = cellEl.dataset.outside === '1';
+    cell.today = cellEl.dataset.today === '1';
+    cellEl.className = cellClass(cell);
+
+    // Update aria-selected
+    const isSelected = (val && isSameDay(iso, val))
+      || (m === 'multi' && multiSelected.peek().includes(iso))
+      || (rStart && rEnd && (isSameDay(iso, rStart) || isSameDay(iso, rEnd)));
+    if (isSelected) cellEl.setAttribute('aria-selected', 'true');
+    else cellEl.removeAttribute('aria-selected');
+
+    // Update tabindex for roving focus
+    cellEl.setAttribute('tabindex', isSameDay(iso, focusedDate.peek()) ? '0' : '-1');
+  }
+}
+
+// Sync external value changes. An array is a range or the multi selection: a range is drawn from
+// `rangeStart` / `rangeEnd`, so it is copied there; the multi selection is the list itself.
+$effect(() => {
+  const raw = value;
+  if (Array.isArray(raw)) {
+    if (selMode() === 'multi') multiSelected = [...raw as string[]];
+    else {
+      setOwnProp(el, 'rangeStart', raw[0] ?? '');
+      setOwnProp(el, 'rangeEnd', raw[1] ?? '');
+    }
+  }
+  const val = singleValue() || (Array.isArray(raw) && selMode() !== 'multi' ? (raw[0] as string) ?? '' : '');
+  if (val) {
+    const d = parseISO(val);
+    viewYear = d.year;
+    viewMonth = d.month;
+    focusedDate = val;
+  }
+  // Keep view mode synced with selection mode
+  const m = selMode();
+  if (m === 'month' || m === 'quarter') {
+    if (viewMode.peek() === 'days') viewMode = 'months';
+  } else if (m === 'year') {
+    if (viewMode.peek() === 'days') viewMode = 'years';
+  }
+});
+
+// Structure effect: rebuild grid on navigation/view changes
+$effect(() => {
+  const year = viewYear as number;
+  const month = viewMonth as number;
+  const view = viewMode as ViewMode;
+  const loc = localeNow();
+  const cal = calSys();
+  const numMonths = Math.min(3, Math.max(1, numberOfMonths as number));
+  const showWeekNums = weekNumbers as boolean;
+  const fd = firstDayOfWeek();
+  const isInline = inline as boolean;
+
+  drawsQueued++;
+  requestAnimationFrame(() => {
+    drawsQueued--;
+    el.innerHTML = '';
+    cellMap.clear();
+
+    const frameEl = document.createElement('div');
+    // No state class: `disabled` is the host's :state(disabled) (#287).
+    frameEl.className = 'pdx-calendar' + (isInline ? ' pdx-calendar-inline' : '');
+    frameEl.setAttribute('data-part', 'root');
+    // A named group, not role="application", which switches a screen reader's browse mode
+    // off for the whole widget, header buttons included; the grid role gives the keys.
+    frameEl.setAttribute('role', 'group');
+    uiAttr(frameEl, 'aria-label', () => uiString('calendar', 'label'));
+    frameEl.addEventListener('keydown', onKeydown);
+
+    if (view === 'days') {
+      renderDayView(frameEl, year, month, numMonths, loc, cal, showWeekNums, fd, views);
+    } else if (view === 'months') {
+      renderMonthView(frameEl, year, loc, cal, views);
+    } else if (view === 'years') {
+      renderYearView(frameEl, year, views);
+    }
+
+    el.appendChild(frameEl);
+    // After building, apply current selection styles
+    updateCellStyles();
+    if (focusPending && viewReady) focusPending = !focusActiveCell();
+  });
+});
+
+// Style effect: update CSS classes without DOM recreation
+$effect(() => {
+  // Read all selection-related signals to subscribe
+  void value;
+  void rangeStart;
+  void rangeEnd;
+  void compareStart;
+  void compareEnd;
+  void focusedDate;
+  void hoverDate;
+  void multiSelected;
+  // Apply styles synchronously — cellMap may be empty on first run (before structure frame)
+  if (cellMap.size > 0) updateCellStyles();
+});
+</script>

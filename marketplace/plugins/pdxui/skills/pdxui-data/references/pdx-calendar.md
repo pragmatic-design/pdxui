@@ -33,7 +33,7 @@ A month calendar surface.
 | `getRange()` | The range the selection covers, `[start, end]` as ISO dates: the range itself, or the week, month, quarter or year chosen; `['', '']` when the mode covers none. |
 | `getQuarter()` | The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise. |
 
-**Events:** `pdx-navigate` → `detail: { year, month }` — Fired on navigation.; `pdx-view-change` → `detail: { view }` — Fired when the view changes.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-navigate` → `detail: { year: number; month: number }` — Fired on navigation.; `pdx-view-change` → `detail: { view: 'days' | 'months' | 'years' }` — Fired when the view changes.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row`
 

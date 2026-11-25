@@ -11,7 +11,7 @@
 //   whole widget, header buttons included. The grid role already gives the keyboard model.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/calendar/pdx-calendar';
+import '../../src/calendar/pdx-calendar.pdx';
 
 async function mount(attrs: string): Promise<HTMLElement> {
     const host = document.createElement('div');
