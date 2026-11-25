@@ -87,6 +87,7 @@ const PORTED: Record<string, string> = {
     'pdx-spinner': 'src/spinner/pdx-spinner.pdx',
     'pdx-tag-input': 'src/tag-input/pdx-tag-input.pdx',
     'pdx-textarea': 'src/textarea/pdx-textarea.pdx',
+    'pdx-time-picker': 'src/time-picker/pdx-time-picker.pdx',
     'pdx-timeline': 'src/timeline/pdx-timeline.pdx',
     'pdx-toast': 'src/toast/pdx-toast.pdx',
     'pdx-toggle': 'src/toggle/pdx-toggle.pdx',

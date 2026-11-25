@@ -22,7 +22,7 @@ import '../../src/transfer/pdx-transfer';
 import '../../src/tag-input/pdx-tag-input.pdx';
 import '../../src/mention/pdx-mention';
 import '../../src/date-picker/pdx-date-picker';
-import '../../src/time-picker/pdx-time-picker';
+import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/calendar/pdx-calendar';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/json-editor/pdx-json-editor.pdx';

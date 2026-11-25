@@ -6,7 +6,7 @@
 // screen and to a screen reader, not «no time».
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick, cleanup } from './helpers';
-import '../../src/time-picker/pdx-time-picker';
+import '../../src/time-picker/pdx-time-picker.pdx';
 
 type TimePicker = HTMLElement & { value: string; clear(): void };
 

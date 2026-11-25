@@ -475,7 +475,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // code where html`` stays for the components not moved yet. Measured 478.5 KB in CI and 478.2 locally,
 // the same gap as the dialog's move; the ceiling is held to CI's figure. Entry, css and blocking
 // unchanged.
-const BUDGET_KB = { entry: 43.6, js: 478.5, css: 67, blocking: 102.9 };
+// js 478.5 → 478.6 (the standing OK for #1210's moves): pdx-time-picker moves to .pdx, 0.89× alone with
+// its strings module (3137 against 3512 B). The showcase's forms use it; its strings and form-control
+// registration are a module of their own beside it, and html`` stays for the components not moved yet.
+// Measured 478.6 KB locally; entry, css and blocking unchanged.
+const BUDGET_KB = { entry: 43.6, js: 478.6, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

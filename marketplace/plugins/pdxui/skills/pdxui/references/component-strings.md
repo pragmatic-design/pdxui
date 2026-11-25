@@ -533,14 +533,14 @@ placeholders, filled at render: keep them in the translation.
 | `tag-input` | `label` | `Tag input` | `@pdxui/ui/src/shared/i18n.ts` |
 | `tag-input` | `remove` | `Remove {tag}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `tag-input` | `removed` | `{tag} removed` | `@pdxui/ui/src/shared/i18n.ts` |
-| `time-picker` | `decrement` | `Decrement` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `empty` | `No time` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `hour` | `Hour` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `increment` | `Increment` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `label` | `Time picker` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `minute` | `Minute` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `period` | `AM/PM` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
-| `time-picker` | `second` | `Second` | `@pdxui/ui/src/time-picker/pdx-time-picker.ts` |
+| `time-picker` | `decrement` | `Decrement` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `empty` | `No time` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `hour` | `Hour` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `increment` | `Increment` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `label` | `Time picker` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `minute` | `Minute` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `period` | `AM/PM` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
+| `time-picker` | `second` | `Second` | `@pdxui/ui/src/time-picker/time-picker-strings.ts` |
 | `timeline` | `error` | `error` | `@pdxui/ui/src/shared/i18n.ts` |
 | `timeline` | `info` | `info` | `@pdxui/ui/src/shared/i18n.ts` |
 | `timeline` | `pending` | `In progress...` | `@pdxui/ui/src/shared/i18n.ts` |

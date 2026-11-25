@@ -119,11 +119,6 @@
       "types": "./dist/calendar/pdx-calendar.d.ts",
       "import": "./dist/calendar/pdx-calendar.js"
     },
-    "./time-picker": {
-      "development": "./src/time-picker/pdx-time-picker.ts",
-      "types": "./dist/time-picker/pdx-time-picker.d.ts",
-      "import": "./dist/time-picker/pdx-time-picker.js"
-    },
     "./date-picker": {
       "development": "./src/date-picker/pdx-date-picker.ts",
       "types": "./dist/date-picker/pdx-date-picker.d.ts",
@@ -664,6 +659,11 @@
       "types": "./dist/timeline/pdx-timeline.d.ts",
       "import": "./dist/timeline/pdx-timeline.js"
     },
+    "./time-picker": {
+      "development": "./src/time-picker/pdx-time-picker.pdx",
+      "types": "./dist/time-picker/pdx-time-picker.d.ts",
+      "import": "./dist/time-picker/pdx-time-picker.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [
@@ -676,6 +676,7 @@
     "dist/field-list/field-list-strings.js",
     "dist/inline-edit/inline-edit-strings.js",
     "dist/search-input/search-input-icons.js",
+    "dist/time-picker/time-picker-strings.js",
     "dist/toast/toast-icons.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
@@ -688,6 +689,7 @@
     "src/field-list/field-list-strings.ts",
     "src/inline-edit/inline-edit-strings.ts",
     "src/search-input/search-input-icons.ts",
+    "src/time-picker/time-picker-strings.ts",
     "src/toast/toast-icons.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"

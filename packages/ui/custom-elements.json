@@ -31352,7 +31352,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/time-picker/pdx-time-picker.ts",
+      "path": "src/time-picker/pdx-time-picker.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -31681,7 +31681,7 @@
           "name": "pdx-time-picker",
           "declaration": {
             "name": "PdxTimePicker",
-            "module": "src/time-picker/pdx-time-picker.ts"
+            "module": "src/time-picker/pdx-time-picker.pdx"
           }
         }
       ]
