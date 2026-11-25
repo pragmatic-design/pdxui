@@ -11,7 +11,7 @@
 // transitionend that happy-dom never fires.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/carousel/pdx-carousel';
+import '../../src/carousel/pdx-carousel.pdx';
 
 type Carousel = HTMLElement & { items: unknown[]; goTo(i: number): void; readonly index: number };
 const ITEMS = [{ content: 'One' }, { content: 'Two' }, { content: 'Three' }];

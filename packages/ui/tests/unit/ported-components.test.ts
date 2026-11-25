@@ -41,6 +41,7 @@ const PORTED: Record<string, string> = {
     'pdx-drawer': 'src/drawer/pdx-drawer.pdx',
     'pdx-mention': 'src/mention/pdx-mention.pdx',
     'pdx-overlay-outlet': 'src/overlay/pdx-overlay-outlet.pdx',
+    'pdx-carousel': 'src/carousel/pdx-carousel.pdx',
     'pdx-calendar': 'src/calendar/pdx-calendar.pdx',
     'pdx-transfer': 'src/transfer/pdx-transfer.pdx',
     'pdx-edit-drawer': 'src/edit-drawer/pdx-edit-drawer.pdx',
