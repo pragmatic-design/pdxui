@@ -33363,7 +33363,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tree-select/pdx-tree-select.ts",
+      "path": "src/tree-select/pdx-tree-select.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -33770,7 +33770,7 @@
           "name": "pdx-tree-select",
           "declaration": {
             "name": "PdxTreeSelect",
-            "module": "src/tree-select/pdx-tree-select.ts"
+            "module": "src/tree-select/pdx-tree-select.pdx"
           }
         }
       ]

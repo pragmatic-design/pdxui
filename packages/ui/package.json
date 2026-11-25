@@ -130,7 +130,7 @@
       "import": "./dist/tree/pdx-tree.js"
     },
     "./tree-select": {
-      "development": "./src/tree-select/pdx-tree-select.ts",
+      "development": "./src/tree-select/pdx-tree-select.pdx",
       "types": "./dist/tree-select/pdx-tree-select.d.ts",
       "import": "./dist/tree-select/pdx-tree-select.js"
     },
@@ -685,6 +685,7 @@
     "dist/time-picker/time-picker-strings.js",
     "dist/toast/toast-icons.js",
     "dist/transfer/transfer-strings.js",
+    "dist/tree-select/tree-select-strings.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
@@ -705,6 +706,7 @@
     "src/time-picker/time-picker-strings.ts",
     "src/toast/toast-icons.ts",
     "src/transfer/transfer-strings.ts",
+    "src/tree-select/tree-select-strings.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],

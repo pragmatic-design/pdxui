@@ -17,7 +17,7 @@ import '../../src/context-menu/pdx-context-menu';
 import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menu/pdx-menu.pdx';
 import '../../src/select/pdx-select';
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 
 type Scope = Record<string, unknown>;
 type Args = unknown[];

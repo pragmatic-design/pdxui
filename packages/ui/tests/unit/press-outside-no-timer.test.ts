@@ -13,7 +13,7 @@ import '../../src/context-menu/pdx-context-menu';
 import '../../src/menubar/pdx-menubar';
 import '../../src/inline-edit/pdx-inline-edit.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 import { openColumnChooser, closeColumnChooser } from '../../src/shared/column-chooser';
 import { openFilterPopoverFor, closeFilterPopover, createEmptyState, type FilterFieldInfo } from '../../src/shared/filter-popover';
 

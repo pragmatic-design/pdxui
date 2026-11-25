@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 
-import '../../src/tree-select/pdx-tree-select';
+import '../../src/tree-select/pdx-tree-select.pdx';
 
 describe('pdx-tree-select', () => {
     beforeEach(cleanup);
@@ -50,6 +50,18 @@ describe('pdx-tree-select', () => {
         const el = await mountTreeSelect();
         const trigger = el.querySelector('[role="combobox"]');
         expect(trigger?.getAttribute('aria-haspopup')).toBe('tree');
+    });
+
+    // A parent that empties `value` — a form reset to the default null, a "clear filters" button —
+    // empties the trigger, as `clear()` does. The component kept a copy of the selection that a null
+    // value did not replace, so the old label stayed on show (#1210).
+    it('a null value from outside clears the display text', async () => {
+        const el = await mountTreeSelect({ value: 'apple', placeholder: 'Pick food' });
+        el.value = null;
+        await tick(50);
+        const text = el.querySelector('.pdx-cascader-text');
+        expect(text?.textContent).toBe('Pick food');
+        expect(el.getLabel()).toBe('');
     });
 
     it('shows placeholder when no value', async () => {
