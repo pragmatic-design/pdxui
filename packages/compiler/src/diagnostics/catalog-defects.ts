@@ -153,6 +153,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Move its markup into the first `<template>`.',
         reproducedIn: `${T}duplicate-blocks.test.ts`,
     },
+    PDX_MARKUP_OUTSIDE_TEMPLATE: {
+        severity: 'error', category: 'defect',
+        summary: 'Markup in a `.pdx` outside its `<template>`, `<script>` and `<style>` blocks.',
+        explanation: "The parser reads the blocks and drops the rest. A `.pdx` whose markup sits beside its `<script>` with no `<template>` compiled to a module with no component, and nothing said so: the page's tag never rendered (#1249). So anything but whitespace and comments outside the blocks stops the compile, naming its line. A file with only a `<script>`, and a `.pdx.ts` module, have nothing outside it and are unchanged.",
+        fix: 'Move the markup into the `<template>` block; add one if the file has none.',
+        reproducedIn: `${T}markup-outside-template.test.ts`,
+    },
     PDX_STORE_EXPORT: {
         severity: 'error', category: 'defect',
         summary: 'An `export` in a `@store` module that reads a name the store owns.',

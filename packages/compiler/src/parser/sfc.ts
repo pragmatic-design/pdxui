@@ -94,6 +94,15 @@ function parseBlocks(source: string): SFCDescriptor {
     const taken = [tpl, script, ...styles].filter((b): b is SFCBlock => b !== null);
     if (script) reportSecond(source, 'script', 'PDX_DUPLICATE_SCRIPT', script, taken, errors);
     if (tpl) reportSecond(source, 'template', 'PDX_DUPLICATE_TEMPLATE', tpl, taken, errors);
+    // Only on a file whose blocks are well formed: an unclosed or second block is the error to fix
+    // first, and its text would be named here again as markup outside the blocks.
+    if (errors.length === 0) {
+        reportOutside(source, [
+            ...(tpl ? [{ block: tpl, tag: 'template' }] : []),
+            ...(script ? [{ block: script, tag: 'script' }] : []),
+            ...styles.map((block) => ({ block, tag: 'style' })),
+        ], errors);
+    }
     return {
         template: tpl ? { ...tpl, shadow } : null,
         script,
@@ -122,6 +131,52 @@ function reportSecond(source: string, tag: string, code: string, first: SFCBlock
             + `and its content never reaches the component. Move it into the first <${tag}> (line ${lineAt(source, firstOpen)}).`);
         return;
     }
+}
+
+/**
+ * Report the first text outside every block that is not whitespace or an HTML comment (#1249). The
+ * blocks are read and the rest dropped, so markup written beside them — a `<button>` after the
+ * `<script>`, as the hello scenario was first written — compiled to a module with no component, and
+ * nothing said so. Only on a file with at least one block: a source with none is a `.pdx.ts` script.
+ */
+function reportOutside(source: string, blocks: { block: SFCBlock; tag: string }[], errors: string[]): void {
+    if (blocks.length === 0) return;
+    // Each block's whole extent, from its opening `<tag` to past its closing tag (or its own `/>`).
+    const spans = blocks.map(({ block, tag }) => {
+        const open = block.src !== null && block.content === '' && source.startsWith(`<${tag}`, block.start)
+            ? block.start
+            : source.lastIndexOf(`<${tag}`, block.start);
+        const closing = `</${tag}>`;
+        const end = source.startsWith(closing, block.end) ? block.end + closing.length : block.end;
+        return [open, end] as const;
+    }).sort((a, b) => a[0] - b[0]);
+    let at = 0;
+    for (const [open, end] of [...spans, [source.length, source.length] as const]) {
+        const found = firstMarkup(source, at, open);
+        if (found >= 0) {
+            const code = 'PDX_MARKUP_OUTSIDE_TEMPLATE';
+            errors.push(`[${code}] the markup at line ${lineAt(source, found)} is outside the `
+                + '<template>, <script> and <style> blocks, and is dropped: it never reaches the component. '
+                + 'Move it into the <template> block (add one if the file has none).');
+            return;
+        }
+        at = Math.max(at, end);
+    }
+}
+
+/** The offset of the first character in `[from, to)` that is neither whitespace nor in a comment, or -1. */
+function firstMarkup(source: string, from: number, to: number): number {
+    for (let i = from; i < to; i++) {
+        if (isSpace(source[i])) continue;
+        if (source.startsWith('<!--', i)) {
+            const close = source.indexOf('-->', i + 4);
+            if (close === -1 || close + 3 > to) return i;
+            i = close + 2;
+            continue;
+        }
+        return i;
+    }
+    return -1;
 }
 
 /** 1-based line number of `offset` in `source`. */

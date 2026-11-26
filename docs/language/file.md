@@ -45,6 +45,9 @@ defined in [template.md](template.md), `Script` in [script.md](script.md), `Css`
   `pdx migrate` converts it (migration.md). Landed (#158): the registry entry `legacy-script`, and the
   legacy code generator is removed — a file without a script compiles like one with an empty script.
 - A second `<template>` or `<script>` is `PDX_DUPLICATE_TEMPLATE` / `PDX_DUPLICATE_SCRIPT`, as in alpha.
+- Outside the blocks a `.pdx` holds only whitespace and HTML comments. Markup there would be dropped —
+  a `<button>` after the `<script>` of a file with no `<template>` compiled to a module with no
+  component — so it is `PDX_MARKUP_OUTSIDE_TEMPLATE` (error), naming its line. Landed (#1249).
 - **One reading rule for declarations** (decisions.md 11 — landed, #524): any declaration may span
   lines when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end
   of that block. Alpha allowed it declaration by declaration. The full rule, bodies included, is in
