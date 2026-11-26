@@ -9,7 +9,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/nav-menu/pdx-nav-menu';
+import '../../src/nav-menu/pdx-nav-menu.pdx';
 
 const items = (collapsed = false) => [
     { key: 'work', type: 'header', label: 'Work', collapsed, children: [

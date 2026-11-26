@@ -4,7 +4,7 @@
 // inside it, so Tab does not walk every entry one by one. Its own module
 // because it is its own responsibility: the component builds the entries, this moves between them.
 
-import type { NavMenuItem } from './pdx-nav-menu';
+import type { NavMenuItem } from './nav-menu-types';
 import type { NavFlyout } from './nav-flyout';
 
 /** What the keyboard moves between: the entries, and the headings that fold a group. */

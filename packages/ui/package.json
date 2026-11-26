@@ -145,7 +145,7 @@
       "import": "./dist/menubar/pdx-menubar.js"
     },
     "./nav-menu": {
-      "development": "./src/nav-menu/pdx-nav-menu.ts",
+      "development": "./src/nav-menu/pdx-nav-menu.pdx",
       "types": "./dist/nav-menu/pdx-nav-menu.d.ts",
       "import": "./dist/nav-menu/pdx-nav-menu.js"
     },

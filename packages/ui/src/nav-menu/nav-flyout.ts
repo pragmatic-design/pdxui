@@ -6,7 +6,7 @@
 // is styled — measured before, a block there is as wide as the body. Never hidden while measured:
 // see `open`.
 
-import type { NavMenuItem } from './pdx-nav-menu';
+import type { NavMenuItem } from './nav-menu-types';
 import { NAV_ENTRY } from './nav-keys';
 
 export interface NavFlyoutHost {

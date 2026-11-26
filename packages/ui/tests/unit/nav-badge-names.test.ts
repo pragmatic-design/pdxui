@@ -10,7 +10,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
 import '../../src/bottom-nav/pdx-bottom-nav.pdx';
-import '../../src/nav-menu/pdx-nav-menu';
+import '../../src/nav-menu/pdx-nav-menu.pdx';
 import '../../src/breadcrumb/pdx-breadcrumb.pdx';
 
 async function create(tag: string, props: Record<string, unknown>): Promise<HTMLElement> {

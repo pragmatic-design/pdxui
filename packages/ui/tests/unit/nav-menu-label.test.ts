@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/nav-menu/pdx-nav-menu';
+import '../../src/nav-menu/pdx-nav-menu.pdx';
 
 async function mount(attrs: Record<string, string> = {}): Promise<HTMLElement> {
     const el = document.createElement('pdx-nav-menu');

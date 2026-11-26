@@ -8,7 +8,7 @@ import '../../src/tabs/pdx-tabs.pdx';
 import '../../src/description-list/pdx-description-list.pdx';
 import '../../src/statistic/pdx-statistic.pdx';
 import '../../src/wizard/pdx-wizard';
-import '../../src/nav-menu/pdx-nav-menu';
+import '../../src/nav-menu/pdx-nav-menu.pdx';
 import '../../src/kbd/pdx-kbd.pdx';
 import '../../src/avatar-group/pdx-avatar-group.pdx';
 

@@ -11,7 +11,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/nav-menu/pdx-nav-menu';
+import '../../src/nav-menu/pdx-nav-menu.pdx';
 
 const ITEMS = [
     { key: 'dashboard', label: 'Dashboard', href: '/' },

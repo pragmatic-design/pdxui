@@ -1,0 +1,534 @@
+<template></template>
+
+<script>
+/**
+ * A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a
+ * collapsed icon-only mode.
+ *
+ * @slot item - Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`.
+ * @slot itemActions - Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.
+ *
+ * @csspart nav - The `role="navigation"` element that holds the entries (`.pdx-nav`).
+ * @csspart item - An entry, a link or a button; the current one is `aria-current="page"`, an open group's `aria-expanded="true"`.
+ * @csspart group - The entries of an open group, or of a heading that folds (`role="group"`).
+ * @csspart heading - A section heading, text or the button that folds its group.
+ * @csspart separator - The rule between two sections.
+ * @csspart actions - The `actions` slot's controls beside a leaf entry.
+ * @csspart flyout - A collapsed menu's group, opened beside its icon (on `<body>`).
+ * @cssstate ready - Its entries are drawn.
+ * @cssstate collapsed - `collapsed` is set: icons only, a group in a flyout.
+ */
+// pdx-nav-menu — Vertical navigation menu for sidebars.
+// Data-driven: items with nesting, icons, badges, collapsible groups, active state.
+// Use inside a sidebar or standalone as vertical navigation.
+//
+// The menu's <nav> and its entries are built by the script, a frame after mount and a frame after a
+// change, as the TypeScript version built them.
+import { sanitizeUrl, generatedId, onNextFrame, onDestroy } from '@pdxui/core';
+import { sanitizeSVG } from '../shared/sanitize';
+import { uiString, format, uiAttr } from '../shared/i18n';
+import { createNavKeys, NAV_ENTRY } from './nav-keys';
+import { createNavFlyout } from './nav-flyout';
+import type { NavMenuItem } from './nav-menu-types';
+
+// The entry shape an app builds in TypeScript (`import type { NavMenuItem } from '@pdxui/ui/nav-menu'`),
+// in its own module so nav-keys and nav-flyout import it without the component.
+export type { NavMenuItem };
+
+/** A `data-*` suffix that makes a valid attribute name: lowercase, starting with a letter. */
+const DATA_NAME = /^[a-z][a-z0-9-]*$/;
+
+function applyData(el: HTMLElement, data: Record<string, string> | undefined): void {
+  if (!data) return;
+  for (const [name, value] of Object.entries(data)) {
+    if (DATA_NAME.test(name)) el.setAttribute('data-' + name, String(value));
+  }
+}
+
+// `activeKey` and `collapsed` are the app's to write, never the menu's: props, not models (#289).
+/** An entry was chosen; cancellable, so an app under the router navigates itself. */
+@event(cancelable) 'pdx-select': { key: string; item: T; href?: string };
+/** A group was folded or unfolded: its `key` and whether it is open now. Does not bubble. */
+@event 'pdx-toggle': { key: string; expanded: boolean };
+// Set where the TypeScript version set them (#1436): `ready` when the entries are first drawn,
+// `collapsed` with them and on every rebuild — the prop's name, so its binding is `folded` (#1441).
+@state ready;
+@state collapsed as folded;
+// The <nav> and every entry are built by the script.
+@part(external) nav, item, group, heading, separator, actions, flyout;
+// The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+@generic T extends { key: string; label: string };
+/** Menu items */
+@prop items: T[] = [];
+/** Currently active item key */
+@prop activeKey: string = '';
+/** Collapsed mode (show only icons, hide labels) */
+@prop collapsed: boolean = false;
+/** Indent per nesting level (px) */
+@prop indent: number = 36;
+/** Icon set name (for pdx-icon set attribute) */
+@prop iconSet: string = '';
+/**
+ * The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need
+ * two names, or a screen-reader user cannot tell the landmarks apart (#1023).
+ */
+@prop label: string = '';
+// The looks nav.css keys by (#632), reflected on the host and drawn from it; the host is the
+// element the old `.pdx-nav-{look}-{value}` classes went on, so no native class is kept. A value
+// outside a list is the default, as an unknown attribute value is in HTML.
+@variants {
+  /** `sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar. */
+  size: { md, sm } = md;
+  /** How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge. */
+  indicator: { fill, border } = fill;
+  /** Where a group's chevron sits: before its icon, or at the end of its row. */
+  chevron: { start, end } = start;
+  /** `overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest. */
+  actions: { inline, overlay } = inline;
+}
+// A parent's `@snippet` sets these, positional arguments; the alpha scoped slots are not read
+// (#492). The controls' snippet is `itemActions`, named apart from the `actions` prop above.
+// Any entry of the tree the menu renders through the snippet: an element of `items`, or a
+// child or grandchild of one through `children`, less the headers and separators it draws
+// itself (`type: 'header' as const` on the app's side). Written out, because the editor
+// pastes the signature where no alias is in scope. Three levels, the menu's own
+// (`data-level` stops at 3); a recursive item type collapses to `T`.
+@slot item?: (item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, expanded: boolean, active: boolean);
+@slot itemActions?: (item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, active: boolean);
+@host host;
+@expose toggleGroup, expandAll, collapseAll;
+
+/** The entry type a snippet receives. */
+type Entry = Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>;
+
+/** Prefix of this menu's group ids, which the toggles' aria-controls point at. */
+const uid = generatedId('pdx-nav');
+/** The open groups. Nothing reads them reactively: the entries are built from them. */
+let expandedKeys = new Set<string>();
+let navEl: HTMLElement | null = null;
+
+/** Expand or collapse one group by key. It selects nothing. */
+function toggleGroup(key: string): void {
+  const next = new Set(expandedKeys);
+  if (next.has(key)) next.delete(key);
+  else next.add(key);
+  expandedKeys = next;
+  rebuildItems();
+  // The component keeps nothing across a reload: the app does, from this.
+  // Not bubbling, as every pdx-toggle in the library: a nav menu inside a component that
+  // listens for its own pdx-toggle would otherwise fire it.
+  pdxToggle({ key, expanded: next.has(key) });
+}
+
+/** False when a `pdx-select` listener took the navigation over. */
+function onItemClick(entry: NavMenuItem): boolean {
+  if (entry.disabled) return true;
+  if (entry.children?.length) {
+    // Collapsed, a group's children are in its flyout; there is nothing to fold in place.
+    if (collapsed as boolean) {
+      const anchor = keys.entryByKey(entry.key);
+      if (anchor) flyout.open(anchor, entry);
+    } else {
+      toggleGroup(entry.key);
+    }
+    return true;
+  }
+  // CANCELABLE: an app under the router prevents it and navigates itself; the anchor is
+  // then stopped, or it would load the whole page.
+  const go = pdxSelect({ key: entry.key, item: entry as unknown as T, href: entry.href });
+  // A choice made in the flyout ends it.
+  flyout.close(false);
+  return go;
+}
+
+// The keyboard and the collapsed menu's flyout, each its own
+// module: this component builds the entries, they move between them and open a group.
+const keys = createNavKeys({
+  nav: () => navEl,
+  activeKey: () => activeKey as string,
+  toggleGroup,
+  itemByKey: (key) => findItem(items as unknown as NavMenuItem[], key),
+  flyout: () => flyout,
+});
+const flyout = createNavFlyout({
+  uid,
+  build: (list, container) => buildItems(list, container, 0, true),
+  entryByKey: keys.entryByKey,
+  focusEntry: keys.focusEntry,
+});
+
+// ─── Build item DOM ──────────────────────────────────
+/** `labels`: draw every entry with its label even in a collapsed menu — the flyout's. */
+function buildItems(list: NavMenuItem[], container: HTMLElement, level: number, labels = false): void {
+  const isCollapsed = !labels && (collapsed as boolean);
+  const indentPx = indent as number;
+  const current = activeKey as string;
+  const set = iconSet as string;
+  const open = expandedKeys;
+  // The parent's snippets, read where the entries are drawn: one set after mount is seen.
+  const itemSnippet = item;
+  const actionsSnippet = itemActions;
+
+  for (const entry of list) {
+    if (entry.type === 'separator') {
+      const sep = document.createElement('hr');
+      sep.className = 'pdx-nav-separator';
+      sep.setAttribute('data-part', 'separator');
+      container.appendChild(sep);
+      continue;
+    }
+
+    if (entry.type === 'header') {
+      const folds = !!entry.children?.length;
+      if (!folds) {
+        if (!isCollapsed) {
+          const hdr = document.createElement('div');
+          hdr.className = 'pdx-nav-heading';
+          hdr.setAttribute('data-part', 'heading');
+          hdr.textContent = entry.label;
+          container.appendChild(hdr);
+        }
+        continue;
+      }
+      // A heading that FOLDS its group: a button, open by default. With
+      // the menu collapsed to icons the heading is text there is no room for, and its
+      // entries stay — folding a group of icons would hide the navigation.
+      const isOpen = isCollapsed || open.has(entry.key);
+      const section = document.createElement('div');
+      section.className = 'pdx-nav-section';
+      section.setAttribute('data-part', 'group');
+      section.setAttribute('role', 'group');
+      section.id = `${uid}-${entry.key}`;
+      if (!isCollapsed) {
+        const hdr = document.createElement('button');
+        hdr.type = 'button';
+        hdr.className = 'pdx-nav-heading pdx-nav-heading-toggle';
+        hdr.setAttribute('data-part', 'heading');
+        hdr.setAttribute('data-nav-key', entry.key);
+        applyData(hdr, entry.data);
+        hdr.setAttribute('aria-expanded', String(isOpen));
+        hdr.setAttribute('aria-controls', section.id);
+        const text = document.createElement('span');
+        text.textContent = entry.label;
+        hdr.appendChild(text);
+        const chev = document.createElement('span');
+        // Turned by the heading's aria-expanded (nav.css), not a class (#289).
+        chev.className = 'pdx-nav-chevron pdx-nav-heading-chevron';
+        chev.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+        hdr.appendChild(chev);
+        hdr.addEventListener('click', () => toggleGroup(entry.key));
+        container.appendChild(hdr);
+        section.setAttribute('aria-label', entry.label);
+      }
+      if (isOpen) {
+        buildItems(entry.children!, section, level, labels);
+        container.appendChild(section);
+      }
+      continue;
+    }
+
+    const hasChildren = entry.children && entry.children.length > 0;
+    const isExpanded = open.has(entry.key);
+    const isActive = entry.key === current;
+
+    // Item element
+    const el = entry.href && !hasChildren
+      ? document.createElement('a')
+      : document.createElement('button');
+
+    if (entry.href && el instanceof HTMLAnchorElement) {
+      const safe = sanitizeUrl(entry.href); // items may be data-driven → block javascript:
+      if (safe) el.href = safe;
+    }
+    if (el instanceof HTMLButtonElement) {
+      el.type = 'button';
+    }
+
+    // The current entry is its aria-current, below, which nav.css selects: no class (#289).
+    el.className = 'pdx-nav-item';
+    el.setAttribute('data-part', 'item');
+    if (hasChildren) el.classList.add('pdx-nav-group-trigger');
+    if (entry.disabled) {
+      el.setAttribute('aria-disabled', 'true');
+      if (el instanceof HTMLButtonElement) el.disabled = true;
+    }
+
+    el.setAttribute('data-nav-key', entry.key);
+    applyData(el, entry.data);
+    // The level the per-level properties select (`--pdx-nav-level2-size` …), 1-based, the
+    // third standing for every deeper one; the indent as a property the level may replace.
+    // Not an inline `padding-left`: it outranks every stylesheet rule, so a shell that wants
+    // its own indent would have to reach the entry with `!important`.
+    el.setAttribute('data-level', String(Math.min(level + 1, 3)));
+    el.style.setProperty('--pdx-nav-pad', (level * indentPx + 8) + 'px');
+
+    if (isActive) el.setAttribute('aria-current', 'page');
+    if (hasChildren) {
+      el.setAttribute('aria-expanded', String(!!isExpanded));
+    }
+    // Collapsed to icons, a group opens in a FLYOUT beside it, not in place: in place
+    // there are no labels to show. Hover and focus open it.
+    if (hasChildren && isCollapsed) {
+      el.setAttribute('data-nav-flyout', '');
+      el.setAttribute('aria-expanded', String(flyout.isOpenFor(entry.key)));
+      el.setAttribute('aria-controls', flyout.id(entry.key));
+      el.addEventListener('pointerenter', () => flyout.open(el, entry));
+      el.addEventListener('pointerleave', flyout.scheduleClose);
+      el.addEventListener('focus', () => { if (!flyout.returningFocus()) flyout.open(el, entry); });
+    }
+
+    // Collapse chevron for groups
+    if (hasChildren) {
+      const chev = document.createElement('span');
+      // Turned by the entry's aria-expanded (nav.css), not a class (#289).
+      chev.className = 'pdx-nav-chevron';
+      chev.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"></polyline></svg>';
+      el.appendChild(chev);
+    }
+
+    // Content: slot > default (icon + label + badge). The slot draws a group's entry
+    // too, or an app that draws its own icons has a collapsed group that shows only the
+    // chevron.
+    if (itemSnippet) {
+      el.appendChild(itemSnippet(entry as unknown as Entry, level, isExpanded, isActive));
+    } else {
+      // Icon — always reserve space for alignment
+      if (entry.icon) {
+        if (entry.icon.startsWith('<')) {
+          const icon = document.createElement('span');
+          icon.className = 'pdx-nav-icon';
+          icon.innerHTML = sanitizeSVG(entry.icon);
+          el.appendChild(icon);
+        } else {
+          // An icon NAME: `pdx-icon` is loaded the first time one is met, so a
+          // menu of SVG icons never pays for the icon set.
+          if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
+          const icon = document.createElement('pdx-icon');
+          icon.className = 'pdx-nav-icon';
+          icon.setAttribute('name', entry.icon);
+          icon.setAttribute('size', '18');
+          if (set) icon.setAttribute('set', set);
+          el.appendChild(icon);
+        }
+      } else if (!hasChildren) {
+        const spacer = document.createElement('span');
+        spacer.className = 'pdx-nav-icon';
+        el.appendChild(spacer);
+      }
+
+      if (!isCollapsed) {
+        const labelSpan = document.createElement('span');
+        labelSpan.className = 'pdx-nav-label';
+        labelSpan.textContent = entry.label;
+        el.appendChild(labelSpan);
+      }
+    }
+
+    // Badge
+    if (entry.badge && !isCollapsed) {
+      const badge = document.createElement('span');
+      badge.className = 'pdx-nav-badge';
+      if (entry.badgeVariant && entry.badgeVariant !== 'default') {
+        badge.classList.add('pdx-nav-badge-' + entry.badgeVariant);
+      }
+      badge.textContent = entry.badge;
+      // A space between the label and the count: run together, «Tickets12» is a word the
+      // name below does not hold (WCAG 2.5.3). The item is flex: the space is not laid out.
+      el.appendChild(document.createTextNode(' '));
+      el.appendChild(badge);
+      // A name of its own, or it reads the count glued to the label, "Inbox12".
+      // Captured for the reason `pdx-bottom-nav` gives at the same line.
+      const badgeText = entry.badge;
+      uiAttr(el, 'aria-label', () => format(uiString('nav-menu', 'badge'), { label: entry.label, badge: badgeText }));
+    }
+
+    // Collapsed to icons: the label is the name, and a tooltip shown on focus as well as
+    // hover. `title` alone would show it to the mouse only.
+    if (isCollapsed) {
+      el.setAttribute('aria-label', entry.label);
+      el.setAttribute('data-tooltip', entry.label);
+    }
+
+    // Click handler
+    el.addEventListener('click', (e) => {
+      if (entry.href && !hasChildren) {
+        // A modified click — Ctrl, Cmd, Shift, Alt, another button — is the
+        // browser's: «open in a new tab» keeps working, and it is no selection
+        // here, or the app would navigate this tab too.
+        if (e instanceof MouseEvent && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0)) return;
+      } else {
+        e.preventDefault();
+      }
+      if (!onItemClick(entry)) e.preventDefault();
+    });
+
+    // The app's controls for this entry sit BESIDE its link, in a row with it: inside, a
+    // pin button and a second link would make the entry an <a> with interactive
+    // content — invalid HTML, and one accessible name for three things. A leaf only: a
+    // group's entry is itself the control that opens it.
+    const rowActions = !hasChildren ? actionsSnippet : undefined;
+    if (rowActions) {
+      const row = document.createElement('div');
+      row.className = 'pdx-nav-row';
+      const actionsEl = document.createElement('div');
+      actionsEl.className = 'pdx-nav-actions';
+      actionsEl.setAttribute('data-part', 'actions');
+      actionsEl.appendChild(rowActions(entry as unknown as Entry, level, isActive));
+      row.append(el, actionsEl);
+      container.appendChild(row);
+    } else {
+      container.appendChild(el);
+    }
+
+    // Children (if expanded)
+    if (hasChildren && isExpanded && !isCollapsed) {
+      const groupEl = document.createElement('div');
+      groupEl.className = 'pdx-nav-group';
+      groupEl.setAttribute('data-part', 'group');
+      groupEl.setAttribute('role', 'group');
+      // The toggle says what it opens: aria-controls beside aria-expanded.
+      groupEl.id = `${uid}-${entry.key}`;
+      el.setAttribute('aria-controls', groupEl.id);
+      buildItems(entry.children!, groupEl, level + 1, labels);
+      container.appendChild(groupEl);
+    }
+  }
+}
+
+/** One item by key, at any depth. */
+function findItem(list: NavMenuItem[], key: string): NavMenuItem | null {
+  for (const entry of list) {
+    if (entry.key === key) return entry;
+    const inner = entry.children ? findItem(entry.children, key) : null;
+    if (inner) return inner;
+  }
+  return null;
+}
+
+function rebuildItems(): void {
+  if (!navEl) return;
+  // The entries are replaced, the reader's place is not. Taken by KEY before they go:
+  // `innerHTML = ''` removes the focused entry, and the focus would fall to <body>.
+  const focusedEl = document.activeElement as HTMLElement | null;
+  const inNav = focusedEl && navEl.contains(focusedEl)
+    ? focusedEl.closest(NAV_ENTRY)?.getAttribute('data-nav-key') ?? null
+    : null;
+  const inFlyout = flyout.focused();
+  const flyoutWasOpenFor = inNav && flyout.isOpenFor(inNav);
+  // The entries are about to be replaced: a flyout would be anchored to one that is gone.
+  flyout.close(false);
+  navEl.innerHTML = '';
+  const list = items as unknown as NavMenuItem[];
+  buildItems(list, navEl, 0);
+  keys.applyRoving();
+
+  if (inFlyout) {
+    const anchor = keys.entryByKey(inFlyout.group);
+    const groupItem = findItem(list, inFlyout.group);
+    if (anchor && groupItem?.children?.length && (collapsed as boolean)) {
+      flyout.open(anchor, groupItem);
+      flyout.focusKey(inFlyout.key);
+    } else if (anchor) {
+      flyout.giveBack(anchor);
+    }
+  } else if (inNav) {
+    const entryEl = keys.entryByKey(inNav) ?? navEl.querySelector<HTMLElement>('[tabindex="0"]');
+    if (!entryEl) return;
+    // A trigger's focus opens its flyout: only when it was open does it open again.
+    if (flyoutWasOpenFor) keys.focusEntry(entryEl);
+    else flyout.giveBack(entryEl);
+  }
+}
+
+// ─── Initial expanded keys from data ─────────────────
+function initExpanded(list: NavMenuItem[]): void {
+  const next = new Set<string>();
+  function walk(level: NavMenuItem[]) {
+    for (const entry of level) {
+      if (entry.expanded && entry.children?.length) next.add(entry.key);
+      // A folding heading is open unless it says otherwise.
+      if (entry.type === 'header' && entry.children?.length && !entry.collapsed) next.add(entry.key);
+      if (entry.children) walk(entry.children);
+    }
+  }
+  walk(list);
+  expandedKeys = next;
+}
+
+// The landmark's name follows `label` without a rebuild of the entries; `uiAttr` re-reads it
+// when the language changes.
+$effect(() => {
+  const name = (label as string) || uiString('nav-menu', 'label');
+  navEl?.setAttribute('aria-label', name);
+});
+
+// ─── Build ───────────────────────────────────────────
+let prevItemsRef: NavMenuItem[] | null = null;
+// The first run reads the props and the expanded keys; the menu is built a frame after mount,
+// below. Every later run rebuilds it a frame later.
+let started = false;
+$effect(() => {
+  const list = items as unknown as NavMenuItem[];
+  const isCollapsedNow = collapsed as boolean;
+  void activeKey;
+  void iconSet;
+
+  // Re-init expanded keys when items array changes (e.g. section switch)
+  const itemsChanged = list !== prevItemsRef;
+  if (itemsChanged && list.length) {
+    prevItemsRef = list;
+    initExpanded(list);
+  }
+
+  if (!started) { started = true; return; }
+
+  // Rebuild on any prop change
+  requestAnimationFrame(() => {
+    folded = isCollapsedNow;
+    rebuildItems();
+  });
+});
+
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  // States, not classes (#289): nav.css lays the menu out from them.
+  ready = true;
+  folded = collapsed as boolean;
+
+  navEl = document.createElement('nav');
+  navEl.className = 'pdx-nav';
+  navEl.setAttribute('data-part', 'nav');
+  navEl.setAttribute('role', 'navigation');
+  uiAttr(navEl, 'aria-label', () => (label as string) || uiString('nav-menu', 'label'));
+
+  buildItems(items as unknown as NavMenuItem[], navEl, 0);
+  keys.applyRoving();
+  navEl.addEventListener('keydown', keys.onKeydown);
+  navEl.addEventListener('focusin', keys.onFocusin);
+  host.appendChild(navEl);
+});
+
+// Teardown on destroy only: the flyout is on <body> and would outlive the menu.
+onDestroy(() => flyout.close(false));
+
+/** Expand every group that has children, at any depth. */
+function expandAll(): void {
+  const list = items as unknown as NavMenuItem[];
+  const next = new Set<string>();
+  function walk(level: NavMenuItem[]) {
+    for (const entry of level) {
+      if (entry.children?.length) next.add(entry.key);
+      if (entry.children) walk(entry.children);
+    }
+  }
+  walk(list);
+  expandedKeys = next;
+  rebuildItems();
+}
+
+/** Collapse every group. */
+function collapseAll(): void {
+  expandedKeys = new Set();
+  rebuildItems();
+}
+</script>
