@@ -1303,7 +1303,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             effectOrigins.push(callOrigins(i, body.content));
             effectLines.push(pdxLineOf(i));
             i = body.endLine;
-            usedFeatures.add('effect');
+            // No `effect` feature: a component compiles this to `ctx.track()`. The modules that call
+            // `effect()` for it import it themselves, the script-only one and the store (#1265).
             continue;
         }
 

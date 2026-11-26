@@ -39,6 +39,8 @@ export function compileNewMode(
     const imports = new Set<string>(['html', 'defineComponent']);
     for (const f of analysis.usedFeatures) imports.add(f);
     for (const name of analysis.coreImportNames) imports.add(name);
+    // A script-only module compiles $effect to `effect()`; a component, to `ctx.track()` (#1265).
+    if (scriptOnly && analysis.effects.length > 0) imports.add('effect');
     // @fetch needs resource + getDefaultClient
     if (analysis.fetches.length > 0) {
         imports.add('resource');

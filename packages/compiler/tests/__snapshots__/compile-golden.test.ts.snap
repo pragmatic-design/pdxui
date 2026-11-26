@@ -170,7 +170,7 @@ exports[`compile golden — demo corpus > effect-test.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, computed, defineComponent, effect, eventHandler, onMount, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, computed, defineComponent, eventHandler, onMount, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tt8bks");
@@ -21949,7 +21949,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-infin
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindComponentProp, bindInterpolation, bindRef, createDataSource, defineComponent, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindComponentProp, bindInterpolation, bindRef, createDataSource, defineComponent, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-708apj");
@@ -22027,7 +22027,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-infin
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindComponentProp, bindRef, createDataSource, defineComponent, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindComponentProp, bindRef, createDataSource, defineComponent, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ptw5m8");
@@ -22097,7 +22097,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-infin
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, createDataSource, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, createDataSource, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7vbk09");
@@ -23848,7 +23848,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindComponentProp, bindInterpolation, computed, createDataSource, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindComponentProp, bindInterpolation, computed, createDataSource, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qkqj8x");
@@ -25776,7 +25776,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-navba
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindRef, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-wmtwfp");
