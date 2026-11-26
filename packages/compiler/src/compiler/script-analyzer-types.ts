@@ -50,6 +50,11 @@ export interface StateDecl {
     name: string;
     /** The boolean expression, as written; absent for a state the script sets by assignment. */
     expr?: string;
+    /**
+     * For a state set by assignment, the name the script assigns (#1441): the state's own name, its
+     * camelCase when it is hyphenated (`at-top` → `atTop`), or the one `as` gives (`@state blocked as held;`).
+     */
+    binding?: string;
 }
 
 /**

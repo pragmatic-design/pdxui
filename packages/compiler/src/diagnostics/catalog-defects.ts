@@ -429,8 +429,8 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_MALFORMED_STATE: {
         severity: 'error', category: 'defect',
         summary: '`@state` written in a shape the compiler does not recognise.',
-        explanation: 'A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assignment — and so an identifier. Any other shape declares nothing, and nothing sets it.',
-        fix: 'Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` with an identifier and `name = on;` in the script.',
+        explanation: 'A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assigning its binding: the name, its camelCase when it is hyphenated, or the one `as` gives. A binding is an identifier and not a reserved word. Any other shape declares nothing, and nothing sets it.',
+        fix: 'Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` and `name = on;` in the script (`@state at-top;` and `atTop = on;`; `@state blocked as held;` and `held = on;`).',
         reproducedIn: `${T}state-rune.test.ts`,
     },
     PDX_STATE_READ: {
@@ -445,12 +445,12 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_STATE_REDECLARED: {
         severity: 'error', category: 'defect',
-        summary: 'A `@state name;` whose name the script also declares.',
-        explanation: 'An assignment to the name would set the script\'s variable, not the state, and the state would never be set.',
-        fix: 'Rename one of the two, or follow the variable with `@state name = expression;`.',
+        summary: 'A `@state name;` whose binding the script also declares.',
+        explanation: 'An assignment to the binding would set the script\'s variable — a `let`, a function, a prop — not the state, and the state would never be set.',
+        fix: 'Give the state another binding with `as` (`@state blocked as held;` beside `@prop blocked`), or follow the variable with `@state name = expression;`.',
         example: {
             bad: pdx('<p>x</p>', '@state shown;\nlet shown = false;\nfunction show() { shown = true; }'),
-            good: pdx('<p>x</p>', '@state shown;\nfunction show() { shown = true; }'),
+            good: pdx('<p>x</p>', '@state shown as drawn;\nlet shown = false;\nfunction show() { shown = true; drawn = true; }'),
         },
     },
     PDX_STATE_NOT_BOOLEAN: {

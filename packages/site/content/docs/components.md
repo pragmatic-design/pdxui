@@ -716,7 +716,9 @@ function arm(delay: number) { setTimeout(() => { shown = true; }, delay); }
 
 `shown = true` sets the state, as `ctx.state('shown', true)` would: there is no signal behind it, so
 a mount pays nothing until it is set. Such a state is only written — reading it is
-`PDX_STATE_READ` — and CSS reads it with `:state(shown)`. A TypeScript component declares `states: ['expanded']` in its
+`PDX_STATE_READ` — and CSS reads it with `:state(shown)`. A hyphenated state is set by its
+camelCase, `@state at-top;` by `atTop = on`, and `as` names it when the script already uses the
+name: `@state blocked as held;` beside `@prop blocked` is set by `held = on`. A TypeScript component declares `states: ['expanded']` in its
 descriptor and sets one with `ctx.state('expanded', true)`. The manifest lists a component's states as
 `cssStates`. Inside the component's own `<style scoped>` the host is not reachable yet, so `:state()`
 is written from a theme or the page.

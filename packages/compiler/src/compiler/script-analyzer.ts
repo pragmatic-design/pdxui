@@ -915,11 +915,13 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
         // ─── @state name; — a state the script sets by assignment (#1436) ───
-        // Match: @state shown;  — the name is assigned in the script, so it is an identifier.
-        // Groups: [1]=name
-        const setStateMatch = trimmed.match(/^@state\s+([A-Za-z_$][\w$]*)\s*;?\s*$/);
-        if (setStateMatch) {
-            states.push({ name: setStateMatch[1] });
+        // Match: @state shown;  @state at-top;  @state blocked as held;  — the script assigns the
+        // binding: the name, its camelCase when hyphenated, as an @event's emitter is, or `as`'s (#1441).
+        // Groups: [1]=name [2]=the binding `as` gives (optional)
+        const setStateMatch = trimmed.match(/^@state\s+([A-Za-z][\w-]*)(?:\s+as\s+([A-Za-z_$][\w$]*))?\s*;?\s*$/);
+        const binding = setStateMatch && (setStateMatch[2] ?? eventEmitterName(setStateMatch[1]));
+        if (setStateMatch && binding && /^[A-Za-z_$][\w$]*$/.test(binding) && !isReservedWord(binding)) {
+            states.push({ name: setStateMatch[1], binding });
             continue;
         }
         if (trimmed.startsWith('@state')) {
@@ -927,7 +929,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 code: 'PDX_MALFORMED_STATE',
                 severity: 'error' as const,
                 message: `Invalid @state declaration: "${trimmed}".`,
-                hint: 'Use: @state name = booleanExpression; or @state name; set by an assignment in the script (name = on;), whose name is an identifier.',
+                hint: 'Use: @state name = booleanExpression; or @state name; set by an assignment in the script (name = on;). '
+                    + 'A hyphenated name is assigned by its camelCase (at-top: atTop = on;); `@state name as other;` names it otherwise, '
+                    + 'with an identifier that is not a reserved word.',
             });
             continue;
         }

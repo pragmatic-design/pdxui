@@ -46,28 +46,32 @@ export function checkSetStates(
     templateIds: ReadonlySet<string>,
     declared: ReadonlySet<string>,
 ): ValidationWarning[] {
-    const names = new Set(analysis.states.filter(s => s.expr === undefined).map(s => s.name));
-    if (names.size === 0) return [];
+    // binding → the state it sets (#1441): `atTop` → `at-top`, `held` → `blocked`.
+    const stateOf = new Map(analysis.states.flatMap(s => s.binding !== undefined ? [[s.binding, s.name] as const] : []));
+    if (stateOf.size === 0) return [];
+    const bindings = new Set(stateOf.keys());
     const out: ValidationWarning[] = [];
-    const redeclared = new Set([...names].filter(n => declared.has(n)));
-    for (const name of redeclared) {
+    const redeclared = new Set([...bindings].filter(b => declared.has(b)));
+    for (const binding of redeclared) {
+        const name = stateOf.get(binding)!;
         out.push({
             code: 'PDX_STATE_REDECLARED',
             severity: 'error',
-            message: `'${name}' is both @state ${name}; and a declaration of the script: an assignment would set the variable, not the state.`,
-            hint: `Rename one of them, or set the state from the variable: @state ${name} = expression;`,
+            message: `'${binding}' is both the binding of @state ${name} and a declaration of the script: an assignment would set the variable, not the state.`,
+            hint: `Give the state another binding (@state ${name} as ${binding}On;), or set it from the variable: @state ${name} = expression;`,
         });
     }
     const read = new Set<string>();
-    for (const piece of scriptPieces) for (const n of readsIn(piece, names)) read.add(n);
-    for (const id of templateIds) if (names.has(id)) read.add(id);
-    for (const name of read) {
-        if (redeclared.has(name)) continue;
+    for (const piece of scriptPieces) for (const b of readsIn(piece, bindings)) read.add(b);
+    for (const id of templateIds) if (bindings.has(id)) read.add(id);
+    for (const binding of read) {
+        if (redeclared.has(binding)) continue;
+        const name = stateOf.get(binding)!;
         out.push({
             code: 'PDX_STATE_READ',
             severity: 'error',
-            message: `@state '${name}' is read, but a state declared with no expression is only set: \`${name} = on\` is ctx.state('${name}', on), and nothing holds the value to read back.`,
-            hint: `Keep the value in a $signal and follow it: let ${name}On = $signal(false); @state ${name} = ${name}On; — or, in CSS, read :state(${name}).`,
+            message: `@state '${name}' is read as ${binding}, but a state declared with no expression is only set: \`${binding} = on\` is ctx.state('${name}', on), and nothing holds the value to read back.`,
+            hint: `Keep the value in a $signal and follow it: let ${binding}On = $signal(false); @state ${name} = ${binding}On; — or, in CSS, read :state(${name}).`,
         });
     }
     return out;

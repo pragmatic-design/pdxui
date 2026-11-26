@@ -210,6 +210,8 @@ It takes a boolean only; `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN` — reac
 A state a handler, a timer or an observer writes is **`@state name;`**, set by assignment
 (`name = on;` is `ctx.state('name', !!on)`, no signal, no effect); it is never read
 (`PDX_STATE_READ`) — don't mirror it in a `$signal` just to feed `@state name = signal;`.
+A hyphenated one is assigned by its camelCase (`@state at-top;` → `atTop = on`); beside a prop of the
+same name, `@state blocked as held;` → `held = on`.
 A TypeScript component declares `states: ['open']` and calls `ctx.state('open', on)`.
 
 **`@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }`** declares the

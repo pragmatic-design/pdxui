@@ -770,12 +770,12 @@ beta (#160)
 
 ```ebnf
 StateDecl ::= "@state" S StateName S? "=" S? Expression S? ";"?
-           | "@state" S Identifier S? ";"?
+           | "@state" S StateName ( S "as" S Identifier )? S? ";"?
 StateName ::= [A-Za-z] [A-Za-z0-9_-]*
 ```
 
 The analyzer's forms: `@state name = booleanExpression;`, a state that follows its expression, and
-`@state name;`, a state the script sets by assignment (#1436).
+`@state name;`, a state the script sets by assignment (#1436), through its binding (#1441).
 
 #### Semantics
 
@@ -795,18 +795,25 @@ assignment. A parameter or a local of the same name is that binding, not the sta
 for a state written by an event, a timer or an observer; a state that is a condition over what the
 script already holds is `@state name = expression;`.
 
+The script assigns the state's binding (#1441). It is the state's name; for a hyphenated name, its
+camelCase, as a quoted `@event 'open-change'` is emitted with `openChange(…)` — `@state at-top;` is
+set by `atTop = on`. `as` names the binding when the script already uses the state's name:
+`@state blocked as held;` beside `@prop blocked` is set by `held = on`, and `blocked` stays the prop.
+
 #### Rules
 
 - The expression is a boolean. A non-boolean literal, a `$signal(…)` or `$store(…)`, or a `$signal`
   that starts as a non-boolean literal raises `PDX_STATE_NOT_BOOLEAN`. `@state` is not Svelte's
   `$state`: reactive data is a `$signal`.
-- A `@state` with no name, an empty expression, or a hyphenated name and no expression (it could
-  not be assigned) raises `PDX_MALFORMED_STATE`.
-- A state with no expression is written, not read: a read of it in the script or the template —
-  `if (shown)`, `shown = !shown`, `shown ||= x`, `shown++`, `:hidden="!shown"` — raises
+- A `@state` with no name, an empty expression, or a binding that is not an identifier or is a
+  reserved word (`@state label-;`, `@state delete;`, `@state open as class;`) raises
+  `PDX_MALFORMED_STATE`.
+- A state with no expression is written, not read: a read of its binding in the script or the
+  template — `if (shown)`, `shown = !shown`, `shown ||= x`, `shown++`, `:hidden="!shown"` — raises
   `PDX_STATE_READ`. A value the script reads is a `$signal`, which `@state name = signal;` follows.
-- A state with no expression whose name the script also declares (`let shown`, `function shown`)
-  raises `PDX_STATE_REDECLARED`: its assignments would set the variable, not the state.
+- A binding the script also declares (`let shown`, `function shown`, `@prop shown`) raises
+  `PDX_STATE_REDECLARED`: its assignments would set the variable, not the state. `as` gives the
+  state another binding.
 - Inside the component's own `<style scoped>`, the host is `:scope` (#152), so `:scope:state(open)`
   styles the component in that state; a theme or the page write `:state()` on the tag.
 - Under `target: 'baseline-2024'` the state will also be mirrored as a `data-state-<name>` attribute;

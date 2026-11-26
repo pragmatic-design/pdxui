@@ -80,12 +80,14 @@ describe('a signal a @state reads is read', () => {
 });
 
 describe('PDX_MALFORMED_STATE', () => {
-    // `@state open;` is a declaration since #1436, a state the script sets by assignment
-    // (state-set.test.ts). What is still no declaration is reported, not dropped.
-    it('a @state with no name, or a hyphenated name and no expression, is reported, not dropped', () => {
+    // `@state open;` is a declaration since #1436, a state the script sets by assignment, and so is
+    // `@state label-left;`, set by its camelCase, since #1441 (state-set.test.ts). What is still no
+    // declaration is reported, not dropped.
+    it('a @state with no name, an empty expression or a binding that cannot be one is reported, not dropped', () => {
         expect(codes('@state;', 'PDX_MALFORMED_STATE')).toHaveLength(1);
-        expect(codes('@state label-left;', 'PDX_MALFORMED_STATE')).toHaveLength(1);
         expect(codes('@state open = ;', 'PDX_MALFORMED_STATE')).toHaveLength(1);
+        expect(codes('@state label-;', 'PDX_MALFORMED_STATE')).toHaveLength(1);
         expect(codes('@state open;', 'PDX_MALFORMED_STATE')).toHaveLength(0);
+        expect(codes('@state label-left;', 'PDX_MALFORMED_STATE')).toHaveLength(0);
     });
 });

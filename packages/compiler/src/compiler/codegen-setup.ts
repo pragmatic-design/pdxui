@@ -268,8 +268,9 @@ export function buildSetupBody(
     }
     // @search: searchParams is a computed too (#204)
     if (analysis.route.searchParams && analysis.route.searchParams.length > 0) callableNames.add('searchParams');
-    // @state name; (#1436): an assignment to the name sets the state, `ctx.state('name', !!(on))`.
-    const setStateNames = new Set(analysis.states.filter(s => s.expr === undefined).map(s => s.name));
+    // @state name; (#1436): an assignment to its binding sets the state, `ctx.state('name', !!(on))` —
+    // binding → state, `atTop` → `at-top` (#1441).
+    const setStateNames = new Map(analysis.states.flatMap(s => s.binding !== undefined ? [[s.binding, s.name] as const] : []));
 
     // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass. Declared
     // before the first statement that uses it: the sets above are consts, and a call ahead of them
