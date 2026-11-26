@@ -71,6 +71,7 @@ const PORTED: Record<string, string> = {
     'pdx-empty-state': 'src/empty-state/pdx-empty-state.pdx',
     'pdx-statistic': 'src/statistic/pdx-statistic.pdx',
     'pdx-split-button': 'src/split-button/pdx-split-button.pdx',
+    'pdx-splitter': 'src/splitter/pdx-splitter.pdx',
     'pdx-fab': 'src/fab/pdx-fab.pdx',
     'pdx-icon': 'src/icon/pdx-icon.pdx',
     'pdx-image':'src/image/pdx-image.pdx',
