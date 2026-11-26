@@ -30,7 +30,7 @@ import { componentTokens } from '../../design/scripts/component-tokens.mjs';
 import {
     UI_ROOT, normalizeEol, PROP_DESC, jsdocDescription, jsdocTags, splitNameDesc, scanRoles, withoutComments,
     scanSlots, scanExportedShapes, declaredFunction, functionParameters, describeProp, assembleModule,
-    scanContexts, helperFiles,
+    scanContexts, helperFiles, objectShape,
 } from './manifest-shared.mjs';
 import { analyzePdxFile } from './manifest-pdx.mjs';
 import { declaresInternal } from '@pdxui/compiler';
@@ -529,23 +529,6 @@ function parametersOf(prop, sourceFile) {
             : named ? declaredFunction(named, sourceFile) : null;
     if (!fn) return null;
     return functionParameters(fn, sourceFile);
-}
-/**
- * The shape of an exposed object, as a reader would call it: `{ scrollTo(opts), getViewport() }`.
- * Each key with its parameter names, because the whole point of publishing it is that
- * `el.scrollArea.scrollTo(...)` is reachable and `el.scrollArea()` is not.
- */
-function objectShape(object, sourceFile) {
-    const parts = [];
-    for (const prop of object.properties) {
-        const key = prop.name && (ts.isIdentifier(prop.name) || ts.isStringLiteral(prop.name)) ? prop.name.text : null;
-        if (!key) continue;
-        const fn = ts.isMethodDeclaration(prop) ? prop
-            : ts.isPropertyAssignment(prop) && (ts.isArrowFunction(prop.initializer) || ts.isFunctionExpression(prop.initializer))
-                ? prop.initializer : null;
-        parts.push(fn ? `${key}(${fn.parameters.map(p => p.name.getText(sourceFile)).join(', ')})` : key);
-    }
-    return `{ ${parts.join(', ')} }`;
 }
 
 // ─── Per-file extraction ────────────────────────────────────────────

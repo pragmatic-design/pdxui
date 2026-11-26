@@ -8,7 +8,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { describeComponent, internalViews } from '@pdxui/compiler';
 import {
     normalizeEol, PROP_DESC, readDocComment, describeProp, scanRoles, withoutComments, scanSlots,
-    scanExportedShapes, declaredFunction, functionParameters, assembleModule, scanContexts, helperFiles,
+    scanExportedShapes, declaredFunction, declaredObject, objectShape, functionParameters, assembleModule,
+    scanContexts, helperFiles,
 } from './manifest-shared.mjs';
 
 /** The library's tag prefix: `select.pdx` and `pdx-select.pdx` register `<pdx-select>`. */
@@ -95,6 +96,9 @@ export function analyzePdxFile(file, text, categories) {
     const getters = new Set(a.exposeGetters ?? []);
     const methods = a.exposes.map(name => {
         const fn = derived.has(name) || getters.has(name) ? null : declaredFunction(name, body);
+        // An object it exposes, `const api = { … }`, is a read-only field typed by its keys (#1210).
+        const object = fn || derived.has(name) || getters.has(name) ? null : declaredObject(name, body);
+        if (object) return { name, kind: 'object', objectType: objectShape(object, body), description: docOf('declaration', name) };
         return fn
             ? { name, kind: 'method', params: functionParameters(fn, body), description: docOf('declaration', name) }
             // An `@expose`d $derived, signal or part is read-only on the element (#752).

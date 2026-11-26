@@ -1,0 +1,187 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxScrollArea",
+  "tagName": "pdx-scroll-area",
+  "category": "Layout",
+  "order": 74,
+  "description": "A scrollable container that replaces the native scrollbars with styled, auto-hiding overlay\nscrollbars, vertical, horizontal or on both axes.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "type",
+      "description": "Scrollbar visibility: auto (show on scroll+hover), always, hover (show on hover only), never",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "type"
+    },
+    {
+      "kind": "field",
+      "name": "axis",
+      "description": "Axis: vertical (default), horizontal, both",
+      "type": {
+        "text": "string"
+      },
+      "default": "'vertical'",
+      "attribute": "axis"
+    },
+    {
+      "kind": "field",
+      "name": "scrollHideDelay",
+      "description": "Auto-hide delay in ms (0 = never hide). Used when type=auto",
+      "type": {
+        "text": "number"
+      },
+      "default": "1200",
+      "attribute": "scrollhidedelay"
+    },
+    {
+      "kind": "field",
+      "name": "maxHeight",
+      "description": "Max height (CSS value). Enables scroll when content overflows",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "maxheight"
+    },
+    {
+      "kind": "field",
+      "name": "height",
+      "description": "Height (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "height"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Names the scrollable area (\"Release notes\") and makes it a region landmark. Empty: no\nlandmark — the area stays focusable (tabindex 0) so the keyboard can scroll it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "scrollArea",
+      "readonly": true,
+      "type": {
+        "text": "{ scrollTo(opts), scrollBy(opts), scrollIntoView(el, opts), getViewport(), recalculate() }"
+      },
+      "description": "Helpers over the inner viewport, reached as `el.scrollArea.scrollTo(…)`: the host is not\nthe element that scrolls, so the natives would act on the wrong box (which is also why\nthey are namespaced here rather than flattened onto the host)."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-scroll",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The viewport scrolled: where it is, and how big the content and the viewport are.",
+      "detail": "{ scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number }"
+    }
+  ],
+  "roles": [
+    "region"
+  ],
+  "attributes": [
+    {
+      "name": "type",
+      "fieldName": "type",
+      "description": "Scrollbar visibility: auto (show on scroll+hover), always, hover (show on hover only), never",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "axis",
+      "fieldName": "axis",
+      "description": "Axis: vertical (default), horizontal, both",
+      "type": {
+        "text": "string"
+      },
+      "default": "'vertical'"
+    },
+    {
+      "name": "scrollhidedelay",
+      "fieldName": "scrollHideDelay",
+      "description": "Auto-hide delay in ms (0 = never hide). Used when type=auto",
+      "type": {
+        "text": "number"
+      },
+      "default": "1200"
+    },
+    {
+      "name": "maxheight",
+      "fieldName": "maxHeight",
+      "description": "Max height (CSS value). Enables scroll when content overflows",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "height",
+      "fieldName": "height",
+      "description": "Height (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Names the scrollable area (\"Release notes\") and makes it a region landmark. Empty: no\nlandmark — the area stays focusable (tabindex 0) so the keyboard can scroll it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "viewport",
+      "description": "The element that scrolls (`.pdx-scroll-area-viewport`), around the content."
+    },
+    {
+      "name": "scrollbar",
+      "description": "An overlay scrollbar's track, one per axis it scrolls on."
+    },
+    {
+      "name": "thumb",
+      "description": "A scrollbar's thumb."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "at-top",
+      "description": "Scrolled to the top: nothing more above."
+    },
+    {
+      "name": "at-bottom",
+      "description": "Scrolled to the bottom: nothing more below."
+    },
+    {
+      "name": "at-left",
+      "description": "Scrolled to the left edge (horizontal or two-axis area)."
+    },
+    {
+      "name": "at-right",
+      "description": "Scrolled to the right edge (horizontal or two-axis area)."
+    }
+  ]
+}

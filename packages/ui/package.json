@@ -170,7 +170,7 @@
       "import": "./dist/splitter/pdx-splitter.js"
     },
     "./scroll-area": {
-      "development": "./src/scroll-area/pdx-scroll-area.ts",
+      "development": "./src/scroll-area/pdx-scroll-area.pdx",
       "types": "./dist/scroll-area/pdx-scroll-area.d.ts",
       "import": "./dist/scroll-area/pdx-scroll-area.js"
     },
