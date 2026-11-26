@@ -11,7 +11,7 @@ import './server-dom';
 import { describe, it, expect } from 'vitest';
 import { html } from '@pdxui/core';
 import { renderToStringWithReport } from '@pdxui/core/server';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 
 describe('pdx-autocomplete on the server', () => {
     it('renders its matches, highlighted, with nothing left as an empty host', () => {

@@ -134,7 +134,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // the showcase does not render it, so this entry is where its weight is read (#1379); the
     // module alone is 1333 B against 1003 B, its template's compiled blocks. 345.7 after
     // pdx-bulk-actions (measured here: 345.6), the same reason: 1703 B alone against 1459 B (#1379).
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 345.7 },
+    // 345.9 after pdx-autocomplete (measured here: 345.8): 0.95× alone (4636 against 4902 B), but its
+    // option list's template compiles to blocks where the TypeScript version shared html``'s engine.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 345.9 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -157,8 +159,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // here: 335.5), as for the entry above. 335.9 after pdx-cascader (measured here: 335.8), as for
     // the entry above. 336.2 after pdx-date-picker (measured here: 336.1), as for the entry above.
     // 336.4 after pdx-page-header (measured here: 336.3), as for the entry above. 336.7 after
-    // pdx-bulk-actions (measured here: 336.6), as for the entry above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 336.7 },
+    // pdx-bulk-actions (measured here: 336.6), as for the entry above. 336.8 after pdx-autocomplete
+    // (measured here: 336.7, on the ceiling), as for the entry above.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 336.8 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

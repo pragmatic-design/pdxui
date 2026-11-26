@@ -122,7 +122,7 @@ import './command/pdx-command.pdx';
 
 // Tier 3A: Data-bound
 import './select/pdx-select';
-import './autocomplete/pdx-autocomplete';
+import './autocomplete/pdx-autocomplete.pdx';
 import './data-source/pdx-data-source.pdx';
 import './data-grid/pdx-data-grid';
 import './filter-builder/pdx-filter-builder.pdx';

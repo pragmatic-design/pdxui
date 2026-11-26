@@ -1596,7 +1596,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/autocomplete/pdx-autocomplete.ts",
+      "path": "src/autocomplete/pdx-autocomplete.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -2239,7 +2239,7 @@
           "name": "pdx-autocomplete",
           "declaration": {
             "name": "PdxAutocomplete",
-            "module": "src/autocomplete/pdx-autocomplete.ts"
+            "module": "src/autocomplete/pdx-autocomplete.pdx"
           }
         }
       ]

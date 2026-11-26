@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { cleanup, mount } from './helpers';
 import '../../src/select/pdx-select';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';

@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/select/pdx-select';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/date-picker/pdx-date-picker.pdx';

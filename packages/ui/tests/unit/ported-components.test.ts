@@ -23,6 +23,7 @@ const PORTED: Record<string, string> = {
     'pdx-alert-dialog': 'src/alert-dialog/pdx-alert-dialog.pdx',
     'pdx-app-layout': 'src/app-layout/pdx-app-layout.pdx',
     'pdx-auto-form':'src/auto-form/pdx-auto-form.pdx',
+    'pdx-autocomplete': 'src/autocomplete/pdx-autocomplete.pdx',
     'pdx-avatar': 'src/avatar/pdx-avatar.pdx',
     'pdx-avatar-group': 'src/avatar-group/pdx-avatar-group.pdx',
     'pdx-block-ui': 'src/block-ui/pdx-block-ui.pdx',

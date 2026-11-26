@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-autocomplete (tier 2, combobox text input + suggestions listbox)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/autocomplete/pdx-autocomplete.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/autocomplete/pdx-autocomplete.pdx)
  * and the CSS (packages/design/src/components/autocomplete.css).
  *
  * ── DOM structure (light DOM, render() in pdx-autocomplete.ts:375) ──
