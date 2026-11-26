@@ -8,7 +8,7 @@ import { cleanup, tick } from './helpers';
 
 import '../../src/pagination/pdx-pagination.pdx';
 import '../../src/otp-input/pdx-otp-input.pdx';
-import '../../src/page-header/pdx-page-header';
+import '../../src/page-header/pdx-page-header.pdx';
 
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 

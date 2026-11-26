@@ -1,0 +1,90 @@
+<template>
+  <header class="pdx-page-header" data-part="root">
+    @if (crumbList().length) {
+      <nav class="pdx-breadcrumb" data-part="breadcrumb" :aria-label="uiString('page-header', 'breadcrumb')">
+        <ol class="pdx-breadcrumb-list" role="list">
+          @for (crumbList() as c, i; track i) {
+            <li class="pdx-breadcrumb-item">
+              <!-- The separator is empty: nav.css fills the theme's glyph, as pdx-breadcrumb's. -->
+              @if (i === crumbList().length - 1) {
+                <span class="pdx-breadcrumb-current" aria-current="page">{{ c.label }}</span>
+              } @else if (c.href) {
+                <a class="pdx-breadcrumb-link" :href="c.href" @click="chooseCrumb(c)">{{ c.label }}</a><span class="pdx-breadcrumb-sep" aria-hidden="true"></span>
+              } @else {
+                <!-- No href: a button. An <a> without one is not a link and takes no focus, so the
+                     keyboard could not reach the crumb (#289). -->
+                <button type="button" class="pdx-breadcrumb-link" @click="chooseCrumb(c)">{{ c.label }}</button><span class="pdx-breadcrumb-sep" aria-hidden="true"></span>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    }
+    <div class="pdx-page-header-row">
+      <div class="pdx-page-header-titles">
+        {{ heading() }}
+        @if (subtitle) {<p class="pdx-page-header-subtitle" data-part="subtitle">{{ subtitle }}</p>}
+      </div>
+      <div class="pdx-page-header-actions" data-part="actions"><slot name="actions"></slot></div>
+    </div>
+  </header>
+</template>
+
+<script>
+/**
+ * The standard header of a page: a breadcrumb, the title with an optional subtitle, and an area for
+ * the page's actions.
+ *
+ * @slot actions - Commands shown in the header's actions area (e.g. the page's primary action).
+ *
+ * @csspart root - The `<header>`.
+ * @csspart breadcrumb - The `<nav>` of the crumbs, when there are any.
+ * @csspart title - The title, the heading `heading-level` names.
+ * @csspart subtitle - The line under the title, when there is one.
+ * @csspart actions - The area the `actions` slot lands in.
+ */
+// pdx-page-header — Standard page header: breadcrumb + title (+ subtitle) + an actions slot.
+// Replaces the hand-assembled "breadcrumb + <h1> + buttons" row repeated on every list/detail screen.
+import { uiString } from '../shared/i18n';
+import type { PageHeaderCrumb } from './page-header-types';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/page-header';
+
+// A header holds no position and no state of its own (#289).
+/** A crumb with a link was chosen: its `key` and the crumb. */
+@event 'pdx-crumb': { key: string; item: PageHeaderCrumb };
+// pdx-ignore PDX_PART_NAME_TAKEN: `subtitle` is the theme's part on the line; the script's `subtitle` is the prop
+@part root, breadcrumb, subtitle, actions;
+// The title is built by the script, as the heading `headingLevel` names (#1284).
+@part(external) title;
+@prop title: string = '';
+@prop subtitle: string = '';
+@prop crumbs: unknown[] = [];
+/** The title's heading level, 1-6. Default 1; lower it for a header inside a dialog or a section. */
+@prop headingLevel: number = 1;
+
+/**
+ * The title, an h1…h6 by `headingLevel`, so a page that has its own h1 does not get two, and one
+ * inside a dialog or a section can be demoted. A real heading element, so the level is native; the
+ * class carries the look.
+ */
+function heading(): HTMLElement {
+  const level = Math.min(6, Math.max(1, Math.round(Number(headingLevel) || 1)));
+  const h = document.createElement(`h${level}`);
+  h.className = 'pdx-page-header-title';
+  h.setAttribute('data-part', 'title');
+  h.textContent = title as string;
+  return h;
+}
+
+function chooseCrumb(c: PageHeaderCrumb) {
+  pdxCrumb({ key: c.key, item: c });
+}
+
+// A `:crumbs` binding reaches the prop as the array; anything else is no crumbs.
+function crumbList(): PageHeaderCrumb[] {
+  const v = crumbs as unknown;
+  return Array.isArray(v) ? (v as PageHeaderCrumb[]) : [];
+}
+</script>

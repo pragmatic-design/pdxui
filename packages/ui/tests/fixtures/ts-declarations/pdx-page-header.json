@@ -1,0 +1,125 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxPageHeader",
+  "tagName": "pdx-page-header",
+  "category": "Navigation",
+  "order": 63,
+  "description": "The standard header of a page: a breadcrumb, the title with an optional subtitle, and an area for\nthe page's actions.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "title"
+    },
+    {
+      "kind": "field",
+      "name": "subtitle",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "subtitle"
+    },
+    {
+      "kind": "field",
+      "name": "crumbs",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "headingLevel",
+      "description": "The title's heading level, 1-6. Default 1; lower it for a header inside a dialog or a section.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "headinglevel"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-crumb",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A crumb with a link was chosen: its `key` and the crumb.",
+      "detail": "{ key: string; item: PageHeaderCrumb }"
+    }
+  ],
+  "roles": [
+    "list"
+  ],
+  "attributes": [
+    {
+      "name": "title",
+      "fieldName": "title",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "subtitle",
+      "fieldName": "subtitle",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "headinglevel",
+      "fieldName": "headingLevel",
+      "description": "The title's heading level, 1-6. Default 1; lower it for a header inside a dialog or a section.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "PageHeaderCrumb",
+      "fields": [
+        "key: string",
+        "label: string",
+        "href?: string"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "actions",
+      "description": "Commands shown in the header's actions area (e.g. the page's primary action)."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `<header>`."
+    },
+    {
+      "name": "breadcrumb",
+      "description": "The `<nav>` of the crumbs, when there are any."
+    },
+    {
+      "name": "title",
+      "description": "The title, the heading `heading-level` names."
+    },
+    {
+      "name": "subtitle",
+      "description": "The line under the title, when there is one."
+    },
+    {
+      "name": "actions",
+      "description": "The area the `actions` slot lands in."
+    }
+  ]
+}
