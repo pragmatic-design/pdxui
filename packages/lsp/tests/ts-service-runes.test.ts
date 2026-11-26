@@ -71,6 +71,11 @@ describe('the rune declarations', () => {
         expect(diagnose(wrong).some(d => /string.*not assignable.*boolean/.test(d)), JSON.stringify(diagnose(wrong))).toBe(true);
     });
 
+    it('a hyphenated @state is its camelCase, and `as` names the binding beside a prop (#1441)', () => {
+        const script = '@prop blocked: boolean = false;\n@state at-top;\n@state blocked as held;\nfunction f() { atTop = true; held = blocked; }\nf;\n';
+        expect(diagnose(script)).toEqual([]);
+    });
+
     it('a @model is a typed name the script reads and writes (#124)', () => {
         const script = "@model value: string = '';\nfunction clear() { value = ''; }\nfunction len() { return value.length; }\nclear; len;\n";
         expect(diagnose(script)).toEqual([]);

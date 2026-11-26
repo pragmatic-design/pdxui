@@ -391,7 +391,7 @@ alpha → beta (#131)
 
 ```ebnf
 StateDecl ::= "@state" S Identifier S? "=" S? Expression End
-            | "@state" S Identifier End
+            | "@state" S StateName ( S "as" S Identifier )? End
 ```
 
 ### Semantics
@@ -405,7 +405,9 @@ build emits the attribute selector beside `:state()`. The manifest lists the sta
 
 With no expression (#1436), `@state shown;` is a state the script sets by assignment: `shown = on`
 compiles to `ctx.state('shown', !!(on))`, with no signal and no effect — the form for a state an
-event, a timer or an observer writes.
+event, a timer or an observer writes. A hyphenated state is set by its camelCase (`@state at-top;`,
+`atTop = on`), and `as` names the binding when the script already uses the name
+(`@state blocked as held;` beside `@prop blocked`) (#1441).
 
 ### Rules
 

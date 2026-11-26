@@ -69,15 +69,16 @@ function reportFallback(filename: string, reason: string, fragment: string, sink
     });
 }
 
-const NO_NAMES: ReadonlySet<string> = new Set();
+const NO_STATES: ReadonlyMap<string, string> = new Map();
 
 /**
  * @param untracked every read of a $signal is `__name.peek()`: its value now, subscribing nothing.
  *   For an initialiser, which runs once at setup and whose reads are its starting values (#682).
- * @param stateNames the states declared `@state name;` (#1436): `name = on` is `ctx.state('name', !!(on))`.
- *   A read of one is PDX_STATE_READ's, reported by validation; it is left as written here.
+ * @param stateNames the states declared `@state name;` (#1436), binding → state name (#1441):
+ *   `atTop = on` is `ctx.state('at-top', !!(on))`. A read of one is PDX_STATE_READ's, reported by
+ *   validation; it is left as written here.
  */
-export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false, stateNames: ReadonlySet<string> = NO_NAMES): string {
+export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false, stateNames: ReadonlyMap<string, string> = NO_STATES): string {
     if (signalNames.size === 0 && callableNames.size === 0 && stateNames.size === 0) return code;
     // Edits whose start falls inside a protected [start,end) range are dropped — used to skip
     // @raw regions while still parsing the WHOLE body as one unit (so multiline statements
@@ -128,7 +129,8 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         // write is the setter, as `ctx.state` is in TypeScript, with no signal behind it.
         if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
             ts.isIdentifier(node.left) && stateNames.has(node.left.text) && !shadowed(node.left.text)) {
-            edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `ctx.state('${node.left.text}', !!(` }); // an identifier: no quote to escape
+            // The state's name is [A-Za-z][\w-]*: no quote to escape.
+            edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `ctx.state('${stateNames.get(node.left.text)}', !!(` });
             edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: '))' });
             visit(node.right, peekName);
             return true;

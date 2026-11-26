@@ -1016,9 +1016,9 @@ write:
 
 *error* — `@state` written in a shape the compiler does not recognise.
 
-A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assignment — and so an identifier. Any other shape declares nothing, and nothing sets it.
+A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assigning its binding: the name, its camelCase when it is hyphenated, or the one `as` gives. A binding is an identifier and not a reserved word. Any other shape declares nothing, and nothing sets it.
 
-**Fix.** Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` with an identifier and `name = on;` in the script.
+**Fix.** Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` and `name = on;` in the script (`@state at-top;` and `atTop = on;`; `@state blocked as held;` and `held = on;`).
 
 ### PDX_MODEL_ATTRIBUTE_AMBIGUOUS
 
@@ -1846,11 +1846,11 @@ function toggle() { drawn = !drawn; }
 
 ### PDX_STATE_REDECLARED
 
-*error* — A `@state name;` whose name the script also declares.
+*error* — A `@state name;` whose binding the script also declares.
 
-An assignment to the name would set the script's variable, not the state, and the state would never be set.
+An assignment to the binding would set the script's variable — a `let`, a function, a prop — not the state, and the state would never be set.
 
-**Fix.** Rename one of the two, or follow the variable with `@state name = expression;`.
+**Fix.** Give the state another binding with `as` (`@state blocked as held;` beside `@prop blocked`), or follow the variable with `@state name = expression;`.
 
 Instead of:
 
@@ -1872,8 +1872,9 @@ write:
   <p>x</p>
 </template>
 <script>
-@state shown;
-function show() { shown = true; }
+@state shown as drawn;
+let shown = false;
+function show() { shown = true; drawn = true; }
 </script>
 ```
 

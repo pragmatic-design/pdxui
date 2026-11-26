@@ -251,12 +251,6 @@ export function projectScriptMapped(
             const formAssociated = analyzeScript(s, 'projection.pdx').props.some((p) => p.model && p.form);
             if (named) emitters.push(`var ${named[1]}: import('@pdxui/core').${formAssociated ? 'FormPdxElement' : 'PdxElement'};`);
         }
-        if (kw === 'state') {
-            // Match: @state shown; — set by assignment (#1436), so a boolean; `@state x = e;` declares no name.
-            // Groups: [1]=the name
-            const set = /^\s+([A-Za-z_$][\w$]*)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
-            if (set) emitters.push(`var ${set[1]}: boolean;`);
-        }
         if (kw === 'part') {
             // Match: @part trigger, popup; — each name is its element, null while not rendered (#134),
             // or the array of its elements when the template renders it more than once (#988).
@@ -393,6 +387,9 @@ export function projectScriptMapped(
             insertions.push({ at, length: text.length });
         }
     }
+    // `@state shown;`, `@state at-top;`, `@state blocked as held;` (#1436, #1441): the binding the script
+    // assigns, a boolean, as the compiler's analyzer reads it. `@state x = e;` declares none.
+    if (/^\s*@state\b/m.test(s)) for (const st of analyzeScript(s, 'projection.pdx').states) if (st.binding) emitters.push(`var ${st.binding}: boolean;`);
     // `var`: declared after the code that reads them, as the compiler makes them available before it.
     const decls = [...[...names].map(([n, type]) => `var ${n}: ${type};`), ...emitters].join(' ');
     return { text: decls ? `${res}\n;${decls}` : res, insertions };

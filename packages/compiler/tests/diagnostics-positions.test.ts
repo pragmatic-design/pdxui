@@ -76,7 +76,7 @@ const ROWS: Record<string, Row> = {
     PDX_PART_EXTERNAL_DRAWN: { src: pdx('<p data-part="panel">{{ a }}</p>', "let a = $signal(1);\n@part(external) panel;\nfunction m(el) { el.dataset.part = 'panel'; }"), at: '@part(external) panel;' },
     PDX_PART_UNDECLARED: { src: pdx('<p data-part="popup">{{ a }}</p>', 'let a = $signal(1);'), at: 'data-part="popup"' },
     PDX_HOST_INVALID_ATTRIBUTE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@host {\n  role="button"\n  data-part="x"\n}'), at: 'data-part="x"' },
-    PDX_MALFORMED_STATE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state label-left;'), at: '@state label-left;' },
+    PDX_MALFORMED_STATE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state label-;'), at: '@state label-;' },
     PDX_STATE_READ: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state shown;\nfunction f() { if (shown) a = 2; }'), at: '@state shown;' },
     PDX_STATE_REDECLARED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state shown;\nlet shown = false;'), at: '@state shown;' },
     PDX_STATE_NOT_BOOLEAN: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state busy = a;'), at: '@state busy' },

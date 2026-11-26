@@ -77,7 +77,7 @@ SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type
 GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
 StateDecl      ::= "@state" S StateName S? "=" S? Expression End                                    (β #132)
-                 | "@state" S Identifier End                                                       (set by assignment, #1436)
+                 | "@state" S StateName ( S "as" S Identifier )? End                                (set by assignment, #1436; its binding, #1441)
 StateName      ::= [A-Za-z] [A-Za-z0-9_-]*                                                          (a CSS custom state's name, #1230)
 HydrateDecl    ::= "@hydrate" S Triggers End                                                       (β #160: @defer's triggers, no `when`)
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
