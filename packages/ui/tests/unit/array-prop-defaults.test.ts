@@ -5,7 +5,7 @@
 // This pins the six that declare one.
 import { describe, it, expect, afterEach } from 'vitest';
 import '../../src/select/pdx-select';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/page-header/pdx-page-header.pdx';
 import '../../src/relation-picker/pdx-relation-picker.pdx';

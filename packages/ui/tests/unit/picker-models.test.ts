@@ -15,7 +15,7 @@ import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
 import '../../src/select/pdx-select';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';

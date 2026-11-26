@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { cleanup, tick } from './helpers';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/command/pdx-command.pdx';
 import '../../src/context-menu/pdx-context-menu.pdx';

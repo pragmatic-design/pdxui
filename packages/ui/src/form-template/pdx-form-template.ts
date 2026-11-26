@@ -28,7 +28,7 @@ import '../masked-input/pdx-masked-input.pdx';
 import '../number-input/pdx-number-input.pdx';
 import '../date-picker/pdx-date-picker.pdx';
 import '../select/pdx-select';
-import '../autocomplete/pdx-autocomplete';
+import '../autocomplete/pdx-autocomplete.pdx';
 import '../checkbox/pdx-checkbox.pdx';
 import '../checkbox-group/pdx-checkbox-group.pdx';
 import '../radio/pdx-radio.pdx';

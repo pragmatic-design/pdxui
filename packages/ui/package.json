@@ -95,7 +95,7 @@
       "import": "./dist/select/pdx-select.js"
     },
     "./autocomplete": {
-      "development": "./src/autocomplete/pdx-autocomplete.ts",
+      "development": "./src/autocomplete/pdx-autocomplete.pdx",
       "types": "./dist/autocomplete/pdx-autocomplete.d.ts",
       "import": "./dist/autocomplete/pdx-autocomplete.js"
     },

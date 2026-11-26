@@ -35,7 +35,7 @@ import '../../src/button-group/pdx-button-group.pdx';
 import '../../src/inline-edit/pdx-inline-edit.pdx';
 import '../../src/json-editor/pdx-json-editor.pdx';
 import '../../src/calendar/pdx-calendar.pdx';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';

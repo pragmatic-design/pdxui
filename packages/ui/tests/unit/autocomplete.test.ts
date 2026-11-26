@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/autocomplete/pdx-autocomplete.pdx';
 
 function create(attrs: Record<string, string> = {}) {
     const el = document.createElement('pdx-autocomplete') as any;

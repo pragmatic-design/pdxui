@@ -1,0 +1,634 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAutocomplete",
+  "tagName": "pdx-autocomplete",
+  "category": "Data-bound",
+  "order": 104,
+  "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "suggestions",
+      "description": "The list of suggestions to match against.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "The data source to render from.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "Object field used as the visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "valueField",
+      "description": "Object field used as the value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'",
+      "attribute": "valuefield"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "minLength",
+      "description": "Minimum characters before suggestions appear.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "minlength"
+    },
+    {
+      "kind": "field",
+      "name": "debounce",
+      "description": "Delay (ms) before querying after a keystroke.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "debounce"
+    },
+    {
+      "kind": "field",
+      "name": "forceSelection",
+      "description": "Require the value to be one of the suggestions.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "forceselection"
+    },
+    {
+      "kind": "field",
+      "name": "highlight",
+      "description": "Highlights the matched substring in suggestions.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "highlight"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "maxItems",
+      "description": "Maximum number of suggestions to show.",
+      "type": {
+        "text": "number"
+      },
+      "default": "10",
+      "attribute": "maxitems"
+    },
+    {
+      "kind": "field",
+      "name": "remote",
+      "description": "Enable server-side filtering via DataSource.setFilter() with debounce.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "remote"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135).",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the popup."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the popup."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Open the popup when closed, close it when open."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "getText",
+      "parameters": [],
+      "description": "The text the field shows: the picked suggestion's label, or the free text."
+    },
+    {
+      "kind": "method",
+      "name": "getSelectedItem",
+      "parameters": [],
+      "description": "The suggestion last picked, as given; null when the value is free text or set from outside."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-input",
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "label": "$event.currentTarget.getText()",
+    "item": "$event.currentTarget.getSelectedItem()"
+  },
+  "alphaRename": {
+    "pdx-input": "query-change"
+  },
+  "events": [
+    {
+      "name": "query-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The text typed, on each keystroke: the query the suggestions are filtered by.",
+      "detail": "{ value: string }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the clear button empties the field, after its `value-change`."
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: unknown }"
+    }
+  ],
+  "roles": [
+    "combobox",
+    "listbox",
+    "option",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "Object field used as the visible label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "valuefield",
+      "fieldName": "valueField",
+      "description": "Object field used as the value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "minlength",
+      "fieldName": "minLength",
+      "description": "Minimum characters before suggestions appear.",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "debounce",
+      "fieldName": "debounce",
+      "description": "Delay (ms) before querying after a keystroke.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    },
+    {
+      "name": "forceselection",
+      "fieldName": "forceSelection",
+      "description": "Require the value to be one of the suggestions.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "highlight",
+      "fieldName": "highlight",
+      "description": "Highlights the matched substring in suggestions.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "maxitems",
+      "fieldName": "maxItems",
+      "description": "Maximum number of suggestions to show.",
+      "type": {
+        "text": "number"
+      },
+      "default": "10"
+    },
+    {
+      "name": "remote",
+      "fieldName": "remote",
+      "description": "Enable server-side filtering via DataSource.setFilter() with debounce.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The model's value. A form submits it: a picked suggestion's value, not the label shown; free text as typed (#135).",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "option",
+      "description": "Renders one option: a snippet `option(option, index, highlighted)`; `option.raw` is the original item.",
+      "signature": "(option: { label: string; value: unknown; raw: T }, index: number, highlighted: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The frame: border, background and the states' colours."
+    },
+    {
+      "name": "input",
+      "description": "The native `<input>`, the combobox."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable` and something is typed."
+    },
+    {
+      "name": "spinner",
+      "description": "The loading spinner, while loading."
+    },
+    {
+      "name": "popup",
+      "description": "The floating panel that holds the list."
+    },
+    {
+      "name": "list",
+      "description": "The `role=\"listbox\"`."
+    },
+    {
+      "name": "option",
+      "description": "A suggestion of the list."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-input-border-color",
+      "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-focus",
+      "description": "The frame's border while focused (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-invalid",
+      "description": "The frame's border in the invalid state."
+    },
+    {
+      "name": "--pdx-input-border-color-success",
+      "description": "The frame's border in the success state."
+    },
+    {
+      "name": "--pdx-input-border-color-warning",
+      "description": "The frame's border in the warning state."
+    },
+    {
+      "name": "--pdx-input-border-width",
+      "description": "The frame's bottom border, in the filled input style."
+    },
+    {
+      "name": "--pdx-input-focus-ring",
+      "description": "The ring around the frame while focused."
+    },
+    {
+      "name": "--pdx-input-min-height",
+      "description": "The frame's height, at the md size."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "The popup is open."
+    },
+    {
+      "name": "invalid",
+      "description": "`error` is set."
+    },
+    {
+      "name": "success",
+      "description": "`success` is set."
+    },
+    {
+      "name": "warning",
+      "description": "`warning` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set, or the DataSource is loading."
+    }
+  ],
+  "x-pdx-context": {
+    "injects": [
+      {
+        "token": "DataSourceContext",
+        "optional": true
+      }
+    ]
+  }
+}

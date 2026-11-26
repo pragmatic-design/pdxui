@@ -514,7 +514,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // #1287's.
 // entry 43.6 → 43.7 (the owner's OK, on #1448): the new `snippet` chunk is named in Vite's preload
 // map in the entry, +25 B, which took CI's entry from 43.6 to 43.7 KB; locally it rounds to 43.6.
-const BUDGET_KB = { entry: 43.7, js: 481.0, css: 67, blocking: 102.9 };
+// js 481.0 → 481.5 (the same standing OK): pdx-autocomplete moves to .pdx, 0.95× alone (4636 against
+// 4902 B gzip), but the pdx-tag-input chunk it is bundled into grows 242 B: its template compiles to
+// blocks where the TypeScript version shared html``'s engine, as the moves before it found. +439 B
+// over 77 files, the entry +16 B (44698 B, 43.65 KB, still under 43.7). 481.0 KB measured locally
+// against 480.5 on main.
+const BUDGET_KB = { entry: 43.7, js: 481.5, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
