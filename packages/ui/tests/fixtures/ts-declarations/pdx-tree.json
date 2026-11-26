@@ -276,6 +276,12 @@
   "cssProperties": [
     {
       "name": "--pdx-tree-level"
+    },
+    {
+      "name": "--pdx-tree-twisty-size"
+    },
+    {
+      "name": "--pdx-tree-twisty-stroke"
     }
   ]
 }

@@ -319,7 +319,9 @@ function buildRow(n: TreeNode, level: number, position: number, setSize: number)
   twisty.className = 'pdx-tree-twisty';
   twisty.dataset.part = 'twisty';
   twisty.setAttribute('aria-hidden', 'true');
-  twisty.textContent = branch ? (loadingIds.has(id) ? '⋯' : (expanded.has(id) ? '▾' : '▸')) : '';
+  // The arrow is drawn by the design system from the row's aria-expanded (#1279); a branch on
+  // its way is busy, which turns it into the loading ring.
+  if (loadingIds.has(id)) row.setAttribute('aria-busy', 'true');
   row.appendChild(twisty);
 
   if (checkable) {

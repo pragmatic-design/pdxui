@@ -8,7 +8,7 @@
  *   <pdx-tree>                                 ← HOST, no box of its own
  *     <div class="pdx-tree" role="tree">       ← the box: overflow, gap
  *       <div class="pdx-tree-item" role="treeitem" aria-level="1" style="--pdx-tree-level:1">
- *         <span class="pdx-tree-twisty">       ← ▸ / ▾ / ⋯, aria-hidden
+ *         <span class="pdx-tree-twisty">       ← the arrow, drawn in CSS from the row's aria-expanded / aria-busy, aria-hidden
  *         <input class="pdx-tree-check">       ← only with `checkable`
  *         <span class="pdx-tree-label">
  *       <div class="pdx-tree-group" role="group">   ← the children, siblings of the rows
@@ -93,9 +93,13 @@ export const tree: ComponentManifest = {
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="tree"] .pdx-tree-twisty',
-                        description: 'the twisty keeps its column even on a leaf, so labels line up',
-                        width: { op: '>=', value: 12 },
+                        // On a LEAF: the selector matched the first twisty, a branch's, and never
+                        // measured a leaf. The leaf keeps the arrow's box with its borders
+                        // transparent (#1279); its margins make the 1rem column, and the labels
+                        // lining up is the composition rule below.
+                        selector: 'section:not([hidden]) [data-test="tree"] [aria-level="2"]:not([aria-expanded]) > .pdx-tree-twisty',
+                        description: 'the twisty keeps its box even on a leaf, so labels line up',
+                        width: { op: '>=', value: 8 },
                     },
                 ],
                 composition: [
@@ -115,6 +119,19 @@ export const tree: ComponentManifest = {
                         relations: [
                             { description: 'the child label starts further right', left: 'rootLabel.left', op: '<', right: 'childLabel.left' },
                             { description: 'but the row ends where the parent row ends', left: 'root.right', op: '==', right: 'child.right', tolerance: 1 },
+                        ],
+                    },
+                    {
+                        // `app.pdx` is a leaf and `pages` a branch, both at level 2: the leaf keeps an
+                        // empty twisty as wide as the arrow, so the two labels start together (#1279).
+                        description: 'a leaf\'s label starts where a branch\'s does, at the same level',
+                        parent: 'section:not([hidden]) [data-test="tree"] .pdx-tree',
+                        children: {
+                            leafLabel: 'section:not([hidden]) [data-test="tree"] [aria-level="2"]:not([aria-expanded]) .pdx-tree-label',
+                            branchLabel: 'section:not([hidden]) [data-test="tree"] [aria-level="2"][aria-expanded] .pdx-tree-label',
+                        },
+                        relations: [
+                            { description: 'the two labels start at the same x', left: 'leafLabel.left', op: '==', right: 'branchLabel.left', tolerance: 0.5 },
                         ],
                     },
                     {
@@ -151,6 +168,27 @@ export const tree: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="tree-c"] [role="treeitem"]',
                         description: 'a closed branch renders no children: two roots, not five nodes',
                         count: { op: '==', value: 2 },
+                    },
+                    {
+                        // The twisty IS the arrow, drawn by the design system as the accordion's
+                        // chevron is (#1279). It was a text glyph that no theme's font carries: 6×4 px
+                        // of fallback-font ink in a 16×19 box, a third of the label beside it. The
+                        // box is the chevron's (rotated, so its bounding box), at least the
+                        // accordion's 8 px and at most the label's 16 px font.
+                        selector: 'section:not([hidden]) [data-test="tree-c"] [aria-expanded] > .pdx-tree-twisty',
+                        description: 'a branch\'s arrow is drawn at least 8px and at most the label\'s font across',
+                        width: { op: 'between', value: 8, range: [8, 16] },
+                        height: { op: 'between', value: 8, range: [8, 16] },
+                    },
+                ],
+                states: [
+                    {
+                        // Clicking the arrow opens the branch, and the row drawn for the open branch
+                        // turns its chevron down.
+                        description: 'opening a branch turns its arrow',
+                        selector: 'section:not([hidden]) [data-test="tree-c"] .pdx-tree-item:nth-of-type(1) > .pdx-tree-twisty',
+                        trigger: 'click',
+                        changes: { mustDiffer: ['transform'] },
                     },
                 ],
             },

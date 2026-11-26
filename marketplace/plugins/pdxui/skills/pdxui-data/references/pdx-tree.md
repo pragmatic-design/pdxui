@@ -42,7 +42,7 @@ row. It shares the
 
 **Parts:** `[data-part="root"]` — The `role="tree"`: one click and one keydown listener serve every row.; `[data-part="item"]` — A row, `role="treeitem"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3).; `[data-part="group"]` — The `role="group"` of an open branch's children.; `[data-part="twisty"]` — A branch's open/closed marker.; `[data-part="check"]` — A row's checkbox, with `checkable`.; `[data-part="label"]` — A row's label.
 
-**Tokens:** `--pdx-tree-level`. Set one at `:root`, on a subtree, or on the element itself.
+**Tokens:** `--pdx-tree-level`; `--pdx-tree-twisty-size`; `--pdx-tree-twisty-stroke`. Set one at `:root`, on a subtree, or on the element itself.
 
 **Shapes:** `TreeNode { isBranch?: boolean }`
 
@@ -82,7 +82,7 @@ are checked against the manifest above._
 </div>
 ```
 
-**Children fetched when asked for** — `loadChildren` is called the first time a branch opens, and the branch shows `⋯` while it waits. The second server here fails on purpose: the branch stays askable, and `pdx-load-error` fires rather than the tree emptying itself.
+**Children fetched when asked for** — `loadChildren` is called the first time a branch opens, and the branch's arrow turns into a spinning ring while it waits. The second server here fails on purpose: the branch stays askable, and `pdx-load-error` fires rather than the tree emptying itself.
 
 ```js
 const fetchChildren = (node) => api.get('/servers/' + node.id + '/disks');

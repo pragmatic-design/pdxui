@@ -33791,7 +33791,7 @@ import { bindComponentProp, defineComponent, staticBlock, staticMarkup } from '@
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-8ih76b]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-xl); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Children fetched when asked for</h2> <p class="pdx-txt-small pdx-ink-muted"><code>loadChildren</code> is called the first time a branch opens, and the branch shows\\n      <code>⋯</code> while it waits. The second server here fails on purpose: the branch stays\\n      askable, and <code>pdx-load-error</code> fires rather than the tree emptying itself.</p> <div class="demo-stack"><pdx-tree label="Servers"></pdx-tree></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>const fetchChildren = (node) =&gt; api.get(\\'/servers/\\' + node.id + \\'/disks\\');\\n\\n&lt;pdx-tree :nodes="servers" :loadChildren="fetchChildren"&gt;&lt;/pdx-tree&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Children fetched when asked for</h2> <p class="pdx-txt-small pdx-ink-muted"><code>loadChildren</code> is called the first time a branch opens, and the branch\\'s arrow\\n      turns into a spinning ring while it waits. The second server here fails on purpose: the branch stays\\n      askable, and <code>pdx-load-error</code> fires rather than the tree emptying itself.</p> <div class="demo-stack"><pdx-tree label="Servers"></pdx-tree></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>const fetchChildren = (node) =&gt; api.get(\\'/servers/\\' + node.id + \\'/disks\\');\\n\\n&lt;pdx-tree :nodes="servers" :loadChildren="fetchChildren"&gt;&lt;/pdx-tree&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;return [n2];};
 defineComponent('app-demo-comp-tree-lazy-children', {
   props: {},
@@ -33819,9 +33819,9 @@ defineComponent('app-demo-comp-tree-lazy-children', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el7]=__walk0(__frag);
-    bindComponentProp(__el7, "nodes", ()=>ctx.servers);
-    bindComponentProp(__el7, "loadChildren", ()=>ctx.fetchChildren);
+    const [__el6]=__walk0(__frag);
+    bindComponentProp(__el6, "nodes", ()=>ctx.servers);
+    bindComponentProp(__el6, "loadChildren", ()=>ctx.fetchChildren);
     return __frag;
   })(),
 });

@@ -2,8 +2,8 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">Children fetched when asked for</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      <code>loadChildren</code> is called the first time a branch opens, and the branch shows
-      <code>⋯</code> while it waits. The second server here fails on purpose: the branch stays
+      <code>loadChildren</code> is called the first time a branch opens, and the branch's arrow
+      turns into a spinning ring while it waits. The second server here fails on purpose: the branch stays
       askable, and <code>pdx-load-error</code> fires rather than the tree emptying itself.
     </p>
 

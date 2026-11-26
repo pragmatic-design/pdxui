@@ -55,14 +55,51 @@
     color: var(--pdx-color-primary-ink);
 }
 
+/* The twisty is the arrow, drawn as the accordion draws its chevron: a box with two borders, turned
+   right when closed and down when open (#1279). It was a text glyph, ▸ or ▾, that no theme's font
+   carries: 6×4 px of fallback-font ink, a third of the label beside it, that a theme could colour
+   and nothing else.
+   A leaf keeps the same box with its borders transparent, so its label starts where a branch's
+   does; the margin centres the box in the 1rem column the row has always had. */
 .pdx-tree-twisty {
-    display: inline-flex;
-    justify-content: center;
-    width: 1rem;
+    box-sizing: content-box;
     flex: none;
+    width: var(--pdx-tree-twisty-size, 0.5rem);
+    height: var(--pdx-tree-twisty-size, 0.5rem);
+    margin-inline: calc((1rem - var(--pdx-tree-twisty-size, 0.5rem) - var(--pdx-tree-twisty-stroke, 2px)) / 2);
+    border-inline-end: var(--pdx-tree-twisty-stroke, 2px) solid transparent;
+    border-block-end: var(--pdx-tree-twisty-stroke, 2px) solid transparent;
     color: var(--pdx-color-muted);
-    font-size: 0.75rem;
     user-select: none;
+}
+
+.pdx-tree-item[aria-expanded] > .pdx-tree-twisty {
+    border-color: currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--pdx-transition);
+}
+
+.pdx-tree-item[aria-expanded="true"] > .pdx-tree-twisty {
+    transform: rotate(45deg);
+}
+
+/* A right-to-left tree points a closed branch the other way. */
+.pdx-tree-item[aria-expanded="false"]:dir(rtl) > .pdx-tree-twisty {
+    transform: rotate(135deg);
+}
+
+/* A lazy branch on its way: a ring that turns, in place of the arrow. The row is `aria-busy`. */
+.pdx-tree-item[aria-busy="true"] > .pdx-tree-twisty {
+    border: var(--pdx-tree-twisty-stroke, 2px) solid var(--pdx-color-border);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    margin-inline: calc((1rem - var(--pdx-tree-twisty-size, 0.5rem) - 2 * var(--pdx-tree-twisty-stroke, 2px)) / 2);
+    transform: none;
+    animation: pdx-tree-spin 0.6s linear infinite;
+}
+
+@keyframes pdx-tree-spin {
+    to { transform: rotate(360deg); }
 }
 
 .pdx-tree-check {
