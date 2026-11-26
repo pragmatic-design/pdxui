@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/app-layout/pdx-app-layout';
+import '../../src/app-layout/pdx-app-layout.pdx';
 
 type Layout = HTMLElement & {
     navbarCollapsed: boolean;

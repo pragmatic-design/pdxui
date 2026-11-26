@@ -13,7 +13,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/app-layout/pdx-app-layout';
+import '../../src/app-layout/pdx-app-layout.pdx';
 
 /** Mount an app-layout carrying the given children, and collect what it warned about. */
 async function mountWith(html: string): Promise<{ el: HTMLElement; warnings: string[] }> {

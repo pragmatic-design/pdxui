@@ -81,7 +81,7 @@ import './fab/pdx-fab.pdx';
 import './split-button/pdx-split-button.pdx';
 
 // Tier 1E: Layout
-import './app-layout/pdx-app-layout';
+import './app-layout/pdx-app-layout.pdx';
 import './app-shell/pdx-app-shell.pdx';
 import './row/pdx-row.pdx';
 import './col/pdx-col.pdx';
