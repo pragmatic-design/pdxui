@@ -144,6 +144,7 @@ const ELSEWHERE: Record<string, string> = {
     PDX_DUPLICATE_SCRIPT: 'a parse error: stops the compile, its line is in the message — duplicate-blocks.test.ts',
     PDX_DUPLICATE_TEMPLATE: 'a parse error: stops the compile, its line is in the message — duplicate-blocks.test.ts',
     PDX_MARKUP_OUTSIDE_TEMPLATE: 'a parse error: stops the compile, its line is in the message — markup-outside-template.test.ts',
+    PDX_IMPORT_NAME_TAKEN: 'stops the compile; the import is quoted in the message — core-import-alias-taken.test.ts',
     PDX_INLINE_NODE_UNSUPPORTED: 'unreachable today (catalog)',
     PDX_LIBRARY_INTERNALS: 'carries its line from the style scan — design-checks.test.ts',
     PDX_EFFECT_STATE: 'carries its line from the data-flow scan — design-checks-data-flow.test.ts',

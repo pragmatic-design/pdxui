@@ -347,6 +347,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Rename the declaration.',
         reproducedIn: `${T}reserved-element-names.test.ts`,
     },
+    PDX_IMPORT_NAME_TAKEN: {
+        severity: 'error', category: 'defect',
+        summary: 'A script\'s import from `@pdxui/core` aliased to a name the compiled module binds to another core export.',
+        explanation: "The compiler writes the module's one import from `@pdxui/core` and merges the script's core imports into it. `import { component as defineComponent }` beside the `defineComponent` the module calls declared that name twice: the module did not parse, and the error came from the bundler at a column of generated code (#1254). So the compile stops at the alias, naming it and the export the compiler binds to that name. An import of the same export the compiler binds, `import { signal }` beside a `$signal`, is merged as it was.",
+        fix: 'Choose another alias for the import.',
+        reproducedIn: `${T}core-import-alias-taken.test.ts`,
+    },
     PDX_SLOT_REQUIRED: {
         severity: 'error', category: 'defect',
         summary: 'A component used without a snippet it requires (#489).',

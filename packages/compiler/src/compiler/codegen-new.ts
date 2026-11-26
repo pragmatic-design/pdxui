@@ -23,6 +23,7 @@ import { coreRuleImports } from './form-rules';
 import { variantsDescriptor } from './variants';
 import { repeatedParts, withScriptSnippets } from './validate-parts';
 import { readParts } from './part-reads';
+import { coreImportSpecifiers } from './core-import-names';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -328,7 +329,7 @@ export function compileStoreMode(
     // Capitalize store name for useXxx hook
     const hookName = `use${store.name.charAt(0).toUpperCase()}${store.name.slice(1)}`;
 
-    const coreImports = Array.from(imports).sort().join(', ');
+    const coreImports = coreImportSpecifiers(imports, filename);
     let code = `import { ${coreImports} } from '@pdxui/core';\n`;
     if (analysis.userImports.length > 0) code += analysis.userImports.join('\n') + '\n';
     code += '\n';

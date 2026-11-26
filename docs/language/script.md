@@ -49,6 +49,10 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
   are emitted beside its imports, outside the setup, and the `.d.ts` re-exports them. A component
   whose entry also gives its API, as `@pdxui/ui/data-source` gives `DataSourceContext`, keeps it there.
   An `export { a }` with no `from` is the script's own name, and stays `PDX_SCRIPT_EXPORT`.
+- **An import from `@pdxui/core` joins the module's own**, the one import the compiler writes for
+  what the module calls. An alias that takes a name that import binds to another export —
+  `import { component as defineComponent }` — would declare it twice, and is `PDX_IMPORT_NAME_TAKEN`
+  (error, #1254). Importing the export the compiler binds, `import { signal }`, is merged as it is.
 
 **The signal rewrite.** One pass over the TypeScript AST (`signal-rewrite-ast.ts`) rewrites the setup
 body, the bodies of `$effect`, `$watch`, `onMount` and `onDestroy`, every `$derived` expression and

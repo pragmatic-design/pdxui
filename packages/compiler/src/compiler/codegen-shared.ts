@@ -16,6 +16,7 @@ import { jsQuote, jsString } from './js-literal';
 import { routeParams } from '../text-scan';
 import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
 import type { BrowserTarget } from './compile-context';
+import { coreImportSpecifiers } from './core-import-names';
 
 export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX };
 
@@ -336,7 +337,7 @@ export function assembleModule(
         ? layoutTags.map((t) => importPathOf(t)).filter((path): path is string => path !== null)
         : [];
 
-    const coreImports = Array.from(imports).sort().join(', ');
+    const coreImports = coreImportSpecifiers(imports, filename);
     let code = `import { ${coreImports} } from '@pdxui/core';\n`;
     if (userImports.length > 0) code += userImports.join('\n') + '\n';
     for (const path of layoutImports) code += `import ${jsQuote(path)};\n`;
