@@ -17,6 +17,7 @@ import { BLOCK_DIRECTIVES, TEMPLATE_AT_DIRECTIVES } from './template-directives'
 import { splitAwaitBinding } from './await-binding';
 import { splitAtDepthZero } from '../compiler/tokenizer';
 import { parseTryOptions } from './try-options';
+import { parseAwaitTiming } from './await-timing';
 import type { TryOption } from './try-options';
 
 // ─── Source Location ───────────────────────────────────────────────
@@ -1009,35 +1010,17 @@ function parseAwait(ctx: ParseContext, loc: SourceLoc): AwaitNode {
     const { expr: condition, as } = splitAwaitBinding(parseParenthesized(ctx));
     skipWhitespace(ctx);
 
-    // Optional timing options: { minMs: 200, maxMs: 5000 }
+    // Optional timing: { minMs: 200, maxMs: 5000 }, a block that another block follows (./await-timing, #1369)
     let minMs: number | undefined;
     let maxMs: number | undefined;
-    // Peek: if next block looks like options (contains minMs/maxMs), parse it
-    const savedPos = ctx.pos;
-    const savedLine = ctx.line;
-    const savedCol = ctx.column;
     if (ctx.source[ctx.pos] === '{') {
-        const blockStart = ctx.pos + 1;
-        const blockEnd = findClosingBrace(ctx.source, blockStart);
-        if (blockEnd > blockStart) {
-            const preview = ctx.source.slice(blockStart, blockEnd).trim();
-            if (preview.includes('minMs') || preview.includes('maxMs')) {
-                // Parse as options, not body
-                advanceTo(ctx, blockEnd + 1);
-                for (const part of preview.split(',')) {
-                    const m = part.trim().match(/^(minMs|maxMs)\s*:\s*(\d+)$/);
-                    if (m) {
-                        if (m[1] === 'minMs') minMs = Number(m[2]);
-                        else maxMs = Number(m[2]);
-                    }
-                }
-                skipWhitespace(ctx);
-            } else {
-                // Not options — restore position, parse as body below
-                ctx.pos = savedPos;
-                ctx.line = savedLine;
-                ctx.column = savedCol;
-            }
+        const blockEnd = findClosingBrace(ctx.source, ctx.pos + 1);
+        let after = blockEnd + 1;
+        while (after < ctx.source.length && /\s/.test(ctx.source[after])) after++;
+        if (blockEnd > ctx.pos && ctx.source[after] === '{') {
+            ({ minMs, maxMs } = parseAwaitTiming(ctx.source.slice(ctx.pos + 1, blockEnd), ctx.line));
+            advanceTo(ctx, blockEnd + 1);
+            skipWhitespace(ctx);
         }
     }
 
