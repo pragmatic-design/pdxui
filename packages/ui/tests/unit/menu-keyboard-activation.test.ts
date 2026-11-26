@@ -5,7 +5,7 @@
 // the split button's "Save As..." — menus that open from the keyboard and cannot be used.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/context-menu/pdx-context-menu';
+import '../../src/context-menu/pdx-context-menu.pdx';
 import '../../src/split-button/pdx-split-button.pdx';
 
 const ITEMS = `[{"key":"cut","label":"Cut"},{"key":"copy","label":"Copy"}]`;

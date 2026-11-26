@@ -31,7 +31,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-color-picker',
     'pdx-command',
     'pdx-container',
-    'pdx-context-menu',
     'pdx-data-grid',
     'pdx-date-picker',
     'pdx-description-list',

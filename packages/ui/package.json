@@ -155,7 +155,7 @@
       "import": "./dist/breadcrumb/pdx-breadcrumb.js"
     },
     "./context-menu": {
-      "development": "./src/context-menu/pdx-context-menu.ts",
+      "development": "./src/context-menu/pdx-context-menu.pdx",
       "types": "./dist/context-menu/pdx-context-menu.d.ts",
       "import": "./dist/context-menu/pdx-context-menu.js"
     },
