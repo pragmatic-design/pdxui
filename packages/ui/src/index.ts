@@ -49,7 +49,7 @@ import './date-picker/pdx-date-picker.pdx';
 import './transfer/pdx-transfer.pdx';
 import './mention/pdx-mention.pdx';
 import './cascader/pdx-cascader.pdx';
-import './tree/pdx-tree';
+import './tree/pdx-tree.pdx';
 import './tree-select/pdx-tree-select.pdx';
 import './inline-edit/pdx-inline-edit.pdx';
 

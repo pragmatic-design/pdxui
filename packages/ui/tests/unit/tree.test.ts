@@ -8,7 +8,7 @@
 // W3C `tree` pattern is not something a list can be composed into — which is why this exists.
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import '../../src/tree/pdx-tree';
+import '../../src/tree/pdx-tree.pdx';
 
 const NODES = [
     {
