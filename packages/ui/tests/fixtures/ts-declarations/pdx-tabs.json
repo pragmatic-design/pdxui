@@ -1,0 +1,277 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTabs",
+  "tagName": "pdx-tabs",
+  "category": "Overlay + Containers",
+  "order": 97,
+  "description": "Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy\nmounting and closable tabs.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "Orientation: horizontal (default) or vertical",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "bordered",
+      "description": "Add border around entire tabs + panels",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "bordered"
+    },
+    {
+      "kind": "field",
+      "name": "mount",
+      "description": "Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'eager'",
+      "attribute": "mount"
+    },
+    {
+      "kind": "field",
+      "name": "activation",
+      "description": "Activation: automatic (activate on focus) or manual (Enter/Space to activate)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'automatic'",
+      "attribute": "activation"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The tablist's accessible name (\"Account settings\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "line (the default), card (a bordered container) or pills (rounded buttons).",
+      "type": {
+        "text": "'line' | 'card' | 'pills'"
+      },
+      "default": "'line'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "select",
+      "parameters": [
+        {
+          "name": "value",
+          "type": {
+            "text": "string"
+          }
+        }
+      ],
+      "description": "Activate a tab by its `data-tab` value, not by its position."
+    },
+    {
+      "kind": "method",
+      "name": "next",
+      "parameters": [],
+      "description": "Advances to the next item."
+    },
+    {
+      "kind": "method",
+      "name": "prev",
+      "parameters": [],
+      "description": "Goes to the previous item."
+    },
+    {
+      "kind": "field",
+      "name": "active",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.active`."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "variants": [
+    {
+      "name": "variant",
+      "values": [
+        "line",
+        "card",
+        "pills"
+      ],
+      "default": "line"
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pdx-close",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A tab's close button removed it and its panel; the value is the removed tab's. Does not bubble.",
+      "detail": "{ value: string }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string }"
+    }
+  ],
+  "roles": [
+    "tab",
+    "tablist",
+    "tabpanel"
+  ],
+  "attributes": [
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "Orientation: horizontal (default) or vertical",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "bordered",
+      "fieldName": "bordered",
+      "description": "Add border around entire tabs + panels",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "mount",
+      "fieldName": "mount",
+      "description": "Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'eager'"
+    },
+    {
+      "name": "activation",
+      "fieldName": "activation",
+      "description": "Activation: automatic (activate on focus) or manual (Enter/Space to activate)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'automatic'"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The tablist's accessible name (\"Account settings\").",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Show loading state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "line (the default), card (a bordered container) or pills (rounded buttons).",
+      "type": {
+        "text": "'line' | 'card' | 'pills'"
+      },
+      "default": "'line'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "list",
+      "description": "The strip of tabs, the `role=\"tablist\"` element the author wrote (`.pdx-tabs`)."
+    },
+    {
+      "name": "tab",
+      "description": "A tab, an element with `data-tab`."
+    },
+    {
+      "name": "panel",
+      "description": "A panel, an element with `data-tab-panel`."
+    },
+    {
+      "name": "indicator",
+      "description": "The bar under the active tab, which slides to it (not with `variant=\"pills\"`)."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "`loading` is set: the active panel is `aria-busy`."
+    },
+    {
+      "name": "bordered",
+      "description": "`bordered` is set: a border around the strip and the panels."
+    },
+    {
+      "name": "overflow",
+      "description": "The tabs do not fit in one row: the strip keeps one row and scrolls."
+    }
+  ]
+}
