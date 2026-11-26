@@ -1,0 +1,238 @@
+<template>
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * A loading overlay that wraps content and, while blocked, stops interaction with it and covers it
+ * with a semi-transparent overlay and a spinner.
+ *
+ * @cssstate blocked - The input is blocked: from the moment `blocked` turns on until the overlay is taken away.
+ * @cssstate shown - The overlay is drawn: past its `delay`, and for at least `min-duration`.
+ * @csspart overlay - The overlay over the wrapped content.
+ * @csspart spinner - The group in the overlay that holds the spinner and the message.
+ * @csspart message - The message, the overlay's live region.
+ */
+// pdx-block-ui — Loading overlay that blocks interaction on a container.
+// Wraps content. When `blocked`, shows a semi-transparent overlay with spinner.
+// Used by data-bound components (List, Table, DataGrid) during loading.
+//
+// Blocking and drawing are two different moments: the input is
+// blocked the moment `blocked` turns on — `inert`, `aria-busy` — and the overlay is DRAWN only after
+// `delay` ms, then kept for at least `min-duration` ms. A 40 ms save does not flash a spinner, and
+// one that ends 20 ms after appearing does not blink. `fullscreen` covers the viewport and makes the
+// rest of the document inert, which the libraries that have a full-screen mode do not.
+import { onNextFrame, onDestroy } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/block-ui';
+// `pdx-spinner` is imported where the input is first blocked (`block`), not here. Its element is built
+// with the overlay at mount, but drawn only past `delay` while blocked, and it draws from a stylesheet
+// of its own (#821): a static import put that stylesheet in the first wave of every page with a
+// block-ui, where the route waited for it (#963, #969).
+
+// Emits `pdx-block` when the overlay is DRAWN (past its delay) and `pdx-unblock` when it is taken
+// away: the moments a person sees, not the moments `blocked` changed.
+/** The overlay is drawn: past its delay, the moment a person sees it. */
+@event 'pdx-block': void;
+/** The overlay is taken away and the input given back. */
+@event 'pdx-unblock': void;
+// The host's states (#291), set where the TypeScript version set them (#1436): block-ui.css draws
+// the overlay from `shown`, which `draw` sets. `blocked` — the prop's name, so its binding is `held`
+// (#1441) — is set by `block`: from the moment the input is blocked until it is given back, while
+// the prop is on and after it while the overlay is held for `min-duration`.
+@state blocked as held;
+@state shown;
+// The overlay is built by the script, a frame after mount, as the TypeScript version built it.
+@part(external) overlay, spinner, message;
+/** Whether the UI is blocked (shows overlay + spinner) */
+@prop blocked: boolean = false;
+/** Custom message shown below spinner */
+@prop message: string = '';
+/** Spinner variant: spinner (default), skeleton, none */
+@prop variant: string = 'spinner';
+/** Cover the viewport, not the element, and make the rest of the document inert. */
+@prop fullscreen: boolean = false;
+/** Ms before the overlay is drawn. The input is blocked from the start either way. */
+@prop delay: number = 300;
+/** Ms the overlay stays drawn once it is, however soon the block ends. */
+@prop minDuration: number = 200;
+@host host;
+
+let overlayEl: HTMLElement | null = null;
+// The live region. Built always, whatever `message` is at first: a message bound to a
+// value that arrives later needs an element to go into.
+let msgEl: HTMLElement | null = null;
+let wasShown = false;
+/** Drawn — past its delay — and since when. */
+let isDrawn = false;
+let shownAt = 0;
+let showTimer: ReturnType<typeof setTimeout> | null = null;
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
+/** What a fullscreen block made inert outside itself, to give back exactly that. */
+let inertOutsideEls: Element[] = [];
+
+/**
+ * The region's text follows the DRAWN overlay. A live region announces a CHANGE of its
+ * content: text written once at build while only aria-hidden flips is never announced.
+ * So: empty while hidden; on showing, empty now and the message in the
+ * next frame, when the overlay is already exposed.
+ */
+function syncMessage(on: boolean, text: string): void {
+  if (!msgEl) return;
+  if (!on) { msgEl.textContent = ''; wasShown = false; return; }
+  if (wasShown) { msgEl.textContent = text; return; } // a message changed while shown
+  wasShown = true;
+  msgEl.textContent = '';
+  requestAnimationFrame(() => {
+    if (msgEl && isDrawn) msgEl.textContent = message.peek() as string;
+  });
+}
+
+/**
+ * The overlay stops the mouse; `inert` stops the keyboard and the screen reader, or Tab would
+ * reach a control under the overlay and Enter would run it. Every child but the overlay, whose
+ * status message must still be read.
+ */
+function syncInert(on: boolean): void {
+  for (const child of Array.from(host.children)) {
+    if (child !== overlayEl) child.toggleAttribute('inert', on);
+  }
+}
+
+/**
+ * Fullscreen: every element beside the path from the host up to <body>, made inert — the
+ * header, the rail, the rest of the page. Only what was not inert already, so the release
+ * gives back exactly what the block took.
+ */
+function inertOutside(on: boolean): void {
+  if (!on) {
+    for (const el of inertOutsideEls) el.removeAttribute('inert');
+    inertOutsideEls = [];
+    return;
+  }
+  if (inertOutsideEls.length > 0) return;
+  for (let node: Element | null = host; node && node !== document.body; node = node.parentElement) {
+    const parent: HTMLElement | null = node.parentElement;
+    if (!parent) break;
+    for (const sibling of Array.from<Element>(parent.children)) {
+      if (sibling === node || sibling.hasAttribute('inert')) continue;
+      if (sibling.tagName === 'SCRIPT' || sibling.tagName === 'STYLE') continue;
+      sibling.setAttribute('inert', '');
+      inertOutsideEls.push(sibling);
+    }
+  }
+}
+
+function draw(on: boolean): void {
+  shown = on;
+  if (overlayEl) overlayEl.setAttribute('aria-hidden', String(!on));
+  syncMessage(on, message.peek() as string);
+}
+
+/** The input: blocked or given back, at once. */
+function block(on: boolean): void {
+  // The spinner is drawn past `delay` from here on; its element is in the overlay already and
+  // upgrades when its module lands. `variant: 'none'` builds none.
+  if (on && variant.peek() !== 'none' && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
+  // Busy while blocked and not otherwise (A4): no `aria-busy="false"` on a region at rest.
+  if (on) host.setAttribute('aria-busy', 'true'); else host.removeAttribute('aria-busy');
+  held = on;
+  syncInert(on);
+  inertOutside(on && (fullscreen.peek() as boolean));
+}
+
+function show(): void {
+  showTimer = null;
+  if (!blocked.peek()) return;
+  isDrawn = true;
+  shownAt = performance.now();
+  draw(true);
+  pdxBlock();
+}
+
+function hide(): void {
+  hideTimer = null;
+  if (blocked.peek()) return; // blocked again while it was held: stays
+  isDrawn = false;
+  draw(false);
+  block(false);
+  pdxUnblock();
+}
+
+function apply(on: boolean): void {
+  if (on) {
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    block(true);
+    if (isDrawn) { draw(true); return; }
+    if (showTimer) return;
+    const wait = Math.max(0, Number(delay.peek()) || 0);
+    if (wait === 0) show(); else showTimer = setTimeout(show, wait);
+    return;
+  }
+  if (showTimer) { clearTimeout(showTimer); showTimer = null; }
+  if (!isDrawn) { block(false); return; } // never drawn: nothing to take away
+  if (hideTimer) return;
+  const left = (Math.max(0, Number(minDuration.peek()) || 0)) - (performance.now() - shownAt);
+  if (left > 0) hideTimer = setTimeout(hide, left); else hide();
+}
+
+// Built a frame after mount: a setup a move destroyed does not build again.
+// The host carries no class (#291): block-ui.css draws it from the tag.
+onNextFrame(() => {
+  const el = document.createElement('div');
+  el.className = 'pdx-block-ui-overlay';
+  el.setAttribute('data-part', 'overlay');
+  el.setAttribute('aria-hidden', 'true');
+
+  const spinnerWrap = document.createElement('div');
+  spinnerWrap.className = 'pdx-block-ui-spinner';
+  spinnerWrap.setAttribute('data-part', 'spinner');
+
+  if (variant.peek() !== 'none') {
+    const spinner = document.createElement('pdx-spinner');
+    spinner.setAttribute('size', 'md');
+    // Decorative HERE: the overlay already has a live region, the message
+    // below, and pdx-spinner carries its own role="status" with a "Loading"
+    // label. Two live regions in one overlay is what the block announces
+    // twice, and the invariant this component's own test states is ONE.
+    spinner.setAttribute('aria-hidden', 'true');
+    spinnerWrap.appendChild(spinner);
+  }
+
+  // Live region: the screen reader announces the loading state.
+  msgEl = document.createElement('span');
+  msgEl.className = 'pdx-block-ui-message';
+  msgEl.setAttribute('data-part', 'message');
+  msgEl.setAttribute('role', 'status');
+  msgEl.setAttribute('aria-live', 'polite');
+  spinnerWrap.appendChild(msgEl);
+
+  el.appendChild(spinnerWrap);
+  el.classList.toggle('pdx-block-ui-fullscreen', fullscreen.peek() as boolean);
+  host.appendChild(el);
+  overlayEl = el;
+  apply(blocked.peek() as boolean);
+});
+
+$effect(() => {
+  const on = blocked as boolean;
+  message;
+  const isFullscreen = fullscreen as boolean;
+  variant;
+  if (!overlayEl) return; // still building: the frame above applies the current state
+  overlayEl.classList.toggle('pdx-block-ui-fullscreen', isFullscreen);
+  apply(on);
+});
+
+// The overlay is appended to the host, next to the author's children, and core counts what
+// arrives there after mount as authored: left in place, a move would put it back as a child
+// and the next mount would build a second one beside it.
+onDestroy(() => {
+  if (showTimer) clearTimeout(showTimer);
+  if (hideTimer) clearTimeout(hideTimer);
+  syncInert(false);
+  inertOutside(false);
+  overlayEl?.remove(); overlayEl = null; msgEl = null;
+});
+</script>

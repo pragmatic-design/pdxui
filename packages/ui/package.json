@@ -160,7 +160,7 @@
       "import": "./dist/context-menu/pdx-context-menu.js"
     },
     "./block-ui": {
-      "development": "./src/block-ui/pdx-block-ui.ts",
+      "development": "./src/block-ui/pdx-block-ui.pdx",
       "types": "./dist/block-ui/pdx-block-ui.d.ts",
       "import": "./dist/block-ui/pdx-block-ui.js"
     },

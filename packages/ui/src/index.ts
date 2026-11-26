@@ -91,7 +91,7 @@ import './scroll-area/pdx-scroll-area';
 import './scroll-spy/pdx-scroll-spy.pdx';
 import './affix/pdx-affix';
 import './aspect-ratio/pdx-aspect-ratio.pdx';
-import './block-ui/pdx-block-ui';
+import './block-ui/pdx-block-ui.pdx';
 
 // Tier 1F: Data Display
 import './list/pdx-list.pdx';

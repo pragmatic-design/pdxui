@@ -1,0 +1,176 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBlockUi",
+  "tagName": "pdx-block-ui",
+  "category": "Layout",
+  "order": 78,
+  "description": "A loading overlay that wraps content and, while blocked, stops interaction with it and covers it\nwith a semi-transparent overlay and a spinner.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "blocked",
+      "description": "Whether the UI is blocked (shows overlay + spinner)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "blocked"
+    },
+    {
+      "kind": "field",
+      "name": "message",
+      "description": "Custom message shown below spinner",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "message"
+    },
+    {
+      "kind": "field",
+      "name": "variant",
+      "description": "Spinner variant: spinner (default), skeleton, none",
+      "type": {
+        "text": "string"
+      },
+      "default": "'spinner'",
+      "attribute": "variant"
+    },
+    {
+      "kind": "field",
+      "name": "fullscreen",
+      "description": "Cover the viewport, not the element, and make the rest of the document inert.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "fullscreen"
+    },
+    {
+      "kind": "field",
+      "name": "delay",
+      "description": "Ms before the overlay is drawn. The input is blocked from the start either way.",
+      "type": {
+        "text": "number"
+      },
+      "default": "300",
+      "attribute": "delay"
+    },
+    {
+      "kind": "field",
+      "name": "minDuration",
+      "description": "Ms the overlay stays drawn once it is, however soon the block ends.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "minduration"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-block",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The overlay is drawn: past its delay, the moment a person sees it."
+    },
+    {
+      "name": "pdx-unblock",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The overlay is taken away and the input given back."
+    }
+  ],
+  "roles": [
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "blocked",
+      "fieldName": "blocked",
+      "description": "Whether the UI is blocked (shows overlay + spinner)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "message",
+      "fieldName": "message",
+      "description": "Custom message shown below spinner",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "variant",
+      "fieldName": "variant",
+      "description": "Spinner variant: spinner (default), skeleton, none",
+      "type": {
+        "text": "string"
+      },
+      "default": "'spinner'"
+    },
+    {
+      "name": "fullscreen",
+      "fieldName": "fullscreen",
+      "description": "Cover the viewport, not the element, and make the rest of the document inert.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "delay",
+      "fieldName": "delay",
+      "description": "Ms before the overlay is drawn. The input is blocked from the start either way.",
+      "type": {
+        "text": "number"
+      },
+      "default": "300"
+    },
+    {
+      "name": "minduration",
+      "fieldName": "minDuration",
+      "description": "Ms the overlay stays drawn once it is, however soon the block ends.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "overlay",
+      "description": "The overlay over the wrapped content."
+    },
+    {
+      "name": "spinner",
+      "description": "The group in the overlay that holds the spinner and the message."
+    },
+    {
+      "name": "message",
+      "description": "The message, the overlay's live region."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "blocked",
+      "description": "The input is blocked: from the moment `blocked` turns on until the overlay is taken away."
+    },
+    {
+      "name": "shown",
+      "description": "The overlay is drawn: past its `delay`, and for at least `min-duration`."
+    }
+  ]
+}

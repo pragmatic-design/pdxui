@@ -6,7 +6,7 @@
 // arrives later needs an element to go to, whether or not `message` was set at the first build.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/block-ui/pdx-block-ui';
+import '../../src/block-ui/pdx-block-ui.pdx';
 
 type BlockUi = HTMLElement & { blocked: boolean; message: string };
 

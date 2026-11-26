@@ -5,7 +5,7 @@
 // status message, is not.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/block-ui/pdx-block-ui';
+import '../../src/block-ui/pdx-block-ui.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     const host = document.createElement('div');

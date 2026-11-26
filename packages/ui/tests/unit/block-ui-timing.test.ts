@@ -6,7 +6,7 @@
 // 300/200 here: nothing drawn for a block shorter than 300 ms, and once drawn, drawn for 200.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { tick } from './helpers';
-import '../../src/block-ui/pdx-block-ui';
+import '../../src/block-ui/pdx-block-ui.pdx';
 
 type BlockUi = HTMLElement & { blocked: boolean };
 
