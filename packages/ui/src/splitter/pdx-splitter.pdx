@@ -1,0 +1,366 @@
+<template>
+  <slot></slot>
+</template>
+
+<script>
+/**
+ * A layout of resizable panes the user resizes by dragging the handles between them or from the
+ * keyboard, with collapsible and nested panes.
+ *
+ * @csspart pane - One of the app's children, laid out as a pane (`.pdx-splitter-pane`).
+ * @csspart gutter - The handle between two panes (`role="separator"`), dragged or moved with the arrows.
+ *
+ * @cssstate horizontal - `orientation="horizontal"`: the panes side by side.
+ * @cssstate vertical - `orientation="vertical"`: the panes stacked.
+ * @cssstate dragging - A gutter is being dragged: the panes take no pointer until it is let go.
+ */
+// pdx-splitter — Resizable split pane layout.
+// Children become panes. Drag handles appear between them.
+// Supports: H/V orientation, min/max per pane, collapsible, keyboard resize,
+// autoSaveId persistence, double-click to collapse/reset, nested splits.
+//
+// The panes and the handles are laid out by the script, a frame after a change, as the TypeScript
+// version laid them out.
+import { generatedId } from '@pdxui/core';
+import { uiString, uiAttr } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/splitter';
+
+export interface SplitterPane {
+  /** Min size in % (default: 10) */
+  min?: number;
+  /** Max size in % (default: 90) */
+  max?: number;
+  /** Default size in % (auto-distributed if omitted) */
+  defaultSize?: number;
+  /** Collapsible — double-click handle to collapse */
+  collapsible?: boolean;
+  /** Collapsed size in % when collapsed (default: 0) */
+  collapsedSize?: number;
+}
+
+/** The sizes changed: by a drag, the arrows, Home/End or a double-click; in percent. */
+@event 'pdx-resize': { sizes: number[] };
+/** A drag began; the sizes before it. */
+@event 'pdx-resize-start': { sizes: number[] };
+/** A drag ended; the sizes it left. */
+@event 'pdx-resize-end': { sizes: number[] };
+// On the host as custom states (#132, #290), in place of the classes it set on itself. Set where
+// the TypeScript version set them (#1436): the orientation when the panes are laid out, `dragging`
+// while a gutter is held.
+@state horizontal;
+@state vertical;
+@state dragging;
+// The panes are the app's children; the gutters are built by the script.
+@part(external) pane, gutter;
+/** Orientation: horizontal (side-by-side) or vertical (stacked) */
+@prop orientation: string = 'horizontal';
+/** Pane configurations — array matching child elements */
+@prop panes: unknown[] = [];
+/** Gutter size in px */
+@prop gutterSize: number = 6;
+/** localStorage key for persistence (empty = no save) */
+@prop autoSaveId: string = '';
+/** Keyboard step size in % */
+@prop keyboardStep: number = 2;
+@host host;
+@expose getSizes, setSizes, resetSizes, isDragging;
+
+const uid = generatedId('pdx-splitter');
+/** The pane sizes now, in percent. Nothing reads them reactively: the handlers read and write them. */
+let sizesNow: number[] = [];
+/** A gutter is held. */
+let held = false;
+let paneEls: HTMLElement[] = [];
+let handleEls: HTMLElement[] = [];
+
+function getSavedSizes(): number[] | null {
+  const saveId = autoSaveId as string;
+  if (!saveId) return null;
+  try {
+    const saved = localStorage.getItem('pdx-splitter-' + saveId);
+    return saved ? JSON.parse(saved) : null;
+  } catch { return null; }
+}
+
+function saveSizes(sizes: number[]): void {
+  const saveId = autoSaveId as string;
+  if (saveId) localStorage.setItem('pdx-splitter-' + saveId, JSON.stringify(sizes));
+}
+
+// A size is a percentage of the space the gutters leave, as the drag computes it. As a bare
+// `flex-basis: N%` of the whole host, the panes would sum to 100% with the gutters on top:
+// with flex-shrink 0 the last pane would run past the host by the gutter width and be clipped.
+function applySizes(sizes: number[]): void {
+  const gutters = (gutterSize as number) * Math.max(0, paneEls.length - 1);
+  for (let idx = 0; idx < paneEls.length; idx++) {
+    if (idx < sizes.length) {
+      paneEls[idx].style.flexBasis = `calc(${sizes[idx]}% - ${(gutters * sizes[idx]) / 100}px)`;
+      paneEls[idx].style.flexGrow = '0';
+      paneEls[idx].style.flexShrink = '0';
+    }
+  }
+}
+
+function initPanes(): void {
+  const children = Array.from(host.children).filter(
+    (ch) => ch instanceof HTMLElement && !ch.classList.contains('pdx-splitter-handle')
+  ) as HTMLElement[];
+
+  const paneConfigs = panes as SplitterPane[];
+  const count = children.length;
+  if (count < 2) return;
+
+  // Calculate initial sizes
+  const saved = getSavedSizes();
+  let sizes: number[];
+  if (saved && saved.length === count) {
+    sizes = saved;
+  } else {
+    sizes = [];
+    let remaining = 100;
+    for (let idx = 0; idx < count; idx++) {
+      const config = paneConfigs[idx];
+      if (config?.defaultSize != null) {
+        sizes.push(config.defaultSize);
+        remaining -= config.defaultSize;
+      } else {
+        sizes.push(-1); // auto
+      }
+    }
+    const autoCount = sizes.filter(s => s === -1).length;
+    const autoSize = autoCount > 0 ? remaining / autoCount : 0;
+    sizes = sizes.map(s => s === -1 ? autoSize : s);
+  }
+
+  sizesNow = sizes;
+
+  // Build container
+  const dir = orientation as string;
+  const gutter = gutterSize as number;
+
+  // The host carries no class (#290): splitter.css draws it on the tag, oriented by the state.
+  horizontal = dir !== 'vertical';
+  vertical = dir === 'vertical';
+  paneEls = [];
+  handleEls = [];
+
+  // Wrap children in pane containers and insert handles
+  for (let idx = 0; idx < children.length; idx++) {
+    const pane = children[idx];
+    pane.classList.add('pdx-splitter-pane');
+    pane.setAttribute('data-part', 'pane');
+    pane.setAttribute('data-pane-index', String(idx));
+    if (!pane.id) pane.id = `${uid}-pane-${idx}`;
+    paneEls.push(pane);
+
+    // Insert handle between panes (not after last)
+    if (idx < children.length - 1) {
+      const handle = document.createElement('div');
+      handle.className = 'pdx-splitter-handle';
+      handle.setAttribute('data-part', 'gutter');
+      handle.setAttribute('role', 'separator');
+      handle.setAttribute('tabindex', '0');
+      handle.setAttribute('aria-orientation', dir);
+      handle.setAttribute('aria-valuenow', String(Math.round(sizes[idx])));
+      // The WAI-ARIA "Window Splitter" pattern: the separator needs min/max and an
+      // accessible name (it is focusable). Without them AT reports neither the range nor the identity.
+      handle.setAttribute('aria-valuemin', String(paneConfigs[idx]?.min ?? 0));
+      handle.setAttribute('aria-valuemax', String(paneConfigs[idx]?.max ?? 100));
+      uiAttr(handle, 'aria-label', () => uiString('splitter', 'label'));
+      // The pane whose size aria-valuenow is (APG window splitter).
+      handle.setAttribute('aria-controls', pane.id);
+      handle.setAttribute('data-handle-index', String(idx));
+
+      if (dir === 'vertical') {
+        handle.style.height = gutter + 'px';
+        handle.style.cursor = 'row-resize';
+      } else {
+        handle.style.width = gutter + 'px';
+        handle.style.cursor = 'col-resize';
+      }
+
+      // Insert handle after the pane
+      pane.after(handle);
+
+      // Drag logic
+      setupHandleDrag(handle, idx, dir, gutter);
+
+      // Double-click to collapse/reset
+      handle.addEventListener('dblclick', () => {
+        const config = (panes as SplitterPane[])[idx];
+        if (config?.collapsible) {
+          const currentSizes = sizesNow.slice();
+          const collapsedSize = config.collapsedSize ?? 0;
+          if (currentSizes[idx] <= collapsedSize + 1) {
+            // Expand back to default
+            currentSizes[idx] = config.defaultSize ?? (100 / currentSizes.length);
+            // Redistribute
+            const total = currentSizes.reduce((a, b) => a + b, 0);
+            if (total !== 100) {
+              const factor = 100 / total;
+              for (let j = 0; j < currentSizes.length; j++) currentSizes[j] *= factor;
+            }
+          } else {
+            // Collapse
+            const freed = currentSizes[idx] - collapsedSize;
+            currentSizes[idx] = collapsedSize;
+            currentSizes[idx + 1] += freed;
+          }
+          sizesNow = currentSizes;
+          applySizes(currentSizes);
+          saveSizes(currentSizes);
+          pdxResize({ sizes: currentSizes });
+        }
+      });
+
+      // Keyboard resize
+      handle.addEventListener('keydown', (e: KeyboardEvent) => {
+        const step = keyboardStep as number;
+        const currentSizes = sizesNow.slice();
+        let changed = false;
+
+        if ((dir === 'horizontal' && e.key === 'ArrowLeft') ||
+            (dir === 'vertical' && e.key === 'ArrowUp')) {
+          e.preventDefault();
+          if (currentSizes[idx] > ((panes as SplitterPane[])[idx]?.min ?? 5)) {
+            currentSizes[idx] -= step;
+            currentSizes[idx + 1] += step;
+            changed = true;
+          }
+        } else if ((dir === 'horizontal' && e.key === 'ArrowRight') ||
+                   (dir === 'vertical' && e.key === 'ArrowDown')) {
+          e.preventDefault();
+          if (currentSizes[idx + 1] > ((panes as SplitterPane[])[idx + 1]?.min ?? 5)) {
+            currentSizes[idx] += step;
+            currentSizes[idx + 1] -= step;
+            changed = true;
+          }
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          const maxLeft = (panes as SplitterPane[])[idx]?.max ?? 90;
+          const freed = maxLeft - currentSizes[idx];
+          currentSizes[idx] = maxLeft;
+          currentSizes[idx + 1] -= freed;
+          changed = true;
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          const minLeft = (panes as SplitterPane[])[idx]?.min ?? 5;
+          const freed = currentSizes[idx] - minLeft;
+          currentSizes[idx] = minLeft;
+          currentSizes[idx + 1] += freed;
+          changed = true;
+        }
+
+        if (changed) {
+          sizesNow = currentSizes;
+          applySizes(currentSizes);
+          saveSizes(currentSizes);
+          // Keep aria-valuenow in step with a keyboard resize (otherwise AT stays put).
+          handle.setAttribute('aria-valuenow', String(Math.round(currentSizes[idx])));
+          pdxResize({ sizes: currentSizes });
+        }
+      });
+
+      handleEls.push(handle);
+    }
+  }
+
+  applySizes(sizes);
+}
+
+function setupHandleDrag(handle: HTMLElement, handleIdx: number, dir: string, gutter: number): void {
+  let startPos = 0;
+  let startSizes: number[] = [];
+  let containerSize = 0;
+
+  handle.addEventListener('pointerdown', (e: PointerEvent) => {
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+    held = true;
+    // The host's `dragging` state (#290); the dragged gutter is its own `:active`.
+    dragging = true;
+
+    startPos = dir === 'vertical' ? e.clientY : e.clientX;
+    startSizes = sizesNow.slice();
+    const rect = host.getBoundingClientRect();
+    containerSize = dir === 'vertical' ? rect.height : rect.width;
+    // Subtract gutter sizes
+    containerSize -= gutter * (paneEls.length - 1);
+
+    pdxResizeStart({ sizes: startSizes });
+  });
+  // A move processed at most once per frame: style writes +
+  // setAttribute + emit on every event would cause a burst of style recalcs.
+  let moveRaf = 0;
+  let lastMove: PointerEvent | null = null;
+  handle.addEventListener('pointermove', (e: PointerEvent) => {
+    if (!held) return;
+    lastMove = e;
+    if (moveRaf) return;
+    moveRaf = requestAnimationFrame(() => {
+      moveRaf = 0;
+      if (lastMove && held) processMove(lastMove);
+    });
+  });
+
+  const processMove = (e: PointerEvent): void => {
+    const currentPos = dir === 'vertical' ? e.clientY : e.clientX;
+    const deltaPx = currentPos - startPos;
+    const deltaPercent = (deltaPx / containerSize) * 100;
+
+    const newSizes = startSizes.slice();
+    const paneConfigs = panes as SplitterPane[];
+    const minA = paneConfigs[handleIdx]?.min ?? 5;
+    const maxA = paneConfigs[handleIdx]?.max ?? 95;
+    const minB = paneConfigs[handleIdx + 1]?.min ?? 5;
+    const maxB = paneConfigs[handleIdx + 1]?.max ?? 95;
+
+    let sizeA = startSizes[handleIdx] + deltaPercent;
+    let sizeB = startSizes[handleIdx + 1] - deltaPercent;
+
+    // Clamp
+    if (sizeA < minA) { sizeB += sizeA - minA; sizeA = minA; }
+    if (sizeB < minB) { sizeA += sizeB - minB; sizeB = minB; }
+    if (sizeA > maxA) { sizeB += sizeA - maxA; sizeA = maxA; }
+    if (sizeB > maxB) { sizeA += sizeB - maxB; sizeB = maxB; }
+
+    newSizes[handleIdx] = sizeA;
+    newSizes[handleIdx + 1] = sizeB;
+
+    sizesNow = newSizes;
+    applySizes(newSizes);
+    handle.setAttribute('aria-valuenow', String(Math.round(sizeA)));
+    pdxResize({ sizes: newSizes });
+  };
+
+  const onPointerUp = () => {
+    if (!held) return;
+    held = false;
+    dragging = false;
+    saveSizes(sizesNow);
+    pdxResizeEnd({ sizes: sizesNow });
+  };
+  handle.addEventListener('pointerup', onPointerUp);
+  handle.addEventListener('pointercancel', onPointerUp);
+}
+
+$effect(() => {
+  void orientation;
+  void panes;
+
+  // Post-mount changes of orientation/panes re-initialize the panes
+  // instead of staying inert after the first build.
+  requestAnimationFrame(() => initPanes());
+});
+
+/** The pane sizes now, in percent of the space the gutters leave. */
+function getSizes() { return sizesNow; }
+/** Apply pane sizes, in percent, and save them when `auto-save-id` is set. */
+function setSizes(sizes: number[]) { sizesNow = sizes; applySizes(sizes); saveSizes(sizes); }
+/** Forget the saved sizes and lay the panes out again from their props. */
+function resetSizes() { localStorage.removeItem('pdx-splitter-' + (autoSaveId as string)); initPanes(); }
+/** Whether a divider is being dragged right now. */
+function isDragging() { return held; }
+</script>

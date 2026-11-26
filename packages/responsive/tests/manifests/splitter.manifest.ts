@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
  *
- *   - Source: packages/ui/src/splitter/pdx-splitter.ts
+ *   - Source: packages/ui/src/splitter/pdx-splitter.pdx
  *       · render() = <slot></slot>: the children (the panes) are projected as direct children
  *         of the HOST <pdx-splitter> (light DOM). There is NO extra wrapper.
  *       · The build happens in `requestAnimationFrame(() => initPanes())` inside ctx.track

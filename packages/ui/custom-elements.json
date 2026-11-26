@@ -29168,7 +29168,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/splitter/pdx-splitter.ts",
+      "path": "src/splitter/pdx-splitter.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -29377,7 +29377,7 @@
           "name": "pdx-splitter",
           "declaration": {
             "name": "PdxSplitter",
-            "module": "src/splitter/pdx-splitter.ts"
+            "module": "src/splitter/pdx-splitter.pdx"
           }
         }
       ]

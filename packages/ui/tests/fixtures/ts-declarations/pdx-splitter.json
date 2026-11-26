@@ -1,0 +1,200 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSplitter",
+  "tagName": "pdx-splitter",
+  "category": "Layout",
+  "order": 73,
+  "description": "A layout of resizable panes the user resizes by dragging the handles between them or from the\nkeyboard, with collapsible and nested panes.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "Orientation: horizontal (side-by-side) or vertical (stacked)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "panes",
+      "description": "Pane configurations — array matching child elements",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "gutterSize",
+      "description": "Gutter size in px",
+      "type": {
+        "text": "number"
+      },
+      "default": "6",
+      "attribute": "guttersize"
+    },
+    {
+      "kind": "field",
+      "name": "autoSaveId",
+      "description": "localStorage key for persistence (empty = no save)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "autosaveid"
+    },
+    {
+      "kind": "field",
+      "name": "keyboardStep",
+      "description": "Keyboard step size in %",
+      "type": {
+        "text": "number"
+      },
+      "default": "2",
+      "attribute": "keyboardstep"
+    },
+    {
+      "kind": "method",
+      "name": "getSizes",
+      "parameters": [],
+      "description": "The pane sizes now, in percent of the space the gutters leave."
+    },
+    {
+      "kind": "method",
+      "name": "setSizes",
+      "parameters": [
+        {
+          "name": "sizes",
+          "type": {
+            "text": "number[]"
+          }
+        }
+      ],
+      "description": "Apply pane sizes, in percent, and save them when `auto-save-id` is set."
+    },
+    {
+      "kind": "method",
+      "name": "resetSizes",
+      "parameters": [],
+      "description": "Forget the saved sizes and lay the panes out again from their props."
+    },
+    {
+      "kind": "method",
+      "name": "isDragging",
+      "parameters": [],
+      "description": "Whether a divider is being dragged right now."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-resize",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The sizes changed: by a drag, the arrows, Home/End or a double-click; in percent.",
+      "detail": "{ sizes: number[] }"
+    },
+    {
+      "name": "pdx-resize-start",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A drag began; the sizes before it.",
+      "detail": "{ sizes: number[] }"
+    },
+    {
+      "name": "pdx-resize-end",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A drag ended; the sizes it left.",
+      "detail": "{ sizes: number[] }"
+    }
+  ],
+  "roles": [
+    "separator"
+  ],
+  "attributes": [
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "Orientation: horizontal (side-by-side) or vertical (stacked)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "guttersize",
+      "fieldName": "gutterSize",
+      "description": "Gutter size in px",
+      "type": {
+        "text": "number"
+      },
+      "default": "6"
+    },
+    {
+      "name": "autosaveid",
+      "fieldName": "autoSaveId",
+      "description": "localStorage key for persistence (empty = no save)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "keyboardstep",
+      "fieldName": "keyboardStep",
+      "description": "Keyboard step size in %",
+      "type": {
+        "text": "number"
+      },
+      "default": "2"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "SplitterPane",
+      "fields": [
+        "min?: number",
+        "max?: number",
+        "defaultSize?: number",
+        "collapsible?: boolean",
+        "collapsedSize?: number"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "pane",
+      "description": "One of the app's children, laid out as a pane (`.pdx-splitter-pane`)."
+    },
+    {
+      "name": "gutter",
+      "description": "The handle between two panes (`role=\"separator\"`), dragged or moved with the arrows."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "horizontal",
+      "description": "`orientation=\"horizontal\"`: the panes side by side."
+    },
+    {
+      "name": "vertical",
+      "description": "`orientation=\"vertical\"`: the panes stacked."
+    },
+    {
+      "name": "dragging",
+      "description": "A gutter is being dragged: the panes take no pointer until it is let go."
+    }
+  ]
+}

@@ -99,7 +99,7 @@ describe('an event with a detail says what is in it', () => {
         // a component moved to .pdx (#1210) declares each event's detail with its `@event` type, so it
         // leaves the scan, and its name leaves this list.
         expect(checks).toEqual(expect.arrayContaining([
-            'pdx-splitter pdx-resize', 'pdx-select pdx-search',
+            'pdx-select pdx-search',
             'pdx-autocomplete query-change', 'pdx-bottom-sheet pdx-detent-change',
         ]));
     });

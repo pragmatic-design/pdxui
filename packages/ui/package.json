@@ -165,7 +165,7 @@
       "import": "./dist/block-ui/pdx-block-ui.js"
     },
     "./splitter": {
-      "development": "./src/splitter/pdx-splitter.ts",
+      "development": "./src/splitter/pdx-splitter.pdx",
       "types": "./dist/splitter/pdx-splitter.d.ts",
       "import": "./dist/splitter/pdx-splitter.js"
     },

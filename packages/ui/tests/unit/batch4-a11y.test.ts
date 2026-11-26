@@ -14,7 +14,7 @@ import '../../src/label/pdx-label.pdx';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/scroll-area/pdx-scroll-area.pdx';
 import '../../src/statistic/pdx-statistic.pdx';
-import '../../src/splitter/pdx-splitter';
+import '../../src/splitter/pdx-splitter.pdx';
 import '../../src/relative-time/pdx-relative-time.pdx';
 
 beforeEach(cleanup);
