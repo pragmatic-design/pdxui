@@ -579,6 +579,10 @@ get the same result with a prop (`:open="..."`), prefer the prop — it's more d
 Exposing a `$signal` or a `$derived` puts its **value** on the element: `@expose isOpen` lets the
 parent read `dialogRef.isOpen`, and write `dialogRef.isOpen = true`. A `$derived` is read-only.
 
+A value the parent only asks for now and then needs no signal: `@expose get isEmpty` over
+`function isEmpty() { … }` is a read-only property that calls the function when it is read. It is not
+reactive, and costs nothing at mount, where a `$derived` costs a signal and a computed per instance.
+
 ## @part — named, public parts
 
 A component's inner elements are its own business, except the ones it names. `@part` declares them,

@@ -193,6 +193,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const fetches: FetchDecl[] = [];
     const forms: FormDecl[] = [];
     const exposes: string[] = [];
+    const exposeGetters: string[] = [];
     const states: StateDecl[] = [];
     let hydrate: string | undefined;
     let host: HostAttr[] | undefined;
@@ -818,11 +819,13 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
-        // ─── @expose name1, name2, ... ───
-        const exposeMatch = trimmed.match(/^@expose\s+(.+);?\s*$/);
+        // ─── @expose name1, name2, ... / @expose get name1, name2 (#1423) ───
+        // Match: `@expose a, b;` or `@expose get a, b;`. Groups: [1]=`get ` when present [2]=the names
+        const exposeMatch = trimmed.match(/^@expose\s+(get\s+)?(.+);?\s*$/);
         if (exposeMatch) {
-            const names = exposeMatch[1].replace(/;$/, '').split(',').map(n => n.trim()).filter(Boolean);
+            const names = exposeMatch[2].replace(/;$/, '').split(',').map(n => n.trim()).filter(Boolean);
             exposes.push(...names);
+            if (exposeMatch[1]) exposeGetters.push(...names);
             continue;
         }
 
@@ -1506,6 +1509,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         fetches,
         forms,
         exposes,
+        exposeGetters,
         states,
         ...(hydrate ? { hydrate } : {}),
         ...(host ? { host } : {}),

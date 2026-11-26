@@ -57,6 +57,7 @@ const ROWS: Record<string, Row> = {
     PDX_ATTACH_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<input attach:toltip />', 'let a = $signal(1);'), at: 'attach:toltip' },
     PDX_EVENT_BUBBLES_UNUSED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event(bubbles) saved: number;'), at: '@event(bubbles) saved' },
     PDX_EXPOSE_UNDECLARED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@expose close;'), at: '@expose close;' },
+    PDX_EXPOSE_GET_NOT_FUNCTION: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@expose get a;'), at: '@expose get a;' },
     PDX_COMMAND_TARGET_MISSING: { src: pdx('<p>{{ a }}</p>\n<button commandfor="gone" command="close">x</button>', 'let a = $signal(1);'), at: 'commandfor="gone"' },
     PDX_COMMAND_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<button commandfor="d" command="show">x</button><dialog id="d"></dialog>', 'let a = $signal(1);'), at: 'command="show"' },
     PDX_PIPE_SINGLE: { src: pdx('<p>{{ a }}</p>\n<p>{{ a | up }}</p>', 'let a = $signal(1);\nfunction up(v) { return v; }'), at: '{{ a | up }}' },

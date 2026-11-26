@@ -177,7 +177,8 @@ component is typed in the editor by what it exposes: `dlg.nope()` is an error.
 **An exposed `$signal` or `$derived` is its value on the element, not a function.** With
 `@expose count;`, a parent reads `counter.count` and writes `counter.count = 5` (a `$derived` is
 read-only). `counter.count()` is the alpha form: `pdx migrate` flags it on a `:ref`
-(`expose-reactive-call`).
+(`expose-reactive-call`). A read-only value nothing follows reactively is `@expose get isEmpty;` over
+`function isEmpty() { … }`: a plain getter that calls it, with no signal or computed per mount.
 
 **`@part trigger, popup;`** names a component's public inner elements: write `data-part="popup"` on
 the elements it names. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,

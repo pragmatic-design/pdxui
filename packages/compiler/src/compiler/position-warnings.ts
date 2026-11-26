@@ -218,6 +218,7 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // The block's opening: the message names what in it could not be read.
             return find(source, script, /@variants\b/);
         case 'PDX_EXPOSE_UNDECLARED':
+        case 'PDX_EXPOSE_GET_NOT_FUNCTION':
             // Match: `@expose a, close` — the line that lists the name.
             return name ? find(source, script, new RegExp(`@expose\\b[^;\\n]*\\b${escape(name)}\\b`)) : undefined;
         case 'PDX_FETCH_NO_ERROR_UI':
