@@ -1,0 +1,316 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxBottomSheet",
+  "tagName": "pdx-bottom-sheet",
+  "category": "Overlay + Containers",
+  "order": 101,
+  "description": "A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to\nresize it and swipes down to dismiss it.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "detents",
+      "description": "Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85]",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[0.4, 0.85]"
+    },
+    {
+      "kind": "field",
+      "name": "initialDetent",
+      "description": "Initial detent index. Default: 0 (smallest)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "initialdetent"
+    },
+    {
+      "kind": "field",
+      "name": "backdrop",
+      "description": "Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "backdrop"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnBackdrop",
+      "description": "Close on backdrop click. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonbackdrop"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnEscape",
+      "description": "Close on Escape. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonescape"
+    },
+    {
+      "kind": "field",
+      "name": "closeOnSwipeDown",
+      "description": "Close on swipe down below minimum detent. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "closeonswipedown"
+    },
+    {
+      "kind": "field",
+      "name": "showHandle",
+      "description": "Show drag handle bar. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "showhandle"
+    },
+    {
+      "kind": "field",
+      "name": "showClose",
+      "description": "Show close button. Default: false",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showclose"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Label for accessibility.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "open"
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Shows it."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Closes it."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Toggles it open/closed."
+    },
+    {
+      "kind": "field",
+      "name": "isOpen",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.isOpen`."
+    },
+    {
+      "kind": "method",
+      "name": "snapTo",
+      "parameters": [
+        {
+          "name": "detentIndex",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Move the sheet to a detent by index, clamped to the detents declared, and emit `pdx-detent-change`."
+    }
+  ],
+  "models": [
+    "open"
+  ],
+  "events": [
+    {
+      "name": "pdx-before-close",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open."
+    },
+    {
+      "name": "pdx-detent-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The sheet came to rest at a detent: its fraction of the viewport height, and its index.",
+      "detail": "{ detent: number; index: number }"
+    },
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `open`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "dialog",
+    "slider"
+  ],
+  "attributes": [
+    {
+      "name": "initialdetent",
+      "fieldName": "initialDetent",
+      "description": "Initial detent index. Default: 0 (smallest)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "backdrop",
+      "fieldName": "backdrop",
+      "description": "Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonbackdrop",
+      "fieldName": "closeOnBackdrop",
+      "description": "Close on backdrop click. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonescape",
+      "fieldName": "closeOnEscape",
+      "description": "Close on Escape. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "closeonswipedown",
+      "fieldName": "closeOnSwipeDown",
+      "description": "Close on swipe down below minimum detent. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showhandle",
+      "fieldName": "showHandle",
+      "description": "Show drag handle bar. Default: true",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "showclose",
+      "fieldName": "showClose",
+      "description": "Show close button. Default: false",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Label for accessibility.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "open",
+      "fieldName": "open",
+      "description": "Whether it is open.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "header",
+      "description": "Content of the sheet's header, above the body."
+    },
+    {
+      "name": "footer",
+      "description": "Content at the bottom of the sheet, below the body (e.g. actions)."
+    },
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The element reached as `[data-part=\"root\"]`."
+    },
+    {
+      "name": "backdrop",
+      "description": "The element reached as `[data-part=\"backdrop\"]`."
+    },
+    {
+      "name": "handle",
+      "description": "The element reached as `[data-part=\"handle\"]`."
+    },
+    {
+      "name": "header",
+      "description": "The element reached as `[data-part=\"header\"]`."
+    },
+    {
+      "name": "close",
+      "description": "The element reached as `[data-part=\"close\"]`."
+    },
+    {
+      "name": "body",
+      "description": "The element reached as `[data-part=\"body\"]`."
+    },
+    {
+      "name": "footer",
+      "description": "The element reached as `[data-part=\"footer\"]`."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "Matched with `:state(open)`."
+    },
+    {
+      "name": "dragging",
+      "description": "Matched with `:state(dragging)`."
+    }
+  ]
+}

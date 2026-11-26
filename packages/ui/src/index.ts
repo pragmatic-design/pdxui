@@ -117,7 +117,7 @@ import './tabs/pdx-tabs.pdx';
 import './accordion/pdx-accordion.pdx';
 import './card/pdx-card.pdx';
 import './banner/pdx-banner.pdx';
-import './bottom-sheet/pdx-bottom-sheet';
+import './bottom-sheet/pdx-bottom-sheet.pdx';
 import './command/pdx-command.pdx';
 
 // Tier 3A: Data-bound
