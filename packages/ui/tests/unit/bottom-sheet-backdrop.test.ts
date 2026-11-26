@@ -6,7 +6,7 @@
 // overlay holds — it opens, Escape closes it.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/bottom-sheet/pdx-bottom-sheet';
+import '../../src/bottom-sheet/pdx-bottom-sheet.pdx';
 
 type Sheet = HTMLElement & { open: boolean; isOpen: boolean };
 

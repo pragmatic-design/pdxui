@@ -100,7 +100,7 @@ describe('an event with a detail says what is in it', () => {
         // leaves the scan, and its name leaves this list.
         expect(checks).toEqual(expect.arrayContaining([
             'pdx-select pdx-search',
-            'pdx-autocomplete query-change', 'pdx-bottom-sheet pdx-detent-change',
+            'pdx-autocomplete query-change',
         ]));
     });
 

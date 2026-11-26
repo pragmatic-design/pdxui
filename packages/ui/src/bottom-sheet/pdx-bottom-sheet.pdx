@@ -1,0 +1,434 @@
+<template>
+  <div class="pdx-bottom-sheet-backdrop" data-part="backdrop" :hidden="!backdrop"></div>
+  <div class="pdx-bottom-sheet" data-part="root" role="dialog" aria-modal="true"
+    :aria-label="label || uiString('bottom-sheet', 'label')">
+    @if (showHandle) {
+      <div class="pdx-bottom-sheet-handle" data-part="handle" role="slider" tabindex="0"
+        :aria-label="uiString('bottom-sheet', 'handle')"
+        aria-valuemin="0" :aria-valuemax="detentMax()"
+        :aria-valuenow="String(currentDetent)"
+        :aria-valuetext="detentText()"
+        @keydown="onHandleKey">
+        <div class="pdx-bottom-sheet-bar"></div>
+      </div>
+    }
+    <div class="pdx-bottom-sheet-header" data-part="header">
+      <slot name="header"></slot>
+      @if (showClose) {
+        <button type="button" class="pdx-bottom-sheet-close pdx-dialog-close" data-part="close" :aria-label="uiString('bottom-sheet', 'close')" @click="tryClose">&#x2715;</button>
+      }
+    </div>
+    <div class="pdx-bottom-sheet-body" data-part="body">
+      <slot></slot>
+    </div>
+    <div class="pdx-bottom-sheet-footer" data-part="footer">
+      <slot name="footer"></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+/**
+ * A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to
+ * resize it and swipes down to dismiss it.
+ *
+ * @slot header - Content of the sheet's header, above the body.
+ * @slot footer - Content at the bottom of the sheet, below the body (e.g. actions).
+ */
+// pdx-bottom-sheet — Draggable sheet from bottom with detent snap points.
+// Uses overlayStack for z-index + Escape, focusTrap for keyboard, drag for gesture.
+// Detents: array of fractions (0-1) of viewport height. Default: [0.4, 0.85].
+// CSS from @pdxui/design (bottom-sheet.css).
+//
+// The sheet is opened and sized by the script, a frame after `open` changes, as the TypeScript
+// version did it.
+import { overlayStack, focusTrap, generatedId } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/bottom-sheet';
+// Its ✕ is a `.pdx-dialog-close`, drawn by dialog.css.
+import '@pdxui/design/components/dialog';
+
+// `open` is a model (#288): the sheet closes itself — Escape, the ✕, the backdrop, a swipe down —
+// and its own writes announce `open-change` `{ value }`, which `::open` follows. It replaced
+// `pdx-close`.
+@model open: boolean = false;
+// On the host as custom states (#132, #288): bottom-sheet.css draws the sheet and backdrop from them.
+// Set where the TypeScript version set them (#1436); the `open` state's binding is `shown`, since
+// `open` is the model (#1441).
+@state open as shown;
+@state dragging;
+@part root, backdrop, handle, header, close, body, footer;
+/** Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] */
+@prop detents: unknown[] = [0.4, 0.85];
+/** Initial detent index. Default: 0 (smallest) */
+@prop initialDetent: number = 0;
+/** Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it. */
+@prop backdrop: boolean = true;
+/** Close on backdrop click. Default: true */
+@prop closeOnBackdrop: boolean = true;
+/** Close on Escape. Default: true */
+@prop closeOnEscape: boolean = true;
+/** Close on swipe down below minimum detent. Default: true */
+@prop closeOnSwipeDown: boolean = true;
+/** Show drag handle bar. Default: true */
+@prop showHandle: boolean = true;
+/** Show close button. Default: false */
+@prop showClose: boolean = false;
+/** Label for accessibility. */
+@prop label: string = '';
+/** Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open. */
+@event(cancelable) 'pdx-before-close': void;
+/** The sheet came to rest at a detent: its fraction of the viewport height, and its index. */
+@event 'pdx-detent-change': { detent: number; index: number };
+@host host;
+// Imperative API: el.show() / el.close() / el.toggle() / el.isOpen + snapTo(index). Each writes
+// the model, so each announces `open-change`.
+@expose show, close, toggle;
+@expose get isOpen;
+@expose snapTo;
+
+let trapDispose: Dispose | null = null;
+let dismissDispose: Dispose | null = null;
+let overlayId = '';
+let backdropEl: HTMLElement | null = null;
+let sheetEl: HTMLElement | null = null;
+let handleEl: HTMLElement | null = null;
+let bodyEl: HTMLElement | null = null;
+let bound = false;
+let rafId = 0;
+let innerRafId = 0;
+
+// Drag state
+let startY = 0;
+let startHeight = 0;
+let isDragging = false;
+let currentHeight = 0;
+/** The detent the sheet rests at — what the handle, a slider, reports and moves. */
+let currentDetent = $signal(0);
+
+const VELOCITY_THRESHOLD = 400; // px/s to trigger quick snap/dismiss
+/**
+ * The release velocity is measured over the last 100 ms of movement, not the step between the
+ * last pointermove and the pointerup, which arrive at the same position for mouse and touch:
+ * that is about 0, and a fast swipe would never dismiss. Times are the events' own `timeStamp`,
+ * when the input happened: the time the handler runs adds main-thread delay, and a busy page
+ * would read a fast swipe as a slow one.
+ */
+const VELOCITY_WINDOW_MS = 100;
+let samples: { y: number; t: number }[] = [];
+
+function sample(y: number, t: number): void {
+  samples.push({ y, t });
+  while (samples.length > 1 && t - samples[0].t > VELOCITY_WINDOW_MS) samples.shift();
+}
+
+/** px/s over the window, positive downward (the closing direction); 0 after a pause. */
+function releaseVelocity(y: number, t: number): number {
+  sample(y, t);
+  const now = samples[samples.length - 1].t;
+  const recent = samples.filter((s) => now - s.t <= VELOCITY_WINDOW_MS);
+  const first = recent[0], last = recent[recent.length - 1];
+  const dt = (last.t - first.t) / 1000;
+  return dt > 0 ? (last.y - first.y) / dt : 0;
+}
+
+function getDetents(): number[] {
+  const d = detents as number[];
+  return (d && d.length > 0) ? d.slice().sort((a, b) => a - b) : [0.4, 0.85];
+}
+
+function getVh(): number {
+  return window.innerHeight;
+}
+
+function tryClose() {
+  // It stays on the sheet, as no undeclared event bubbles (#138).
+  if (!pdxBeforeClose()) return;
+  doClose();
+}
+
+function doClose() {
+  open = false;
+}
+
+function applyHeight(h: number, animate: boolean) {
+  currentHeight = h;
+  if (!sheetEl) return;
+  const maxH = getVh() * 0.95;
+  const clamped = Math.max(0, Math.min(h, maxH));
+  sheetEl.style.height = `${clamped}px`;
+  dragging = !animate;
+  // Sync backdrop opacity with sheet position
+  if (backdropEl) {
+    const list = getDetents();
+    const ratio = clamped / getVh();
+    const opacity = Math.min(1, ratio / (list[0] || 0.4));
+    backdropEl.style.opacity = String(opacity);
+  }
+}
+
+/** Move the sheet to a detent by index, clamped to the detents declared, and emit `pdx-detent-change`. */
+function snapTo(detentIndex: number) {
+  const list = getDetents();
+  const idx = Math.max(0, Math.min(detentIndex, list.length - 1));
+  const h = list[idx] * getVh();
+  applyHeight(h, true);
+  currentDetent = idx;
+  pdxDetentChange({ detent: list[idx], index: idx });
+}
+
+/**
+ * The handle is a slider over the detents: ArrowUp/Right raise the sheet a detent, ArrowDown/Left
+ * lower it, Home/End go to the ends; Escape closes, through the overlay stack. Its role, tab stop
+ * and name keep the detents from being pointer-only.
+ */
+function onHandleKey(e: KeyboardEvent): void {
+  const last = getDetents().length - 1;
+  const idx = currentDetent;
+  const next = e.key === 'ArrowUp' || e.key === 'ArrowRight' ? idx + 1
+    : e.key === 'ArrowDown' || e.key === 'ArrowLeft' ? idx - 1
+      : e.key === 'Home' ? 0
+        : e.key === 'End' ? last
+          : null;
+  if (next === null) return;
+  e.preventDefault();
+  snapTo(Math.max(0, Math.min(next, last)));
+}
+
+function snapToNearest(h: number, velocity: number) {
+  const list = getDetents();
+  const vh = getVh();
+  const ratio = h / vh;
+
+  // Fast swipe down below minimum → close
+  if (closeOnSwipeDown && velocity > VELOCITY_THRESHOLD && ratio < list[0]) {
+    animateOut();
+    return;
+  }
+
+  // Fast swipe down from any detent → snap to lower or close
+  if (velocity > VELOCITY_THRESHOLD) {
+    for (let i = list.length - 1; i >= 0; i--) {
+      if (list[i] < ratio + 0.05) {
+        if (i === 0 && velocity > VELOCITY_THRESHOLD * 1.5 && closeOnSwipeDown) {
+          animateOut();
+          return;
+        }
+        snapTo(i);
+        return;
+      }
+    }
+  }
+
+  // Fast swipe up → snap to higher
+  if (velocity < -VELOCITY_THRESHOLD) {
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] > ratio - 0.05) {
+        snapTo(i);
+        return;
+      }
+    }
+    snapTo(list.length - 1);
+    return;
+  }
+
+  // Slow release below half the smallest detent → close: a slow drag to the bottom dismisses,
+  // rather than snapping back to the smallest detent.
+  if (closeOnSwipeDown && ratio < list[0] * 0.5) {
+    animateOut();
+    return;
+  }
+
+  // Slow release → snap to closest
+  let closestIdx = 0;
+  let closestDist = Infinity;
+  for (let i = 0; i < list.length; i++) {
+    const dist = Math.abs(list[i] - ratio);
+    if (dist < closestDist) {
+      closestDist = dist;
+      closestIdx = i;
+    }
+  }
+  snapTo(closestIdx);
+}
+
+function animateOut() {
+  dragging = false;
+  if (sheetEl) sheetEl.style.height = '0px';
+  // Wait for animation then actually close
+  setTimeout(() => doClose(), 300);
+}
+
+// ─── Drag Handlers ───
+
+function isScrolledToTop(): boolean {
+  if (!bodyEl) return true;
+  return bodyEl.scrollTop <= 0;
+}
+
+function onPointerDown(e: PointerEvent) {
+  // Drag from handle always, or from body only when scrolled to top
+  const target = e.target as HTMLElement;
+  const isHandle = handleEl?.contains(target);
+  const isBody = bodyEl?.contains(target);
+
+  if (!isHandle && isBody && !isScrolledToTop()) return;
+  if (!isHandle && !isBody) return;
+
+  e.preventDefault();
+  isDragging = true;
+  startY = e.clientY;
+  startHeight = currentHeight;
+  samples = [];
+  sample(e.clientY, e.timeStamp);
+
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (!isDragging) return;
+  const dy = startY - e.clientY; // positive = drag up = increase height
+  const newHeight = Math.max(0, startHeight + dy);
+
+  // Rubber-band effect when exceeding max detent
+  const list = getDetents();
+  const maxHeight = list[list.length - 1] * getVh();
+  if (newHeight > maxHeight) {
+    const excess = newHeight - maxHeight;
+    applyHeight(maxHeight + excess * 0.3, false);
+  } else {
+    applyHeight(newHeight, false);
+  }
+
+  sample(e.clientY, e.timeStamp);
+}
+
+function onPointerUp(e: PointerEvent) {
+  document.removeEventListener('pointermove', onPointerMove);
+  document.removeEventListener('pointerup', onPointerUp);
+
+  if (!isDragging) return;
+  isDragging = false;
+
+  snapToNearest(currentHeight, releaseVelocity(e.clientY, e.timeStamp));
+}
+
+function onBackdropClick() {
+  if (backdrop && closeOnBackdrop) tryClose();
+}
+
+// ─── Lifecycle ───
+
+$effect(() => {
+  const isOpenNow = open;
+
+  if (!bound) {
+    bound = true;
+    requestAnimationFrame(() => {
+      backdropEl = host.querySelector('.pdx-bottom-sheet-backdrop');
+      sheetEl = host.querySelector('.pdx-bottom-sheet');
+      handleEl = host.querySelector('.pdx-bottom-sheet-handle');
+      bodyEl = host.querySelector('.pdx-bottom-sheet-body');
+
+      if (backdropEl) backdropEl.addEventListener('click', onBackdropClick);
+
+      // Drag on handle
+      if (handleEl) {
+        handleEl.addEventListener('pointerdown', onPointerDown);
+      }
+      // Drag on body when scrolled to top
+      if (bodyEl) {
+        bodyEl.addEventListener('pointerdown', onPointerDown);
+      }
+    });
+  }
+
+  if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+  if (innerRafId) { cancelAnimationFrame(innerRafId); innerRafId = 0; }
+
+  rafId = requestAnimationFrame(() => {
+    rafId = 0;
+    // Lazy (re)resolve: the once-on-mount capture above runs in a rAF and can miss the sheet if the
+    // render hasn't painted it yet (render timing in a real browser differs from jsdom) — leaving
+    // sheetEl/backdropEl null forever so the sheet is never sized and never opens.
+    if (!sheetEl) sheetEl = host.querySelector('.pdx-bottom-sheet');
+    if (!backdropEl) {
+      backdropEl = host.querySelector('.pdx-bottom-sheet-backdrop');
+      if (backdropEl) backdropEl.addEventListener('click', onBackdropClick);
+    }
+
+    if (isOpenNow) {
+      overlayId = generatedId('pdx-bottom-sheet');
+      const zIndex = overlayStack.push(overlayId, { modal: true });
+      if (backdropEl) {
+        backdropEl.style.zIndex = String(zIndex - 1);
+        backdropEl.style.opacity = '0';
+      }
+      if (sheetEl) {
+        sheetEl.style.zIndex = String(zIndex);
+        sheetEl.style.height = '0px';
+      }
+
+      innerRafId = requestAnimationFrame(() => {
+        innerRafId = 0;
+        shown = true;
+        if (sheetEl) {
+          // Animate to initial detent
+          const idx = (initialDetent as number) || 0;
+          snapTo(idx);
+        }
+
+        // Focus trap
+        if (sheetEl) {
+          trapDispose = focusTrap(sheetEl, { restoreFocus: true, escapeDeactivates: false });
+        }
+
+        // Hide footer if empty
+        // Not named `footer`: that is the part's name, and a read of it by name is a ref at every mount.
+        const footerEl = host.querySelector('.pdx-bottom-sheet-footer') as HTMLElement;
+        if (footerEl) {
+          const hasContent = host.querySelector('[slot="footer"]');
+          footerEl.style.display = hasContent ? '' : 'none';
+        }
+      });
+
+      // Escape
+      if (closeOnEscape) {
+        dismissDispose = overlayStack.onDismissTop(tryClose);
+      }
+    } else {
+      // Close
+      shown = false;
+      dragging = false;
+      if (backdropEl) backdropEl.style.opacity = '';
+      if (sheetEl) sheetEl.style.height = '';
+      if (trapDispose) { trapDispose(); trapDispose = null; }
+      if (dismissDispose) { dismissDispose(); dismissDispose = null; }
+      if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+    }
+  });
+
+  return () => {
+    if (trapDispose) { trapDispose(); trapDispose = null; }
+    if (dismissDispose) { dismissDispose(); dismissDispose = null; }
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+  };
+});
+
+function show() { open = true; }
+function close() { tryClose(); }
+function toggle() { if (open) tryClose(); else open = true; }
+function isOpen() { return open as boolean; }
+
+function detentMax(): string { return String(getDetents().length - 1); }
+function detentText(): string {
+  return format(uiString('bottom-sheet', 'height'),
+    { percent: Math.round((getDetents()[currentDetent] ?? 0) * 100) });
+}
+</script>

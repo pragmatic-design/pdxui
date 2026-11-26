@@ -3424,7 +3424,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/bottom-sheet/pdx-bottom-sheet.ts",
+      "path": "src/bottom-sheet/pdx-bottom-sheet.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -3749,7 +3749,7 @@
           "name": "pdx-bottom-sheet",
           "declaration": {
             "name": "PdxBottomSheet",
-            "module": "src/bottom-sheet/pdx-bottom-sheet.ts"
+            "module": "src/bottom-sheet/pdx-bottom-sheet.pdx"
           }
         }
       ]

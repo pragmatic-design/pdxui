@@ -85,7 +85,7 @@
       "import": "./dist/dialog/dialog-service.js"
     },
     "./bottom-sheet": {
-      "development": "./src/bottom-sheet/pdx-bottom-sheet.ts",
+      "development": "./src/bottom-sheet/pdx-bottom-sheet.pdx",
       "types": "./dist/bottom-sheet/pdx-bottom-sheet.d.ts",
       "import": "./dist/bottom-sheet/pdx-bottom-sheet.js"
     },

@@ -27,6 +27,7 @@ const PORTED: Record<string, string> = {
     'pdx-avatar-group': 'src/avatar-group/pdx-avatar-group.pdx',
     'pdx-block-ui': 'src/block-ui/pdx-block-ui.pdx',
     'pdx-badge': 'src/badge/pdx-badge.pdx',
+    'pdx-bottom-sheet': 'src/bottom-sheet/pdx-bottom-sheet.pdx',
     'pdx-accordion': 'src/accordion/pdx-accordion.pdx',
     'pdx-breadcrumb': 'src/breadcrumb/pdx-breadcrumb.pdx',
     'pdx-command': 'src/command/pdx-command.pdx',

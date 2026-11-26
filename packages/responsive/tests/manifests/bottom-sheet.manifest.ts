@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-bottom-sheet (Tier 2A, overlay)
  *
- * Contracts written by inspecting the source (packages/ui/src/bottom-sheet/pdx-bottom-sheet.ts) and the CSS
+ * Contracts written by inspecting the source (packages/ui/src/bottom-sheet/pdx-bottom-sheet.pdx) and the CSS
  * (packages/design/src/components/bottom-sheet.css).
  *
  * DOM structure (NOT portalled): the custom element <pdx-bottom-sheet> renders, inside its own host

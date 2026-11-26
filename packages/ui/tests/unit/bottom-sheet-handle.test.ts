@@ -9,7 +9,7 @@
 // happy-dom's window is 768 px tall, so the default detents [0.4, 0.85] rest at 307 px and 653 px.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
-import '../../src/bottom-sheet/pdx-bottom-sheet';
+import '../../src/bottom-sheet/pdx-bottom-sheet.pdx';
 
 type Sheet = HTMLElement & { open: boolean };
 

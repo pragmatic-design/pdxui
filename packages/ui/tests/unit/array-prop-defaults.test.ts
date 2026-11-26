@@ -9,7 +9,7 @@ import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/page-header/pdx-page-header.pdx';
 import '../../src/relation-picker/pdx-relation-picker.pdx';
-import '../../src/bottom-sheet/pdx-bottom-sheet';
+import '../../src/bottom-sheet/pdx-bottom-sheet.pdx';
 
 const CASES: [tag: string, prop: string, expected: unknown[]][] = [
     ['pdx-select', 'options', []],
