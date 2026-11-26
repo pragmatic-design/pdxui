@@ -510,9 +510,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // renderer/snippet.ts in the shell chunk every route shares; the .pdx reads its snippets as values,
 // so that module leaves the shell (-59 B) for a chunk of its own, `snippet`, which the ~20 route and
 // component chunks that still call it import (+181 B for the chunk, a few bytes of import in each).
-// Entry 43.6 and blocking 102.6 KB are unchanged. 480.5 KB measured locally against 479.8 on main;
-// the split is #1287's.
-const BUDGET_KB = { entry: 43.6, js: 481.0, css: 67, blocking: 102.9 };
+// Blocking 102.6 KB is unchanged. 480.5 KB measured locally against 479.8 on main; the split is
+// #1287's.
+// entry 43.6 → 43.7 (the owner's OK, on #1448): the new `snippet` chunk is named in Vite's preload
+// map in the entry, +25 B, which took CI's entry from 43.6 to 43.7 KB; locally it rounds to 43.6.
+const BUDGET_KB = { entry: 43.7, js: 481.0, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
