@@ -656,7 +656,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/app-layout/pdx-app-layout.ts",
+      "path": "src/app-layout/pdx-app-layout.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -959,7 +959,7 @@
           "name": "pdx-app-layout",
           "declaration": {
             "name": "PdxAppLayout",
-            "module": "src/app-layout/pdx-app-layout.ts"
+            "module": "src/app-layout/pdx-app-layout.pdx"
           }
         }
       ]

@@ -2,7 +2,7 @@
  * MANIFEST — pdx-app-layout (Tier 6 — layout/shell)
  *
  * Contracts written by inspecting:
- *  - the source: packages/ui/src/app-layout/pdx-app-layout.ts
+ *  - the source: packages/ui/src/app-layout/pdx-app-layout.pdx
  *      Light DOM, render: <slot></slot>. In rAF (on ctx.track's first run) it builds the shell
  *      DIRECTLY on the HOST <pdx-app-layout>:
  *        - the host carries NO class (#290): app-layout.css draws the grid on the tag

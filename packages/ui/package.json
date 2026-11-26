@@ -175,7 +175,7 @@
       "import": "./dist/scroll-area/pdx-scroll-area.js"
     },
     "./app-layout": {
-      "development": "./src/app-layout/pdx-app-layout.ts",
+      "development": "./src/app-layout/pdx-app-layout.pdx",
       "types": "./dist/app-layout/pdx-app-layout.d.ts",
       "import": "./dist/app-layout/pdx-app-layout.js"
     },

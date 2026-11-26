@@ -1,0 +1,294 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAppLayout",
+  "tagName": "pdx-app-layout",
+  "category": "Layout",
+  "order": 68,
+  "description": "An application shell that places a header, side bars, main content and a footer on a CSS grid that\ncollapses responsively.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "headerHeight",
+      "description": "Header height (CSS value). Empty = no header.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'52px'",
+      "attribute": "headerheight"
+    },
+    {
+      "kind": "field",
+      "name": "footerHeight",
+      "description": "Footer height (CSS value). Empty = no footer.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "footerheight"
+    },
+    {
+      "kind": "field",
+      "name": "navbarWidth",
+      "description": "Navbar (left sidebar) width (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'260px'",
+      "attribute": "navbarwidth"
+    },
+    {
+      "kind": "field",
+      "name": "navbarCollapsedWidth",
+      "description": "Navbar collapsed width for mini mode. A non-zero rail keeps icon-only nav visible\nwhen collapsed (set to '0px' explicitly for a fully-hidden navbar).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'60px'",
+      "attribute": "navbarcollapsedwidth"
+    },
+    {
+      "kind": "field",
+      "name": "navbarBreakpoint",
+      "description": "Breakpoint (px) below which navbar auto-collapses to overlay",
+      "type": {
+        "text": "number"
+      },
+      "default": "768",
+      "attribute": "navbarbreakpoint"
+    },
+    {
+      "kind": "field",
+      "name": "asideWidth",
+      "description": "Aside (right sidebar) width. Empty = no aside.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "asidewidth"
+    },
+    {
+      "kind": "field",
+      "name": "navbarFullHeight",
+      "description": "Full-height navbar: the left sidebar spans header+main+footer (logo lives in the\nnavbar), and the header only sits above main. Default false = header spans full width.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "navbarfullheight"
+    },
+    {
+      "kind": "field",
+      "name": "withBorder",
+      "description": "Show border between regions",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "withborder"
+    },
+    {
+      "kind": "field",
+      "name": "transitionDuration",
+      "description": "Transition duration (ms)",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "transitionduration"
+    },
+    {
+      "kind": "field",
+      "name": "navbarCollapsed",
+      "description": "Navbar collapsed state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "navbarcollapsed"
+    },
+    {
+      "kind": "method",
+      "name": "toggleNavbar",
+      "parameters": [],
+      "description": "Open or close the navbar: the mobile drawer under the breakpoint, the `navbar-collapsed` prop above it."
+    },
+    {
+      "kind": "method",
+      "name": "openNavbar",
+      "parameters": [],
+      "description": "Open the navbar, on either side of the breakpoint."
+    },
+    {
+      "kind": "method",
+      "name": "closeNavbar",
+      "parameters": [],
+      "description": "Close the navbar, on either side of the breakpoint."
+    }
+  ],
+  "models": [
+    "navbarCollapsed"
+  ],
+  "events": [
+    {
+      "name": "navbar-collapsed-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `navbarCollapsed`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "banner",
+    "complementary",
+    "contentinfo",
+    "navigation"
+  ],
+  "attributes": [
+    {
+      "name": "headerheight",
+      "fieldName": "headerHeight",
+      "description": "Header height (CSS value). Empty = no header.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'52px'"
+    },
+    {
+      "name": "footerheight",
+      "fieldName": "footerHeight",
+      "description": "Footer height (CSS value). Empty = no footer.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "navbarwidth",
+      "fieldName": "navbarWidth",
+      "description": "Navbar (left sidebar) width (CSS value)",
+      "type": {
+        "text": "string"
+      },
+      "default": "'260px'"
+    },
+    {
+      "name": "navbarcollapsedwidth",
+      "fieldName": "navbarCollapsedWidth",
+      "description": "Navbar collapsed width for mini mode. A non-zero rail keeps icon-only nav visible\nwhen collapsed (set to '0px' explicitly for a fully-hidden navbar).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'60px'"
+    },
+    {
+      "name": "navbarbreakpoint",
+      "fieldName": "navbarBreakpoint",
+      "description": "Breakpoint (px) below which navbar auto-collapses to overlay",
+      "type": {
+        "text": "number"
+      },
+      "default": "768"
+    },
+    {
+      "name": "asidewidth",
+      "fieldName": "asideWidth",
+      "description": "Aside (right sidebar) width. Empty = no aside.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "navbarfullheight",
+      "fieldName": "navbarFullHeight",
+      "description": "Full-height navbar: the left sidebar spans header+main+footer (logo lives in the\nnavbar), and the header only sits above main. Default false = header spans full width.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "withborder",
+      "fieldName": "withBorder",
+      "description": "Show border between regions",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "transitionduration",
+      "fieldName": "transitionDuration",
+      "description": "Transition duration (ms)",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    },
+    {
+      "name": "navbarcollapsed",
+      "fieldName": "navbarCollapsed",
+      "description": "Navbar collapsed state",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "header",
+      "description": "The app's `data-region=\"header\"` element (`.pdx-app-header`, `role=\"banner\"`)."
+    },
+    {
+      "name": "navbar",
+      "description": "The app's `data-region=\"navbar\"` element (`.pdx-app-navbar`, `role=\"navigation\"`)."
+    },
+    {
+      "name": "aside",
+      "description": "The app's `data-region=\"aside\"` element (`.pdx-app-aside`, `role=\"complementary\"`)."
+    },
+    {
+      "name": "main",
+      "description": "The `<main class=\"pdx-app-main\">` it wraps everything without a region in; the element that scrolls."
+    },
+    {
+      "name": "footer",
+      "description": "The app's `data-region=\"footer\"` element (`.pdx-app-footer`, `role=\"contentinfo\"`)."
+    },
+    {
+      "name": "overlay",
+      "description": "The backdrop behind the open drawer, below the breakpoint."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "bordered",
+      "description": "`withBorder` is set: a line between the regions."
+    },
+    {
+      "name": "drawer",
+      "description": "Below `navbarBreakpoint`: the navbar is an overlay drawer, off screen until opened."
+    },
+    {
+      "name": "drawer-open",
+      "description": "The drawer is open, with its backdrop."
+    },
+    {
+      "name": "navbar-collapsed",
+      "description": "Above the breakpoint, the navbar is collapsed to its rail."
+    },
+    {
+      "name": "navbar-gone",
+      "description": "Collapsed to a `0px` rail: the navbar takes no width at all."
+    }
+  ]
+}
