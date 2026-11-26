@@ -37,11 +37,12 @@ import '@pdxui/design/components/block-ui';
 @event 'pdx-block': void;
 /** The overlay is taken away and the input given back. */
 @event 'pdx-unblock': void;
-// The host's states (#291): block-ui.css draws the overlay from `shown`.
-// `blocked`: from the moment the input is blocked until it is given back — while the prop is on,
-// and after it while the overlay is held for `min-duration`.
-@state blocked = (blocked as boolean) || drawn;
-@state shown = drawn;
+// The host's states (#291), set where the TypeScript version set them (#1436): block-ui.css draws
+// the overlay from `shown`, which `draw` sets. `blocked` — the prop's name, so its binding is `held`
+// (#1441) — is set by `block`: from the moment the input is blocked until it is given back, while
+// the prop is on and after it while the overlay is held for `min-duration`.
+@state blocked as held;
+@state shown;
 // The overlay is built by the script, a frame after mount, as the TypeScript version built it.
 @part(external) overlay, spinner, message;
 /** Whether the UI is blocked (shows overlay + spinner) */
@@ -58,8 +59,6 @@ import '@pdxui/design/components/block-ui';
 @prop minDuration: number = 200;
 @host host;
 
-/** The `shown` state: the overlay is drawn. */
-let drawn = $signal(false);
 let overlayEl: HTMLElement | null = null;
 // The live region. Built always, whatever `message` is at first: a message bound to a
 // value that arrives later needs an element to go into.
@@ -126,7 +125,7 @@ function inertOutside(on: boolean): void {
 }
 
 function draw(on: boolean): void {
-  drawn = on;
+  shown = on;
   if (overlayEl) overlayEl.setAttribute('aria-hidden', String(!on));
   syncMessage(on, message.peek() as string);
 }
@@ -138,6 +137,7 @@ function block(on: boolean): void {
   if (on && variant.peek() !== 'none' && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner.pdx');
   // Busy while blocked and not otherwise (A4): no `aria-busy="false"` on a region at rest.
   if (on) host.setAttribute('aria-busy', 'true'); else host.removeAttribute('aria-busy');
+  held = on;
   syncInert(on);
   inertOutside(on && (fullscreen.peek() as boolean));
 }
