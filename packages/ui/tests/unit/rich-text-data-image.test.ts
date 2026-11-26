@@ -8,7 +8,7 @@
 // allows data:image, as the view's render does.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 type RichText = HTMLElement & { value: unknown; getHTML(): string; setHTML(html: string): void };
 

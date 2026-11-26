@@ -8,7 +8,7 @@
 //   5. `label` is declared, so the editing area takes its name rather than "Rich text editor".
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 type RichText = HTMLElement & {
     value: unknown;

@@ -135,7 +135,7 @@ import './json-editor/pdx-json-editor.pdx';
 import './relation-picker/pdx-relation-picker.pdx';
 import './chart/pdx-chart.pdx';
 import './chart/pdx-sparkline.pdx';
-import './rich-text/pdx-rich-text';
+import './rich-text/pdx-rich-text.pdx';
 
 // Infrastructure components (non-rendering / utility)
 import './provide/pdx-provide.pdx';

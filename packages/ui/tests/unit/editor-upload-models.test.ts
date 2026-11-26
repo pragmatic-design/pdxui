@@ -10,7 +10,7 @@ import { join } from 'path';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { tick, cleanup } from './helpers';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 import '../../src/json-editor/pdx-json-editor.pdx';
 import '../../src/input/pdx-input.pdx';
 import '../../src/file-upload/pdx-file-upload.pdx';

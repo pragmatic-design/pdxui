@@ -24362,7 +24362,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/rich-text/pdx-rich-text.ts",
+      "path": "src/rich-text/pdx-rich-text.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -24822,7 +24822,7 @@
           "name": "pdx-rich-text",
           "declaration": {
             "name": "PdxRichText",
-            "module": "src/rich-text/pdx-rich-text.ts"
+            "module": "src/rich-text/pdx-rich-text.pdx"
           }
         }
       ]

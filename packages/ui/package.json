@@ -215,7 +215,7 @@
       "import": "./dist/entity-grid/pdx-entity-grid.js"
     },
     "./rich-text": {
-      "development": "./src/rich-text/pdx-rich-text.ts",
+      "development": "./src/rich-text/pdx-rich-text.pdx",
       "types": "./dist/rich-text/pdx-rich-text.d.ts",
       "import": "./dist/rich-text/pdx-rich-text.js"
     },

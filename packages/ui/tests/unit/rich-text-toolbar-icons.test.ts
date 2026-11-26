@@ -5,7 +5,7 @@
 // with nothing inside. Nothing showed it while a test or an app imported the whole library. This file
 // is its own module graph: it imports the editor and nothing else.
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/rich-text/pdx-rich-text';
+import '../../src/rich-text/pdx-rich-text.pdx';
 
 const settle = (ms = 100): Promise<void> => new Promise(r => setTimeout(r, ms));
 
