@@ -53,8 +53,12 @@ export function rewritePropPeeks(expr: string, propNames: Set<string>): string {
             // Object key: identifier followed by a single `:` (not `::`).
             const after = expr.slice(pos).match(/^\s*:/);
             const isObjectKey = !!after && expr[pos + after[0].length] !== ':';
+            // A `.peek()` the script wrote on the prop is the signal's own, as elsewhere in the script
+            // (#676): peeked again it was `ctx.start.peek().peek()`, asked of the value, and threw
+            // (#1419). Match: `.peek` then `(`, whitespace allowed around the dot
+            const peeksItself = /^\s*\.\s*peek\s*\(/.test(expr.slice(pos));
             if (propNames.has(id) && prevChar !== '.' && !isObjectKey) {
-                result += `ctx.${id}.peek()`;
+                result += peeksItself ? `ctx.${id}` : `ctx.${id}.peek()`;
             } else {
                 result += id;
             }
