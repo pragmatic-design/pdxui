@@ -304,6 +304,8 @@ export interface ScriptAnalysis {
     fetches: FetchDecl[];    // @fetch declarations
     forms: FormDecl[];       // @form declarations
     exposes: string[];       // names declared via @expose
+    /** The `exposes` written `@expose get name` (#1423): functions exposed as a plain getter that calls them. */
+    exposeGetters?: string[];
     states: StateDecl[];     // @state name = expr;
     /** `@hydrate viewport;` (#160, part 4d): the triggers a generated host waits for, as written. */
     hydrate?: string;

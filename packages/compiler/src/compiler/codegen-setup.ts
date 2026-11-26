@@ -616,13 +616,16 @@ export function buildSetupBody(
     // @expose — expose declared names on the host element (#752). A reactive name becomes an accessor
     // to its value: a $derived a getter alone (read-only), a $signal a getter and a setter that stores
     // the value as an assignment in the script does (setRaw: a function is kept, not called). Functions
-    // and constants keep their bare name.
+    // and constants keep their bare name. `@expose get name` (#1423) is a getter that calls the
+    // function `name`: not reactive, nothing created at mount, as a TypeScript `get name()`.
     if (analysis.exposes.length > 0) {
         const derivedNames = new Set(analysis.deriveds.map(d => d.name));
+        const getterNames = new Set(analysis.exposeGetters ?? []);
         const exposeObj = analysis.exposes.map(n =>
-            signalNames.has(n) ? `get ${n}() { return __${n}(); }, set ${n}(v) { __${n}.setRaw(v); }`
-                : derivedNames.has(n) ? `get ${n}() { return ${n}(); }`
-                    : `${n}`,
+            getterNames.has(n) ? `get ${n}() { return ${n}(); }`
+                : signalNames.has(n) ? `get ${n}() { return __${n}(); }, set ${n}(v) { __${n}.setRaw(v); }`
+                    : derivedNames.has(n) ? `get ${n}() { return ${n}(); }`
+                        : `${n}`,
         ).join(', ');
         parts.push(`    ctx.expose({ ${exposeObj} });`);
     }

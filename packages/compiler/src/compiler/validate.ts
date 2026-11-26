@@ -27,6 +27,7 @@ import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 import { checkRequiredSlots, type RequiredSlotsLookup } from './validate-required-slots';
 import { checkReservedNames } from './validate-reserved-names';
+import { checkExposeGetters } from './validate-expose-get';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
@@ -558,6 +559,7 @@ export function validate(
             });
         }
     }
+    warnings.push(...checkExposeGetters(analysis, allDeclaredNames));
 
     // ─── Check 10b: @state holds a boolean (#132) ─────────────────
 

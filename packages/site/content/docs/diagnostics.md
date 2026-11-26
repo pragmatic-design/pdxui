@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 121 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 122 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -494,6 +494,14 @@ write:
 @event remove: { id: string };
 </script>
 ```
+
+### PDX_EXPOSE_GET_NOT_FUNCTION
+
+*error* — `@expose get` names something that is not a function (#1423).
+
+`@expose get name` exposes a read-only property whose getter calls the function `name` when it is read. A $signal, a $derived or a constant is not called: the getter would throw.
+
+**Fix.** Declare it as a function (`function isEmpty() { return … }`), or expose a reactive name without `get`: `@expose count;`.
 
 ### PDX_EXPOSE_UNDECLARED
 

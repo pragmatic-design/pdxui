@@ -25,17 +25,26 @@ export interface ExposedMember {
  * - a $signal, a writable accessor; a $derived, a read-only one (#752);
  * - a part (#134), its element or, when `partCounts` says the template renders more than one, the
  *   array of them (#988) — read-only, the template sets it;
- * - a function, a method with the parameters and the return type its declaration writes (#1004).
+ * - a function, a method with the parameters and the return type its declaration writes (#1004);
+ * - a function written `@expose get name`, a read-only member of its return type (#1423).
  *
  * A constant is exposed as it is, and the .d.ts says nothing of it.
  */
 export function exposedMembers(
-    analysis: Pick<ScriptAnalysis, 'exposes' | 'signals' | 'deriveds'> & Partial<Pick<ScriptAnalysis, 'body'>>,
+    analysis: Pick<ScriptAnalysis, 'exposes' | 'signals' | 'deriveds'> & Partial<Pick<ScriptAnalysis, 'body' | 'exposeGetters'>>,
     partCounts: ReadonlyMap<string, number> = new Map(),
 ): ExposedMember[] {
     const out: ExposedMember[] = [];
     let body: ts.SourceFile | undefined;
+    const getters = new Set(analysis.exposeGetters ?? []);
     for (const name of analysis.exposes) {
+        if (getters.has(name)) {
+            // `@expose get name` (#1423): a read-only property of the function's return type.
+            body ??= ts.createSourceFile('script.ts', analysis.body ?? '', ts.ScriptTarget.Latest, true);
+            const method = declaredMethod(name, body);
+            if (method) out.push({ name, type: method.type, readonly: true });
+            continue;
+        }
         const signal = analysis.signals.find(s => s.name === name);
         if (signal?.part) {
             out.push({ name, type: (partCounts.get(name) ?? 0) > 1 ? 'HTMLElement[]' : 'HTMLElement | null', readonly: true });
@@ -52,11 +61,10 @@ export function exposedMembers(
 }
 
 /**
- * The function `name` declares in the script — `function name(…)`, or `const name = (…) => …` — as a
- * method: its parameters, a default making one optional, and its return type as written (`unknown`
- * when none is, a `Promise` of it for an async one). Null when `name` is not a function.
+ * The function the script declares as `name` at its top level — `function name(…)`, or
+ * `const name = (…) => …` / `function (…)` — or null when `name` is not one.
  */
-function declaredMethod(name: string, body: ts.SourceFile): { params: string; type: string } | null {
+export function declaredFunction(name: string, body: ts.SourceFile): ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression | null {
     let fn: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression | null = null;
     for (const st of body.statements) {
         if (ts.isFunctionDeclaration(st) && st.name?.text === name) fn = st;
@@ -67,6 +75,16 @@ function declaredMethod(name: string, body: ts.SourceFile): { params: string; ty
             }
         }
     }
+    return fn;
+}
+
+/**
+ * The function `name` declares in the script — `function name(…)`, or `const name = (…) => …` — as a
+ * method: its parameters, a default making one optional, and its return type as written (`unknown`
+ * when none is, a `Promise` of it for an async one). Null when `name` is not a function.
+ */
+function declaredMethod(name: string, body: ts.SourceFile): { params: string; type: string } | null {
+    const fn = declaredFunction(name, body);
     if (!fn) return null;
     const params = fn.parameters.map((p) => {
         const optional = p.questionToken || p.initializer ? '?' : '';

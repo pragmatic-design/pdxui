@@ -91,8 +91,10 @@ export function analyzePdxFile(file, text, categories) {
     // The script without its runes, as TypeScript: the functions an `@expose` names, the interfaces it exports.
     const body = ts.createSourceFile(`${file}.ts`, a.body, ts.ScriptTarget.Latest, true);
     const derived = new Set([...a.deriveds.map(x => x.name), ...a.signals.map(x => x.name)]);
+    // An `@expose get` function is a read-only property, not a method (#1423).
+    const getters = new Set(a.exposeGetters ?? []);
     const methods = a.exposes.map(name => {
-        const fn = derived.has(name) ? null : declaredFunction(name, body);
+        const fn = derived.has(name) || getters.has(name) ? null : declaredFunction(name, body);
         return fn
             ? { name, kind: 'method', params: functionParameters(fn, body), description: docOf('declaration', name) }
             // An `@expose`d $derived, signal or part is read-only on the element (#752).

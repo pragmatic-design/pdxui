@@ -298,6 +298,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it first (`function close() { … }`), or remove it from `@expose`.',
         reproducedIn: `${T}validate.test.ts`,
     },
+    PDX_EXPOSE_GET_NOT_FUNCTION: {
+        severity: 'error', category: 'defect',
+        summary: '`@expose get` names something that is not a function (#1423).',
+        explanation: '`@expose get name` exposes a read-only property whose getter calls the function `name` when it is read. A $signal, a $derived or a constant is not called: the getter would throw.',
+        fix: 'Declare it as a function (`function isEmpty() { return … }`), or expose a reactive name without `get`: `@expose count;`.',
+        reproducedIn: `${T}expose-get.test.ts`,
+    },
     PDX_COMMAND_TARGET_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A `commandfor` whose target id is not in the template.',

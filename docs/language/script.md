@@ -506,10 +506,10 @@ beta (#490)
 #### Syntax
 
 ```ebnf
-ExposeDecl ::= "@expose" S Identifier ( S? "," S? Identifier )* S? ";"?
+ExposeDecl ::= "@expose" S ( "get" S )? Identifier ( S? "," S? Identifier )* S? ";"?
 ```
 
-The analyzer's form: `@expose methodA, methodB;`
+The analyzer's form: `@expose methodA, methodB;`, and `@expose get isEmpty;` (#1423).
 
 #### Semantics
 
@@ -522,9 +522,17 @@ to its value (#752): a `$signal` gets a getter and a setter, so the outside read
 `readonly`, each with the type its declaration was written with (`$signal<T>`, `$derived<T>` or an
 annotation), `unknown` without one.
 
+`@expose get name` names a function of the script and exposes a read-only property whose getter calls
+it when it is read (#1423): `get name() { return name(); }`. It is not reactive, and nothing is created
+at mount, as with a TypeScript component's `get name()`; a `$derived` costs a signal and a computed per
+instance, which is its price for being readable inside an effect. Use `get` for a value the outside
+asks for now and then (`el.isEmpty`), and a `$derived` for one it follows. The `.d.ts` declares it
+`readonly`, of the function's return type; `get` applies to every name on its line.
+
 #### Rules
 
 - A name the component does not declare raises `PDX_EXPOSE_UNDECLARED`.
+- `@expose get` on a name that is not a function raises `PDX_EXPOSE_GET_NOT_FUNCTION`.
 - Several `@expose` lines add up.
 - An exposed `$signal` or `$derived` counts as used: no `PDX_UNUSED_REACTIVE`, its reader is outside.
 
@@ -545,9 +553,19 @@ function hide() { open = false; }
 </script>
 ```
 
+```pdx
+<script>
+let text = '';
+
+function isEmpty(): boolean { return text.length === 0; }
+
+@expose get isEmpty;
+</script>
+```
+
 #### Since
 
-alpha
+alpha; `get`, beta (#1423)
 
 ### @part
 

@@ -164,6 +164,27 @@ describe('the TypeScript modules in a .pdx component\'s folder', () => {
     });
 });
 
+// `@expose get name` (#1423) exposes a function as a read-only property, called when it is read: the
+// manifest lists a read-only field, as for a TypeScript `get name()`, not a method to call.
+describe('a .pdx @expose get', () => {
+    it('is a read-only field in the manifest, and a plain exposed function stays a method', () => {
+        write('g/pdx-g.pdx', [
+            '<template><p></p></template>',
+            '<script>',
+            'function isEmpty(): boolean { return true; }',
+            'function focus() {}',
+            '@expose get isEmpty;',
+            '@expose focus;',
+            '</script>',
+        ].join('\n'));
+        const file = join(root, 'g/pdx-g.pdx');
+        const [mod] = analyzePdxFile(file, readFileSync(file, 'utf-8'), {});
+        const members = mod.declarations[0].members as { kind: string; name: string; readonly?: boolean }[];
+        expect(members.find(m => m.name === 'isEmpty')).toEqual(expect.objectContaining({ kind: 'field', readonly: true }));
+        expect(members.find(m => m.name === 'focus')).toEqual(expect.objectContaining({ kind: 'method' }));
+    });
+});
+
 // `@prop(icon)` (#1317) is the .pdx form of `prop('inbox', { iconName: true })`: the manifest says the
 // prop names an icon, and the compiler imports the icon a consumer writes in it (icon-imports.ts).
 describe('a .pdx prop that names an icon', () => {
