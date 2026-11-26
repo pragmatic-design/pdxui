@@ -1,0 +1,348 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxNavMenu",
+  "tagName": "pdx-nav-menu",
+  "category": "Navigation",
+  "order": 57,
+  "description": "A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a\ncollapsed icon-only mode.",
+  "generics": [
+    "T extends { key: string; label: string }"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "Menu items",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "activeKey",
+      "description": "Currently active item key",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "activekey"
+    },
+    {
+      "kind": "field",
+      "name": "collapsed",
+      "description": "Collapsed mode (show only icons, hide labels)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "collapsed"
+    },
+    {
+      "kind": "field",
+      "name": "indent",
+      "description": "Indent per nesting level (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "36",
+      "attribute": "indent"
+    },
+    {
+      "kind": "field",
+      "name": "iconSet",
+      "description": "Icon set name (for pdx-icon set attribute)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "iconset"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need\ntwo names, or a screen-reader user cannot tell the landmarks apart (#1023).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "`sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar.",
+      "type": {
+        "text": "'md' | 'sm'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "indicator",
+      "description": "How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge.",
+      "type": {
+        "text": "'fill' | 'border'"
+      },
+      "default": "'fill'",
+      "attribute": "indicator"
+    },
+    {
+      "kind": "field",
+      "name": "chevron",
+      "description": "Where a group's chevron sits: before its icon, or at the end of its row.",
+      "type": {
+        "text": "'start' | 'end'"
+      },
+      "default": "'start'",
+      "attribute": "chevron"
+    },
+    {
+      "kind": "field",
+      "name": "actions",
+      "description": "`overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest.",
+      "type": {
+        "text": "'inline' | 'overlay'"
+      },
+      "default": "'inline'",
+      "attribute": "actions"
+    },
+    {
+      "kind": "method",
+      "name": "toggleGroup",
+      "parameters": [
+        {
+          "name": "key",
+          "type": {
+            "text": "string"
+          }
+        }
+      ],
+      "description": "Expand or collapse one group by key. It selects nothing."
+    },
+    {
+      "kind": "method",
+      "name": "expandAll",
+      "parameters": [],
+      "description": "Expand every group that has children, at any depth."
+    },
+    {
+      "kind": "method",
+      "name": "collapseAll",
+      "parameters": [],
+      "description": "Collapse every group."
+    }
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm"
+      ],
+      "default": "md"
+    },
+    {
+      "name": "indicator",
+      "values": [
+        "fill",
+        "border"
+      ],
+      "default": "fill"
+    },
+    {
+      "name": "chevron",
+      "values": [
+        "start",
+        "end"
+      ],
+      "default": "start"
+    },
+    {
+      "name": "actions",
+      "values": [
+        "inline",
+        "overlay"
+      ],
+      "default": "inline"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An entry was chosen; cancellable, so an app under the router navigates itself.",
+      "detail": "{ key: string; item: T; href?: string }"
+    },
+    {
+      "name": "pdx-toggle",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A group was folded or unfolded: its `key` and whether it is open now. Does not bubble.",
+      "detail": "{ key: string; expanded: boolean }"
+    }
+  ],
+  "roles": [
+    "group",
+    "navigation"
+  ],
+  "attributes": [
+    {
+      "name": "activekey",
+      "fieldName": "activeKey",
+      "description": "Currently active item key",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "collapsed",
+      "fieldName": "collapsed",
+      "description": "Collapsed mode (show only icons, hide labels)",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "indent",
+      "fieldName": "indent",
+      "description": "Indent per nesting level (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "36"
+    },
+    {
+      "name": "iconset",
+      "fieldName": "iconSet",
+      "description": "Icon set name (for pdx-icon set attribute)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need\ntwo names, or a screen-reader user cannot tell the landmarks apart (#1023).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "`sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar.",
+      "type": {
+        "text": "'md' | 'sm'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "indicator",
+      "fieldName": "indicator",
+      "description": "How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge.",
+      "type": {
+        "text": "'fill' | 'border'"
+      },
+      "default": "'fill'"
+    },
+    {
+      "name": "chevron",
+      "fieldName": "chevron",
+      "description": "Where a group's chevron sits: before its icon, or at the end of its row.",
+      "type": {
+        "text": "'start' | 'end'"
+      },
+      "default": "'start'"
+    },
+    {
+      "name": "actions",
+      "fieldName": "actions",
+      "description": "`overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest.",
+      "type": {
+        "text": "'inline' | 'overlay'"
+      },
+      "default": "'inline'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "NavMenuItem",
+      "fields": [
+        "key: string",
+        "label: string",
+        "icon?: string",
+        "badge?: string",
+        "badgeVariant?: 'default' | 'primary' | 'danger' | 'success'",
+        "children?: NavMenuItem[]",
+        "type?: 'item' | 'header' | 'separator'",
+        "href?: string",
+        "disabled?: boolean",
+        "expanded?: boolean",
+        "collapsed?: boolean",
+        "data?: Record<string, string>"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`.",
+      "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, expanded: boolean, active: boolean)"
+    },
+    {
+      "name": "itemActions",
+      "description": "Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.",
+      "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, active: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "nav",
+      "description": "The `role=\"navigation\"` element that holds the entries (`.pdx-nav`)."
+    },
+    {
+      "name": "item",
+      "description": "An entry, a link or a button; the current one is `aria-current=\"page\"`, an open group's `aria-expanded=\"true\"`."
+    },
+    {
+      "name": "group",
+      "description": "The entries of an open group, or of a heading that folds (`role=\"group\"`)."
+    },
+    {
+      "name": "heading",
+      "description": "A section heading, text or the button that folds its group."
+    },
+    {
+      "name": "separator",
+      "description": "The rule between two sections."
+    },
+    {
+      "name": "actions",
+      "description": "The `actions` slot's controls beside a leaf entry."
+    },
+    {
+      "name": "flyout",
+      "description": "A collapsed menu's group, opened beside its icon (on `<body>`)."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "ready",
+      "description": "Its entries are drawn."
+    },
+    {
+      "name": "collapsed",
+      "description": "`collapsed` is set: icons only, a group in a flyout."
+    }
+  ]
+}

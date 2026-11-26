@@ -68,7 +68,7 @@ import './wizard/pdx-wizard';
 import './navbar/pdx-navbar.pdx';
 import './sidebar/pdx-sidebar.pdx';
 import './bottom-nav/pdx-bottom-nav.pdx';
-import './nav-menu/pdx-nav-menu';
+import './nav-menu/pdx-nav-menu.pdx';
 import './menubar/pdx-menubar';
 import './menu/pdx-menu.pdx';
 import './dropdown-menu/pdx-dropdown-menu.pdx';

@@ -2,7 +2,7 @@
  * MANIFEST — pdx-nav-menu (Tier 6)
  *
  * NEW contracts, derived by inspecting:
- *  - the source: packages/ui/src/nav-menu/pdx-nav-menu.ts
+ *  - the source: packages/ui/src/nav-menu/pdx-nav-menu.pdx
  *      the HOST <pdx-nav-menu> → in an rAF it takes the custom state :state(ready), and :state(collapsed)
  *      while `collapsed` is set (#289, no class on the host), and creates inside it an INNER
  *      <nav class="pdx-nav" data-part="nav" role="navigation" aria-label="Navigation">. Selected by part.

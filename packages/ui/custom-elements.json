@@ -20372,7 +20372,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/nav-menu/pdx-nav-menu.ts",
+      "path": "src/nav-menu/pdx-nav-menu.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -20729,7 +20729,7 @@
           "name": "pdx-nav-menu",
           "declaration": {
             "name": "PdxNavMenu",
-            "module": "src/nav-menu/pdx-nav-menu.ts"
+            "module": "src/nav-menu/pdx-nav-menu.pdx"
           }
         }
       ]
