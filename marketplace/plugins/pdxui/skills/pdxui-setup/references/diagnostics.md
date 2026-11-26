@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 125 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 126 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -809,6 +809,14 @@ write:
 let a = $signal(1);
 </script>
 ```
+
+### PDX_IMPORT_NAME_TAKEN
+
+*error* — A script's import from `@pdxui/core` aliased to a name the compiled module binds to another core export.
+
+The compiler writes the module's one import from `@pdxui/core` and merges the script's core imports into it. `import { component as defineComponent }` beside the `defineComponent` the module calls declared that name twice: the module did not parse, and the error came from the bundler at a column of generated code (#1254). So the compile stops at the alias, naming it and the export the compiler binds to that name. An import of the same export the compiler binds, `import { signal }` beside a `$signal`, is merged as it was.
+
+**Fix.** Choose another alias for the import.
 
 ### PDX_INLINE_BINDINGS_IGNORED
 

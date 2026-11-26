@@ -5,6 +5,29 @@
 // value import that the browser refuses. Types are left to the type eraser.
 
 /**
+ * The specifiers of the module's core import, sorted and joined, once each name it binds is bound once
+ * (#1254). The script's own core imports are merged into `imports` with the names the compiler binds;
+ * one that aliases another export to such a name — `component as defineComponent` beside the
+ * `defineComponent` the module calls — would declare that name twice, and the module would not parse.
+ * That is a compile error naming the alias. A script import of the same export the compiler binds
+ * (`signal` beside a `$signal`) is the same specifier, and stays merged. The compiler adds no aliased
+ * specifier of its own, so an `x as y` in `imports` is the script's.
+ */
+export function coreImportSpecifiers(imports: ReadonlySet<string>, filename: string): string {
+    for (const spec of imports) {
+        // Match: `exported as local`. Groups: [1]=the export [2]=the local name it is bound to
+        const aliased = /^([\w$]+)\s+as\s+([\w$]+)$/.exec(spec);
+        if (!aliased || aliased[1] === aliased[2] || !imports.has(aliased[2])) continue;
+        const code = 'PDX_IMPORT_NAME_TAKEN';
+        throw new Error(`[${code}] ${filename} — \`import { ${spec} } from '@pdxui/core'\` binds \`${aliased[2]}\` to core's `
+            + `\`${aliased[1]}\`, and the module the compiler writes binds \`${aliased[2]}\` to core's \`${aliased[2]}\`: `
+            + 'the name would be declared twice, and the module would not parse.\n'
+            + `  Hint: choose another alias, e.g. \`import { ${aliased[1]} as ${aliased[1]}Fn } from '@pdxui/core'\`.`);
+    }
+    return Array.from(imports).sort().join(', ');
+}
+
+/**
  * The runtime names of a one-line core import: none for `import type { … }`, and every name but the
  * `type X` ones for `import { a, type X }`.
  */
