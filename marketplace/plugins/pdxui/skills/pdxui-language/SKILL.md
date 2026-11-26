@@ -344,8 +344,10 @@ A component that draws a piece the parent decides — a row, an option, an empty
 @slot row: (item: T, index: number);   // required: the parent must give it
 @slot empty?: ();                      // optional: @render empty?.() draws nothing without it
 </script>
+```
 
-<!-- parent -->
+```html
+<!-- parent: in the page's template -->
 <app-user-list :items="users">
   @snippet row(u, i) { <strong>{{ i + 1 }}.</strong> {{ u.name }} }
 </app-user-list>

@@ -16,6 +16,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_EMPTY_SOURCE` | error | An empty `.pdx` file (build error). | [The file](file.md#the-file) |
 | `PDX_DUPLICATE_TEMPLATE` | error | A second `<template>` block in a `.pdx`. | [The file](file.md#the-file) |
 | `PDX_DUPLICATE_SCRIPT` | error | A second `<script>` block in a `.pdx`. | [The file](file.md#the-file) |
+| `PDX_MARKUP_OUTSIDE_TEMPLATE` | error | Markup in a `.pdx` outside its `<template>`, `<script>` and `<style>` blocks. | [The file](file.md#the-file) |
 | `PDX_SCRIPT_SYNTAX_ERROR` | error | The `<script>` does not parse. | [The file](file.md#the-file) |
 | `PDX_SETUP_REDUNDANT` | info | `<script setup>`: `setup` has no meaning (#158). | [The file](file.md#the-file) |
 | `PDX_TS_UNSUPPORTED` | error | TypeScript in a `.pdx` script that has a runtime of its own: an enum, a namespace, a parameter property, `import = require()`. | [The file](file.md#the-file) |

@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 124 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 125 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1019,6 +1019,14 @@ write:
 A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assigning its binding: the name, its camelCase when it is hyphenated, or the one `as` gives. A binding is an identifier and not a reserved word. Any other shape declares nothing, and nothing sets it.
 
 **Fix.** Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` and `name = on;` in the script (`@state at-top;` and `atTop = on;`; `@state blocked as held;` and `held = on;`).
+
+### PDX_MARKUP_OUTSIDE_TEMPLATE
+
+*error* — Markup in a `.pdx` outside its `<template>`, `<script>` and `<style>` blocks.
+
+The parser reads the blocks and drops the rest. A `.pdx` whose markup sits beside its `<script>` with no `<template>` compiled to a module with no component, and nothing said so: the page's tag never rendered (#1249). So anything but whitespace and comments outside the blocks stops the compile, naming its line. A file with only a `<script>`, and a `.pdx.ts` module, have nothing outside it and are unchanged.
+
+**Fix.** Move the markup into the `<template>` block; add one if the file has none.
 
 ### PDX_MODEL_ATTRIBUTE_AMBIGUOUS
 

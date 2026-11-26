@@ -41,7 +41,9 @@ const SCRIPT_LINE = /^\s*(?:@(?:form|fetch|store|page|guard|prop|event|title|met
 function docsFile(body: string): string {
     const hasScript = /<script/.test(body);
     const hasTemplate = /<template/.test(body);
-    if (hasScript && hasTemplate) return body;
+    // A fence with a <template> is a file already, with or without a script. Wrapped in a second one,
+    // its own closing tag ended the outer block and the last `</template>` was left outside it (#1249).
+    if (hasTemplate) return body;
     if (hasScript) {
         const markup = body.slice(0, body.indexOf('<script')).trim();
         const script = body.slice(body.indexOf('<script'));

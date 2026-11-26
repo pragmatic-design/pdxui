@@ -46,6 +46,15 @@ export function analyzeDocument(source: string, filename: string, options?: Anal
         return result;
     }
 
+    // The parser's coded errors (#1249): `compile()` stops at them, so its warnings below never come,
+    // and without these the editor would draw nothing where the build refuses the file. Each names
+    // its line in the message; the first `line N` is where it is drawn.
+    for (const error of result.descriptor.errors ?? []) {
+        // Match: `[PDX_CODE] message …line N…`. Groups: [1]=the code [2]=the line
+        const coded = /^\[(PDX_[A-Z_]+)\][^\n]*?\bline (\d+)/.exec(error);
+        if (coded) result.warnings.push({ code: coded[1], severity: 'error', message: error.replace(/^\[PDX_[A-Z_]+\]\s*/, ''), line: Number(coded[2]) });
+    }
+
     if (result.descriptor.template) {
         try {
             result.ast = parseTemplate(result.descriptor.template.content, 1);

@@ -162,6 +162,16 @@ export async function runCheck(cwd: string, resolved: ResolvedConfig, args: Chec
             let source = readFileSync(file, 'utf-8');
             const descriptor = parseSFC(source);
 
+            // The parser's own errors first (#1249): markup outside the blocks of a file with no
+            // <template> is that error, not a missing template.
+            if (descriptor.errors && descriptor.errors.length > 0) {
+                sources.push({ file, source });
+                report.errors.push(...descriptor.errors);
+                result.totalErrors += descriptor.errors.length;
+                reports.push(report);
+                continue;
+            }
+
             if (!descriptor.template) {
                 sources.push({ file, source });
                 report.errors.push('Missing <template> block');

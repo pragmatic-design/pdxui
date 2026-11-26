@@ -1136,7 +1136,13 @@ function compileScriptOnly(
     // A .pdx routed here may still carry <script> tags (a no-<template> SFC, e.g. @store files):
     // strip the SFC wrapper so we analyze/lower the pure script body, not the literal tags.
     // A genuine .pdx.ts / tag-less source is used as-is.
-    const sfcScript = source.includes('<script') ? parseSFC(source).script : null;
+    const sfc = source.includes('<script') ? parseSFC(source) : null;
+    // A .pdx's structural errors stop it here as they stop a .pdx with a <template> (#1249): its
+    // markup outside the blocks — a no-<template> file is routed here — would otherwise be dropped.
+    if (sfc?.errors && sfc.errors.length > 0 && !filename.endsWith('.pdx.ts')) {
+        throw new Error(sfc.errors.join('\n'));
+    }
+    const sfcScript = sfc?.script ?? null;
     let scriptContent = sfcScript?.content ?? source;
     const writtenScript = scriptContent;
     // Run transformScript hooks
