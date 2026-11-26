@@ -85,6 +85,7 @@ const PORTED: Record<string, string> = {
     'pdx-file-upload': 'src/file-upload/pdx-file-upload.pdx',
     'pdx-filter-builder': 'src/filter-builder/pdx-filter-builder.pdx',
     'pdx-menu': 'src/menu/pdx-menu.pdx',
+    'pdx-menubar': 'src/menubar/pdx-menubar.pdx',
     'pdx-aspect-ratio': 'src/aspect-ratio/pdx-aspect-ratio.pdx',
     'pdx-provide': 'src/provide/pdx-provide.pdx',
     'pdx-sidebar': 'src/sidebar/pdx-sidebar.pdx',

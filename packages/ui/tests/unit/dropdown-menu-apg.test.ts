@@ -12,7 +12,7 @@ import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menu/pdx-menu.pdx';
 import '../../src/context-menu/pdx-context-menu.pdx';
 import '../../src/split-button/pdx-split-button.pdx';
-import '../../src/menubar/pdx-menubar';
+import '../../src/menubar/pdx-menubar.pdx';
 
 async function mountDropdown(items: unknown[]): Promise<HTMLElement> {
     const el = document.createElement('pdx-dropdown-menu');

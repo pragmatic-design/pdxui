@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-menubar (tier 3, a horizontal menu bar of the File | Edit | View … kind)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/menubar/pdx-menubar.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/menubar/pdx-menubar.pdx)
  * and the CSS (packages/design/src/components/menu.css).
  *
  * ── Props ──

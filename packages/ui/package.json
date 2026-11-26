@@ -140,7 +140,7 @@
       "import": "./dist/wizard/pdx-wizard.js"
     },
     "./menubar": {
-      "development": "./src/menubar/pdx-menubar.ts",
+      "development": "./src/menubar/pdx-menubar.pdx",
       "types": "./dist/menubar/pdx-menubar.d.ts",
       "import": "./dist/menubar/pdx-menubar.js"
     },
