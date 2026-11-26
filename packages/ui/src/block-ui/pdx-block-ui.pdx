@@ -38,7 +38,9 @@ import '@pdxui/design/components/block-ui';
 /** The overlay is taken away and the input given back. */
 @event 'pdx-unblock': void;
 // The host's states (#291): block-ui.css draws the overlay from `shown`.
-@state blocked = inputBlocked;
+// `blocked`: from the moment the input is blocked until it is given back — while the prop is on,
+// and after it while the overlay is held for `min-duration`.
+@state blocked = (blocked as boolean) || drawn;
 @state shown = drawn;
 // The overlay is built by the script, a frame after mount, as the TypeScript version built it.
 @part(external) overlay, spinner, message;
@@ -56,11 +58,6 @@ import '@pdxui/design/components/block-ui';
 @prop minDuration: number = 200;
 @host host;
 
-/**
- * The `blocked` state: from the moment the input is blocked until it is given back — while `blocked`
- * is on, and after it while the overlay is held for `min-duration`.
- */
-const inputBlocked = $derived((blocked as boolean) || drawn);
 /** The `shown` state: the overlay is drawn. */
 let drawn = $signal(false);
 let overlayEl: HTMLElement | null = null;
