@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import type { Mock } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { badge } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 const ROWS = [
     { id: 1, name: 'Ada', active: false, status: 'Active' },

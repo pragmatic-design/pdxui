@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource, setLocaleStrings, clearComponentStrings } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 type Grid = HTMLElement & Record<string, unknown>;
 

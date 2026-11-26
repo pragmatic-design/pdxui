@@ -9,7 +9,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup } from './helpers';
 import { registerComponentStrings, setComponentStrings } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 type Grid = HTMLElement & { columns: unknown; data: unknown; whenReady(): Promise<void> };
 

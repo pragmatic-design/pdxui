@@ -8680,7 +8680,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/data-grid/pdx-data-grid.ts",
+      "path": "src/data-grid/pdx-data-grid.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -9207,7 +9207,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the row is clicked.",
-              "detail": "{ row, index, id }"
+              "detail": "{ row: T; index: number; id: unknown }"
             },
             {
               "name": "pdx-row-reorder",
@@ -9215,7 +9215,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-reorder`.",
-              "detail": "{ from, to, fromId, toId }"
+              "detail": "{ from: number; to: number; fromId: unknown; toId: unknown }"
             },
             {
               "name": "pdx-row-collapse",
@@ -9223,7 +9223,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-collapse`.",
-              "detail": "{ id }"
+              "detail": "{ id: unknown }"
             },
             {
               "name": "pdx-row-expand",
@@ -9231,7 +9231,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-expand`.",
-              "detail": "{ id }"
+              "detail": "{ id: unknown }"
             },
             {
               "name": "pdx-cell-edit-start",
@@ -9239,7 +9239,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-cell-edit-start`.",
-              "detail": "{ rowId, field, value }"
+              "detail": "{ rowId: unknown; field: string; value: unknown }"
             },
             {
               "name": "pdx-cell-edit-end",
@@ -9247,7 +9247,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-cell-edit-end`.",
-              "detail": "{ rowId, field, oldValue, newValue }"
+              "detail": "{ rowId: unknown; field: string; oldValue: unknown; newValue: unknown }"
             },
             {
               "name": "pdx-cell-edit-cancel",
@@ -9255,7 +9255,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-cell-edit-cancel`.",
-              "detail": "{ rowId, field }"
+              "detail": "{ rowId: unknown; field: string }"
             },
             {
               "name": "pdx-row-edit-start",
@@ -9263,7 +9263,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-edit-start`.",
-              "detail": "{ rowId, row }"
+              "detail": "{ rowId: unknown; row: T }"
             },
             {
               "name": "pdx-row-edit-end",
@@ -9271,7 +9271,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-edit-end`.",
-              "detail": "{ rowId, values }"
+              "detail": "{ rowId: unknown; values: Record<string, unknown> }"
             },
             {
               "name": "pdx-row-edit-cancel",
@@ -9279,7 +9279,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-edit-cancel`.",
-              "detail": "{ rowId }"
+              "detail": "{ rowId: unknown }"
             },
             {
               "name": "pdx-batch-commit",
@@ -9287,7 +9287,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-batch-commit`.",
-              "detail": "{ count }"
+              "detail": "{ count: number }"
             },
             {
               "name": "pdx-batch-revert",
@@ -9295,7 +9295,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-batch-revert`.",
-              "detail": "{}"
+              "detail": "Record<string, never>"
             },
             {
               "name": "pdx-row-delete",
@@ -9303,7 +9303,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-row-delete`.",
-              "detail": "{ rowId, row }"
+              "detail": "{ rowId: unknown; row: T }"
             },
             {
               "name": "pdx-selection-change",
@@ -9311,7 +9311,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the selection changes.",
-              "detail": "{ selected, count }"
+              "detail": "{ selected: unknown[]; count: number }"
             },
             {
               "name": "pdx-grid-export",
@@ -9319,7 +9319,31 @@
                 "text": "CustomEvent"
               },
               "description": "Fired on `pdx-grid-export`.",
-              "detail": "{ rows, columns, format }"
+              "detail": "{ rows: number; columns: number; format: string }"
+            },
+            {
+              "name": "pdx-column-reorder",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired on `pdx-column-reorder`.",
+              "detail": "{ field: string; columnOrder: string[] }"
+            },
+            {
+              "name": "pdx-column-visibility-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the column visibility changes.",
+              "detail": "{ field: string; visible: boolean; columnVisibility: Record<string, boolean> }"
+            },
+            {
+              "name": "pdx-column-resize",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired on `pdx-column-resize`.",
+              "detail": "{ field: string; width: number; columnWidths: Record<string, number> }"
             }
           ],
           "roles": [
@@ -9597,7 +9621,7 @@
                 "selectedIds: Set<unknown>",
                 "getHeaderEl?: () => HTMLElement | null",
                 "getBodyEl?: () => HTMLElement | null",
-                "emit: (name: string, detail: unknown) => void",
+                "emit: <K extends keyof GridEmits>(name: K, detail: GridEmits[K]) => void",
                 "hasFilterRow: () => boolean",
                 "hasToolbar: () => boolean",
                 "hasSearch: () => boolean",
@@ -9795,7 +9819,7 @@
           "name": "pdx-data-grid",
           "declaration": {
             "name": "PdxDataGrid",
-            "module": "src/data-grid/pdx-data-grid.ts"
+            "module": "src/data-grid/pdx-data-grid.pdx"
           }
         }
       ]

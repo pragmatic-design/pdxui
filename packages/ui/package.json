@@ -195,7 +195,7 @@
       "import": "./dist/command/pdx-command.js"
     },
     "./data-grid": {
-      "development": "./src/data-grid/pdx-data-grid.ts",
+      "development": "./src/data-grid/pdx-data-grid.pdx",
       "types": "./dist/data-grid/pdx-data-grid.d.ts",
       "import": "./dist/data-grid/pdx-data-grid.js"
     },

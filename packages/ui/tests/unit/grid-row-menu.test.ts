@@ -16,7 +16,7 @@ import { cleanup, tick } from './helpers';
 import { renderCellNode } from '../../src/data-grid/grid-cell';
 import { bindBody } from '../../src/data-grid/grid-delegate';
 import { rowMenu } from '@pdxui/core';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 const ROW = { id: 7, reference: 'T-007', subject: 'Printer jam' };
 

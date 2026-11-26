@@ -42,6 +42,7 @@ const PORTED: Record<string, string> = {
     'pdx-checkbox-group': 'src/checkbox-group/pdx-checkbox-group.pdx',
     'pdx-chip': 'src/chip/pdx-chip.pdx',
     'pdx-color-picker': 'src/color-picker/pdx-color-picker.pdx',
+    'pdx-data-grid': 'src/data-grid/pdx-data-grid.pdx',
     'pdx-data-source': 'src/data-source/pdx-data-source.pdx',
     'pdx-description-list': 'src/description-list/pdx-description-list.pdx',
     'pdx-dialog': 'src/dialog/pdx-dialog.pdx',

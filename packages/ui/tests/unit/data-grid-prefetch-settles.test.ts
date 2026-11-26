@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'vitest';
 
-await import('../../src/data-grid/pdx-data-grid');
+await import('../../src/data-grid/pdx-data-grid.pdx');
 
 type Grid = HTMLElement & { columns: unknown; data: unknown; editable: boolean; whenReady(): Promise<void> };
 
