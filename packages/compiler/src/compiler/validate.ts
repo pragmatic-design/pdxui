@@ -28,6 +28,7 @@ import { checkRequiredProps, type RequiredPropsLookup } from './validate-require
 import { checkRequiredSlots, type RequiredSlotsLookup } from './validate-required-slots';
 import { checkReservedNames } from './validate-reserved-names';
 import { checkExposeGetters } from './validate-expose-get';
+import { checkSetStates } from './validate-state-set';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
@@ -564,7 +565,7 @@ export function validate(
     // ─── Check 10b: @state holds a boolean (#132) ─────────────────
 
     for (const s of analysis.states) {
-        if (!stateExprIsNotBoolean(s.expr, analysis)) continue;
+        if (s.expr === undefined || !stateExprIsNotBoolean(s.expr, analysis)) continue;
         warnings.push({
             code: 'PDX_STATE_NOT_BOOLEAN',
             severity: 'error',
@@ -572,6 +573,8 @@ export function validate(
             hint: `Write the condition it is on for (@state ${s.name} = count > 0;). For reactive data, use $signal.`,
         });
     }
+    // @state name; is set, never read (#1436).
+    warnings.push(...checkSetStates(analysis, [analysis.body, ...reactiveSurfaces(analysis, '')], templateIds, allDeclaredNames));
 
     // ─── Check 10c: @host holds what a host can carry (#133) ─────
 

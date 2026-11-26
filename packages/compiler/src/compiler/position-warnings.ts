@@ -213,6 +213,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             return attr ? find(source, script, new RegExp(`(?<=@host\\s*\\{[^}]*)${escape(attr)}`)) : undefined;
         }
         case 'PDX_STATE_NOT_BOOLEAN':
+        case 'PDX_STATE_READ':
+        case 'PDX_STATE_REDECLARED':
             return name ? find(source, script, new RegExp(`@state\\s+${escape(name)}\\b`)) : undefined;
         case 'PDX_VARIANTS_MALFORMED':
             // The block's opening: the message names what in it could not be read.

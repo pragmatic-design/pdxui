@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 122 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 124 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1016,9 +1016,9 @@ write:
 
 *error* — `@state` written in a shape the compiler does not recognise.
 
-A state is a name and the condition it is on for. Without both, nothing is declared and nothing sets it.
+A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assignment — and so an identifier. Any other shape declares nothing, and nothing sets it.
 
-**Fix.** Write `@state name = condition;`, for example `@state expanded = open;`.
+**Fix.** Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` with an identifier and `name = on;` in the script.
 
 ### PDX_MODEL_ATTRIBUTE_AMBIGUOUS
 
@@ -1808,6 +1808,72 @@ write:
 <script>
 let count = $signal(0);
 @state busy = count > 0;
+</script>
+```
+
+### PDX_STATE_READ
+
+*error* — A `@state name;` read in the script or the template.
+
+A state declared with no expression is set by assignment: `shown = on` is `ctx.state('shown', on)`, with no signal behind it. Nothing holds the value to read back; CSS reads the state with `:state(shown)`. A compound write (`shown ||= x`, `shown++`) reads it too.
+
+**Fix.** Keep the value in a `$signal` and follow it with `@state shown = drawn;`, or read `:state(shown)` in CSS.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@state shown;
+function toggle() { shown = !shown; }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+let drawn = $signal(false);
+@state shown = drawn;
+function toggle() { drawn = !drawn; }
+</script>
+```
+
+### PDX_STATE_REDECLARED
+
+*error* — A `@state name;` whose name the script also declares.
+
+An assignment to the name would set the script's variable, not the state, and the state would never be set.
+
+**Fix.** Rename one of the two, or follow the variable with `@state name = expression;`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@state shown;
+let shown = false;
+function show() { shown = true; }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@state shown;
+function show() { shown = true; }
 </script>
 ```
 

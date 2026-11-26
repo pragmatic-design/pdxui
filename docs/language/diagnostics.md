@@ -69,6 +69,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host`, [script.md](script.md) |
 | `PDX_MALFORMED_STATE` | error | `@state` written in a shape the compiler does not recognise. | `@state`, [script.md](script.md) |
 | `PDX_STATE_NOT_BOOLEAN` | error | `@state` given something that is not a boolean. | `@state`, [script.md](script.md) |
+| `PDX_STATE_READ` | error | A `@state name;` read in the script or the template. | `@state`, [script.md](script.md) |
+| `PDX_STATE_REDECLARED` | error | A `@state name;` whose name the script also declares. | `@state`, [script.md](script.md) |
 | `PDX_UNUSED_REACTIVE` | info | A `$signal` or `$derived` that nothing reads. | `$signal`, `$derived`, [script.md](script.md) |
 | `PDX_VERSION_COUNTER` | warn | A `$signal` only ever bumped, and read only to be discarded (CD-S3, a heuristic). *(design)* | `$signal`, [script.md](script.md) |
 | `PDX_CIRCULAR_DERIVED` | error | `$derived` values that depend on each other in a cycle. | `$derived`, [script.md](script.md) |

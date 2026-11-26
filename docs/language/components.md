@@ -391,6 +391,7 @@ alpha → beta (#131)
 
 ```ebnf
 StateDecl ::= "@state" S Identifier S? "=" S? Expression End
+            | "@state" S Identifier End
 ```
 
 ### Semantics
@@ -402,11 +403,17 @@ A visual state exposed through the platform's custom states (#132): the compiler
 build emits the attribute selector beside `:state()`. The manifest lists the states. Descriptor:
 `states: ['open']` with `ctx.state('open', bool)`.
 
+With no expression (#1436), `@state shown;` is a state the script sets by assignment: `shown = on`
+compiles to `ctx.state('shown', !!(on))`, with no signal and no effect — the form for a state an
+event, a timer or an observer writes.
+
 ### Rules
 
 - The expression must be boolean: otherwise `PDX_STATE_NOT_BOOLEAN`, hint «use `$signal` for
   reactive data». (The name echoes Svelte's `$state`, which is a different thing; the platform's name
   wins, and this diagnostic is the guard.)
+- A state with no expression is only written: a read is `PDX_STATE_READ`, a name the script also
+  declares is `PDX_STATE_REDECLARED`.
 
 ### Examples
 

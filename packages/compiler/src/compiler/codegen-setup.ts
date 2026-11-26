@@ -268,12 +268,14 @@ export function buildSetupBody(
     }
     // @search: searchParams is a computed too (#204)
     if (analysis.route.searchParams && analysis.route.searchParams.length > 0) callableNames.add('searchParams');
+    // @state name; (#1436): an assignment to the name sets the state, `ctx.state('name', !!(on))`.
+    const setStateNames = new Set(analysis.states.filter(s => s.expr === undefined).map(s => s.name));
 
     // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass. Declared
     // before the first statement that uses it: the sets above are consts, and a call ahead of them
     // would be in their temporal dead zone.
     function rewriteAll(code: string): string {
-        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink);
+        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink, false, setStateNames);
     }
 
     // @fetch declarations → resource() calls with HttpClient
@@ -536,7 +538,7 @@ export function buildSetupBody(
                     }
                     offset += line.length + 1; // +1 for the '\n'
                 }
-                const rewritten = rewriteAst(setupBody, signalNames, callableNames, filename, protectedRanges, sink);
+                const rewritten = rewriteAst(setupBody, signalNames, callableNames, filename, protectedRanges, sink, false, setStateNames);
                 bodyCode = indent(rewritten.split(RAW_MARKER).join(''), 4);
             } else {
                 const rewrittenLines = setupBody.split('\n').map(line =>
@@ -639,8 +641,10 @@ export function buildSetupBody(
     // and the deriveds, so the expression can read anything the script declares.
     // One call for all of them (#1207): core's `ctx.states` tracks each in its own effect, as a
     // `ctx.track(() => { ctx.state(…) })` per state did, written out once per state.
-    if (!scriptOnly && analysis.states.length > 0) {
-        const entries = analysis.states.map(s =>
+    // A state with no expression (#1436) is not here: the script's assignments set it.
+    const followed = analysis.states.filter((s): s is { name: string; expr: string } => s.expr !== undefined);
+    if (!scriptOnly && followed.length > 0) {
+        const entries = followed.map(s =>
             `${/^[A-Za-z_$][\w$]*$/.test(s.name) ? s.name : jsQuote(s.name)}: ${arrowOf(rewriteAll(s.expr))}`);
         parts.push(`    ctx.states({ ${entries.join(', ')} });`);
     }
