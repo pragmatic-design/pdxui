@@ -32,6 +32,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | Code | Severity | Meaning | Construct |
 |---|---|---|---|
 | `PDX_UNKNOWN_DECLARATION` | error | A known `@` declaration, or a `$signal` / `$derived` / `$store` declaration, written in a shape the compiler does not recognise; an `@store` `persist` that is not `'local'` or `'session'`. | any `@` declaration, `$signal`, `@store`, [script.md](script.md), [data.md](data.md) |
+| `PDX_RUNE_MEMBER` | error | A call of a member of a rune name, `$derived.by(…)` or `$effect.pre(…)`: not a PDX form (#1404). | `$signal`, `$derived`, `$store`, `$effect`, `$watch`, [script.md](script.md) |
 | `PDX_RUNE_POSITION` | error | A `$` rune where the compiler does not read it: not the initialiser of a top-level declaration, or not a top-level statement. | `$signal`, `$derived`, `$store`, `$effect`, `$watch`, [script.md](script.md) |
 | `PDX_IMPORT_NAME_TAKEN` | error | A script's import from `@pdxui/core` aliased to a name the compiled module binds to another core export (#1254). | [script.md](script.md) |
 | `PDX_DUP_DECLARATION` | error | The same name declared twice at the top of the script: runes, `@prop`, imports, functions, classes, plain variables. | [script.md](script.md) |

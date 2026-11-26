@@ -1247,6 +1247,9 @@ the rewritten expression is `undefined`.
   `signal()` from `@pdxui/core`, the function for that place (#278). A destructuring pattern, or a
   statement that does not parse, is `PDX_UNKNOWN_DECLARATION` (error), and nothing is generated for
   it. The same rule holds for `$derived` (`computed()`) and `$store` (`store()`).
+- A rune is the call itself: a member of its name called — `$derived.by(…)`, `$effect.pre(…)`, the
+  forms another framework has — is `PDX_RUNE_MEMBER` (error) at the call, for each of the five runes,
+  whose hint names the PDX form (#1404). It compiled as written, and threw at mount.
 - A destructuring assignment to a signal (`[count] = pair`) is not rewritten, and `count` is not
   defined at run time — not checked today.
 - A plain `let` the template reads and the script changes raises `PDX_NON_REACTIVE`.

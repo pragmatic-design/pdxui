@@ -103,11 +103,72 @@ export function misplacedRunes(code: string): MisplacedRune[] {
     return out;
 }
 
-/** Every rune of the script outside its position, as PDX_RUNE_POSITION at the call. */
+/** A call of a member of a rune name: where it is, the rune, the member, and the call as written. */
+export interface RuneMemberCall {
+    at: number;
+    rune: string;
+    member: string;
+    text: string;
+}
+
+/**
+ * Every call of a member of a rune name — `$derived.by(…)`, `$effect.pre(…)` — in a script (its
+ * content), wherever it is (#1404). PDX has no such form: the call reached the module as written, and
+ * `$derived` names nothing when it runs. misplacedRunes reads a call whose callee is the rune itself,
+ * so it never saw these.
+ */
+export function runeMemberCalls(code: string): RuneMemberCall[] {
+    if (!/\$(?:signal|derived|store|effect|watch)\s*\./.test(code)) return [];
+    const { code: script } = withoutDeclarations(code);
+    const sf = ts.createSourceFile('__pdx_runes.ts', script, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const out: RuneMemberCall[] = [];
+    const visit = (node: ts.Node): void => {
+        if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && ts.isIdentifier(node.expression.expression)) {
+            const rune = node.expression.expression.text;
+            if (DECLARED.has(rune) || STATEMENT.has(rune)) {
+                out.push({ at: node.getStart(sf), rune, member: node.expression.name.text, text: node.getText(sf) });
+            }
+        }
+        ts.forEachChild(node, visit);
+    };
+    visit(sf);
+    return out;
+}
+
+/** The PDX form a rune is written in, for a message that names it. */
+const RUNE_FORM = new Map<string, string>([
+    ['$signal', '`let name = $signal(initial)`'],
+    ['$derived', '`const name = $derived(expression)`, or `$derived(() => { … })` for a derived with a body'],
+    ['$store', '`let name = $store({ … })`'],
+    ['$effect', '`$effect(() => { … })`, a top-level statement'],
+    ['$watch', '`$watch(source, (value) => { … })`, a top-level statement'],
+]);
+
+/** Every call of a member of a rune name, as PDX_RUNE_MEMBER at the call. */
+function validateRuneMembers(content: string, start: number, source: string): ValidationWarning[] {
+    return runeMemberCalls(content).map(({ at: offset, rune, member }) => {
+        const at = start + offset;
+        const before = source.slice(0, at);
+        return {
+            code: 'PDX_RUNE_MEMBER',
+            severity: 'error' as const,
+            message: `\`${rune}.${member}(…)\` is not a PDX rune: the call is left as written, and \`${rune}\` is not defined when it runs.`,
+            hint: `Write ${RUNE_FORM.get(rune)}.`,
+            line: before.split('\n').length,
+            column: at - before.lastIndexOf('\n'),
+        };
+    });
+}
+
+/**
+ * Every rune of the script outside its position, as PDX_RUNE_POSITION at the call, and every call
+ * of a member of a rune name, as PDX_RUNE_MEMBER (#1404).
+ */
 export function validateRunePosition(descriptor: SFCDescriptor, source: string): ValidationWarning[] {
     const script = descriptor.script && !descriptor.script.src ? descriptor.script : null;
     if (!script) return [];
-    return misplacedRunes(script.content).map(({ at: offset, rune }) => {
+    const members = validateRuneMembers(script.content, script.start, source);
+    return [...members, ...misplacedRunes(script.content).map(({ at: offset, rune }) => {
         const at = script.start + offset;
         const before = source.slice(0, at);
         const declared = DECLARED.get(rune);
@@ -121,5 +182,5 @@ export function validateRunePosition(descriptor: SFCDescriptor, source: string):
             line: before.split('\n').length,
             column: at - before.lastIndexOf('\n'),
         };
-    });
+    })];
 }

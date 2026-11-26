@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 126 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 127 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1669,6 +1669,38 @@ write:
 <script>
 @page '/users/:id';
 @params { id: number };
+</script>
+```
+
+### PDX_RUNE_MEMBER
+
+*error* — A call of a member of a rune name, `$derived.by(…)` or `$effect.pre(…)`: not a PDX form.
+
+PDX's runes are the five calls themselves. A member call on one of their names, the form another framework spells `$derived.by` or `$effect.pre`, was not read as a rune and compiled with no diagnostic: it reached the module as written, and `$derived` is not defined when it runs (#1404).
+
+**Fix.** Write the rune itself: `$derived(() => { … })` for a derived with a body, `$effect(() => { … })` for an effect; the hint names the form for the rune you wrote.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ doubled }}</p>
+</template>
+<script>
+@prop n: number = 1;
+const doubled = $derived.by(() => n * 2);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ doubled }}</p>
+</template>
+<script>
+@prop n: number = 1;
+const doubled = $derived(() => n * 2);
 </script>
 ```
 

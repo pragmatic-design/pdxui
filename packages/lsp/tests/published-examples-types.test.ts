@@ -57,6 +57,9 @@ const TYPE_ERRORS_SHOWN: Record<string, { tsCode: number; why: string }[]> = {
     // The defect it shows: `@state shown;` declares the boolean the editor types, and the script's
     // `let shown` declares the name again (#1436).
     'diagnostics catalogue PDX_STATE_REDECLARED (bad)': [{ tsCode: 2451, why: 'the second declaration it shows' }],
+    // The defect it shows: `$derived.by` is a member the rune does not have, in the compiler and in
+    // the editor alike (#1404).
+    'diagnostics catalogue PDX_RUNE_MEMBER (bad)': [{ tsCode: 2339, why: 'the member it calls, which the rune has not' }],
 };
 
 const EXAMPLES = [...docsExamples(), ...skillExamples().filter(e => !e.partial), ...languageExamples(), ...CATALOGUE].map(e => ({

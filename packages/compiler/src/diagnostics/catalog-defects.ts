@@ -132,6 +132,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<button @click="reset()">Reset</button>', "let draft = $signal('');\nfunction reset() {\n  draft = '';\n}"),
         },
     },
+    PDX_RUNE_MEMBER: {
+        severity: 'error', category: 'defect',
+        summary: 'A call of a member of a rune name, `$derived.by(…)` or `$effect.pre(…)`: not a PDX form.',
+        explanation: "PDX's runes are the five calls themselves. A member call on one of their names, the form another framework spells `$derived.by` or `$effect.pre`, was not read as a rune and compiled with no diagnostic: it reached the module as written, and `$derived` is not defined when it runs (#1404).",
+        fix: 'Write the rune itself: `$derived(() => { … })` for a derived with a body, `$effect(() => { … })` for an effect; the hint names the form for the rune you wrote.',
+        example: {
+            bad: pdx('<p>{{ doubled }}</p>', '@prop n: number = 1;\nconst doubled = $derived.by(() => n * 2);'),
+            good: pdx('<p>{{ doubled }}</p>', '@prop n: number = 1;\nconst doubled = $derived(() => n * 2);'),
+        },
+    },
     PDX_TS_UNSUPPORTED: {
         severity: 'error', category: 'defect',
         summary: 'TypeScript in a `.pdx` script that has a runtime of its own: an enum, a namespace, a parameter property, `import = require()`.',
