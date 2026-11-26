@@ -64,6 +64,13 @@ describe('the rune declarations', () => {
         expect(projectScript(script)).not.toMatch(/role|aria-expanded|expanded =/);
     });
 
+    it('a @state with no expression is a boolean the script assigns (#1436)', () => {
+        const script = '@state shown;\nfunction draw(on: boolean) { shown = on; }\nfunction hide() { shown = false; }\ndraw; hide;\n';
+        expect(diagnose(script)).toEqual([]);
+        const wrong = "@state shown;\nfunction draw() { shown = 'yes'; }\ndraw;\n";
+        expect(diagnose(wrong).some(d => /string.*not assignable.*boolean/.test(d)), JSON.stringify(diagnose(wrong))).toBe(true);
+    });
+
     it('a @model is a typed name the script reads and writes (#124)', () => {
         const script = "@model value: string = '';\nfunction clear() { value = ''; }\nfunction len() { return value.length; }\nclear; len;\n";
         expect(diagnose(script)).toEqual([]);

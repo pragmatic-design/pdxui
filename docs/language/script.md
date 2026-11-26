@@ -770,10 +770,12 @@ beta (#160)
 
 ```ebnf
 StateDecl ::= "@state" S StateName S? "=" S? Expression S? ";"?
+           | "@state" S Identifier S? ";"?
 StateName ::= [A-Za-z] [A-Za-z0-9_-]*
 ```
 
-The analyzer's form: `@state name = booleanExpression;`
+The analyzer's forms: `@state name = booleanExpression;`, a state that follows its expression, and
+`@state name;`, a state the script sets by assignment (#1436).
 
 #### Semantics
 
@@ -786,12 +788,25 @@ change of anything one expression reads re-evaluates them all, #1432). A name ma
 the component itself — instead of a class or an attribute each component names its own way. The
 manifest lists a component's states.
 
+A state with no expression (#1436) is set where the script assigns it: `shown = on` compiles to
+`ctx.state('shown', !!(on))`, as a component written in TypeScript calls `ctx.state` from a handler
+or a timer. It has no signal and no effect, so a mount pays nothing for it until the first
+assignment. A parameter or a local of the same name is that binding, not the state. It is the form
+for a state written by an event, a timer or an observer; a state that is a condition over what the
+script already holds is `@state name = expression;`.
+
 #### Rules
 
 - The expression is a boolean. A non-boolean literal, a `$signal(…)` or `$store(…)`, or a `$signal`
   that starts as a non-boolean literal raises `PDX_STATE_NOT_BOOLEAN`. `@state` is not Svelte's
   `$state`: reactive data is a `$signal`.
-- A `@state` without `= expression` raises `PDX_MALFORMED_STATE`.
+- A `@state` with no name, an empty expression, or a hyphenated name and no expression (it could
+  not be assigned) raises `PDX_MALFORMED_STATE`.
+- A state with no expression is written, not read: a read of it in the script or the template —
+  `if (shown)`, `shown = !shown`, `shown ||= x`, `shown++`, `:hidden="!shown"` — raises
+  `PDX_STATE_READ`. A value the script reads is a `$signal`, which `@state name = signal;` follows.
+- A state with no expression whose name the script also declares (`let shown`, `function shown`)
+  raises `PDX_STATE_REDECLARED`: its assignments would set the variable, not the state.
 - Inside the component's own `<style scoped>`, the host is `:scope` (#152), so `:scope:state(open)`
   styles the component in that state; a theme or the page write `:state()` on the tag.
 - Under `target: 'baseline-2024'` the state will also be mirrored as a `data-state-<name>` attribute;
@@ -813,6 +828,16 @@ let open = $signal(false);
 ```css
 /* A theme, or the page: the menu while it is open. */
 x-menu:state(expanded) button { font-weight: 600; }
+```
+
+```pdx
+<script>
+// Set from a timer: no signal, no effect at mount.
+@state shown;
+let timer = 0;
+function arm(delay: number) { timer = window.setTimeout(() => { shown = true; }, delay); }
+function disarm() { clearTimeout(timer); shown = false; }
+</script>
 ```
 
 #### Since

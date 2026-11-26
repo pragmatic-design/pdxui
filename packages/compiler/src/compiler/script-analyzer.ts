@@ -908,10 +908,18 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // ─── @state name = expression; — a visual state of the host (#132) ───
         // Match: @state expanded = open;  /  @state label-left = pos === 'left'; — a CSS custom state's
         // name may hold a hyphen (#1230).
-        // Groups: [1]=name [2]=expression
-        const stateMatch = trimmed.match(/^@state\s+([A-Za-z][\w-]*)\s*=\s*(.+?)\s*;?\s*$/);
+        // Groups: [1]=name [2]=expression — which does not start at the `;`: `@state open = ;` has none.
+        const stateMatch = trimmed.match(/^@state\s+([A-Za-z][\w-]*)\s*=\s*([^;\s].*?)\s*;?\s*$/);
         if (stateMatch) {
             states.push({ name: stateMatch[1], expr: stateMatch[2] });
+            continue;
+        }
+        // ─── @state name; — a state the script sets by assignment (#1436) ───
+        // Match: @state shown;  — the name is assigned in the script, so it is an identifier.
+        // Groups: [1]=name
+        const setStateMatch = trimmed.match(/^@state\s+([A-Za-z_$][\w$]*)\s*;?\s*$/);
+        if (setStateMatch) {
+            states.push({ name: setStateMatch[1] });
             continue;
         }
         if (trimmed.startsWith('@state')) {
@@ -919,7 +927,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 code: 'PDX_MALFORMED_STATE',
                 severity: 'error' as const,
                 message: `Invalid @state declaration: "${trimmed}".`,
-                hint: 'Use: @state name = booleanExpression;',
+                hint: 'Use: @state name = booleanExpression; or @state name; set by an assignment in the script (name = on;), whose name is an identifier.',
             });
             continue;
         }

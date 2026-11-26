@@ -704,7 +704,19 @@ my-menu:state(expanded) button { font-weight: 600; }
 
 The compiler keeps the state in sync with the expression, so there is no class to toggle and no
 attribute to name. The expression has to be a boolean: `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN`
-(reactive data is a `$signal`). A TypeScript component declares `states: ['expanded']` in its
+(reactive data is a `$signal`).
+
+A state an event, a timer or an observer writes is declared with no condition, and the script sets
+it by assignment:
+
+```pdx
+@state shown;
+function arm(delay: number) { setTimeout(() => { shown = true; }, delay); }
+```
+
+`shown = true` sets the state, as `ctx.state('shown', true)` would: there is no signal behind it, so
+a mount pays nothing until it is set. Such a state is only written — reading it is
+`PDX_STATE_READ` — and CSS reads it with `:state(shown)`. A TypeScript component declares `states: ['expanded']` in its
 descriptor and sets one with `ctx.state('expanded', true)`. The manifest lists a component's states as
 `cssStates`. Inside the component's own `<style scoped>` the host is not reachable yet, so `:state()`
 is written from a theme or the page.

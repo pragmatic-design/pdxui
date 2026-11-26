@@ -42,11 +42,14 @@ export interface EventInfo {
     cancelable?: true;
 }
 
-/** `@state name = expression;` — a visual state of the host, a custom state (#132). */
+/**
+ * `@state name = expression;` — a visual state of the host, a custom state (#132) — or `@state name;`,
+ * one the script sets by assignment (#1436).
+ */
 export interface StateDecl {
     name: string;
-    /** The boolean expression, as written. */
-    expr: string;
+    /** The boolean expression, as written; absent for a state the script sets by assignment. */
+    expr?: string;
 }
 
 /**

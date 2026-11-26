@@ -207,6 +207,9 @@ use `el` (its `id`, its size, `el.focus()`) instead of `ctx.el`. A form-associat
 platform's custom states and matched in CSS with `:state(name)` (`my-menu:state(expanded) button { … }`,
 written in a theme or the page). The compiler keeps it in sync with the condition: no class to toggle.
 It takes a boolean only; `@state count = 0;` is `PDX_STATE_NOT_BOOLEAN` — reactive data is a `$signal`.
+A state a handler, a timer or an observer writes is **`@state name;`**, set by assignment
+(`name = on;` is `ctx.state('name', !!on)`, no signal, no effect); it is never read
+(`PDX_STATE_READ`) — don't mirror it in a `$signal` just to feed `@state name = signal;`.
 A TypeScript component declares `states: ['open']` and calls `ctx.state('open', on)`.
 
 **`@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }`** declares the

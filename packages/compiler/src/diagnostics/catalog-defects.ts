@@ -429,9 +429,29 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_MALFORMED_STATE: {
         severity: 'error', category: 'defect',
         summary: '`@state` written in a shape the compiler does not recognise.',
-        explanation: 'A state is a name and the condition it is on for. Without both, nothing is declared and nothing sets it.',
-        fix: 'Write `@state name = condition;`, for example `@state expanded = open;`.',
+        explanation: 'A state is a name and the condition it is on for, `@state name = condition;`, or a name alone, `@state name;`, which the script sets by assignment — and so an identifier. Any other shape declares nothing, and nothing sets it.',
+        fix: 'Write `@state name = condition;`, for example `@state expanded = open;`, or `@state name;` with an identifier and `name = on;` in the script.',
         reproducedIn: `${T}state-rune.test.ts`,
+    },
+    PDX_STATE_READ: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@state name;` read in the script or the template.',
+        explanation: 'A state declared with no expression is set by assignment: `shown = on` is `ctx.state(\'shown\', on)`, with no signal behind it. Nothing holds the value to read back; CSS reads the state with `:state(shown)`. A compound write (`shown ||= x`, `shown++`) reads it too.',
+        fix: 'Keep the value in a `$signal` and follow it with `@state shown = drawn;`, or read `:state(shown)` in CSS.',
+        example: {
+            bad: pdx('<p>x</p>', '@state shown;\nfunction toggle() { shown = !shown; }'),
+            good: pdx('<p>x</p>', 'let drawn = $signal(false);\n@state shown = drawn;\nfunction toggle() { drawn = !drawn; }'),
+        },
+    },
+    PDX_STATE_REDECLARED: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@state name;` whose name the script also declares.',
+        explanation: 'An assignment to the name would set the script\'s variable, not the state, and the state would never be set.',
+        fix: 'Rename one of the two, or follow the variable with `@state name = expression;`.',
+        example: {
+            bad: pdx('<p>x</p>', '@state shown;\nlet shown = false;\nfunction show() { shown = true; }'),
+            good: pdx('<p>x</p>', '@state shown;\nfunction show() { shown = true; }'),
+        },
     },
     PDX_STATE_NOT_BOOLEAN: {
         severity: 'error', category: 'defect',

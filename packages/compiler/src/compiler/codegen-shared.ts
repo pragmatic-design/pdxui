@@ -543,7 +543,7 @@ export function detectDeadSignals(
         if (analysis.signals.some(s => s !== sig && re.test(s.initialExpr))) continue;
         // A @state's expression (#1306): on the server the handlers that write a signal are not
         // compiled, and a state may be its only reader.
-        if (analysis.states.some(s => re.test(s.expr))) continue;
+        if (analysis.states.some(s => s.expr !== undefined && re.test(s.expr))) continue;
         if (analysis.stores.some(s => re.test(s.initialExpr))) continue;
 
         dead.add(name);

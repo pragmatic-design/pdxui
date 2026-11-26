@@ -251,6 +251,12 @@ export function projectScriptMapped(
             const formAssociated = analyzeScript(s, 'projection.pdx').props.some((p) => p.model && p.form);
             if (named) emitters.push(`var ${named[1]}: import('@pdxui/core').${formAssociated ? 'FormPdxElement' : 'PdxElement'};`);
         }
+        if (kw === 'state') {
+            // Match: @state shown; — set by assignment (#1436), so a boolean; `@state x = e;` declares no name.
+            // Groups: [1]=the name
+            const set = /^\s+([A-Za-z_$][\w$]*)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            if (set) emitters.push(`var ${set[1]}: boolean;`);
+        }
         if (kw === 'part') {
             // Match: @part trigger, popup; — each name is its element, null while not rendered (#134),
             // or the array of its elements when the template renders it more than once (#988).

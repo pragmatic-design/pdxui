@@ -69,12 +69,16 @@ function reportFallback(filename: string, reason: string, fragment: string, sink
     });
 }
 
+const NO_NAMES: ReadonlySet<string> = new Set();
+
 /**
  * @param untracked every read of a $signal is `__name.peek()`: its value now, subscribing nothing.
  *   For an initialiser, which runs once at setup and whose reads are its starting values (#682).
+ * @param stateNames the states declared `@state name;` (#1436): `name = on` is `ctx.state('name', !!(on))`.
+ *   A read of one is PDX_STATE_READ's, reported by validation; it is left as written here.
  */
-export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false): string {
-    if (signalNames.size === 0 && callableNames.size === 0) return code;
+export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false, stateNames: ReadonlySet<string> = NO_NAMES): string {
+    if (signalNames.size === 0 && callableNames.size === 0 && stateNames.size === 0) return code;
     // Edits whose start falls inside a protected [start,end) range are dropped — used to skip
     // @raw regions while still parsing the WHOLE body as one unit (so multiline statements
     // outside @raw are rewritten correctly). Raw spans are marked by /*@raw*/ comments, which
@@ -96,7 +100,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         const wrapped = `(${code})`;
         if (parsesCleanly(wrapped)) {
             const shifted = protectedRanges?.map(([s, e]): [number, number] => [s + 1, e + 1]);
-            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink, untracked).slice(1, -1);
+            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink, untracked, stateNames).slice(1, -1);
         }
         if (mentionsAnyName(code, signalNames)) {
             reportFallback(_filename, 'unparseable fragment that names a signal', withoutOrigins(code).slice(0, 80), sink);
@@ -120,6 +124,16 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
     }
 
     function handle(node: ts.Node, peekName?: string): boolean {
+        // shown = on → ctx.state('shown', !!(on)), for a state declared `@state shown;` (#1436): the
+        // write is the setter, as `ctx.state` is in TypeScript, with no signal behind it.
+        if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+            ts.isIdentifier(node.left) && stateNames.has(node.left.text) && !shadowed(node.left.text)) {
+            edits.push({ start: node.left.getStart(sf), end: node.right.getStart(sf), text: `ctx.state('${node.left.text}', !!(` }); // an identifier: no quote to escape
+            edits.push({ start: node.right.getEnd(), end: node.right.getEnd(), text: '))' });
+            visit(node.right, peekName);
+            return true;
+        }
+
         // count++ / ++count / count-- / --count
         if ((ts.isPostfixUnaryExpression(node) || ts.isPrefixUnaryExpression(node)) &&
             (node.operator === ts.SyntaxKind.PlusPlusToken || node.operator === ts.SyntaxKind.MinusMinusToken) &&
@@ -259,7 +273,7 @@ const LOGICAL_ASSIGN_OP: Partial<Record<ts.SyntaxKind, string>> = {
 
 /** True when this Identifier is a genuine value READ (not a property name, declaration, callee,
  *  assignment target, ++/-- operand, type, or import specifier). Mirrors the regex read filter. */
-function isReadPosition(id: ts.Identifier): boolean {
+export function isReadPosition(id: ts.Identifier): boolean {
     const p = id.parent;
     if (!p) return true;
     // Destructuring-assignment target: `[count] = pair` / `({ count } = obj)`. The identifier is
@@ -340,7 +354,7 @@ function isDestructuringAssignmentTarget(id: ts.Identifier): boolean {
 }
 
 /** Binding names a scope-introducing node adds, or null if `node` opens no scope. */
-function scopeBindings(node: ts.Node): string[] | null {
+export function scopeBindings(node: ts.Node): string[] | null {
     if (ts.isArrowFunction(node) || ts.isFunctionExpression(node) || ts.isFunctionDeclaration(node) ||
         ts.isMethodDeclaration(node) || ts.isConstructorDeclaration(node) ||
         ts.isGetAccessorDeclaration(node) || ts.isSetAccessorDeclaration(node)) {
@@ -361,7 +375,7 @@ function scopeBindings(node: ts.Node): string[] | null {
 }
 
 /** let/const/var/function/class names declared directly in a statement list. */
-function collectBlockBindings(statements: readonly ts.Statement[]): string[] {
+export function collectBlockBindings(statements: readonly ts.Statement[]): string[] {
     const names: string[] = [];
     for (const s of statements) {
         if (ts.isVariableStatement(s)) {
