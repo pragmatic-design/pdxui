@@ -90,7 +90,7 @@
       "import": "./dist/bottom-sheet/pdx-bottom-sheet.js"
     },
     "./select": {
-      "development": "./src/select/pdx-select.ts",
+      "development": "./src/select/pdx-select.pdx",
       "types": "./dist/select/pdx-select.d.ts",
       "import": "./dist/select/pdx-select.js"
     },

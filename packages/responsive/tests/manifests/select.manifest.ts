@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-select (tier 2, a combobox/listbox with a floating dropdown)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/select/pdx-select.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/select/pdx-select.pdx)
  * and the CSS (packages/design/src/components/select.css).
  *
  * ── DOM structure (light DOM, render() in pdx-select.ts:628) ──

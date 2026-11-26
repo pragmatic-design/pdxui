@@ -285,7 +285,7 @@ let sizeSelect: SizeSelect | null = null;
 function createSizeSelect(): SizeSelect {
   // Loaded the first time a pager offers sizes: one that offers none never fetches it.
   // The element is upgraded when it arrives, keeping what is set on it below.
-  if (!customElements.get('pdx-select')) void import('../select/pdx-select');
+  if (!customElements.get('pdx-select')) void import('../select/pdx-select.pdx');
   const select = document.createElement('pdx-select') as SizeSelect;
   select.className = 'pdx-pagination-size';
   select.setAttribute('data-part', 'size');

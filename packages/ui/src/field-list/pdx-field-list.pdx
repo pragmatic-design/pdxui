@@ -50,7 +50,7 @@ import '../form-field/pdx-form-field.pdx';
 import '../input/pdx-input.pdx';
 import '../number-input/pdx-number-input.pdx';
 import '../textarea/pdx-textarea.pdx';
-import '../select/pdx-select';
+import '../select/pdx-select.pdx';
 import '../checkbox/pdx-checkbox.pdx';
 import '../switch-toggle/pdx-switch.pdx';
 // This component's styles live in form.css — written where the

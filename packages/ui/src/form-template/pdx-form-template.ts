@@ -27,7 +27,7 @@ import '../search-input/pdx-search-input.pdx';
 import '../masked-input/pdx-masked-input.pdx';
 import '../number-input/pdx-number-input.pdx';
 import '../date-picker/pdx-date-picker.pdx';
-import '../select/pdx-select';
+import '../select/pdx-select.pdx';
 import '../autocomplete/pdx-autocomplete.pdx';
 import '../checkbox/pdx-checkbox.pdx';
 import '../checkbox-group/pdx-checkbox-group.pdx';

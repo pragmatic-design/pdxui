@@ -4,12 +4,12 @@
 // server with PDX_PILOT=1), so that both measure the same substitution.
 //
 // The redirect works on the RESOLVED module, not on an import string, so every import of a piloted
-// component reaches the .pdx: a test's `../../src/select/pdx-select`, a sibling component's
-// `../select/pdx-select` and a scenario page's aliased `@pdxui/ui/select` alike. pdx() compiles
-// the .pdx files with the library's prefix, so `select.pdx` registers `<pdx-select>`.
+// component reaches the .pdx: a test's `../../src/shared/filter-popover`, a sibling module's
+// `../shared/filter-popover` alike. pdx() compiles the .pdx files with the library's prefix.
 //
 // The switch was piloted here too, and moved to src/switch-toggle/pdx-switch.pdx (#1008): it is the
-// library's now, not a rewrite.
+// library's now, not a rewrite. So is the select, src/select/pdx-select.pdx (#1210), written again
+// from the TypeScript version it replaced, which had changed since the pilot's rewrite.
 import type { Plugin } from 'vite';
 import { resolve } from 'node:path';
 import { pdx } from '../../compiler/src/index';
@@ -18,7 +18,6 @@ const here = (p: string) => resolve(__dirname, '..', p).replace(/\\/g, '/');
 
 /** TypeScript component → its .pdx rewrite. */
 export const PILOT: Record<string, string> = {
-    [here('src/select/pdx-select.ts')]: here('pilot/select.pdx'),
     [here('src/shared/filter-popover.ts')]: here('pilot/filter-popover.ts'),
 };
 

@@ -6,7 +6,7 @@
 // so no assertion on the open state sees it; only a global error collector does.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 
 let errors: unknown[] = [];
 const onError = (e: ErrorEvent): void => { errors.push(e.error ?? e.message); };

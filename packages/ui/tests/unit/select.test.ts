@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 
 // Helper: set an array prop on a CE
 function setOptions(el: HTMLElement, options: unknown[]) {

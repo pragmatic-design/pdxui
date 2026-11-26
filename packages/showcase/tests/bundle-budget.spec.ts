@@ -519,7 +519,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocks where the TypeScript version shared html``'s engine, as the moves before it found. +439 B
 // over 77 files, the entry +16 B (44698 B, 43.65 KB, still under 43.7). 481.0 KB measured locally
 // against 480.5 on main.
-const BUDGET_KB = { entry: 43.7, js: 481.5, css: 67, blocking: 102.9 };
+// js 481.5 → 482.4 (the same standing OK): pdx-select moves to .pdx. Its chunk is 8040 B gzip against
+// 7063 on main's build: the module minifies to the length it had (19866 against 19844 B) and
+// compresses worse (6782 against 5760 B gzip), its compiled template static markup and walks where
+// html`` repeated one shape per binding (#1287). The `snippet` chunk is gone with it, -181 B: no
+// component in the showcase reads a snippet through `declaredSnippet` any more. 482.3 KB measured
+// locally, the entry unchanged at 43.6.
+const BUDGET_KB = { entry: 43.7, js: 482.4, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

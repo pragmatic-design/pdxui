@@ -1,0 +1,722 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSelect",
+  "tagName": "pdx-select",
+  "category": "Data-bound",
+  "order": 103,
+  "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "options",
+      "description": "The selectable options.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "source",
+      "description": "DataSource instance — dedicated prop for data-driven select. Takes priority over options.",
+      "type": {
+        "text": "import('@pdxui/core').DataSource<T> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "Object field used as the option label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "valueField",
+      "description": "Object field used as the option value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'",
+      "attribute": "valuefield"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "success"
+    },
+    {
+      "kind": "field",
+      "name": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "warning"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "searchable",
+      "description": "Adds a search box to filter options.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "searchable"
+    },
+    {
+      "kind": "field",
+      "name": "multiple",
+      "description": "Allow selecting more than one.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "multiple"
+    },
+    {
+      "kind": "field",
+      "name": "maxTagCount",
+      "description": "Multi mode: collapse selected tags in the trigger to keep it compact.\n-1 = unlimited (default, show all chips); 0 = summary only (\"N selected\");\nN>0 = show N chips + a \"+K\" overflow chip. The dropdown is unaffected.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "maxtagcount"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "groupField",
+      "description": "Object field used to group options.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "groupfield"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a\nlabel, after a pdx-label, or with a <label for> the select's id: those name it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "searchPosition",
+      "description": "Where to show search input: 'trigger' (default) or 'dropdown'",
+      "type": {
+        "text": "'trigger' | 'dropdown'"
+      },
+      "default": "'trigger'",
+      "attribute": "searchposition"
+    },
+    {
+      "kind": "field",
+      "name": "creatable",
+      "description": "Allow creating new options when search has no match. Emits pdx-create.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "creatable"
+    },
+    {
+      "kind": "field",
+      "name": "createLabel",
+      "description": "Label template for the create option. Use {query} as placeholder. Empty: the select.create\ncomponent string, «Create \"{query}\"» in English.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "createlabel"
+    },
+    {
+      "kind": "field",
+      "name": "remote",
+      "description": "Enable debounced server-side filtering for remote DataSource.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "remote"
+    },
+    {
+      "kind": "field",
+      "name": "debounce",
+      "description": "Debounce delay in ms for remote search.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200",
+      "attribute": "debounce"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "null",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "selectedItem",
+      "readonly": true,
+      "description": "Read-only, via a ref: `el.selectedItem`."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the popup."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the popup."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Open the popup when closed, close it when open."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value",
+    "values": "$event.detail.value",
+    "item": "$event.currentTarget.selectedItem",
+    "items": "$event.currentTarget.selectedItem"
+  },
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the clear button empties the selection, after its `value-change`."
+    },
+    {
+      "name": "pdx-search",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired as the user types in the search input.",
+      "detail": "{ query: string }"
+    },
+    {
+      "name": "pdx-create",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the user creates an option from the search text.",
+      "detail": "{ value: string; label: string }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: unknown }"
+    }
+  ],
+  "roles": [
+    "combobox",
+    "listbox",
+    "option",
+    "presentation",
+    "status"
+  ],
+  "attributes": [
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "Object field used as the option label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "valuefield",
+      "fieldName": "valueField",
+      "description": "Object field used as the option value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'value'"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text shown while empty.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Makes the value read-only — visible but not editable.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "success",
+      "fieldName": "success",
+      "description": "Applies the success state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "warning",
+      "fieldName": "warning",
+      "description": "Applies the warning state styling.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Shows a clear button to reset the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "searchable",
+      "fieldName": "searchable",
+      "description": "Adds a search box to filter options.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "multiple",
+      "fieldName": "multiple",
+      "description": "Allow selecting more than one.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "maxtagcount",
+      "fieldName": "maxTagCount",
+      "description": "Multi mode: collapse selected tags in the trigger to keep it compact.\n-1 = unlimited (default, show all chips); 0 = summary only (\"N selected\");\nN>0 = show N chips + a \"+K\" overflow chip. The dropdown is unaffected.",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "groupfield",
+      "fieldName": "groupField",
+      "description": "Object field used to group options.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a\nlabel, after a pdx-label, or with a <label for> the select's id: those name it.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "searchposition",
+      "fieldName": "searchPosition",
+      "description": "Where to show search input: 'trigger' (default) or 'dropdown'",
+      "type": {
+        "text": "'trigger' | 'dropdown'"
+      },
+      "default": "'trigger'"
+    },
+    {
+      "name": "creatable",
+      "fieldName": "creatable",
+      "description": "Allow creating new options when search has no match. Emits pdx-create.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "createlabel",
+      "fieldName": "createLabel",
+      "description": "Label template for the create option. Use {query} as placeholder. Empty: the select.create\ncomponent string, «Create \"{query}\"» in English.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "remote",
+      "fieldName": "remote",
+      "description": "Enable debounced server-side filtering for remote DataSource.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "debounce",
+      "fieldName": "debounce",
+      "description": "Debounce delay in ms for remote search.",
+      "type": {
+        "text": "number"
+      },
+      "default": "200"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "unknown"
+      },
+      "default": "null"
+    }
+  ],
+  "slots": [
+    {
+      "name": "item",
+      "description": "Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.",
+      "signature": "(option: { label: string; value: unknown; raw: T }, index: number)"
+    },
+    {
+      "name": "selected",
+      "description": "Renders the selected value in the trigger: a snippet `selected(option)`.",
+      "signature": "(option: { label: string; value: unknown; raw: T })"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The trigger: the frame, its border, background and the states' colours."
+    },
+    {
+      "name": "search",
+      "description": "The search field, while `searchable`: in the trigger, or atop the list with `search-position=\"dropdown\"`."
+    },
+    {
+      "name": "tag",
+      "description": "A chosen option in the trigger, while `multiple`."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`."
+    },
+    {
+      "name": "spinner",
+      "description": "The loading spinner, a `role=\"status\"`, while loading."
+    },
+    {
+      "name": "popup",
+      "description": "The floating panel that holds the list."
+    },
+    {
+      "name": "list",
+      "description": "The `role=\"listbox\"`."
+    },
+    {
+      "name": "option",
+      "description": "An option of the list."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-input-border-color",
+      "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-focus",
+      "description": "The frame's border while focused (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-invalid",
+      "description": "The frame's border in the invalid state."
+    },
+    {
+      "name": "--pdx-input-border-color-success",
+      "description": "The frame's border in the success state."
+    },
+    {
+      "name": "--pdx-input-border-color-warning",
+      "description": "The frame's border in the warning state."
+    },
+    {
+      "name": "--pdx-input-border-width",
+      "description": "The frame's bottom border, in the filled input style."
+    },
+    {
+      "name": "--pdx-input-focus-ring",
+      "description": "The ring around the frame while focused."
+    },
+    {
+      "name": "--pdx-input-min-height",
+      "description": "The frame's height, at the md size."
+    },
+    {
+      "name": "--pdx-select-caret-size"
+    },
+    {
+      "name": "--pdx-select-caret-stroke"
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "The popup is open."
+    },
+    {
+      "name": "invalid",
+      "description": "`error` is set."
+    },
+    {
+      "name": "success",
+      "description": "`success` is set."
+    },
+    {
+      "name": "warning",
+      "description": "`warning` is set."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set, or the DataSource is loading."
+    },
+    {
+      "name": "multiple",
+      "description": "`multiple` is set: the trigger holds tags."
+    }
+  ],
+  "x-pdx-context": {
+    "injects": [
+      {
+        "token": "DataSourceContext",
+        "optional": true
+      }
+    ]
+  }
+}

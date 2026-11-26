@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { getComponentString } from '@pdxui/core';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 
 function create(attrs: Record<string, string> = {}) {
     const el = document.createElement('pdx-select') as any;

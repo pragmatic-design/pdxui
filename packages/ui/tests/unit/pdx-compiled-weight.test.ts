@@ -35,6 +35,13 @@
 // With #1407 an `onDestroy` is core's hook, not an effect returning the callback as its cleanup: the
 // select 7389 → 7391 B, the name `onDestroy` imported and called where `ctx.track(() => () => …)` was
 // — two bytes, for one effect fewer created and run at each mount.
+// With #1210 the select is the library's, src/select/pdx-select.pdx, and the pilot's rewrite is gone:
+// the select is weighed there, 7627 B against the TypeScript version's 7648 B weighed the same way. It
+// was written again from the TypeScript version, and weighed 7878 B with its list in three templates,
+// one per mode, as the TypeScript version drew it, and 7899 B with the two defects fixed with the move
+// (a key dropped, a filter left on its source); one list over the rows of the three modes, as the
+// pilot's rewrite had it, took it to 7627 B. The pilot's rewrite weighed 7391 B: the 236 B between
+// the two are not established here (#1287).
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -52,7 +59,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1256,
-    'pilot/select.pdx': 7391,
+    'src/select/pdx-select.pdx': 7627,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

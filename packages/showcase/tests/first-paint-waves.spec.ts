@@ -318,7 +318,7 @@ test('and the components that chunk imports, which is the same wave', () => {
     expect(modules.some((source) => source.endsWith('ui/src/spinner/pdx-spinner.pdx')),
         'the spinner is preloaded again: something on the landing route imports pdx-spinner statically').toBe(false);
     // The control: the lookup can say no. `pdx-select` is rendered by other routes, not this one.
-    expect(modules.some((source) => source.endsWith('ui/src/select/pdx-select.ts')),
+    expect(modules.some((source) => source.endsWith('ui/src/select/pdx-select.pdx')),
         'the preloaded modules include one no landing chunk imports: the lookup reads everything').toBe(false);
 });
 

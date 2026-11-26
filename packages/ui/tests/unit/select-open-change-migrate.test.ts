@@ -11,7 +11,7 @@ import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
 import { openChangeEvent } from '../../../compiler/src/language/open-change';
 import { tick, cleanup } from './helpers';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 
 const ALPHA = `<template>
 <pdx-select class="sel" label="Pick" :options="opts" @pdx-open="load" @pdx-close="count = 0; touched = true"></pdx-select>
