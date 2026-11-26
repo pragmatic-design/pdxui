@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="pdx-form-section" data-part="root" role="group" :aria-label="label">
+  <fieldset class="pdx-form-section" data-part="root" role="group" :name="name || null" :aria-label="label">
     @if (label) {<legend class="pdx-form-section-legend" data-part="legend">{{ label }}</legend>}
     <div class="pdx-form-section-content" data-part="content"><slot></slot></div>
   </fieldset>
