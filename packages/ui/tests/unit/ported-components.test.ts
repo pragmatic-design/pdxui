@@ -28,6 +28,7 @@ const PORTED: Record<string, string> = {
     'pdx-breadcrumb': 'src/breadcrumb/pdx-breadcrumb.pdx',
     'pdx-command': 'src/command/pdx-command.pdx',
     'pdx-button':'src/button/pdx-button.pdx',
+    'pdx-bulk-actions': 'src/bulk-actions/pdx-bulk-actions.pdx',
     'pdx-button-group': 'src/button-group/pdx-button-group.pdx',
     'pdx-card': 'src/card/pdx-card.pdx',
     'pdx-chart': 'src/chart/pdx-chart.pdx',

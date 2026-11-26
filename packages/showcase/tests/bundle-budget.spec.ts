@@ -501,7 +501,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // modules (6944 against 7882 B, typed-date counted on both sides), but its chunk grows 398 B gzip
 // with the same file count; the per-chunk diff and the cause are on #1287. 479.8 KB measured locally,
 // held to CI's figure as above.
-const BUDGET_KB = { entry: 43.6, js: 480.0, css: 67, blocking: 102.9 };
+// js 480.0 → 480.3 (the same standing OK): pdx-bulk-actions moves to .pdx, 1.17× alone (1703 against
+// 1459 B), the blocks of its template; by #1379 its weight is read here, where /customers renders it
+// inside pdx-entity-grid: that route grows 0.3 KB gzip. 480.0 KB measured locally, held to CI's
+// figure as above.
+const BUDGET_KB = { entry: 43.6, js: 480.3, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

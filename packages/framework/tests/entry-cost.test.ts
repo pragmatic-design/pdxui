@@ -132,8 +132,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 345.2 after pdx-date-picker (measured here: 345.1): 0.88× alone with its modules, the entry
     // +0.2 KB, as for the moves above (#1287). 345.4 after pdx-page-header (measured here: 345.3):
     // the showcase does not render it, so this entry is where its weight is read (#1379); the
-    // module alone is 1333 B against 1003 B, its template's compiled blocks.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 345.4 },
+    // module alone is 1333 B against 1003 B, its template's compiled blocks. 345.7 after
+    // pdx-bulk-actions (measured here: 345.6), the same reason: 1703 B alone against 1459 B (#1379).
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 345.7 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -155,8 +156,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // pdx-mention (measured here: 335.3), as for the entry above. 335.6 after pdx-transfer (measured
     // here: 335.5), as for the entry above. 335.9 after pdx-cascader (measured here: 335.8), as for
     // the entry above. 336.2 after pdx-date-picker (measured here: 336.1), as for the entry above.
-    // 336.4 after pdx-page-header (measured here: 336.3), as for the entry above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 336.4 },
+    // 336.4 after pdx-page-header (measured here: 336.3), as for the entry above. 336.7 after
+    // pdx-bulk-actions (measured here: 336.6), as for the entry above.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 336.7 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

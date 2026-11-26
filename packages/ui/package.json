@@ -200,7 +200,7 @@
       "import": "./dist/data-grid/pdx-data-grid.js"
     },
     "./bulk-actions": {
-      "development": "./src/bulk-actions/pdx-bulk-actions.ts",
+      "development": "./src/bulk-actions/pdx-bulk-actions.pdx",
       "types": "./dist/bulk-actions/pdx-bulk-actions.d.ts",
       "import": "./dist/bulk-actions/pdx-bulk-actions.js"
     },
