@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-context-menu (tier 2, right-click context menu, cursor-positioned, portaled menu)
  *
- * Contracts DERIVED by inspecting the source (packages/ui/src/context-menu/pdx-context-menu.ts)
+ * Contracts DERIVED by inspecting the source (packages/ui/src/context-menu/pdx-context-menu.pdx)
  * and the CSS (packages/design/src/components/menu.css → .pdx-menu / .pdx-menu-item).
  *
  * ── DOM structure ──

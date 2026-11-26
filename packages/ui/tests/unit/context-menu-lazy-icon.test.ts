@@ -4,7 +4,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/context-menu/pdx-context-menu';
+import '../../src/context-menu/pdx-context-menu.pdx';
 
 const SVG = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle></svg>';
 

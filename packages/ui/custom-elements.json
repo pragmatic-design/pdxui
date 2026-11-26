@@ -8486,7 +8486,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/context-menu/pdx-context-menu.ts",
+      "path": "src/context-menu/pdx-context-menu.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -8673,7 +8673,7 @@
           "name": "pdx-context-menu",
           "declaration": {
             "name": "PdxContextMenu",
-            "module": "src/context-menu/pdx-context-menu.ts"
+            "module": "src/context-menu/pdx-context-menu.pdx"
           }
         }
       ]

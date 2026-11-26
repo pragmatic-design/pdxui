@@ -13,7 +13,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/command/pdx-command.pdx';
-import '../../src/context-menu/pdx-context-menu';
+import '../../src/context-menu/pdx-context-menu.pdx';
 import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
 import '../../src/menu/pdx-menu.pdx';
 import '../../src/select/pdx-select';

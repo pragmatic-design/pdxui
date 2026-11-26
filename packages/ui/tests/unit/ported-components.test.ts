@@ -30,6 +30,7 @@ const PORTED: Record<string, string> = {
     'pdx-accordion': 'src/accordion/pdx-accordion.pdx',
     'pdx-breadcrumb': 'src/breadcrumb/pdx-breadcrumb.pdx',
     'pdx-command': 'src/command/pdx-command.pdx',
+    'pdx-context-menu': 'src/context-menu/pdx-context-menu.pdx',
     'pdx-button':'src/button/pdx-button.pdx',
     'pdx-bulk-actions': 'src/bulk-actions/pdx-bulk-actions.pdx',
     'pdx-button-group': 'src/button-group/pdx-button-group.pdx',
