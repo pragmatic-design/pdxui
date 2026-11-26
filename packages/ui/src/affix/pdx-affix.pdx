@@ -16,7 +16,8 @@ import { DEV } from '@pdxui/core';
 // model's event is, `{ value }`, and a state; `::affixed` stays an error.
 /** It started or stopped sticking: `true` while stuck. */
 @event 'affixed-change': { value: boolean };
-@state affixed = affixed;
+// Set in setAffixed, where the TypeScript version called ctx.state (#1436).
+@state affixed;
 /** Offset from top when affixed (px) */
 @prop offsetTop: number = 0;
 /** Offset from bottom when affixed (px) */
@@ -25,7 +26,8 @@ import { DEV } from '@pdxui/core';
 @prop target: string = '';
 @host host;
 
-let affixed = $signal(false);
+/** Stuck now: what the scroll handler compares against. Nothing reads it reactively. */
+let isAffixed = false;
 let scrollHandler: (() => void) | null = null;
 let placeholder: HTMLElement | null = null;
 let observer: IntersectionObserver | null = null;
@@ -33,7 +35,8 @@ let sentinel: HTMLElement | null = null;
 
 /** The affixed state, reported once per change: the custom state, and `affixed-change { value }`. */
 function setAffixed(next: boolean): void {
-  if (next === affixed.peek()) return;
+  if (next === isAffixed) return;
+  isAffixed = next;
   affixed = next;
   affixedChange({ value: next });
 }
@@ -123,7 +126,7 @@ $effect(() => {
         shouldAffix = rect.top <= top;
       }
 
-      if (shouldAffix && !affixed.peek()) {
+      if (shouldAffix && !isAffixed) {
         if (!placeholder) {
           placeholder = document.createElement('div');
           placeholder.style.width = host.offsetWidth + 'px';
@@ -139,7 +142,7 @@ $effect(() => {
           host.style.bottom = '';
         }
         setAffixed(true);
-      } else if (!shouldAffix && affixed.peek()) {
+      } else if (!shouldAffix && isAffixed) {
         host.style.position = '';
         host.style.top = '';
         host.style.bottom = '';
