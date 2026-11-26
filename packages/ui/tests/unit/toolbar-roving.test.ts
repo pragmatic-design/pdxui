@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/toolbar/pdx-toolbar.pdx';
 import '../../src/button/pdx-button.pdx';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 import '../../src/toggle/pdx-toggle.pdx';
 
 beforeEach(cleanup);

@@ -15,7 +15,7 @@ import '../../src/wizard/pdx-wizard';
 
 // The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
 // that reads the select before it is upgraded fails every time instead of once in a while (#692).
-vi.mock('../../src/select/pdx-select', async (importOriginal) => {
+vi.mock('../../src/select/pdx-select.pdx', async (importOriginal) => {
     await new Promise((r) => setTimeout(r, 300));
     return importOriginal();
 });

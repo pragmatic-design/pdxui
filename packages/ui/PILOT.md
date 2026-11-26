@@ -27,17 +27,19 @@ library moves to `.pdx`.
   so it is the owner's to start. What it needs first is under «Before the library moves».
 
 The `.pdx` versions stay here, unexported, until each moves. **The move has started:** `pdx-switch` is
-`src/switch-toggle/pdx-switch.pdx` since #1008, and its TypeScript version is gone. The pilot now
-substitutes the select and the popover only, and the mount measurement below has no switch row any more;
-its numbers here are the record of when it had one.
+`src/switch-toggle/pdx-switch.pdx` since #1008, and its TypeScript version is gone. `pdx-select` is
+`src/select/pdx-select.pdx` since #1210, written again from its TypeScript version, which had changed
+since the pilot's rewrite; the rewrite is gone with it. The pilot now substitutes the popover only, and
+the mount measurement below has no switch or select row any more; their numbers here are the record of
+when it had them.
 
 ## How a pilot component is held to the same bar
 
 [`pilot/plugin.ts`](pilot/plugin.ts) redirects the **resolved** TypeScript module to its rewrite, so
 every import reaches it: a unit test's relative import, a sibling component's import (the pagination's
 page-size select, the grid's filter popover), and a scenario page's `@pdxui/ui/<name>` alias alike. A
-`.pdx` is compiled by `pdx({ prefix: 'pdx' })`, so `select.pdx` registers `<pdx-select>`, the tag the
-tests create.
+`.pdx` is compiled by `pdx({ prefix: 'pdx' })`, so a rewrite registers the `pdx-` tag the tests
+create, as `select.pdx` registered `<pdx-select>` while the pilot had it.
 
 The filter popover is not a tag but a module of functions. Its rewrite is
 [`pilot/filter-popover.ts`](pilot/filter-popover.ts), which re-exports the shared module and redefines
@@ -198,8 +200,8 @@ What the numbers mean:
 ## Where the select reaches `ctx`
 
 The rule asks for no escape hatch. In the first run the select needed five kinds, each marked
-`ESCAPE HATCH` in [`pilot/select.pdx`](pilot/select.pdx). Each is a declaration now, and the select
-has none left. The switch and the filter popover never needed one.
+`ESCAPE HATCH` in the pilot's `select.pdx` (removed with #1210, when the select moved to `src/`). Each
+is a declaration now, and the select has none left. The switch and the filter popover never needed one.
 
 | What the component does | Why no declaration covers it | Places |
 |---|---|---|

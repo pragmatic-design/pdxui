@@ -7,7 +7,7 @@
  *
  * This reads the entry's sourcemap instead: `sources` names every module Rollup put in the chunk,
  * `sourcesContent` gives each one's size. Six lines, and a module that arrives uninvited is NAMED
- * rather than merely weighed — `ui/src/select/pdx-select.ts`, say, with the `createDataSource` it
+ * rather than merely weighed — `ui/src/select/pdx-select.pdx`, say, with the `createDataSource` it
  * imports, for a component the shell does not render.
  *
  * The build is `--sourcemap hidden` (see `playwright.config.ts`): the `.map` files are written and
@@ -37,7 +37,7 @@ function attribute(mapFile: string): Attribution[] {
     return map.sources
         .map((source, i) => ({
             // A sourcemap writes its sources RELATIVE to the file it sits next to, so they arrive
-            // as `../../../ui/src/select/pdx-select.ts` and the word `packages` is not in them —
+            // as `../../../ui/src/select/pdx-select.pdx` and the word `packages` is not in them —
             // resolving against `dist/assets` first is what puts it back. Without it, both "no ui
             // module is in the entry" assertions pass because their prefix matches nothing at all,
             // which is why the control below exists.

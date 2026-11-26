@@ -117,6 +117,7 @@ const PORTED: Record<string, string> = {
     'pdx-search-input': 'src/search-input/pdx-search-input.pdx',
     'pdx-rating': 'src/rating/pdx-rating.pdx',
     'pdx-segmented': 'src/segmented/pdx-segmented.pdx',
+    'pdx-select': 'src/select/pdx-select.pdx',
     'pdx-slider': 'src/slider/pdx-slider.pdx',
     'pdx-sparkline': 'src/chart/pdx-sparkline.pdx',
     'pdx-spinner':'src/spinner/pdx-spinner.pdx',

@@ -1,0 +1,993 @@
+<template>
+  <div class="pdx-select-trigger pdx-input-wrap" data-part="root"
+    :role="inTrigger ? null : 'combobox'"
+    :aria-invalid="!inTrigger && error ? 'true' : null"
+    :aria-haspopup="inTrigger ? null : 'listbox'"
+    :aria-expanded="inTrigger ? null : String(popupOpen)"
+    :aria-controls="inTrigger ? null : listboxId"
+    :aria-activedescendant="inTrigger ? null : activeId()"
+    :aria-label="inTrigger ? null : (label || null)"
+    :aria-disabled="!inTrigger && disabled ? 'true' : null"
+    :tabindex="inTrigger ? '-1' : '0'"
+    @click="onTriggerClick"
+    @keydown="onTriggerKeydown">
+    @if (multiple) {
+      <!-- Multiple mode: tags (with optional collapse) + optional search -->
+      <div class="pdx-select-tags">
+        @if (maxTagCount === 0 && selectedItems.length > 0) {
+          <!-- Summary mode (cap 0): single "N selected" chip, no per-tag removal. -->
+          <span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">{{ format(uiString('select', 'selected'), { n: selectedItems.length }) }}</span>
+        } @else {
+          @for (shownTags as chosen; track chosen.value) {
+            <span class="pdx-chip pdx-chip-sm" data-part="tag">
+              <span>{{ chosen.label }}</span>
+              <button class="pdx-chip-remove" type="button" tabindex="-1"
+                :aria-label="format(uiString('select', 'remove'), { label: chosen.label })"
+                @click.stop="removeTag(chosen.value)">×</button>
+            </span>
+          }
+          @if (tagOverflow > 0) {
+            <span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">+{{ tagOverflow }}</span>
+          }
+        }
+        @if (searchable) {
+          <!-- pdx-ignore PDX_ONE_WAY_EDITED_FIELD: onSearchInput writes `query` from the field, and the other writes (open, close, a created option) empty it, which the binding writes back -->
+          <input :value="query" class="pdx-select-tag-search" data-part="search"
+            type="text"
+            autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+            role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+            :aria-invalid="error ? 'true' : null"
+            :aria-expanded="String(popupOpen)"
+            :aria-controls="listboxId"
+            :aria-activedescendant="activeId()"
+            :aria-label="label || null"
+            :placeholder="selectedValues.size === 0 ? placeholder : ''"
+            :disabled="disabled"
+            @input="onSearchInput"
+            tabindex="0" />
+        } @else if (selectedValues.size === 0) {
+          <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
+        }
+      </div>
+    } @else if (searchable && searchPosition !== 'dropdown') {
+      <!-- Search in trigger. Its keys reach onTriggerKeydown by bubbling to the trigger. It had its
+           own handler as well, so every key ran twice: ↓ skipped an option, and the Enter that
+           picked one reopened the list. -->
+      <!-- pdx-ignore PDX_ONE_WAY_EDITED_FIELD: closed or untouched the field shows the selected label, typed it shows the query onSearchInput wrote from it -->
+      <input :value="!popupOpen ? selectedLabel : (userTyped ? query : selectedLabel)" class="pdx-select-search" data-part="search"
+        type="text"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+        role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+        :aria-invalid="error ? 'true' : null"
+        :aria-expanded="String(popupOpen)"
+        :aria-controls="listboxId"
+        :aria-activedescendant="activeId()"
+        :aria-label="label || null"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        @input="onSearchInput"
+        @focus="onSearchFocus"
+        tabindex="0" />
+    } @else if (chosenItem) {
+      <!-- Non-searchable or search-in-dropdown: show value label -->
+      <span class="pdx-select-value">@render selected?.({ label: chosenItem.label, value: chosenItem.value, raw: chosenItem._raw as T }) @else {{{ chosenItem.label }}}</span>
+    } @else {
+      <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
+    }
+    @if (clearable && !disabled && !readonly && selectedValues.size > 0) {
+      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button"
+        :aria-label="uiString('select', 'clear')" tabindex="-1"
+        @click.stop="clearSelection()">×</button>
+    }
+    @if (isLoading) {
+      <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="uiString('select', 'loading')"></span>
+    }
+    <span class="pdx-select-caret"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+  </div>
+
+  <div class="pdx-select-dropdown" data-part="popup">
+    @if (searchable && searchPosition === 'dropdown') {
+      <div class="pdx-select-search-wrap">
+        <!-- pdx-ignore PDX_ONE_WAY_EDITED_FIELD: onSearchInput writes `query` from the field, and the other writes (open, close, a created option) empty it, which the binding writes back -->
+        <input :value="query" class="pdx-select-dropdown-search" data-part="search"
+          type="text"
+          autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+          :aria-controls="listboxId"
+          :aria-activedescendant="activeId()"
+          :placeholder="uiString('select', 'search')"
+          @input="onSearchInput"
+          @keydown="onTriggerKeydown" />
+      </div>
+    }
+    <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">{{ statusText() }}</span>
+    <div class="pdx-select-list" :class="{ virtual: useVirtual }"
+      role="listbox" data-part="list"
+      :aria-busy="isLoading ? 'true' : null"
+      :id="listboxId"
+      :aria-label="(label as string) || uiString('select', 'listbox')"
+      :aria-multiselectable="multiple ? 'true' : null"
+      @mousedown="onListMousedown"
+      :style="useVirtual ? 'height:' + Math.min(virtualTotalSize, 240) + 'px' : ''">
+      @if (displayItems.length === 0) {
+        <div class="pdx-select-empty">{{ uiString('select', 'noResults') }}</div>
+      } @else {
+        <!-- One list for the three modes (`readRows`): the virtual window, the groups with their
+             headers, or every option. In the virtual window only part of the options is in the DOM:
+             each says where it stands among all of them, or a screen reader counts the rendered ones
+             (A3, #287). -->
+        @for (rows as row; track row.key) {
+          @if (row.opt) {
+            <div class="pdx-select-option" :class="{ active: activeIndex === row.idx }"
+              role="option" data-part="option"
+              :aria-setsize="useVirtual ? String(displayItems.length) : null"
+              :aria-posinset="useVirtual ? String(row.idx + 1) : null"
+              :id="uid + '-opt-' + row.idx"
+              :data-option-index="row.idx"
+              :aria-selected="isItemSelected(row.opt.value) ? 'true' : 'false'"
+              :style="row.style"
+              @click="onOptionClick($event, row.opt)"
+              @mouseenter="activeIndex = row.idx">
+              @if (multiple) {
+                <span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>
+              }
+              @render item?.({ label: row.opt.label, value: row.opt.value, raw: row.opt._raw as T }, row.idx) @else {{{ row.opt.label }}}
+            </div>
+          } @else {
+            <div class="pdx-select-group-header" role="presentation">{{ row.header }}</div>
+          }
+        }
+      }
+      @if (showCreateOption) {
+        <div class="pdx-select-option pdx-select-create"
+          role="option" data-part="option"
+          @click="createOption()">
+          <span class="pdx-select-create-icon">+</span>
+          {{ createText() }}
+        </div>
+      }
+    </div>
+  </div>
+</template>
+
+<script>
+/**
+ * One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple
+ * props, fed by an array or a DataSource.
+ *
+ * @slot item - Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.
+ * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`.
+ *
+ * @csspart root - The trigger: the frame, its border, background and the states' colours.
+ * @csspart search - The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.
+ * @csspart tag - A chosen option in the trigger, while `multiple`.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while loading.
+ * @csspart popup - The floating panel that holds the list.
+ * @csspart list - The `role="listbox"`.
+ * @csspart option - An option of the list.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set, or the DataSource is loading.
+ * @cssstate multiple - `multiple` is set: the trigger holds tags.
+ *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-color-invalid - The frame's border in the invalid state.
+ * @cssprop --pdx-input-border-color-success - The frame's border in the success state.
+ * @cssprop --pdx-input-border-color-warning - The frame's border in the warning state.
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value
+ * @alphadetail item $event.currentTarget.selectedItem
+ * @alphadetail items $event.currentTarget.selectedItem
+ */
+// pdx-select — Unified Select / Combobox / MultiSelect.
+// Single component: `searchable` enables type-to-filter (combobox ARIA),
+// `multiple` enables multi-select with chip tags.
+// Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
+import { createDataSource, isDataSource, inject, generatedId, usePopover, overlayStack, createVirtualizer, effect, onNextFrame, onDestroy } from '@pdxui/core';
+import type { DataSource, PopoverPlacement } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
+import { uiString, format } from '../shared/i18n';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/select';
+// The multi-select's tags are drawn with .pdx-chip, which chip.css owns.
+import '@pdxui/design/components/chip';
+
+// ─── Normalisation helpers ───────────────────────────────────
+
+interface NormalisedOption { label: string; value: unknown; _raw: unknown }
+
+function normaliseOptions(
+  raw: unknown[],
+  labelField: string,
+  valueField: string,
+): NormalisedOption[] {
+  if (!raw || raw.length === 0) return [];
+  const first = raw[0];
+  if (typeof first === 'string' || typeof first === 'number') {
+    return raw.map(v => ({ label: String(v), value: v, _raw: v }));
+  }
+  return raw.map(entry => {
+    const obj = entry as Record<string, unknown>;
+    return {
+      label: String(obj[labelField] ?? ''),
+      value: obj[valueField] ?? entry,
+      _raw: entry,
+    };
+  });
+}
+
+// A row of the list: a group's header, or an option with its index in the list and, in the virtual
+// window, the style that places it.
+interface ListRow { key: string; header?: string; opt?: NormalisedOption; idx: number; style: string }
+
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
+/** Fired when the clear button empties the selection, after its `value-change`. */
+@event 'pdx-clear': void;
+/** Fired as the user types in the search input. */
+@event 'pdx-search': { query: string };
+/** Fired when the user creates an option from the search text. */
+@event 'pdx-create': { value: string; label: string };
+// The visual states, on the host as custom states (#132, #287): a theme styles `pdx-select:state(open)`,
+// and the design CSS draws the trigger and the popup from them. Neither carries a state class. They
+// follow the props and the popup in one effect, as the TypeScript version's track kept them.
+@state open = popupOpen;
+@state invalid = !!error;
+@state success = !!success;
+@state warning = !!warning;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state loading = isLoading;
+@state multiple = !!multiple;
+@part root, search, tag, clear, spinner, popup, list, option;
+// An option's `raw` is the app's entry, an element of `options` or of `source` (#853): the editor
+// infers `T`.
+@generic T;
+@prop options: T[] = [];
+/** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
+@prop source: DataSource<T> | null = null;
+@prop labelField: string = 'label';
+@prop valueField: string = 'value';
+@prop placeholder: string = '';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop error: boolean = false;
+@prop success: boolean = false;
+@prop warning: boolean = false;
+@prop clearable: boolean = false;
+@prop searchable: boolean = false;
+@prop multiple: boolean = false;
+/** Multi mode: collapse selected tags in the trigger to keep it compact.
+ *  -1 = unlimited (default, show all chips); 0 = summary only ("N selected");
+ *  N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. */
+@prop maxTagCount: number = -1;
+@prop name: string = '';
+@prop loading: boolean = false;
+@prop groupField: string = '';
+/** The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a
+ *  label, after a pdx-label, or with a <label for> the select's id: those name it. */
+@prop label: string = '';
+/** Where to show search input: 'trigger' (default) or 'dropdown' */
+@prop searchPosition: 'trigger' | 'dropdown' = 'trigger';
+/** Allow creating new options when search has no match. Emits pdx-create. */
+@prop creatable: boolean = false;
+/** Label template for the create option. Use {query} as placeholder. Empty: the select.create
+ *  component string, «Create "{query}"» in English. */
+@prop createLabel: string = '';
+/** Enable debounced server-side filtering for remote DataSource. */
+@prop remote: boolean = false;
+/** Debounce delay in ms for remote search. */
+@prop debounce: number = 200;
+// The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+// The selection (#481): the option's value, or null; in multiple mode the array of values. A pick,
+// a removed tag and the clear button write it, and the write dispatches `value-change`.
+// A form submits the selection: the value, an empty entry with none as a native select with an
+// empty placeholder, one entry per value when multiple; and resets it (#135).
+@model value: unknown = null { attribute: string, form: () => formEntry() };
+// A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
+@slot item?: (option: { label: string; value: unknown; raw: T }, index: number);
+@slot selected?: (option: { label: string; value: unknown; raw: T });
+// A form-associated element is in FormData under its `name` attribute (#133).
+@host host { :name="name || null" }
+// UI-03: read-only `selectedItem` returning the raw selected record(s); `el.value` is the model.
+// Imperative API: focus/blur/clear, and the popup driven with the overlay verbs (#287), which
+// replace the alpha openSelect/closeSelect/toggleSelect.
+@expose get selectedItem;
+@expose focus, blur, clear, show, close, toggle;
+
+const uid = generatedId('pdx-sel');
+const listboxId = uid + '-lb';
+
+// ── Internal state ──
+let popupOpen = $signal(false);
+let query = $signal('');
+let activeIndex = $signal(-1);
+let selectedValues = $signal<Set<unknown>>(new Set());
+// Tracks whether user has typed in the search input (vs just opened)
+let userTyped = $signal(false);
+
+// ── The DataSource the options come from ──
+let searchDebounceTimer: any = null;
+
+/**
+ * The DataSource the options come from, and whether it is the app's. Priority: source prop >
+ * Context Protocol > options (array or DS). Derived from those, where the TypeScript version
+ * kept two signals in step with an effect: an array of options gets a source of its own,
+ * built again when the array, or the fields it is read by, change.
+ */
+function resolveSource(): { ds: DataSource<Record<string, unknown>>; external: boolean } {
+  const src = source as unknown;
+  const opts = options as unknown;
+  const lf = labelField as string || 'label';
+  const vf = valueField as string || 'value';
+
+  // source prop takes priority — accepts DataSource or ref to <pdx-data-source>
+  if (src) {
+    let ds: DataSource<Record<string, unknown>> | null = null;
+    if (isDataSource(src)) {
+      ds = src as DataSource<Record<string, unknown>>;
+    } else if (src instanceof HTMLElement && typeof (src as any).source === 'function') {
+      ds = (src as any).source();
+    }
+    if (ds) return { ds, external: true };
+  }
+
+  // Fallback: Context Protocol from ancestor <pdx-data-source>
+  const injected = inject(DataSourceContext, host, null);
+  if (injected && isDataSource(injected)) {
+    return { ds: injected as DataSource<Record<string, unknown>>, external: true };
+  }
+
+  if (isDataSource(opts)) return { ds: opts as DataSource<Record<string, unknown>>, external: true };
+  const arr = Array.isArray(opts) ? opts : [];
+  return {
+    ds: createDataSource({
+      data: normaliseOptions(arr, lf, vf) as any[],
+      pageSize: 0,
+      idField: 'value',
+      autoLoad: true,
+    }),
+    external: false,
+  };
+}
+const resolved = $derived(resolveSource());
+const dsRef = $derived(resolved.ds);
+const isExternalDS = $derived(resolved.external);
+
+// Filtered items (from DS or internal)
+function readFilteredItems(): NormalisedOption[] {
+  const ds = dsRef;
+  if (!ds) return [];
+  if (isExternalDS) {
+    const lf = labelField as string || 'label';
+    const vf = valueField as string || 'value';
+    return ds.data().map(entry => ({
+      label: String(entry[lf] ?? ''),
+      value: entry[vf] ?? entry,
+      _raw: entry,
+    }));
+  }
+  return ds.data() as unknown as NormalisedOption[];
+}
+const filteredItems = $derived(readFilteredItems());
+
+// Grouped items
+function readGroupedItems(): Map<string, NormalisedOption[]> | null {
+  const gf = groupField as string;
+  if (!gf) return null;
+  const groups = new Map<string, NormalisedOption[]>();
+  for (const entry of filteredItems) {
+    const raw = entry._raw as Record<string, unknown>;
+    const key = String(raw[gf] ?? '');
+    let bucket = groups.get(key);
+    if (!bucket) { bucket = []; groups.set(key, bucket); }
+    bucket.push(entry);
+  }
+  return groups;
+}
+const groupedItems = $derived(readGroupedItems());
+
+// Flat list for keyboard nav (respects grouping order)
+function readFlatItems(): NormalisedOption[] {
+  const grouped = groupedItems;
+  if (!grouped) return filteredItems;
+  const result: NormalisedOption[] = [];
+  for (const entries of grouped.values()) result.push(...entries);
+  return result;
+}
+const flatItems = $derived(readFlatItems());
+
+
+// ── Selection state ──
+// The value the component last wrote to its own model, so the sync below does not rebuild the
+// selection from it. A value, not a flag raised around the write: a template handler runs in a
+// batch, and the sync runs when the batch ends, after a flag would have been lowered.
+const NONE: unique symbol = Symbol('none');
+let ownValue: unknown = NONE;
+
+// Sync external value prop → internal selection (null/empty = clear).
+// One-way: parent sets el.value = x → selection updates (UI-01 prop reactivity).
+$effect(() => {
+  const v = value;
+  if (v === ownValue) return;
+  ownValue = NONE;
+  if (v === null || v === undefined || v === '') {
+    // pdx-ignore PDX_EFFECT_STATE: the selection is also what a pick, a removed tag and the clear button write; a value set from outside is one more writer
+    selectedValues = new Set();
+    return;
+  }
+  const mul = multiple;
+  if (mul && Array.isArray(v)) {
+    selectedValues = new Set(v);
+  } else if (mul && typeof v === 'string') {
+    // Multi value as comma-joined string (mirrors the hidden input format).
+    selectedValues = new Set(v.split(',').filter(s => s !== ''));
+  } else if (!mul) {
+    selectedValues = new Set([v]);
+  }
+});
+
+/**
+ * Writes the user's selection to the model, which dispatches `value-change` (#481). Single →
+ * the scalar value; multiple → the array. `ownValue` stops the sync above from rebuilding the
+ * selection from this same write.
+ */
+function reflectValue(): void {
+  const sel = selectedValues;
+  // Multiple: the ARRAY is written, not the comma-joined string — a join
+  // loses the type (numbers→strings on the round trip) and collides with
+  // values containing commas.
+  const next = multiple
+    ? Array.from(sel)
+    : (sel.size > 0 ? (sel.values().next().value ?? null) : null);
+  ownValue = next;
+  value = next;
+}
+
+/** What a form submits (#135): the values when multiple, else the first, or an empty entry. */
+function formEntry(): unknown {
+  const sel = Array.from(selectedValues);
+  if (multiple) return sel;
+  return sel.length > 0 ? sel[0] : '';
+}
+
+function readSelectedLabel(): string {
+  const sel = selectedValues;
+  if (sel.size === 0) return '';
+  const val = sel.values().next().value;
+  const found = flatItems.find(i => i.value === val);
+  return found?.label ?? String(val);
+}
+const selectedLabel = $derived(readSelectedLabel());
+
+function readSelectedItems(): NormalisedOption[] {
+  const sel = selectedValues;
+  return flatItems.filter(i => sel.has(i.value));
+}
+const selectedItems = $derived(readSelectedItems());
+
+// The tags the trigger shows, and how many it leaves out, under `maxTagCount` (N > 0).
+function readShownTags(): NormalisedOption[] {
+  const cap = maxTagCount as number;
+  return cap > 0 && selectedItems.length > cap ? selectedItems.slice(0, cap) : selectedItems;
+}
+const shownTags = $derived(readShownTags());
+const tagOverflow = $derived(selectedItems.length - shownTags.length);
+
+function readChosenItem(): NormalisedOption | null {
+  const sel = selectedValues;
+  if (sel.size === 0) return null;
+  const val = sel.values().next().value;
+  return flatItems.find(i => i.value === val) ?? null;
+}
+const chosenItem = $derived(readChosenItem());
+
+function isItemSelected(val: unknown): boolean {
+  return selectedValues.has(val);
+}
+
+// ── The combobox ──
+// One element has role="combobox", and it is the one that takes focus: the search input when
+// it sits in the trigger, else the trigger itself, so the same component never announces two
+// different things.
+const inTrigger = $derived(!!searchable && (!!multiple || searchPosition !== 'dropdown'));
+
+/** The highlighted option's id, while the list is open: what a screen reader announces. */
+function activeId(): string | null {
+  const idx = activeIndex;
+  return popupOpen && idx >= 0 ? uid + '-opt-' + idx : null;
+}
+
+/** Index of the first selected option in the list, or -1. */
+function selectedIndex(): number {
+  const sel = selectedValues.peek();
+  return sel.size === 0 ? -1 : displayItems.peek().findIndex(i => sel.has(i.value));
+}
+
+/** Open from the keyboard on an option: the selected one, else `fallback` (APG select-only). */
+function openOnOption(fallback: number): void {
+  openPopup();
+  if (!popupOpen) return;
+  const sel = selectedIndex();
+  activeIndex = sel >= 0 ? sel : fallback;
+  scrollActiveIntoView();
+}
+
+// A <label for="{host id}"> names the host, which is labelable because it is form-associated,
+// and not the combobox inside it, which would stay unnamed. The label's id goes on the
+// combobox, unless something already names it. The host's labels come from its
+// ElementInternals (#987), with no query on the document.
+onNextFrame(() => {
+  const labelEl = host.labels[0];
+  const cb = host.querySelector('[role="combobox"]');
+  if (!labelEl || !cb || cb.hasAttribute('aria-labelledby') || cb.hasAttribute('aria-label')) return;
+  if (!labelEl.id) labelEl.id = uid + '-label';
+  cb.setAttribute('aria-labelledby', labelEl.id);
+});
+
+// ── Type-ahead ──
+// Printable keys on a select that has no search field: the NEXT option starting with what was
+// typed, cycling when the same letter repeats (APG listbox). Closed and single, it picks that
+// option, as a native <select> does; open, or multiple, it moves the highlight.
+const TYPE_AHEAD_TIMEOUT = 500;        // focusGroup's and activeDescendant's default
+let typeBuffer = '';
+let typeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function typeAhead(char: string): void {
+  typeBuffer += char.toLowerCase();
+  if (typeTimer) clearTimeout(typeTimer);
+  typeTimer = setTimeout(() => { typeBuffer = ''; typeTimer = null; }, TYPE_AHEAD_TIMEOUT);
+  const entries = displayItems;
+  if (entries.length === 0) return;
+  const current = popupOpen ? activeIndex : selectedIndex();
+  const find = (needle: string): number => {
+    for (let i = 1; i <= entries.length; i++) {
+      const idx = (current + i + entries.length) % entries.length;
+      if (entries[idx].label.toLowerCase().startsWith(needle)) return idx;
+    }
+    return -1;
+  };
+  let idx = find(typeBuffer);
+  if (idx < 0 && [...typeBuffer].every(c => c === typeBuffer[0])) idx = find(typeBuffer[0]);
+  if (idx < 0) return;
+  if (!popupOpen && !multiple) {
+    if (!isItemSelected(entries[idx].value)) selectItem(entries[idx]);
+    return;
+  }
+  if (!popupOpen) openPopup();
+  activeIndex = idx;
+  scrollActiveIntoView();
+}
+
+// ── Open/close ──
+let popover: ReturnType<typeof usePopover> | null = null;
+let overlayId = '';
+let virtualizerDispose: (() => void) | null = null;
+
+function openPopup() {
+  if (disabled || readonly || popupOpen) return;
+  popupOpen = true;
+  query = '';
+  userTyped = false;
+  activeIndex = -1;
+  // Lazy load: if external DataSource has no data yet, trigger refresh
+  const ds = dsRef;
+  if (ds && isExternalDS && ds.data().length === 0 && !ds.isLoading()) {
+    ds.refresh();
+  }
+  openChange({ value: true });
+}
+
+function closePopup() {
+  if (!popupOpen) return;
+  popupOpen = false;
+  // Only reset filter if user had typed a search query (avoids needless refetch). Read before
+  // the query is emptied: read after, it was always empty and the filter stayed on the source.
+  const searched = query.peek() !== '';
+  query = '';
+  if (isExternalDS && dsRef && searched) {
+    // A remote search still waiting for its debounce would put the filter back.
+    if (searchDebounceTimer) { clearTimeout(searchDebounceTimer); searchDebounceTimer = null; }
+    dsRef!.setFilter([]);
+  }
+  openChange({ value: false });
+}
+
+function togglePopup() {
+  if (popupOpen) closePopup(); else openPopup();
+}
+
+// ── Selection actions ──
+function selectItem(entry: NormalisedOption) {
+  if (multiple) {
+    const set = new Set(selectedValues);
+    if (set.has(entry.value)) set.delete(entry.value);
+    else set.add(entry.value);
+    selectedValues = set;
+    reflectValue();
+  } else {
+    selectedValues = new Set([entry.value]);
+    reflectValue();
+    closePopup();
+  }
+}
+
+function removeTag(val: unknown) {
+  const set = new Set(selectedValues);
+  set.delete(val);
+  selectedValues = set;
+  reflectValue();
+}
+
+function clearSelection() {
+  selectedValues = new Set();
+  reflectValue();
+  pdxClear();
+}
+
+// ── Search ──
+function onSearchInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value;
+  // Open first: opening empties the query, and a key typed in a field whose list was closed —
+  // by Escape, with the focus left in it — would be dropped, the list showing every option.
+  if (!popupOpen) openPopup();
+  userTyped = true;
+  query = val;
+  activeIndex = -1;
+  pdxSearch({ query: val });
+
+  if (isExternalDS && dsRef) {
+    const lf = labelField as string || 'label';
+    const ds = dsRef!;
+
+    if (remote) {
+      // Remote mode: debounce server-side filter
+      if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => {
+        if (val) {
+          ds.setFilter([{ field: lf, operator: 'contains', value: val }]);
+        } else {
+          ds.setFilter([]);
+        }
+      }, debounce as number);
+    } else {
+      // Local DS: filter immediately
+      if (val) {
+        ds.setFilter([{ field: lf, operator: 'contains', value: val }]);
+      } else {
+        ds.setFilter([]);
+      }
+    }
+  }
+}
+
+/** The search field in the trigger opens the list as it takes focus, and selects what it shows. */
+function onSearchFocus(e: Event) {
+  // Open directly, not a faked click — onTriggerClick(new Event('click')) —
+  // whose target is null, so every focus would throw on target.closest().
+  // onTriggerClick is for real clicks, where target is set.
+  openPopup();
+  const inp = e.target as HTMLInputElement;
+  if (inp.value) requestAnimationFrame(() => inp.select());
+}
+
+// Client-side filter for array mode
+function readDisplayItems(): NormalisedOption[] {
+  const q = query.toLowerCase();
+  if (!q || isExternalDS) return flatItems;
+  return flatItems.filter(i => i.label.toLowerCase().includes(q));
+}
+const displayItems = $derived(readDisplayItems());
+
+// Creatable: show "Create X" when query has no exact match
+function readShowCreateOption(): boolean {
+  if (!creatable) return false;
+  const q = query.trim();
+  if (!q) return false;
+  return !displayItems.some(i => i.label.toLowerCase() === q.toLowerCase());
+}
+const showCreateOption = $derived(readShowCreateOption());
+
+/** The create option's text: the `create-label` template, or the component string, with the query. */
+function createText(): string {
+  return ((createLabel as unknown as string) || uiString('select', 'create')).replace('{query}', query);
+}
+
+function createOption() {
+  const q = query.trim();
+  if (!q) return;
+  const newItem: NormalisedOption = { label: q, value: q, _raw: q };
+  pdxCreate({ value: q, label: q });
+  selectItem(newItem);
+  query = '';
+}
+
+/** What the status region says while open: how many options there are. */
+function statusText(): string {
+  const n = displayItems.length;
+  return popupOpen ? (n === 0 ? uiString('select', 'noResults') : format(uiString('select', 'optionsAvailable'), { n })) : '';
+}
+
+// ── Keyboard ──
+function onTriggerKeydown(e: KeyboardEvent) {
+  if (disabled || readonly) return;
+
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      if (!popupOpen) openOnOption(0);
+      else moveActive(1);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      if (!popupOpen) openOnOption(displayItems.length - 1);
+      else moveActive(-1);
+      break;
+    case 'Enter':
+    case ' ':
+      if (searchable && e.key === ' ') return; // allow space in search
+      // A space inside a type-ahead run is part of the name ("New York").
+      if (e.key === ' ' && typeBuffer) { e.preventDefault(); typeAhead(' '); break; }
+      e.preventDefault();
+      if (popupOpen) {
+        const idx = activeIndex;
+        const entries = displayItems;
+        if (idx >= 0 && idx < entries.length) {
+          selectItem(entries[idx]);
+        } else if (showCreateOption) {
+          // No item selected but create option is available
+          createOption();
+        }
+      } else {
+        openOnOption(0);
+      }
+      break;
+    case 'Escape':
+      if (popupOpen) {
+        e.preventDefault();
+        e.stopPropagation();
+        closePopup();
+      }
+      break;
+    case 'Home':
+      if (popupOpen) { e.preventDefault(); activeIndex = 0; }
+      break;
+    case 'End':
+      if (popupOpen) { e.preventDefault(); activeIndex = displayItems.length - 1; }
+      break;
+    case 'Backspace':
+      if (multiple && searchable && query === '') {
+        // Remove last tag
+        const sel = Array.from(selectedValues);
+        if (sel.length > 0) removeTag(sel[sel.length - 1]);
+      }
+      break;
+    default:
+      if (!searchable && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        typeAhead(e.key);
+      }
+  }
+}
+
+function moveActive(delta: number) {
+  const entries = displayItems;
+  if (entries.length === 0) return;
+  let idx = activeIndex + delta;
+  if (idx < 0) idx = entries.length - 1;
+  else if (idx >= entries.length) idx = 0;
+  activeIndex = idx;
+  scrollActiveIntoView();
+}
+
+function scrollActiveIntoView() {
+  const idx = activeIndex;
+  const el = host.querySelector(`[data-option-index="${idx}"]`) as HTMLElement;
+  el?.scrollIntoView({ block: 'nearest' });
+}
+
+// A mousedown in the list would move focus out of the select — the options are not
+// focusable, so it lands on body — and Escape, handled by the trigger, would no longer close
+// a multiple list that stays open after a pick (#379). Focus stays on the trigger.
+function onListMousedown(e: Event) {
+  e.preventDefault();
+}
+
+function onOptionClick(e: Event, entry: NormalisedOption) {
+  e.preventDefault();
+  e.stopPropagation();
+  selectItem(entry);
+}
+
+// ── Popover setup ──
+// Popover setup: deferred to after mount (querySelector needs rendered DOM)
+let popoverDispose: (() => void) | null = null;
+queueMicrotask(() => {
+  const triggerEl = host.querySelector('.pdx-select-trigger') as HTMLElement;
+  const dropdownEl = host.querySelector('.pdx-select-dropdown') as HTMLElement;
+  if (!triggerEl || !dropdownEl) return;
+
+  popover = usePopover({
+    trigger: 'manual',
+    placement: 'bottom-start' as PopoverPlacement,
+    // No offset: the gap comes from `--pdx-float-offset`, not a literal 4 beside
+    // the token declaring the same number.
+    flip: true,
+    dismissOnOutside: true,
+    dismissOnEscape: false, // handled by onTriggerKeydown
+    container: host, // light DOM: trigger + content are siblings inside host CE
+    onOpenChange: (isOpen) => {
+      if (!isOpen && popupOpen.peek()) closePopup();
+    },
+  });
+
+  popover.setTrigger(triggerEl);
+  popover.setContent(dropdownEl);
+
+  // Sync popupOpen → popover + overlayStack
+  const disposeSync = effect(() => {
+    const isOpen = popupOpen;
+    if (!popover) return;
+    if (isOpen) {
+      // Match dropdown width to trigger
+      dropdownEl.style.width = triggerEl.offsetWidth + 'px';
+      popover.open();
+      overlayId = uid;
+      const zIndex = overlayStack.push(overlayId);
+      dropdownEl.style.zIndex = String(zIndex);
+
+      // Focus search input if searchable
+      requestAnimationFrame(() => {
+        const searchInput = host.querySelector('.pdx-select-search, .pdx-select-tag-search, .pdx-select-dropdown-search') as HTMLInputElement;
+        if (searchInput) searchInput.focus();
+      });
+    } else {
+      popover.close();
+      dropdownEl.style.zIndex = '';
+      if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+    }
+  });
+
+  popoverDispose = () => {
+    disposeSync();
+    popover?.dispose();
+    popover = null;
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+  };
+});
+
+// ── Virtual scroll (auto-activate for large lists) ──
+const VIRTUAL_THRESHOLD = 100;
+const ITEM_HEIGHT = 36; // estimated option height
+
+const useVirtual = $derived(displayItems.length > VIRTUAL_THRESHOLD);
+
+let virtualItems = $signal<{ index: number; offsetStart: number; size: number }[]>([]);
+let virtualTotalSize = $signal(0);
+
+$effect(() => {
+  virtualizerDispose?.();
+  virtualizerDispose = null;
+
+  if (!useVirtual || !popupOpen) {
+    // pdx-ignore PDX_EFFECT_STATE: the window of a virtualizer this effect creates and disposes, copied out of it; none while closed
+    virtualItems = [];
+    // pdx-ignore PDX_EFFECT_STATE: as `virtualItems`, the virtualizer's total height
+    virtualTotalSize = 0;
+    return;
+  }
+
+  const listEl = host.querySelector('.pdx-select-list') as HTMLElement;
+  if (!listEl) return;
+
+  const virt = createVirtualizer({
+    count: () => displayItems.length,
+    estimateSize: () => ITEM_HEIGHT,
+    overscan: 5,
+    getScrollElement: () => listEl,
+  });
+
+  const disposeItems = effect(() => {
+    virtualItems = virt.items();
+    virtualTotalSize = virt.totalSize();
+  });
+
+  virtualizerDispose = () => {
+    disposeItems();
+    virt.dispose();
+  };
+
+  return () => {
+    virtualizerDispose?.();
+    virtualizerDispose = null;
+  };
+});
+
+/**
+ * The list's rows, the three modes the TypeScript version drew in three templates: the virtual
+ * window of the options, placed absolutely; each group's header then its options, indexed across
+ * the groups; or every option.
+ */
+function readRows(): ListRow[] {
+  const entries = displayItems;
+  if (useVirtual) {
+    return virtualItems.filter(vi => !!entries[vi.index]).map(vi => ({
+      key: 'o:' + vi.index, opt: entries[vi.index], idx: vi.index,
+      style: 'position:absolute;top:0;left:0;right:0;height:' + vi.size + 'px;transform:translateY(' + vi.offsetStart + 'px)',
+    }));
+  }
+  const grouped = groupedItems;
+  if (grouped) {
+    const out: ListRow[] = [];
+    let globalIdx = 0;
+    for (const [groupName, groupEntries] of grouped) {
+      out.push({ key: 'h:' + groupName, header: groupName, idx: -1, style: '' });
+      for (const entry of groupEntries) {
+        const idx = globalIdx++;
+        out.push({ key: 'o:' + idx, opt: entry, idx, style: '' });
+      }
+    }
+    return out;
+  }
+  return entries.map((entry, idx) => ({ key: 'o:' + idx, opt: entry, idx, style: '' }));
+}
+const rows = $derived(readRows());
+
+// ── Click handling ──
+function onTriggerClick(e: Event) {
+  const target = e.target as HTMLElement;
+  if (target.closest('.pdx-input-clear') || target.closest('.pdx-chip-remove')) return;
+  // A click in the search field opens and never closes: its focus has just opened the list
+  // (the click follows the focus), and a toggle here would close it again.
+  if (target.closest('.pdx-select-search')) { openPopup(); return; }
+  togglePopup();
+}
+
+// Computed loading: prop OR DataSource.isLoading
+function readLoading(): boolean {
+  if (loading) return true;
+  const ds = dsRef;
+  return ds ? ds.isLoading() : false;
+}
+const isLoading = $derived(readLoading());
+
+// Cleanup on disconnect: the popover, and the debounce and type-ahead timers.
+onDestroy(() => {
+  popoverDispose?.();
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  if (typeTimer) clearTimeout(typeTimer);
+});
+
+// ── The imperative API ──
+function selectedItem(): unknown {
+  const raws = selectedItems.map(i => i._raw);
+  if (multiple) return raws;
+  return raws.length > 0 ? raws[0] : null;
+}
+function focus() { (host.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); }
+function blur() { (host.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); }
+function clear() { clearSelection(); }
+/** Open the popup. */
+function show() { openPopup(); }
+/** Close the popup. */
+function close() { closePopup(); }
+/** Open the popup when closed, close it when open. */
+function toggle() { togglePopup(); }
+</script>

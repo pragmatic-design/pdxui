@@ -12,7 +12,7 @@ import '../../src/json-editor/pdx-json-editor.pdx';
 import '../../src/input/pdx-input.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 import '../../src/button/pdx-button.pdx';
 
 type Editor = HTMLElement & { schema: unknown; value: unknown };

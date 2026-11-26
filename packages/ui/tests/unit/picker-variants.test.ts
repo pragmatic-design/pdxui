@@ -2,7 +2,7 @@
 // `@variant` rules key on it, and no longer assembled into a class on their own elements.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';

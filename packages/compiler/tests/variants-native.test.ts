@@ -53,17 +53,19 @@ describe('the descriptor declares the axes under variants', () => {
         expect(code).not.toContain("':variant'");
     });
 
-    it('the pilot\'s select declares its sizes as the TypeScript select does', () => {
-        const pilot = compile(readFileSync(join(UI, 'pilot', 'select.pdx'), 'utf8'), join(UI, 'pilot', 'select.pdx'), undefined, undefined, { prefix: 'pdx' }).code;
-        const written = /variants: (\{ size: \{[^}]*\} \}),/.exec(pilot)?.[1];
-        expect(written, 'the pilot declares no size axis with selectors').toBeDefined();
-        const ts = readFileSync(join(UI, 'src', 'select', 'pdx-select.ts'), 'utf8');
-        // Match: the TypeScript descriptor's size record. Groups: [1]=its entries
-        const record = /size: \{ ([^}]*) \}/.exec(ts)![1];
-        const tsSizes = Object.fromEntries([...record.matchAll(/(\w+): '([^']*)'/g)].map((m) => [m[1], m[2]]));
-        const pilotSizes = JSON.parse(written!.replace(/^\{ size: /, '').replace(/ \}$/, ''));
-        expect(pilotSizes).toEqual(tsSizes);
-        expect(Object.keys(pilotSizes)[0], 'the default first, as core reads it').toBe(Object.keys(tsSizes)[0]);
+    // The select moved to .pdx (#1210): its TypeScript version is gone, and the sizes it declared are
+    // in the declaration recorded from it before the move (packages/ui/tests/fixtures/ts-declarations).
+    it('the select compiled from .pdx declares its sizes as its TypeScript version did', () => {
+        const file = join(UI, 'src', 'select', 'pdx-select.pdx');
+        const compiled = compile(readFileSync(file, 'utf8'), file, undefined, undefined, { prefix: 'pdx' }).code;
+        const written = /variants: (\{ size: \{[^}]*\} \}),/.exec(compiled)?.[1];
+        expect(written, 'the select declares no size axis with selectors').toBeDefined();
+        const recorded = JSON.parse(readFileSync(join(UI, 'tests', 'fixtures', 'ts-declarations', 'pdx-select.json'), 'utf8')) as
+            { variants: { name: string; native: Record<string, string> }[] };
+        const tsSizes = recorded.variants.find((v) => v.name === 'size')!.native;
+        const pdxSizes = JSON.parse(written!.replace(/^\{ size: /, '').replace(/ \}$/, ''));
+        expect(pdxSizes).toEqual(tsSizes);
+        expect(Object.keys(pdxSizes)[0], 'the default first, as core reads it').toBe(Object.keys(tsSizes)[0]);
     });
 });
 

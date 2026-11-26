@@ -4,7 +4,7 @@
 // props would hold the FUNCTION (`el.options` on a pdx-select with no options would be a function).
 // This pins the six that declare one.
 import { describe, it, expect, afterEach } from 'vitest';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 import '../../src/autocomplete/pdx-autocomplete.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/page-header/pdx-page-header.pdx';

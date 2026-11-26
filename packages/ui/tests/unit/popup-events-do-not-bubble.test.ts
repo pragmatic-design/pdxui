@@ -12,7 +12,7 @@ import { join, relative } from 'node:path';
 import { cleanup, tick } from './helpers';
 import '../../src/dialog/pdx-dialog.pdx';
 import '../../src/drawer/pdx-drawer.pdx';
-import '../../src/select/pdx-select';
+import '../../src/select/pdx-select.pdx';
 import '../../src/date-picker/pdx-date-picker.pdx';
 import '../../src/form/pdx-form.pdx';
 import '../../src/input/pdx-input.pdx';

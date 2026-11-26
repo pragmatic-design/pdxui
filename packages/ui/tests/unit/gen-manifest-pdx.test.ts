@@ -25,35 +25,16 @@ function declarationOf(relPath: string): Declaration[] {
     return mods.map((m) => m.declarations[0]);
 }
 
-// The switch's pair left when the switch moved to src/ (#1008): switch-is-pdx.test.ts holds its
-// declaration to the one recorded from its TypeScript version.
-const PAIRS = [
-    { pdx: 'pilot/select.pdx', ts: 'src/select/pdx-select.ts' },
-];
-
+// The pilot's pairs left as their components moved to src/: the switch's (#1008), held since by
+// switch-is-pdx.test.ts, and the select's (#1210), held by ported-components.test.ts, which compares
+// every moved tag's declaration with the one recorded from its TypeScript version, field by field.
 describe('a .pdx component in the manifest, against its TypeScript version', () => {
-    for (const { pdx, ts } of PAIRS) {
-        it(`${pdx} is read`, () => {
-            const found = declarationOf(pdx);
-            expect(found.map((d) => d.tagName)).toEqual(declarationOf(ts).map((d) => d.tagName));
-        });
-
-        it(`${pdx} declares what ${ts} declares`, () => {
-            const [fromTs] = declarationOf(ts);
-            const [fromPdx] = declarationOf(pdx);
-            expect(fromPdx, 'the .pdx was not read').toBeDefined();
-            // Field by field, and every field that differs at once, so a difference names its field
-            // rather than the whole declaration.
-            const keys = [...new Set([...Object.keys(fromTs), ...Object.keys(fromPdx)])].sort();
-            const differing = keys
-                .filter((key) => JSON.stringify(fromPdx[key]) !== JSON.stringify(fromTs[key]))
-                .map((key) => ({ key, ts: fromTs[key], pdx: fromPdx[key] }));
-            expect(differing).toEqual([]);
-        });
-    }
+    it('reads a moved component as a .pdx, under its tag', () => {
+        expect(declarationOf('src/select/pdx-select.pdx').map((d) => d.tagName)).toEqual(['pdx-select']);
+    });
 
     it('the control: a TypeScript component is read as before', () => {
-        expect(declarationOf('src/select/pdx-select.ts').map((d) => d.tagName)).toEqual(['pdx-select']);
+        expect(declarationOf('src/wizard/pdx-wizard.ts').map((d) => d.tagName)).toEqual(['pdx-wizard']);
     });
 });
 

@@ -26835,7 +26835,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/select/pdx-select.ts",
+      "path": "src/select/pdx-select.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -27566,7 +27566,7 @@
           "name": "pdx-select",
           "declaration": {
             "name": "PdxSelect",
-            "module": "src/select/pdx-select.ts"
+            "module": "src/select/pdx-select.pdx"
           }
         }
       ]
