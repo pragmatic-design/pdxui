@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
 import { cleanup, tick, whenUpgraded } from './helpers';
 
-import '../../src/tabs/pdx-tabs';
+import '../../src/tabs/pdx-tabs.pdx';
 import '../../src/pagination/pdx-pagination.pdx';
 import '../../src/wizard/pdx-wizard';
 

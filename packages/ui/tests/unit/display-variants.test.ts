@@ -4,7 +4,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/card/pdx-card.pdx';
 import '../../src/fieldset/pdx-fieldset.pdx';
-import '../../src/tabs/pdx-tabs';
+import '../../src/tabs/pdx-tabs.pdx';
 import '../../src/description-list/pdx-description-list.pdx';
 import '../../src/statistic/pdx-statistic.pdx';
 import '../../src/wizard/pdx-wizard';

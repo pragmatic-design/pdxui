@@ -60,7 +60,7 @@
       "import": "./dist/accordion/pdx-accordion.js"
     },
     "./tabs": {
-      "development": "./src/tabs/pdx-tabs.ts",
+      "development": "./src/tabs/pdx-tabs.pdx",
       "types": "./dist/tabs/pdx-tabs.d.ts",
       "import": "./dist/tabs/pdx-tabs.js"
     },

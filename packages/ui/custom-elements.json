@@ -30076,7 +30076,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tabs/pdx-tabs.ts",
+      "path": "src/tabs/pdx-tabs.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -30362,7 +30362,7 @@
           "name": "pdx-tabs",
           "declaration": {
             "name": "PdxTabs",
-            "module": "src/tabs/pdx-tabs.ts"
+            "module": "src/tabs/pdx-tabs.pdx"
           }
         }
       ]

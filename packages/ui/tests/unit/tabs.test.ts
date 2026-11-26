@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/tabs/pdx-tabs';
+import '../../src/tabs/pdx-tabs.pdx';
 
 describe('pdx-tabs', () => {
     beforeEach(cleanup);

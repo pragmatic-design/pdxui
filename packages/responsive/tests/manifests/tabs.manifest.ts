@@ -6,7 +6,7 @@
  * its runtime logic (ARIA setup, indicator, focusGroup roving). Selectors and
  * scenarios differ because the real DOM differs.
  *
- * ── Verified DOM structure (packages/ui/src/tabs/pdx-tabs.ts) ──
+ * ── Verified DOM structure (packages/ui/src/tabs/pdx-tabs.pdx) ──
  *   render() = `<slot></slot>` → the children the dev writes are projected as
  *   DIRECT children of the <pdx-tabs> host (light DOM, no shadow). Canonical markup
  *   (verified in demo/showcase-new/pages/comp-tabs.pdx):
@@ -58,8 +58,8 @@
  *   the active panel below the tablist (horizontal).
  *
  * ── Export/registration: VERIFIED ──
- *   · packages/ui/package.json:143 → "./tabs": { "import": "./src/tabs/pdx-tabs.ts" } ✓
- *   · packages/ui/src/index.ts:98  → import './tabs/pdx-tabs'; ✓
+ *   · packages/ui/package.json:143 → "./tabs": { "import": "./src/tabs/pdx-tabs.pdx" } ✓
+ *   · packages/ui/src/index.ts:98  → import './tabs/pdx-tabs.pdx'; ✓
  *   No registration blocker.
  *
  * ── No blocking BUG. Minor notes ──
