@@ -1,0 +1,153 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxMenubar",
+  "tagName": "pdx-menubar",
+  "category": "Navigation",
+  "order": 58,
+  "description": "A horizontal menu bar whose entries open dropdown submenus, as in File, Edit, View.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "items",
+      "description": "Top-level menu items",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "trigger",
+      "description": "Open mode: 'click' (default) opens on a click, and then the pointer moves between menus\nwhile one is open, as a desktop menubar does; 'hover' opens on mouseenter alone.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'click'",
+      "attribute": "trigger"
+    },
+    {
+      "kind": "method",
+      "name": "openMenu",
+      "parameters": [
+        {
+          "name": "key",
+          "type": {
+            "text": "string"
+          }
+        },
+        {
+          "name": "focus",
+          "type": {
+            "text": "'first' | 'last'"
+          },
+          "optional": true
+        }
+      ],
+      "description": "Open one top-level menu by key, focusing its first item (its last with 'last'). A disabled or unknown key opens nothing."
+    },
+    {
+      "kind": "method",
+      "name": "closeMenu",
+      "parameters": [
+        {
+          "name": "_resetHasOpened",
+          "type": {
+            "text": "boolean"
+          }
+        }
+      ],
+      "description": "Close the open menu and any submenu under it. The boolean it takes is not read."
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "An entry was chosen: its `key` and its item.",
+      "detail": "{ key: string; item: MenuItem }"
+    },
+    {
+      "name": "pdx-check",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "A checkbox or radio entry was toggled: its `key`, whether it is checked, its radio group.",
+      "detail": "{ key: string; checked: boolean | undefined; radioGroup?: string; item: MenuItem }"
+    }
+  ],
+  "roles": [
+    "menu",
+    "menubar",
+    "menuitem",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "presentation",
+    "separator"
+  ],
+  "attributes": [
+    {
+      "name": "trigger",
+      "fieldName": "trigger",
+      "description": "Open mode: 'click' (default) opens on a click, and then the pointer moves between menus\nwhile one is open, as a desktop menubar does; 'hover' opens on mouseenter alone.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'click'"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "MenubarItem",
+      "fields": [
+        "key: string",
+        "label: string",
+        "children?: MenuItem[]",
+        "mega?: boolean",
+        "megaColumns?: MegaColumn[]",
+        "disabled?: boolean"
+      ]
+    },
+    {
+      "name": "MegaColumn",
+      "fields": [
+        "title: string",
+        "items: MenuItem[]"
+      ]
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "bar",
+      "description": "The `role=\"menubar\"` row of triggers."
+    },
+    {
+      "name": "trigger",
+      "description": "A top-level entry; the one whose menu is open is `aria-expanded=\"true\"`."
+    },
+    {
+      "name": "panel",
+      "description": "The open menu, `role=\"menu\"` (on `<body>`)."
+    },
+    {
+      "name": "item",
+      "description": "An entry of the open menu, or of a submenu."
+    },
+    {
+      "name": "separator",
+      "description": "The rule between two groups of entries."
+    },
+    {
+      "name": "label",
+      "description": "A group's label."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "One of its menus is open."
+    }
+  ]
+}

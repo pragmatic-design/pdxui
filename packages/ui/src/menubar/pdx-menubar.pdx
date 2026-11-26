@@ -1,0 +1,660 @@
+<template></template>
+
+<script>
+/**
+ * A horizontal menu bar whose entries open dropdown submenus, as in File, Edit, View.
+ *
+ * @csspart bar - The `role="menubar"` row of triggers.
+ * @csspart trigger - A top-level entry; the one whose menu is open is `aria-expanded="true"`.
+ * @csspart panel - The open menu, `role="menu"` (on `<body>`).
+ * @csspart item - An entry of the open menu, or of a submenu.
+ * @csspart separator - The rule between two groups of entries.
+ * @csspart label - A group's label.
+ * @cssstate open - One of its menus is open.
+ */
+// pdx-menubar — Horizontal menu bar (File | Edit | View ...) with dropdown submenus.
+// Supports: nested submenus, checkbox/radio items, icons, shortcuts, mega menu panels,
+// Arrow L/R between top-level items, Arrow Down to open, full WAI-ARIA menubar pattern.
+//
+// The bar is built by the script, a frame after mount, and its panels when a menu opens, as the
+// TypeScript version built them.
+import { focusGroup, onNextFrame } from '@pdxui/core';
+import type { Dispose } from '@pdxui/core';
+// A menubar is painted by menu.css — the rules are named after the MENU, not after this
+// component, so the import is easy to miss, and without it a page that renders a menubar has to
+// load the whole library to paint it.
+import '@pdxui/design/components/menu';
+import type { MenuItem } from '../menu/menu-types';
+import { sanitizeSVG } from '../shared/sanitize';
+import { uiString, uiAttr } from '../shared/i18n';
+import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
+import { onPressOutside } from '../shared/press-outside';
+/** `pdx-icon` the first time an item names an icon: a use that draws none never pays for the icon set. */
+function loadIcon(): void {
+  if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon.pdx');
+}
+
+export interface MenubarItem {
+  /** Unique key */
+  key: string;
+  /** Display label */
+  label: string;
+  /** Dropdown items (regular menu) */
+  children?: MenuItem[];
+  /** Mega menu: HTML content string for rich panel */
+  mega?: boolean;
+  /** Mega menu column groups */
+  megaColumns?: MegaColumn[];
+  /** Disabled */
+  disabled?: boolean;
+}
+
+export interface MegaColumn {
+  title: string;
+  items: MenuItem[];
+}
+
+// Which menu is open is the user's gesture, read back by nobody: no model (#289).
+/** An entry was chosen: its `key` and its item. */
+@event 'pdx-select': { key: string; item: MenuItem };
+/** A checkbox or radio entry was toggled: its `key`, whether it is checked, its radio group. */
+@event 'pdx-check': { key: string; checked: boolean | undefined; radioGroup?: string; item: MenuItem };
+// Set where the TypeScript version set it, when a menu opens and closes (#1436).
+@state open;
+// The bar, its triggers, the panels and their entries are built by the script.
+@part(external) bar, trigger, panel, item, separator, label;
+/** Top-level menu items */
+@prop items: unknown[] = [];
+/** Open mode: 'click' (default) opens on a click, and then the pointer moves between menus
+ *  while one is open, as a desktop menubar does; 'hover' opens on mouseenter alone. */
+@prop trigger: string = 'click';
+@host host;
+// The alpha handle `host.__menubar` is gone (#289): `openMenu()` and `closeMenu()` are on the host.
+@expose openMenu, closeMenu;
+
+/** The key of the open menu, '' for none. Read by the handlers, never reactively. */
+let activeKey = '';
+let barEl: HTMLElement | null = null;
+let panelEl: HTMLElement | null = null;
+let focusDispose: Dispose | null = null;
+let panelFocusDispose: Dispose | null = null;
+/** Removes the press-outside listener, added when a menu opens (#427). */
+let outsideDispose: (() => void) | null = null;
+let escHandler: ((e: KeyboardEvent) => void) | null = null;
+let activeSubmenuKey = '';
+// The open submenu, on <body>: one at a time, since opening one closes the other. Held, not looked
+// up by its key in the document, where another menubar's submenu may carry the same key.
+let subEl: HTMLElement | null = null;
+let subMenuCloseTimer: ReturnType<typeof setTimeout> | null = null;
+let barLeaveTimer: ReturnType<typeof setTimeout> | null = null;
+let mouseInPanel = false;
+let scrollHandler: (() => void) | null = null;
+// The menu the pointer opened by arriving on its item. The click that follows the hover is
+// the same gesture: it must not close the menu the hover has just opened. Only a menu that
+// was open before the pointer arrived is closed by a click.
+let hoverOpenedKey = '';
+
+function getItems(): MenubarItem[] {
+  return items as unknown as MenubarItem[];
+}
+
+// ─── Open a top-level menu ───────────────────────────
+// `focus`: the entry that takes focus — the first, or the last (ArrowUp on the item).
+/** Open one top-level menu by key, focusing its first item (its last with 'last'). A disabled or unknown key opens nothing. */
+function openMenu(key: string, focus: 'first' | 'last' = 'first'): void {
+  const all = getItems();
+  const entry = all.find(i => i.key === key);
+  if (!entry || entry.disabled) return;
+  if (activeKey === key) return;
+
+  closeMenu(false);
+  activeKey = key;
+  open = true;
+
+  // The open menu's trigger is its aria-expanded, which menu.css selects: no class (#289).
+  if (barEl) {
+    barEl.querySelectorAll('.pdx-menubar-trigger').forEach(t => {
+      t.setAttribute('aria-expanded', t.getAttribute('data-menubar-key') === key ? 'true' : 'false');
+    });
+  }
+
+  // Build panel
+  if (panelEl) panelEl.remove();
+  panelEl = document.createElement('div');
+  panelEl.className = 'pdx-menubar-panel' + (entry.mega ? ' pdx-menubar-mega' : '');
+  panelEl.setAttribute('data-part', 'panel');
+  panelEl.setAttribute('role', 'menu');
+  panelEl.style.position = 'fixed';
+  panelEl.style.zIndex = '1000';
+  panelEl.style.background = 'var(--pdx-color-surface)';
+  panelEl.style.border = '1px solid var(--pdx-color-border)';
+  panelEl.style.borderRadius = 'var(--pdx-radius-md)';
+  panelEl.style.boxShadow = 'var(--pdx-shadow-lg)';
+
+  if (entry.mega && entry.megaColumns?.length) {
+    buildMegaPanel(entry.megaColumns, panelEl);
+  } else if (entry.children?.length) {
+    panelEl.classList.add('pdx-menu');
+    panelEl.style.minWidth = '200px';
+    buildMenuItems(entry.children, panelEl);
+  }
+
+  document.body.appendChild(panelEl);
+  positionPanel(key);
+
+  // Reposition on scroll/resize
+  if (scrollHandler) { window.removeEventListener('scroll', scrollHandler, true); window.removeEventListener('resize', scrollHandler); }
+  scrollHandler = () => positionPanel(key);
+  window.addEventListener('scroll', scrollHandler, { capture: true, passive: true });
+  window.addEventListener('resize', scrollHandler, { passive: true });
+
+  // Track mouse in panel (for hover close delay)
+  panelEl.addEventListener('mouseenter', () => {
+    mouseInPanel = true;
+    if (barLeaveTimer) { clearTimeout(barLeaveTimer); barLeaveTimer = null; }
+  });
+  panelEl.addEventListener('mouseleave', () => {
+    mouseInPanel = false;
+    // Close after leaving panel (unless re-entering bar)
+    barLeaveTimer = setTimeout(() => {
+      if (!mouseInPanel && activeKey) {
+        closeMenu(false);
+      }
+    }, 150);
+  });
+
+  // Panel keyboard
+  panelEl.addEventListener('keydown', onPanelKeydown);
+
+  // Focus group for panel items
+  if (panelFocusDispose) panelFocusDispose();
+  panelFocusDispose = focusGroup(panelEl, {
+    selector: '.pdx-menu-item:not([disabled])',
+    orientation: 'vertical',
+    wrap: true,
+    typeAhead: true,
+    onSelect: (el) => el.click(),
+  });
+
+  // Focus the first item, or the last
+  requestAnimationFrame(() => focusPanelEntry(focus));
+
+  // Click-outside
+  outsideDispose = onPressOutside({
+    inside: (t) => {
+      if (barEl?.contains(t) || panelEl?.contains(t)) return true;
+      // Check submenus
+      return !!subEl?.contains(t);
+    },
+    outside: () => closeMenu(true),
+  });
+
+  // Escape
+  escHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (activeSubmenuKey) {
+        closeSubmenu();
+        const opener = panelEl?.querySelector(`[data-menu-key="${activeSubmenuKey}"]`) as HTMLElement;
+        if (opener) opener.focus();
+      } else {
+        closeMenu(true);
+        // Refocus the bar trigger
+        const opener = barEl?.querySelector(`[data-menubar-key="${key}"]`) as HTMLElement;
+        if (opener) opener.focus();
+      }
+    }
+  };
+  document.addEventListener('keydown', escHandler, true);
+}
+
+function focusPanelEntry(which: 'first' | 'last'): void {
+  const entries = panelEl?.querySelectorAll<HTMLElement>('.pdx-menu-item:not([disabled])');
+  entries?.[which === 'last' ? entries.length - 1 : 0]?.focus();
+}
+
+/** Close the open menu and any submenu under it. The boolean it takes is not read. */
+function closeMenu(_resetHasOpened: boolean): void {
+  const prevKey = activeKey;
+  if (!prevKey) return;
+  activeKey = '';
+  open = false;
+  hoverOpenedKey = '';
+  closeSubmenu();
+  mouseInPanel = false;
+  if (barLeaveTimer) { clearTimeout(barLeaveTimer); barLeaveTimer = null; }
+
+  if (barEl) {
+    barEl.querySelectorAll('.pdx-menubar-trigger').forEach(t => {
+      t.setAttribute('aria-expanded', 'false');
+    });
+  }
+  if (panelEl) { panelEl.remove(); panelEl = null; }
+  if (panelFocusDispose) { panelFocusDispose(); panelFocusDispose = null; }
+  outsideDispose?.(); outsideDispose = null;
+  if (escHandler) { document.removeEventListener('keydown', escHandler, true); escHandler = null; }
+  if (scrollHandler) { window.removeEventListener('scroll', scrollHandler, true); window.removeEventListener('resize', scrollHandler); scrollHandler = null; }
+}
+
+function positionPanel(key: string): void {
+  if (!barEl || !panelEl) return;
+  const opener = barEl.querySelector(`[data-menubar-key="${key}"]`) as HTMLElement;
+  if (!opener) return;
+  const tRect = opener.getBoundingClientRect();
+
+  panelEl.style.visibility = 'hidden';
+  panelEl.style.display = '';
+  const mRect = panelEl.getBoundingClientRect();
+  panelEl.style.visibility = '';
+
+  let top = tRect.bottom + 2;
+  let left = tRect.left;
+
+  // Flip up if overflow
+  if (top + mRect.height > window.innerHeight - 8) top = tRect.top - mRect.height - 2;
+  // Clamp horizontal
+  if (left + mRect.width > window.innerWidth - 8) left = window.innerWidth - mRect.width - 8;
+  if (left < 8) left = 8;
+
+  panelEl.style.top = top + 'px';
+  panelEl.style.left = left + 'px';
+}
+
+// ─── Build menu items (shared with pdx-menu logic) ──
+function buildMenuItems(list: MenuItem[], container: HTMLElement): void {
+  for (const entry of list) {
+    warnMisshapenMenuItem('pdx-menubar', entry);
+    if (entry.type === 'separator') {
+      const sep = document.createElement('hr');
+      sep.className = 'pdx-menu-separator';
+      sep.setAttribute('data-part', 'separator');
+      sep.setAttribute('role', 'separator');
+      container.appendChild(sep);
+      continue;
+    }
+    if (entry.type === 'label') {
+      const lbl = document.createElement('div');
+      lbl.className = 'pdx-menu-label';
+      lbl.setAttribute('data-part', 'label');
+      lbl.setAttribute('role', 'presentation');
+      lbl.textContent = entry.label;
+      container.appendChild(lbl);
+      continue;
+    }
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pdx-menu-item';
+    btn.setAttribute('data-part', 'item');
+    if (entry.danger) btn.classList.add('pdx-menu-danger');
+    if (entry.type === 'submenu') btn.classList.add('pdx-menu-sub');
+    btn.setAttribute('data-menu-key', entry.key);
+    btn.disabled = !!entry.disabled;
+    if (entry.lang) btn.lang = entry.lang;
+
+    if (entry.type === 'checkbox') {
+      btn.setAttribute('role', 'menuitemcheckbox');
+      btn.setAttribute('aria-checked', String(!!entry.checked));
+    } else if (entry.type === 'radio') {
+      btn.setAttribute('role', 'menuitemradio');
+      btn.setAttribute('aria-checked', String(!!entry.checked));
+      if (entry.radioGroup) btn.setAttribute('data-radio-group', entry.radioGroup);
+    } else {
+      btn.setAttribute('role', 'menuitem');
+    }
+
+    if (entry.type === 'submenu' && entry.children?.length) {
+      btn.setAttribute('aria-haspopup', 'menu');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+
+    // EMPTY: menu.css draws the tick from `aria-checked`, and a ✓ written here as well
+    // would be a second one — «✓✓».
+    if (entry.type === 'checkbox' || entry.type === 'radio') {
+      const check = document.createElement('span');
+      check.className = 'pdx-menu-check';
+      btn.appendChild(check);
+    }
+
+    if (entry.icon) {
+      if (entry.icon.startsWith('<')) {
+        const icon = document.createElement('span');
+        icon.className = 'pdx-menu-icon';
+        icon.innerHTML = sanitizeSVG(entry.icon);
+        btn.appendChild(icon);
+      } else {
+        loadIcon();
+        const icon = document.createElement('pdx-icon');
+        icon.className = 'pdx-menu-icon';
+        icon.setAttribute('name', entry.icon);
+        icon.setAttribute('size', '16');
+        btn.appendChild(icon);
+      }
+    }
+
+    const labelSpan = document.createElement('span');
+    labelSpan.className = 'pdx-menu-item-label';
+    labelSpan.textContent = entry.label;
+    btn.appendChild(labelSpan);
+
+    if (entry.shortcut) {
+      const sc = document.createElement('span');
+      sc.className = 'pdx-menu-shortcut';
+      sc.textContent = entry.shortcut;
+      btn.appendChild(sc);
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (entry.disabled) return;
+      if (entry.type === 'checkbox') {
+        entry.checked = !entry.checked;
+        btn.setAttribute('aria-checked', String(entry.checked));
+        pdxCheck({ key: entry.key, checked: entry.checked, item: entry });
+      } else if (entry.type === 'radio') {
+        if (entry.radioGroup) {
+          container.querySelectorAll(`[data-radio-group="${entry.radioGroup}"]`).forEach(el => {
+            el.setAttribute('aria-checked', 'false');
+          });
+        }
+        entry.checked = true;
+        btn.setAttribute('aria-checked', 'true');
+        pdxCheck({ key: entry.key, checked: true, radioGroup: entry.radioGroup, item: entry });
+      } else if (entry.type !== 'submenu') {
+        pdxSelect({ key: entry.key, item: entry });
+        closeMenu(false);
+      } else if (entry.children?.length) {
+        // A click, and Enter or Space through `focusGroup`, open it with the focus on
+        // its first item (APG), as hover and ArrowRight do.
+        openSubmenu(btn, entry);
+        requestAnimationFrame(() => {
+          const first = subEl?.querySelector('.pdx-menu-item:not([disabled])') as HTMLElement | null;
+          if (first) first.focus();
+        });
+      }
+    });
+
+    if (entry.type === 'submenu' && entry.children?.length) {
+      btn.addEventListener('mouseenter', () => openSubmenu(btn, entry));
+      btn.addEventListener('mouseleave', () => scheduleSubmenuClose(entry.key));
+    }
+
+    container.appendChild(btn);
+  }
+}
+
+// ─── Mega menu panel ─────────────────────────────────
+function buildMegaPanel(columns: MegaColumn[], container: HTMLElement): void {
+  const grid = document.createElement('div');
+  grid.className = 'pdx-mega-grid';
+  for (const col of columns) {
+    const colEl = document.createElement('div');
+    colEl.className = 'pdx-mega-column';
+    const title = document.createElement('div');
+    title.className = 'pdx-menu-label';
+    title.textContent = col.title;
+    colEl.appendChild(title);
+    buildMenuItems(col.items, colEl);
+    grid.appendChild(colEl);
+  }
+  container.appendChild(grid);
+}
+
+// ─── Submenu management ──────────────────────────────
+function openSubmenu(triggerBtn: HTMLElement, entry: MenuItem): void {
+  if (subMenuCloseTimer) { clearTimeout(subMenuCloseTimer); subMenuCloseTimer = null; }
+  if (activeSubmenuKey && activeSubmenuKey !== entry.key) closeSubmenu();
+  if (activeSubmenuKey === entry.key) return;
+  activeSubmenuKey = entry.key;
+
+  triggerBtn.setAttribute('aria-expanded', 'true');
+  triggerBtn.classList.add('active');
+
+  const sub = document.createElement('div');
+  sub.className = 'pdx-menu pdx-menu-sub-panel';
+  sub.setAttribute('role', 'menu');
+  sub.setAttribute('data-submenu-key', entry.key);
+  sub.style.minWidth = '160px';
+  buildMenuItems(entry.children!, sub);
+
+  // Style before measuring so layout is correct
+  sub.style.position = 'fixed';
+  sub.style.visibility = 'hidden';
+  sub.style.zIndex = '1010';
+  sub.style.background = 'var(--pdx-color-surface)';
+  sub.style.border = '1px solid var(--pdx-color-border)';
+  sub.style.borderRadius = 'var(--pdx-radius-md)';
+  sub.style.boxShadow = 'var(--pdx-shadow-lg)';
+  document.body.appendChild(sub);
+  subEl = sub;
+
+  const btnRect = triggerBtn.getBoundingClientRect();
+  const subRect = sub.getBoundingClientRect();
+  let left = btnRect.right + 2;
+  let top = btnRect.top;
+  if (left + subRect.width > window.innerWidth - 8) left = btnRect.left - subRect.width - 2;
+  if (top + subRect.height > window.innerHeight - 8) top = window.innerHeight - subRect.height - 8;
+  if (top < 8) top = 8;
+
+  sub.style.left = left + 'px';
+  sub.style.top = top + 'px';
+  sub.style.visibility = '';
+
+  sub.addEventListener('mouseenter', () => {
+    if (subMenuCloseTimer) { clearTimeout(subMenuCloseTimer); subMenuCloseTimer = null; }
+  });
+  sub.addEventListener('mouseleave', () => scheduleSubmenuClose(entry.key));
+  closeSubmenuOnArrowLeft(sub, triggerBtn);
+
+  focusGroup(sub, {
+    selector: '.pdx-menu-item:not([disabled])',
+    orientation: 'vertical', wrap: true, typeAhead: true,
+    onSelect: (el) => el.click(),
+  });
+}
+
+/**
+ * ArrowLeft in a submenu closes it and puts focus back on its item (APG). The submenu lives on
+ * <body>, outside the panel whose keydown handler switches menus: without its own handler the
+ * key does nothing and both menus stay open.
+ */
+function closeSubmenuOnArrowLeft(sub: HTMLElement, triggerBtn: HTMLElement): void {
+  sub.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    e.stopPropagation();
+    closeSubmenu();
+    triggerBtn.focus();
+  });
+}
+
+function scheduleSubmenuClose(key: string): void {
+  subMenuCloseTimer = setTimeout(() => {
+    if (activeSubmenuKey === key) closeSubmenu();
+  }, 150);
+}
+
+function closeSubmenu(): void {
+  if (!activeSubmenuKey) return;
+  const sub = subEl;
+  subEl = null;
+  // The focus inside the panel about to go goes back to its item: a close the pointer caused
+  // would drop it to <body> (as in pdx-menu). A focus elsewhere is left where it is.
+  const hadFocus = !!sub?.contains(document.activeElement);
+  if (sub) sub.remove();
+  if (panelEl) {
+    const opener = panelEl.querySelector(`[data-menu-key="${activeSubmenuKey}"]`) as HTMLElement | null;
+    if (opener) {
+      opener.setAttribute('aria-expanded', 'false');
+      opener.classList.remove('active');
+      if (hadFocus) opener.focus();
+    }
+  }
+  activeSubmenuKey = '';
+}
+
+// ─── Panel keyboard ─────────────────────────────────
+function onPanelKeydown(e: KeyboardEvent): void {
+  const all = getItems();
+  const currentKey = activeKey;
+  const idx = all.findIndex(i => i.key === currentKey);
+
+  // Arrow Left/Right: switch to adjacent top-level menu
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    const prev = idx > 0 ? all[idx - 1] : all[all.length - 1];
+    if (prev && !prev.disabled) openMenu(prev.key);
+  } else if (e.key === 'ArrowRight') {
+    // If on a submenu item, open it
+    const focused = panelEl?.querySelector('.pdx-menu-item:focus') as HTMLElement;
+    if (focused?.classList.contains('pdx-menu-sub')) {
+      const key = focused.getAttribute('data-menu-key') || '';
+      const found = findItemDeep(all, key);
+      if (found?.children?.length) {
+        openSubmenu(focused, found);
+        requestAnimationFrame(() => {
+          const first = subEl?.querySelector('.pdx-menu-item:not([disabled])') as HTMLElement;
+          if (first) first.focus();
+        });
+        return;
+      }
+    }
+    e.preventDefault();
+    const next = idx < all.length - 1 ? all[idx + 1] : all[0];
+    if (next && !next.disabled) openMenu(next.key);
+  }
+}
+
+function findItemDeep(list: MenubarItem[], key: string): MenuItem | null {
+  for (const entry of list) {
+    if (entry.children) {
+      for (const child of entry.children) {
+        if (child.key === key) return child;
+        if (child.children) {
+          const found = findInChildren(child.children, key);
+          if (found) return found;
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function findInChildren(list: MenuItem[], key: string): MenuItem | null {
+  for (const entry of list) {
+    if (entry.key === key) return entry;
+    if (entry.children) { const f = findInChildren(entry.children, key); if (f) return f; }
+  }
+  return null;
+}
+
+// ─── Build bar ──────────────────────────────────────
+/** One top-level item of the bar. The build and the rebuild on `items` share it. */
+function makeTrigger(entry: MenubarItem): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'pdx-menubar-trigger';
+  btn.setAttribute('data-part', 'trigger');
+  btn.setAttribute('role', 'menuitem');
+  btn.setAttribute('data-menubar-key', entry.key);
+  btn.setAttribute('aria-haspopup', 'menu');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.textContent = entry.label;
+  btn.disabled = !!entry.disabled;
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (activeKey !== entry.key) { openMenu(entry.key); return; }
+    // The click ending the hover that opened this menu keeps it open.
+    if (hoverOpenedKey === entry.key) { hoverOpenedKey = ''; return; }
+    closeMenu(false);
+  });
+
+  // The pointer. In `hover` it opens a menu on its own; in `click` — the default — it only moves between menus while one is already open, so crossing the bar
+  // on the way elsewhere opens nothing.
+  btn.addEventListener('mouseenter', () => {
+    if (barLeaveTimer) { clearTimeout(barLeaveTimer); barLeaveTimer = null; }
+    if (entry.disabled) return;
+    const hover = (trigger as string) === 'hover';
+    if (!hover && !activeKey) return;
+    if (activeKey === entry.key) { hoverOpenedKey = ''; return; }
+    openMenu(entry.key);
+    if (hover && activeKey === entry.key) hoverOpenedKey = entry.key;
+  });
+
+  // ArrowDown opens the menu on its first entry, ArrowUp on its last (APG menubar), besides
+  // Enter and Space.
+  btn.addEventListener('keydown', (e: KeyboardEvent) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const which = e.key === 'ArrowUp' ? 'last' : 'first';
+    if (activeKey === entry.key) focusPanelEntry(which);
+    else openMenu(entry.key, which);
+  });
+
+  return btn;
+}
+
+// The first run reads `items`; the bar is built a frame after mount, below. Every later run
+// rebuilds the triggers a frame later.
+let started = false;
+$effect(() => {
+  const all = items as unknown as MenubarItem[];
+  if (!started) { started = true; return; }
+
+  // Rebuild on items change
+  requestAnimationFrame(() => {
+    if (barEl) {
+      barEl.innerHTML = '';
+      for (const entry of all) barEl.appendChild(makeTrigger(entry));
+    }
+  });
+});
+
+// A frame after mount: a setup a move destroyed does not build again.
+onNextFrame(() => {
+  // No class on the host (#289): menu.css reads its tag; a menu open is :state(open).
+  barEl = document.createElement('div');
+  barEl.className = 'pdx-menubar-bar';
+  barEl.setAttribute('data-part', 'bar');
+  barEl.setAttribute('role', 'menubar');
+  uiAttr(barEl, 'aria-label', () => uiString('menubar', 'label'));
+
+  for (const entry of getItems()) barEl.appendChild(makeTrigger(entry));
+
+  host.appendChild(barEl);
+
+  // Bar-level mouseleave: close with delay when mouse leaves bar area
+  barEl.addEventListener('mouseleave', () => {
+    if ((trigger as string) === 'hover' && activeKey) {
+      barLeaveTimer = setTimeout(() => {
+        if (activeKey && !mouseInPanel) {
+          closeMenu(false);
+        }
+      }, 300);
+    }
+  });
+
+  // Focus group for bar triggers
+  focusDispose = focusGroup(barEl, {
+    selector: '.pdx-menubar-trigger:not([disabled])',
+    orientation: 'horizontal',
+    wrap: true,
+    onSelect: (el) => {
+      const key = el.getAttribute('data-menubar-key') || '';
+      if (activeKey === key) closeMenu(true);
+      else openMenu(key);
+    },
+  });
+});
+
+// Cleanup, as the TypeScript version's track: it re-runs on `items`, and on destroy.
+$effect(() => {
+  void items;
+  return () => {
+    closeMenu(true);
+    if (focusDispose) { focusDispose(); focusDispose = null; }
+  };
+});
+</script>

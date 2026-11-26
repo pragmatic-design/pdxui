@@ -3,7 +3,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
-import '../../src/menubar/pdx-menubar';
+import '../../src/menubar/pdx-menubar.pdx';
 
 const BASIC_ITEMS = [
     {

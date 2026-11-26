@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/menu/pdx-menu.pdx';
 import '../../src/dropdown-menu/pdx-dropdown-menu.pdx';
-import '../../src/menubar/pdx-menubar';
+import '../../src/menubar/pdx-menubar.pdx';
 
 const items = () => [
     { key: 'open', label: 'Open' },

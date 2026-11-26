@@ -20203,7 +20203,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/menubar/pdx-menubar.ts",
+      "path": "src/menubar/pdx-menubar.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -20365,7 +20365,7 @@
           "name": "pdx-menubar",
           "declaration": {
             "name": "PdxMenubar",
-            "module": "src/menubar/pdx-menubar.ts"
+            "module": "src/menubar/pdx-menubar.pdx"
           }
         }
       ]
