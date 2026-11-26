@@ -104,6 +104,14 @@ describe('removeTree', () => {
         expect(warnings[0]).toContain('children: 23644 esbuild.exe');
     });
 
+    // #1245: a test that asks whether its project was left removable needs to know which of the two
+    // it got. A directory left behind by a holder outside the tree still exists, and a test that read
+    // that as a process sitting in its project failed three times on the gate with `holders: none`.
+    it('says whether it removed the root: true when removed, false when a holder outside the tree left it', () => {
+        expect(removeTree('/p', fakeFs([]).fs)).toBe(true);
+        expect(removeTree('/p', fakeFs([], false).fs)).toBe(false);
+    });
+
     it('control: a held file still throws, and warns nothing', () => {
         const { fs, warnings } = fakeFs(['/p/dist/index.html'], false, ['23644 esbuild.exe']);
         expect(() => removeTree('/p', fs)).toThrow(/held: dist\/index\.html \(EBUSY\)/);

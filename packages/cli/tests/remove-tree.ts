@@ -97,10 +97,15 @@ const PROBE = '.pdx-probe';
 /**
  * Remove `root`; if it cannot be, throw its error with what refuses a rename, and the child processes.
  * When nothing in the tree refuses, the same report is a warning that `root` was left behind.
+ *
+ * Returns true when `root` was removed, false when it was left behind by a holder outside the tree
+ * (#1245): a caller that asks whether a process sits in its project reads the throw, not whether the
+ * directory still exists.
  */
-export function removeTree(root: string, fs: TreeFs = realFs): void {
+export function removeTree(root: string, fs: TreeFs = realFs): boolean {
     try {
         fs.rm(root);
+        return true;
     } catch (error) {
         const held: string[] = [];
         const refusedFiles: string[] = [];
@@ -142,7 +147,7 @@ export function removeTree(root: string, fs: TreeFs = realFs): void {
         const report = `${err.message}\nheld: ${named}\nchildren: ${children}\nholders: ${holders}`;
         if (held.length === 0) {
             fs.warn(`[remove-tree] left '${root}' behind: ${report}`);
-            return;
+            return false;
         }
         throw Object.assign(new Error(report, { cause: error }), { code: err.code });
     }
