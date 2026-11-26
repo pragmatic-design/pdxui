@@ -180,7 +180,7 @@
       "import": "./dist/app-layout/pdx-app-layout.js"
     },
     "./affix": {
-      "development": "./src/affix/pdx-affix.ts",
+      "development": "./src/affix/pdx-affix.pdx",
       "types": "./dist/affix/pdx-affix.d.ts",
       "import": "./dist/affix/pdx-affix.js"
     },

@@ -204,7 +204,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/affix/pdx-affix.ts",
+      "path": "src/affix/pdx-affix.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -314,7 +314,7 @@
           "name": "pdx-affix",
           "declaration": {
             "name": "PdxAffix",
-            "module": "src/affix/pdx-affix.ts"
+            "module": "src/affix/pdx-affix.pdx"
           }
         }
       ]

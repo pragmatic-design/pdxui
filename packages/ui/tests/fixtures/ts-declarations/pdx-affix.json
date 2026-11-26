@@ -1,0 +1,101 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxAffix",
+  "tagName": "pdx-affix",
+  "category": "Layout",
+  "order": 76,
+  "description": "Makes an element sticky once the user scrolls past a threshold, and reports when it is.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "offsetTop",
+      "description": "Offset from top when affixed (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "offsettop"
+    },
+    {
+      "kind": "field",
+      "name": "offsetBottom",
+      "description": "Offset from bottom when affixed (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "offsetbottom"
+    },
+    {
+      "kind": "field",
+      "name": "target",
+      "description": "Target scroll container selector (default: window)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "target"
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "affixed": "$event.detail.value"
+  },
+  "alphaRename": {
+    "pdx-change": "affixed-change"
+  },
+  "events": [
+    {
+      "name": "affixed-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "It started or stopped sticking: `true` while stuck.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "attributes": [
+    {
+      "name": "offsettop",
+      "fieldName": "offsetTop",
+      "description": "Offset from top when affixed (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "offsetbottom",
+      "fieldName": "offsetBottom",
+      "description": "Offset from bottom when affixed (px)",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "target",
+      "fieldName": "target",
+      "description": "Target scroll container selector (default: window)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "affixed",
+      "description": "The element is stuck: fixed to the window, or sticking in its `target`."
+    }
+  ]
+}

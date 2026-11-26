@@ -5,23 +5,21 @@
 // `customElements`, so it could not see that the guards were not there (#93). Importable means: the
 // module evaluates, `component()` registers nothing, signals run. Rendering needs a DOM, and `html`
 // says so instead of returning something.
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
 
+/** Evaluates a compiled module whose one import is core's, with core handed in. */
+function evaluateWithCore(code: string): void {
+    const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
+    // A module that imports anything else cannot be evaluated this way: say which, not a SyntaxError.
+    expect(body.match(/^\s*import\b.*$/gm) ?? [], 'imports other than @pdxui/core').toEqual([]);
+    new Function('__core', body)(core);
+}
+
 describe('in Node, without a DOM', () => {
-    // Imported here, not in the test: the first import of a source module pays for its whole graph.
-    let libraryImport: Promise<unknown>;
-    beforeAll(async () => {
-        // A library component written in TypeScript whose graph holds no .pdx: core's suite does not
-        // compile .pdx, and the library moves to .pdx one component at a time (#1210). pdx-button,
-        // then pdx-relative-time, were the components this imported, and both are .pdx now.
-        // pdx-affix imports core only. When it moves too, this import has to be of a compiled
-        // module, which core's suite then has to compile.
-        libraryImport = import('../../ui/src/affix/pdx-affix');
-        // Settled here; a rejection is asserted by the test below, which names it, not by the hook.
-        await libraryImport.catch(() => undefined);
-    });
 
     it('has no DOM globals to fall back on', () => {
         expect(typeof document).toBe('undefined');
@@ -50,12 +48,19 @@ describe('in Node, without a DOM', () => {
             + '<script>\nlet count = $signal(0);\n</script>\n';
         const { code } = compile(src, 'node-counter.pdx', [], undefined, {});
         expect(code).toMatch(/from '@pdxui\/core'/);
-        const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
-        expect(() => new Function('__core', body)(core)).not.toThrow();
+        expect(() => evaluateWithCore(code)).not.toThrow();
     });
 
-    it('a library component module imports', async () => {
-        await expect(libraryImport).resolves.toBeDefined();
+    // A library component, compiled from its .pdx (#1210 moved the library there). This imported a
+    // component still in TypeScript, whose graph held no .pdx and no stylesheet, while there was one:
+    // pdx-affix was the last. pdx-affix imports core alone, and reads the window and the document only
+    // in a frame after mount.
+    it('a library component, compiled, evaluates', () => {
+        const file = join(__dirname, '..', '..', 'ui', 'src', 'affix', 'pdx-affix.pdx');
+        const { code } = compile(readFileSync(file, 'utf8'), file, [], undefined, { production: true });
+        // The tag's prefix is the project's (`pdx-` in the library's build), not this compile's.
+        expect(code).toMatch(/defineComponent\('\w+-affix'/);
+        expect(() => evaluateWithCore(code)).not.toThrow();
     });
 
     it('html`` throws an error that names the call instead of returning a fragment', () => {

@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';
+import { existsSync } from 'fs';
 import { getTagContext } from '../src/utils/tag-context';
 import { enumValues, type ManifestComponent } from '../src/utils/manifest-index';
 import { getTagAttributeCompletions } from '../src/capabilities/completion';
@@ -85,17 +86,18 @@ describe('component definition', () => {
     });
 
     it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
-        // A library component still in TypeScript (#1210 moves the library to .pdx; this one is late).
+        // A library component still in TypeScript (#1210 moves the library to .pdx). pdx-affix, then
+        // pdx-breadcrumb were this component until they moved; pdx-wizard is held in TypeScript until
+        // #1287's pass. The file must exist: a moved one would leave the jump nowhere to land.
         const root = join(__dirname, '..', '..', '..');
-        const real = new Map([['pdx-affix', {
-            ...button, tag: 'pdx-affix',
-            filePath: join(root, 'packages', 'ui', 'src', 'affix', 'pdx-affix.ts'),
-        }]]);
-        // tag → its component('pdx-affix' call, past the file's header
-        const tagLoc = resolveComponentDefinition('pdx-affix', real, []);
+        const filePath = join(root, 'packages', 'ui', 'src', 'wizard', 'pdx-wizard.ts');
+        expect(existsSync(filePath), `${filePath} moved to .pdx: name another component still in TypeScript`).toBe(true);
+        const real = new Map([['pdx-wizard', { ...button, tag: 'pdx-wizard', filePath }]]);
+        // tag → its component('pdx-wizard' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-wizard', real, []);
         expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `target:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-affix', real, [], 'target');
+        // member → the `linear:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-wizard', real, [], 'linear');
         expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
     });
 

@@ -19,6 +19,7 @@ interface Module { path: string; declarations: Declaration[]; exports: { declara
 
 /** Each moved tag, and the .pdx it lives in now. */
 const PORTED: Record<string, string> = {
+    'pdx-affix': 'src/affix/pdx-affix.pdx',
     'pdx-alert-dialog': 'src/alert-dialog/pdx-alert-dialog.pdx',
     'pdx-auto-form':'src/auto-form/pdx-auto-form.pdx',
     'pdx-avatar': 'src/avatar/pdx-avatar.pdx',

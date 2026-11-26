@@ -1,0 +1,170 @@
+<template><slot></slot></template>
+
+<script>
+/**
+ * Makes an element sticky once the user scrolls past a threshold, and reports when it is.
+ *
+ * @cssstate affixed - The element is stuck: fixed to the window, or sticking in its `target`.
+ * @alphaevent pdx-change
+ * @alpharename pdx-change affixed-change
+ * @alphadetail affixed $event.detail.value
+ */
+// pdx-affix — Makes child element sticky when scrolling past a threshold.
+import { DEV } from '@pdxui/core';
+
+// Stuck or not is the scroll's doing, not the app's (#290): a read-only output, announced as a
+// model's event is, `{ value }`, and a state; `::affixed` stays an error.
+/** It started or stopped sticking: `true` while stuck. */
+@event 'affixed-change': { value: boolean };
+// Set in setAffixed, where the TypeScript version called ctx.state (#1436).
+@state affixed;
+/** Offset from top when affixed (px) */
+@prop offsetTop: number = 0;
+/** Offset from bottom when affixed (px) */
+@prop offsetBottom: number = -1;
+/** Target scroll container selector (default: window) */
+@prop target: string = '';
+@host host;
+
+/** Stuck now: what the scroll handler compares against. Nothing reads it reactively. */
+let isAffixed = false;
+let scrollHandler: (() => void) | null = null;
+let placeholder: HTMLElement | null = null;
+let observer: IntersectionObserver | null = null;
+let sentinel: HTMLElement | null = null;
+
+/** The affixed state, reported once per change: the custom state, and `affixed-change { value }`. */
+function setAffixed(next: boolean): void {
+  if (next === isAffixed) return;
+  isAffixed = next;
+  affixed = next;
+  affixedChange({ value: next });
+}
+
+/**
+ * Container mode reports when the sticky element is stuck. CSS sticky does the
+ * sticking, and says nothing about it: on its own, `affixed-change` would never fire and
+ * the `affixed` state would never be set. A 1px sentinel sits against the element's
+ * leading edge — before it for `offsetTop`, after it for `offsetBottom` — and an
+ * IntersectionObserver rooted at the target, its edge moved in by the offset, sees the
+ * sentinel leave: that is the moment the element starts to stick.
+ *
+ * The sticking is bounded by the element's parent, as CSS sticky's always is: once the parent
+ * itself has scrolled away the element leaves with it, and the state still says stuck. In the
+ * common case — the element a direct child of the scroll container — the two coincide.
+ */
+function observeStuck(root: Element, top: number, bottom: number): void {
+  const atBottom = bottom >= 0;
+  const s = document.createElement('div');
+  s.className = 'pdx-affix-sentinel';
+  s.setAttribute('aria-hidden', 'true');
+  // One pixel high, taking no space: its far edge touches the element's leading edge.
+  s.style.cssText = `height:1px;${atBottom ? 'margin-bottom' : 'margin-top'}:-1px;visibility:hidden;pointer-events:none`;
+  if (atBottom) host.after(s);
+  else host.before(s);
+  sentinel = s;
+  observer = new IntersectionObserver(([entry]) => {
+    const bounds = entry.rootBounds;
+    if (!bounds) return;
+    const past = atBottom
+      ? entry.boundingClientRect.top >= bounds.bottom
+      : entry.boundingClientRect.bottom <= bounds.top;
+    setAffixed(!entry.isIntersecting && past);
+  }, {
+    root,
+    rootMargin: atBottom ? `0px 0px -${bottom}px 0px` : `-${top}px 0px 0px 0px`,
+    threshold: 0,
+  });
+  observer.observe(s);
+}
+
+$effect(() => {
+  const top = offsetTop as number;
+  const bottom = offsetBottom as number;
+  const targetSelector = target as string;
+
+  requestAnimationFrame(() => {
+    // Host must be block-level: a custom element defaults to display:inline,
+    // but position:sticky/fixed require a block box to reserve space and honor top/bottom.
+    if (!host.style.display) host.style.display = 'block';
+
+    // Inside a scroll container: CSS sticky sticks, and an observer rooted at the target
+    // reports it. The selector is queried, not only a mode switch.
+    if (targetSelector) {
+      host.style.position = 'sticky';
+      host.style.zIndex = '10';
+      if (bottom >= 0) {
+        host.style.bottom = bottom + 'px';
+      } else {
+        host.style.top = top + 'px';
+      }
+      // pdx-ignore PDX_DOCUMENT_QUERY: `target` names the app's scroll container, outside this component by design
+      const root = document.querySelector(targetSelector);
+      if (root) observeStuck(root, top, bottom);
+      else if (DEV) console.warn(`[pdx-affix] target "${targetSelector}" matches no element: the affix sticks to its nearest scroll container, and cannot report when it is stuck.`);
+      return;
+    }
+
+    // Window-level: use scroll listener + fixed positioning
+    if (scrollHandler) {
+      window.removeEventListener('scroll', scrollHandler);
+    }
+
+    let affixRaf = 0;
+    scrollHandler = () => {
+      // A gBCR on every scroll event without a throttle = layout thrash
+      if (affixRaf) return;
+      affixRaf = requestAnimationFrame(() => { affixRaf = 0; measureAffix(); });
+    };
+    const measureAffix = () => {
+      const rect = (placeholder || host).getBoundingClientRect();
+
+      let shouldAffix = false;
+      if (bottom >= 0) {
+        shouldAffix = rect.bottom > window.innerHeight - bottom;
+      } else {
+        shouldAffix = rect.top <= top;
+      }
+
+      if (shouldAffix && !isAffixed) {
+        if (!placeholder) {
+          placeholder = document.createElement('div');
+          placeholder.style.width = host.offsetWidth + 'px';
+          placeholder.style.height = host.offsetHeight + 'px';
+          host.parentNode?.insertBefore(placeholder, host);
+        }
+        host.style.position = 'fixed';
+        if (bottom >= 0) {
+          host.style.bottom = bottom + 'px';
+          host.style.top = '';
+        } else {
+          host.style.top = top + 'px';
+          host.style.bottom = '';
+        }
+        setAffixed(true);
+      } else if (!shouldAffix && isAffixed) {
+        host.style.position = '';
+        host.style.top = '';
+        host.style.bottom = '';
+        if (placeholder) {
+          placeholder.remove();
+          placeholder = null;
+        }
+        setAffixed(false);
+      }
+    };
+
+    window.addEventListener('scroll', scrollHandler, { passive: true });
+  });
+
+  return () => {
+    if (scrollHandler) {
+      window.removeEventListener('scroll', scrollHandler);
+      scrollHandler = null;
+    }
+    if (placeholder) { placeholder.remove(); placeholder = null; }
+    if (observer) { observer.disconnect(); observer = null; }
+    if (sentinel) { sentinel.remove(); sentinel = null; }
+  };
+});
+</script>

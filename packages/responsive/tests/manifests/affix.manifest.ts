@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-affix
  *
- * Contracts written by inspecting the source (packages/ui/src/affix/pdx-affix.ts).
+ * Contracts written by inspecting the source (packages/ui/src/affix/pdx-affix.pdx).
  * Note: there is NO .pdx-affix CSS in the design system. The component is purely behavioural
  * (sticky/fixed on scroll) and has no box styling of its own.
  *
