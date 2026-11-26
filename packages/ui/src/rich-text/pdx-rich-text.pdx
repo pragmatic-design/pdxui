@@ -84,12 +84,15 @@ import '@pdxui/design/components/menu';
 @host el;
 
 // ── Imperative API, attached now: before pdx-ready, before the editor exists ──
-@expose editor, getJSON, getHTML, getText, getWordCount, isEmpty, execCommand, focus, blur, setJSON, setHTML, clear;
+// `editor` and `isEmpty` are read when asked, as the TypeScript getters were: nothing reactive is
+// built for them (#1423). The lines keep the order the element's members had.
+@expose get editor;
+@expose getJSON, getHTML, getText, getWordCount;
+@expose get isEmpty;
+@expose execCommand, focus, blur, setJSON, setHTML, clear;
 
-// The editor, once built: a signal, so `el.editor` and `el.isEmpty` read it.
-let editorView = $signal<EditorView | null>(null);
-// Counts the editor's updates, so `el.isEmpty` reads the document it has now.
-let docVersion = $signal(0);
+// The editor, once built.
+let editorView: EditorView | null = null;
 let toolbarEl: HTMLElement | null = null;
 let wrapperEl: HTMLElement | null = null;
 let bubbleToolbar: BubbleToolbar | null = null;
@@ -101,18 +104,14 @@ let reflected: unknown = undefined;
 // API calls made before the editor exists (setup runs before the frame that builds it).
 const pending: Array<(view: EditorView) => void> = [];
 const whenBuilt = (fn: (view: EditorView) => void) => {
-  const view = editorView.peek();
+  const view = editorView;
   if (view) fn(view); else pending.push(fn);
 };
 
 /** Read-only, via a ref: `el.editor`. */
-const editor = $derived(editorView);
+function editor(): EditorView | null { return editorView; }
 /** Read-only, via a ref: `el.isEmpty`. */
-const isEmpty = $derived(() => {
-  void docVersion;
-  const view = editorView;
-  return view ? textLength(view.state.doc) === 0 : true;
-});
+function isEmpty(): boolean { return editorView ? textLength(editorView.state.doc) === 0 : true; }
 
 function getExtensions(): Extension[] {
   const exts = extensions.peek();
@@ -169,17 +168,17 @@ const replaceDoc = (view: EditorView, d: DocNode) => {
 };
 
 /** The document as JSON, or null while the editor is still being built. */
-function getJSON() { const view = editorView.peek(); return view ? toJSON(view.state.doc) : null; }
+function getJSON() { const view = editorView; return view ? toJSON(view.state.doc) : null; }
 /** The document as HTML — what a copy to the clipboard carries — or '' before the editor is built. */
-function getHTML() { const view = editorView.peek(); return view ? serializeToClipboardHTML(view.state.doc.content) : ''; }
+function getHTML() { const view = editorView; return view ? serializeToClipboardHTML(view.state.doc.content) : ''; }
 /** The document as plain text, or '' before the editor is built. */
-function getText() { const view = editorView.peek(); return view ? textContent(view.state.doc) : ''; }
+function getText() { const view = editorView; return view ? textContent(view.state.doc) : ''; }
 /** How many words the document holds; 0 before the editor is built. */
-function getWordCount() { const view = editorView.peek(); return view ? countWords(view.state.doc) : 0; }
+function getWordCount() { const view = editorView; return view ? countWords(view.state.doc) : 0; }
 /** Run one editor command by name, the same ones the toolbar runs. Does nothing before the editor is built. */
-function execCommand(name: string) { return editorView.peek()?.execCommand(name); }
-function focus() { return editorView.peek()?.focus(); }
-function blur() { return editorView.peek()?.blur(); }
+function execCommand(name: string) { return editorView?.execCommand(name); }
+function focus() { return editorView?.focus(); }
+function blur() { return editorView?.blur(); }
 /** Replace the document with this JSON, waiting for the editor when it is not built yet. */
 function setJSON(json: unknown) {
   whenBuilt(view => {
@@ -213,7 +212,7 @@ $effect(() => {
 
   let cancelled = false;
   requestAnimationFrame(() => {
-    if (cancelled || editorView.peek()) return;
+    if (cancelled || editorView) return;
 
     el.classList.add('pdx-rich-text');
 
@@ -258,7 +257,6 @@ $effect(() => {
 
         const empty = textLength(state.doc) === 0;
         wrapper.classList.toggle('pdx-rt-empty', empty);
-        docVersion = docVersion.peek() + 1;
 
         // Loading the initial value is not a change the user made: no event, no reflection.
         if (building) return;
@@ -317,7 +315,7 @@ $effect(() => {
 
     // Autofocus
     if (autofocusCfg && !readonlyCfg) {
-      requestAnimationFrame(() => editorView.peek()?.focus());
+      requestAnimationFrame(() => editorView?.focus());
     }
 
     // Calls made before the editor existed, in order.
@@ -333,7 +331,7 @@ $effect(() => {
     cancelled = true;
     bubbleToolbar?.destroy();
     bubbleToolbar = null;
-    editorView.peek()?.destroy();
+    editorView?.destroy();
     editorView = null;
     toolbarEl?.remove();
     toolbarEl = null;
