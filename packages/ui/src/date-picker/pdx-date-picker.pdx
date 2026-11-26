@@ -161,16 +161,17 @@ let popover: PopoverReturn | null = null;
 // The prop, then the page's lang, then the browser. Passed resolved to the
 // calendar and the time picker it builds, so all three agree.
 const localeNow = (): string => resolveLocale(el, locale as string);
-let compareEnabled = $signal(false);
+// The compare toggle's state. Nothing reads it yet, as in the TypeScript version: a plain variable,
+// so it costs no signal at mount.
+let compareEnabled = false;
 let timeValue = $signal('00:00');
 let timeEndValue = $signal('00:00');
 // Internal range state (tracks building range before external confirmation)
 let internalRangeStart = $signal('');
 let internalRangeEnd = $signal('');
 let internalValue = $signal('');
-/** A time-only picker has a time: until one is set, or after a clear, its value is ''. A signal: the
- *  trigger shows the time only once there is one. */
-let timeSet = $signal(false);
+/** A time-only picker has a time: until one is set, or after a clear, its value is ''. */
+let timeSet = false;
 /** The multi mode's dates. */
 let internalMulti: string[] = [];
 
@@ -200,8 +201,9 @@ function displayValue(): string {
   const loc = localeNow();
   const cal = calendar as CalendarSystem;
 
-  // The time, once there is one: before that the model is '', and so is what the trigger shows.
-  if (m === 'time') return timeSet ? (timeValue as string) || '' : '';
+  // A time-only picker's model is its time, '' until one is set: the trigger shows the model, not
+  // the time picker's starting 00:00 (#1210).
+  if (m === 'time') return typeof value === 'string' ? value : '';
 
   // The model's date: the sync effect writes it in, whatever shape the mode gives it.
   const val = internalValue as string;
@@ -271,7 +273,7 @@ const withTime = (date: string, time: string): string => (date ? `${date}T${time
 /** The model's value for the mode, from the internal state. */
 function currentModel(): string | string[] {
   const m = modeStr();
-  if (m === 'time') return timeSet.peek() ? timeValue.peek() : '';
+  if (m === 'time') return timeSet ? timeValue.peek() : '';
   if (m === 'multi') return [...internalMulti];
   if (holdsRange()) {
     const rs = internalRangeStart.peek();
