@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
 import { cleanup, tick, whenUpgraded } from './helpers';
-import '../../src/data-grid/pdx-data-grid';
+import '../../src/data-grid/pdx-data-grid.pdx';
 
 // The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
 // that reads the select before it is upgraded fails every time instead of once in a while (#692).

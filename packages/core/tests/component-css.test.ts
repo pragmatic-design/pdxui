@@ -4,7 +4,7 @@
 // download the styles of all 114: 28.8 KB gzipped on the showcase, more than its entire JavaScript
 // bundle, and render-blocking.
 //
-// So each component imports its own — `pdx-data-grid.ts` imports
+// So each component imports its own — `pdx-data-grid.pdx` imports
 // `@pdxui/design/components/data-grid` — and the app ships the styles of what it renders.
 //
 // ⚠️ THE FAILURE THIS GUARDS IS SILENT AND PRODUCTION-ONLY: a component whose import is missing

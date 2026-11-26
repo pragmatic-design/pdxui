@@ -25,7 +25,7 @@
 // built them. The script's own names are not the parts' names: a part's name read in the script
 // makes it a signal of the part's elements at every mount.
 import { uiString, format } from '../shared/i18n';
-import '../data-grid/pdx-data-grid';
+import '../data-grid/pdx-data-grid.pdx';
 import '../button/pdx-button.pdx';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.

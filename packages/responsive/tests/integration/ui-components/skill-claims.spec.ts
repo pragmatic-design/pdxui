@@ -56,7 +56,7 @@ test.describe('claims that are no longer true — the skill must not teach these
 
     test('gotchas.md:95 — "a static createDataSource({data}) does NOT render the rows" — it does now', async ({ page }) => {
         // The workaround was a fake transport for local arrays. `resolveSource()`
-        // (packages/ui/src/data-grid/pdx-data-grid.ts:215) builds a source from static `data`.
+        // (packages/ui/src/data-grid/pdx-data-grid.pdx) builds a source from static `data`.
         const errors = await openCase(page, 'grid-static-source');
         await expect.poll(async () => (await read<{ rows: number }>(page)).rows,
             { message: 'grid cells rendered from a static source' }).toBe(6);   // 3 rows x 2 columns
@@ -182,7 +182,7 @@ test.describe('claims that are STILL true — each one has an issue, and this is
 
     test('gotchas.md:54 — but the API it names does not exist: it is FLAT on the host, not on __dataGrid', async ({ page }) => {
         // The skill says `el.__dataGrid.getSelectedIds()` / `.clearSelection()`. There is no
-        // `__dataGrid`: `ctx.expose()` puts both straight on the element (pdx-data-grid.ts:499).
+        // `__dataGrid`: `ctx.expose()` puts both straight on the element (pdx-data-grid.pdx).
         // An agent following that line gets `undefined` and concludes the grid has no selection API.
         await openCase(page, 'grid-selection');
         await page.locator('pdx-data-grid input[type="checkbox"]').nth(1).click();

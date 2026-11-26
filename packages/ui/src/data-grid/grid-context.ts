@@ -7,6 +7,41 @@ import type { EditCellState } from './grid-edit';
 
 export type AnyColumn = ResolvedColumn<any>;
 
+/**
+ * What each event the sub-modules emit carries. pdx-data-grid.pdx declares each with `@event` and
+ * the same detail, the row typed as the app's `T` there.
+ */
+export interface GridEventDetails {
+    'pdx-row-click': { row: Record<string, unknown>; index: number; id: unknown };
+    'pdx-row-reorder': { from: number; to: number; fromId: unknown; toId: unknown };
+    'pdx-row-collapse': { id: unknown };
+    'pdx-row-expand': { id: unknown };
+    'pdx-cell-edit-start': { rowId: unknown; field: string; value: unknown };
+    'pdx-cell-edit-end': { rowId: unknown; field: string; oldValue: unknown; newValue: unknown };
+    'pdx-cell-edit-cancel': { rowId: unknown; field: string };
+    'pdx-row-edit-start': { rowId: unknown; row: Record<string, unknown> };
+    'pdx-row-edit-end': { rowId: unknown; values: Record<string, unknown> };
+    'pdx-row-edit-cancel': { rowId: unknown };
+    'pdx-batch-commit': { count: number };
+    'pdx-batch-revert': Record<string, never>;
+    'pdx-row-delete': { rowId: unknown; row: Record<string, unknown> };
+    'pdx-selection-change': { selected: unknown[]; count: number };
+    'pdx-grid-export': { rows: number; columns: number; format: string };
+}
+
+/**
+ * What a sub-module hands the component: no event, a call. The TypeScript version dispatched these
+ * on the host and listened for them there; nothing else listened.
+ */
+export interface GridInternalDetails {
+    '__select-all': Record<string, never>;
+    '__toggle-select': { id: unknown; row: Record<string, unknown>; shiftKey: boolean };
+    '__group-toggle': { field: string; value: unknown };
+    '__toggle-detail': { id: unknown };
+}
+
+export type GridEmits = GridEventDetails & GridInternalDetails;
+
 export interface GridContext {
     /** useDataGrid composable (null before first build). */
     grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null;
@@ -54,8 +89,12 @@ export interface GridContext {
     getHeaderEl?: () => HTMLElement | null;
     /** This instance's body element (avoids document.querySelector picking the wrong grid). */
     getBodyEl?: () => HTMLElement | null;
-    /** Emit a custom event from the component. */
-    emit: (name: string, detail: unknown) => void;
+    /**
+     * Emit one of the grid's events, or hand one of its internal ones to the component. The
+     * component maps every name to its `@event` function or its handler (#1210), so a name missing
+     * there is a type error here, not an event lost.
+     */
+    emit: <K extends keyof GridEmits>(name: K, detail: GridEmits[K]) => void;
     /** Whether the inline filter row is active (don't show filter icon in header). */
     hasFilterRow: () => boolean;
     /** Whether the toolbar is visible (hides badge/chooser from header). */
