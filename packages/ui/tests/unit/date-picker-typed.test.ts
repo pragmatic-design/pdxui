@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import { parseTypedDate, parseTypedDateTime, formatTypedDate, dateAllowed } from '../../src/date-picker/typed-date';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 describe('parseTypedDate: the locale\'s pattern, or ISO', () => {
     it('en-US reads month/day/year', () => {

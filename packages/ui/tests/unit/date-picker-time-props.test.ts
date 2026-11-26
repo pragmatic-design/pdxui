@@ -7,7 +7,7 @@
 // The inner picker implements both (`showSeconds`, `step`); the outer one passes them on.
 import { describe, it, expect, afterEach } from 'vitest';
 import { tick, cleanup } from './helpers';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 async function mount(attrs: string, mode = 'datetime'): Promise<HTMLElement> {
     const host = document.createElement('div');

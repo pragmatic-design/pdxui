@@ -6,7 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { resolveLocale } from '../../src/shared/locale';
 import '../../src/number-input/pdx-number-input.pdx';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 type NumberInput = HTMLElement & { value: number };
 

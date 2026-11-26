@@ -25,7 +25,7 @@ import '../../src/slider/pdx-slider.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';
 import '../../src/mention/pdx-mention.pdx';
 import '../../src/select/pdx-select';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/rating/pdx-rating.pdx';
 import '../../src/segmented/pdx-segmented.pdx';

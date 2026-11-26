@@ -1,0 +1,794 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxDatePicker",
+  "tagName": "pdx-date-picker",
+  "category": "Specialized Inputs",
+  "order": 38,
+  "description": "A date picker composed of a calendar and a time picker, with several selection modes, calendar\nsystems and presets.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "rangeStart",
+      "description": "Range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rangestart"
+    },
+    {
+      "kind": "field",
+      "name": "rangeEnd",
+      "description": "Range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "rangeend"
+    },
+    {
+      "kind": "field",
+      "name": "mode",
+      "description": "Picker mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'date'",
+      "attribute": "mode"
+    },
+    {
+      "kind": "field",
+      "name": "locale",
+      "description": "Locale for formatting and i18n. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "locale"
+    },
+    {
+      "kind": "field",
+      "name": "calendar",
+      "description": "Calendar system for display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'gregory'",
+      "attribute": "calendar"
+    },
+    {
+      "kind": "field",
+      "name": "numberOfMonths",
+      "description": "Number of calendar months to show (1-3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "numberofmonths"
+    },
+    {
+      "kind": "field",
+      "name": "weekNumbers",
+      "description": "Show week numbers.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "weeknumbers"
+    },
+    {
+      "kind": "field",
+      "name": "min",
+      "description": "Minimum date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "min"
+    },
+    {
+      "kind": "field",
+      "name": "max",
+      "description": "Maximum date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "max"
+    },
+    {
+      "kind": "field",
+      "name": "disabledDates",
+      "description": "Function: (iso) => boolean for disabled dates.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "highlightedDates",
+      "description": "Function: (iso) => string|false for highlighted dates.",
+      "type": {
+        "text": "Record<string, unknown> | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "fiscalStartMonth",
+      "description": "Fiscal year start month (1-12).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "fiscalstartmonth"
+    },
+    {
+      "kind": "field",
+      "name": "presets",
+      "description": "Preset date options (array of { label, value }).",
+      "type": {
+        "text": "unknown[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "showCompare",
+      "description": "Show comparison range toggle.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showcompare"
+    },
+    {
+      "kind": "field",
+      "name": "compareStart",
+      "description": "Compare range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "comparestart"
+    },
+    {
+      "kind": "field",
+      "name": "compareEnd",
+      "description": "Compare range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "compareend"
+    },
+    {
+      "kind": "field",
+      "name": "showTime",
+      "description": "Show time picker alongside date.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showtime"
+    },
+    {
+      "kind": "field",
+      "name": "timeFormat",
+      "description": "Time format (12h/24h/auto).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'",
+      "attribute": "timeformat"
+    },
+    {
+      "kind": "field",
+      "name": "showSeconds",
+      "description": "Show seconds in time picker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "showseconds"
+    },
+    {
+      "kind": "field",
+      "name": "timeStep",
+      "description": "Time step (1/5/15/30).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1",
+      "attribute": "timestep"
+    },
+    {
+      "kind": "field",
+      "name": "clearable",
+      "description": "Allow clearing the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "clearable"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "readonly",
+      "description": "Readonly state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "readonly"
+    },
+    {
+      "kind": "field",
+      "name": "placeholder",
+      "description": "Placeholder text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "placeholder"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Name for form participation.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "inline",
+      "description": "Inline calendar (no popover, always visible).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "inline"
+    },
+    {
+      "kind": "field",
+      "name": "fixedWeeks",
+      "description": "Fixed weeks in calendar.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "fixedweeks"
+    },
+    {
+      "kind": "field",
+      "name": "firstDay",
+      "description": "First day of week (-1 = auto).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1",
+      "attribute": "firstday"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Aria label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "editable",
+      "description": "The date can be typed: the trigger's text is an input (still the combobox), read in the\nlocale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the\npopup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep\nthe plain trigger.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "editable"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The date, or `[start, end]` with `mode=\"daterange\"` or `\"datetimerange\"`. A form submits it; a range as two entries, one per date (#135).",
+      "type": {
+        "text": "string | string[]"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "getDate",
+      "parameters": [],
+      "description": "The date chosen, ISO: the range's start in a range or week mode; '' with none."
+    },
+    {
+      "kind": "method",
+      "name": "getRange",
+      "parameters": [],
+      "description": "The range chosen, or the one a week, month, quarter or year covers: `[start, end]`, ISO dates."
+    },
+    {
+      "kind": "method",
+      "name": "getTime",
+      "parameters": [],
+      "description": "The time, `HH:mm[:ss]`: the start's in a range."
+    },
+    {
+      "kind": "method",
+      "name": "getEndTime",
+      "parameters": [],
+      "description": "The end's time in a range with times."
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    },
+    {
+      "kind": "method",
+      "name": "show",
+      "parameters": [],
+      "description": "Open the popup; open already, it stays open."
+    },
+    {
+      "kind": "method",
+      "name": "close",
+      "parameters": [],
+      "description": "Close the popup."
+    },
+    {
+      "kind": "method",
+      "name": "toggle",
+      "parameters": [],
+      "description": "Open the popup when closed, close it when open."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "xs",
+        "sm",
+        "lg",
+        "xl"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-input-md",
+        "xs": ".pdx-input-xs",
+        "sm": ".pdx-input-sm",
+        "lg": ".pdx-input-lg",
+        "xl": ".pdx-input-xl"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.currentTarget.getDate()",
+    "values": "$event.detail.value",
+    "rangeStart": "$event.currentTarget.getRange()[0]",
+    "rangeEnd": "$event.currentTarget.getRange()[1]",
+    "time": "$event.currentTarget.getTime()",
+    "timeStart": "$event.currentTarget.getTime()",
+    "timeEnd": "$event.currentTarget.getEndTime()"
+  },
+  "events": [
+    {
+      "name": "open-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+      "detail": "{ value: boolean }"
+    },
+    {
+      "name": "pdx-clear",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the clear button or `clear()` empties the value, after its `value-change`."
+    },
+    {
+      "name": "pdx-blur",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the focus leaves the component: the trigger, the panel and what they hold."
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: string | string[] }"
+    }
+  ],
+  "roles": [
+    "combobox",
+    "dialog"
+  ],
+  "attributes": [
+    {
+      "name": "rangestart",
+      "fieldName": "rangeStart",
+      "description": "Range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "rangeend",
+      "fieldName": "rangeEnd",
+      "description": "Range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "mode",
+      "fieldName": "mode",
+      "description": "Picker mode.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'date'"
+    },
+    {
+      "name": "locale",
+      "fieldName": "locale",
+      "description": "Locale for formatting and i18n. Empty: the page's language (`lang`), then the browser's.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "calendar",
+      "fieldName": "calendar",
+      "description": "Calendar system for display.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'gregory'"
+    },
+    {
+      "name": "numberofmonths",
+      "fieldName": "numberOfMonths",
+      "description": "Number of calendar months to show (1-3).",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    },
+    {
+      "name": "weeknumbers",
+      "fieldName": "weekNumbers",
+      "description": "Show week numbers.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "min",
+      "fieldName": "min",
+      "description": "Minimum date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "max",
+      "fieldName": "max",
+      "description": "Maximum date (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "fiscalstartmonth",
+      "fieldName": "fiscalStartMonth",
+      "description": "Fiscal year start month (1-12).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "showcompare",
+      "fieldName": "showCompare",
+      "description": "Show comparison range toggle.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "comparestart",
+      "fieldName": "compareStart",
+      "description": "Compare range start (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "compareend",
+      "fieldName": "compareEnd",
+      "description": "Compare range end (ISO).",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "showtime",
+      "fieldName": "showTime",
+      "description": "Show time picker alongside date.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "timeformat",
+      "fieldName": "timeFormat",
+      "description": "Time format (12h/24h/auto).",
+      "type": {
+        "text": "string"
+      },
+      "default": "'auto'"
+    },
+    {
+      "name": "showseconds",
+      "fieldName": "showSeconds",
+      "description": "Show seconds in time picker.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "timestep",
+      "fieldName": "timeStep",
+      "description": "Time step (1/5/15/30).",
+      "type": {
+        "text": "number"
+      },
+      "default": "1"
+    },
+    {
+      "name": "clearable",
+      "fieldName": "clearable",
+      "description": "Allow clearing the value.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "readonly",
+      "fieldName": "readonly",
+      "description": "Readonly state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "placeholder",
+      "fieldName": "placeholder",
+      "description": "Placeholder text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Name for form participation.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "inline",
+      "fieldName": "inline",
+      "description": "Inline calendar (no popover, always visible).",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "fixedweeks",
+      "fieldName": "fixedWeeks",
+      "description": "Fixed weeks in calendar.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "firstday",
+      "fieldName": "firstDay",
+      "description": "First day of week (-1 = auto).",
+      "type": {
+        "text": "number"
+      },
+      "default": "-1"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Aria label.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "editable",
+      "fieldName": "editable",
+      "description": "The date can be typed: the trigger's text is an input (still the combobox), read in the\nlocale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the\npopup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep\nthe plain trigger.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+      "type": {
+        "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The date, or `[start, end]` with `mode=\"daterange\"` or `\"datetimerange\"`. A form submits it; a range as two entries, one per date (#135).",
+      "type": {
+        "text": "string | string[]"
+      },
+      "default": "''"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "DatePreset",
+      "fields": [
+        "label: string",
+        "value: string | [string, string]"
+      ]
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The trigger, the combobox unless `editable`: the frame, its border and background."
+    },
+    {
+      "name": "input",
+      "description": "The text field inside the trigger, while `editable`: the combobox then."
+    },
+    {
+      "name": "clear",
+      "description": "The clear button, while `clearable`, something is chosen and not `disabled`."
+    },
+    {
+      "name": "popup",
+      "description": "The floating panel, a `role=\"dialog\"`, that holds the calendar, the time and the presets."
+    },
+    {
+      "name": "preset",
+      "description": "A preset button in the panel's sidebar."
+    },
+    {
+      "name": "calendar",
+      "description": "The `pdx-calendar` the picker draws, in the panel or `inline`."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-input-border-color",
+      "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-color-focus",
+      "description": "The frame's border while focused (the outlined input style)."
+    },
+    {
+      "name": "--pdx-input-border-width",
+      "description": "The frame's bottom border, in the filled input style."
+    },
+    {
+      "name": "--pdx-input-focus-ring",
+      "description": "The ring around the frame while focused."
+    },
+    {
+      "name": "--pdx-input-min-height",
+      "description": "The frame's height, at the md size."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "open",
+      "description": "The popup is open."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "readonly",
+      "description": "`readonly` is set."
+    }
+  ]
+}

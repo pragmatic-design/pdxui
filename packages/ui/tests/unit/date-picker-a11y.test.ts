@@ -7,7 +7,7 @@
 // has a role and a name, and opening it moves focus into it; the month and year grids have a label.
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 const trigger = (el: HTMLElement) => el.querySelector('.pdx-date-picker-trigger') as HTMLElement;
 const panel = (el: HTMLElement) => el.querySelector('.pdx-date-picker-panel') as HTMLElement;

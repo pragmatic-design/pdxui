@@ -9,7 +9,7 @@
 // into the calendar, is still inside it.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 function blurs(el: HTMLElement): Event[] {
     const seen: Event[] = [];

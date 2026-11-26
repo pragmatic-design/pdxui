@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DATE_PICKER_SHEET_QUERY } from '../../src/date-picker/pdx-date-picker';
+import { DATE_PICKER_SHEET_QUERY } from '../../src/date-picker/date-picker-sheet';
 
 const CSS = readFileSync(join(__dirname, '..', '..', '..', 'design', 'src', 'components', 'date-picker.css'), 'utf-8');
 

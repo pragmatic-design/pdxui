@@ -5,7 +5,7 @@ import { cleanup, mount, tick } from './helpers';
 
 import '../../src/calendar/pdx-calendar.pdx';
 import '../../src/time-picker/pdx-time-picker.pdx';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 // ─── pdx-calendar ────────────────────────────────────────────
 

@@ -1,0 +1,868 @@
+<template></template>
+
+<script>
+/**
+ * A date picker composed of a calendar and a time picker, with several selection modes, calendar
+ * systems and presets.
+ *
+ * @csspart root - The trigger, the combobox unless `editable`: the frame, its border and background.
+ * @csspart input - The text field inside the trigger, while `editable`: the combobox then.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel, a `role="dialog"`, that holds the calendar, the time and the presets.
+ * @csspart preset - A preset button in the panel's sidebar.
+ * @csspart calendar - The `pdx-calendar` the picker draws, in the panel or `inline`.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.getDate()
+ * @alphadetail values $event.detail.value
+ * @alphadetail rangeStart $event.currentTarget.getRange()[0]
+ * @alphadetail rangeEnd $event.currentTarget.getRange()[1]
+ * @alphadetail time $event.currentTarget.getTime()
+ * @alphadetail timeStart $event.currentTarget.getTime()
+ * @alphadetail timeEnd $event.currentTarget.getEndTime()
+ */
+// pdx-date-picker — Main date/time picker component.
+// Modes: date | datetime | daterange | datetimerange | time | week | month | year | quarter
+// Structure: input trigger + popover → calendar panel + optional time + presets sidebar.
+//
+// Its DOM is built by the script, a frame after mount, as the TypeScript version built it
+// (date-picker-dom.ts builds its pieces).
+import { untracked, usePopover, getComponentString, generatedId, onNextFrame, onDestroy } from '@pdxui/core';
+import type { PopoverReturn } from '@pdxui/core';
+import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, getFiscalYear } from '@pdxui/core';
+import type { CalendarSystem } from '@pdxui/core';
+import { resolveLocale } from '../shared/locale';
+import { setOwnProp } from '../shared/own-prop';
+import { parseTypedDateTime, formatTypedDate, dateAllowed } from './typed-date';
+import { initCalendarStructuralProps, makeTimePicker, makeCompareRow, makeTriggerIcon, makePresets, makeFooter } from './date-picker-dom';
+import { DATE_PICKER_SHEET_QUERY } from './date-picker-sheet';
+import type { DatePreset } from './date-picker-types';
+import './date-picker-strings';
+import '../calendar/pdx-calendar.pdx';
+import '../time-picker/pdx-time-picker.pdx';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/date-picker';
+
+// The sheet's breakpoint, for its test and for an app that lays out around the panel.
+export { DATE_PICKER_SHEET_QUERY } from './date-picker-sheet';
+// The preset shape an app builds in TypeScript (`import type { DatePreset } from '@pdxui/ui/date-picker'`).
+export type { DatePreset } from './date-picker-types';
+
+// The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
+// mode; the date and its time, `2026-03-14T09:30`, in `datetime` mode or with `show-time`; the time
+// in `time` mode; `[start, end]` in `daterange`, `datetimerange` (each with its time) and `week`
+// mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
+// dispatches `value-change`. A form submits it, a range as two entries, and resets it (#135).
+/** The date, or `[start, end]` with `mode="daterange"` or `"datetimerange"`. A form submits it; a range as two entries, one per date (#135). */
+@model value: string | string[] = '' { attribute: string, form };
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
+/** Fired when the clear button or `clear()` empties the value, after its `value-change`. */
+@event 'pdx-clear': void;
+/** Fired when the focus leaves the component: the trigger, the panel and what they hold. */
+@event 'pdx-blur': void;
+// The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+// from them. The trigger carries no state class.
+@state open = isOpen;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+// Every element is built by the script, a frame after mount (date-picker-dom.ts builds the pieces).
+@part(external) root, input, clear, popup, preset, calendar;
+// The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+// the same size on a native field. `md` is the base look, which no class adds to.
+@variants {
+  /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+  size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md;
+}
+/** Range start (ISO). */
+@prop rangeStart: string = '';
+/** Range end (ISO). */
+@prop rangeEnd: string = '';
+/** Picker mode. */
+@prop mode: string = 'date';
+/** Locale for formatting and i18n. Empty: the page's language (`lang`), then the browser's. */
+@prop locale: string = '';
+/** Calendar system for display. */
+@prop calendar: string = 'gregory';
+/** Number of calendar months to show (1-3). */
+@prop numberOfMonths: number = 0;
+/** Show week numbers. */
+@prop weekNumbers: boolean = false;
+/** Minimum date (ISO). */
+@prop min: string = '';
+/** Maximum date (ISO). */
+@prop max: string = '';
+/** Function: (iso) => boolean for disabled dates. */
+@prop disabledDates: Record<string, unknown> | null = null;
+/** Function: (iso) => string|false for highlighted dates. */
+@prop highlightedDates: Record<string, unknown> | null = null;
+/** Fiscal year start month (1-12). */
+@prop fiscalStartMonth: number = 1;
+/** Preset date options (array of { label, value }). */
+@prop presets: unknown[] = [];
+/** Show comparison range toggle. */
+@prop showCompare: boolean = false;
+/** Compare range start (ISO). */
+@prop compareStart: string = '';
+/** Compare range end (ISO). */
+@prop compareEnd: string = '';
+/** Show time picker alongside date. */
+@prop showTime: boolean = false;
+/** Time format (12h/24h/auto). */
+@prop timeFormat: string = 'auto';
+/** Show seconds in time picker. */
+@prop showSeconds: boolean = false;
+/** Time step (1/5/15/30). */
+@prop timeStep: number = 1;
+/** Allow clearing the value. */
+@prop clearable: boolean = true;
+/** Disabled state. */
+@prop disabled: boolean = false;
+/** Readonly state. */
+@prop readonly: boolean = false;
+/** Placeholder text. */
+@prop placeholder: string = '';
+/** Name for form participation. */
+@prop name: string = '';
+/** Inline calendar (no popover, always visible). */
+@prop inline: boolean = false;
+/** Fixed weeks in calendar. */
+@prop fixedWeeks: boolean = true;
+/** First day of week (-1 = auto). */
+@prop firstDay: number = -1;
+/** Aria label. */
+@prop ariaLabel: string = '';
+/**
+ * The date can be typed: the trigger's text is an input (still the combobox), read in the
+ * locale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the
+ * popup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep
+ * the plain trigger.
+ */
+@prop editable: boolean = false;
+// The host is the one submitter (#135), in FormData under its `name` (#133).
+@host el { :name="name || null" }
+
+// Imperative API: focus/blur/clear, the parts of the value, and the popup driven by the overlay
+// verbs (#287), which replace the undeclared openPopover/closePopover.
+@expose getDate, getRange, getTime, getEndTime, focus, blur, clear, show, close, toggle;
+
+let popover: PopoverReturn | null = null;
+// The prop, then the page's lang, then the browser. Passed resolved to the
+// calendar and the time picker it builds, so all three agree.
+const localeNow = (): string => resolveLocale(el, locale as string);
+let compareEnabled = $signal(false);
+let timeValue = $signal('00:00');
+let timeEndValue = $signal('00:00');
+// Internal range state (tracks building range before external confirmation)
+let internalRangeStart = $signal('');
+let internalRangeEnd = $signal('');
+let internalValue = $signal('');
+/** A time-only picker has a time: until one is set, or after a clear, its value is ''. A signal: the
+ *  trigger shows the time only once there is one. */
+let timeSet = $signal(false);
+/** The multi mode's dates. */
+let internalMulti: string[] = [];
+
+function modeStr(): string { return mode as string; }
+function isRange(): boolean { return modeStr() === 'daterange' || modeStr() === 'datetimerange'; }
+function hasTime(): boolean { return modeStr() === 'datetime' || modeStr() === 'datetimerange' || modeStr() === 'time' || (showTime as boolean); }
+function isTimeOnly(): boolean { return modeStr() === 'time'; }
+
+function autoNumMonths(): number {
+  const n = numberOfMonths as number;
+  if (n > 0) return n;
+  // Range gets 2 months, everything else 1
+  return isRange() ? 2 : 1;
+}
+
+function calendarMode(): string {
+  const m = modeStr();
+  if (m === 'datetime' || m === 'date') return 'date';
+  if (m === 'daterange' || m === 'datetimerange') return 'range';
+  return m; // week, month, year, quarter
+}
+
+// ─── Display Value ─────────────────────────────────
+
+function displayValue(): string {
+  const m = modeStr();
+  const loc = localeNow();
+  const cal = calendar as CalendarSystem;
+
+  // The time, once there is one: before that the model is '', and so is what the trigger shows.
+  if (m === 'time') return timeSet ? (timeValue as string) || '' : '';
+
+  // The model's date: the sync effect writes it in, whatever shape the mode gives it.
+  const val = internalValue as string;
+  const rStart = (internalRangeStart as string) || rangeStart as string;
+  const rEnd = (internalRangeEnd as string) || rangeEnd as string;
+
+  // Range display (daterange, datetimerange, week)
+  if (isRange() || m === 'week') {
+    if (!rStart && !rEnd) return '';
+    const s = rStart ? formatDate(rStart, loc, cal) : '...';
+    const e = rEnd ? formatDate(rEnd, loc, cal) : '...';
+    return `${s} — ${e}`;
+  }
+
+  // Year mode: show just the year
+  if (m === 'year' && val) {
+    return parseISO(val).year.toString();
+  }
+
+  // Month mode: show "Month Year"
+  if (m === 'month' && val) {
+    const d = parseISO(val);
+    const monthNames = getMonthNames(loc, cal, 'long');
+    return `${monthNames[d.month - 1]} ${d.year}`;
+  }
+
+  // Quarter mode: show "Q1 2024"
+  if (m === 'quarter' && val) {
+    const d = parseISO(val);
+    const fiscal = fiscalStartMonth as number;
+    const q = getFiscalQuarter(d.month, fiscal);
+    const fy = getFiscalYear(d.year, d.month, fiscal);
+    return `Q${q} ${fy}`;
+  }
+
+  if (!val) return '';
+
+  let display = formatDate(val, loc, cal);
+  if (hasTime()) {
+    display += ' ' + (timeValue as string);
+  }
+  return display;
+}
+
+function formatDate(iso: string, loc: string, cal: CalendarSystem): string {
+  if (cal !== 'gregory') {
+    return formatWithCalendar(iso, loc, cal, { dateStyle: 'medium' });
+  }
+  return formatWithCalendar(iso, loc, 'gregory', { dateStyle: 'medium' });
+}
+
+function getPlaceholder(): string {
+  const ph = placeholder as string;
+  if (ph) return ph;
+  if (isTimeOnly()) return getComponentString('date-picker', 'placeholderTime')();
+  if (isRange()) return getComponentString('date-picker', 'placeholderRange')();
+  return getComponentString('date-picker', 'placeholder')();
+}
+
+// ─── The model (#481) ──────────────────────────────
+
+/** The mode holds a range: `[start, end]`. */
+function holdsRange(): boolean { return isRange() || modeStr() === 'week'; }
+/** A date and its time, as one ISO string; '' with no date. */
+const withTime = (date: string, time: string): string => (date ? `${date}T${time}` : '');
+
+/** The model's value for the mode, from the internal state. */
+function currentModel(): string | string[] {
+  const m = modeStr();
+  if (m === 'time') return timeSet.peek() ? timeValue.peek() : '';
+  if (m === 'multi') return [...internalMulti];
+  if (holdsRange()) {
+    const rs = internalRangeStart.peek();
+    const re = internalRangeEnd.peek();
+    if (!rs && !re) return [];
+    return hasTime()
+      ? [withTime(rs, timeValue.peek()), withTime(re, timeEndValue.peek())]
+      : [rs, re];
+  }
+  const v = internalValue.peek();
+  return hasTime() ? withTime(v, timeValue.peek()) : v;
+}
+
+/** Writes the model from the internal state, which dispatches `value-change`. */
+function announce(): void {
+  value = currentModel();
+}
+
+/** The range on the host's own props, which the calendar is drawn from. */
+function reflectRange(start: string, end: string): void {
+  setOwnProp(el, 'rangeStart', start);
+  setOwnProp(el, 'rangeEnd', end);
+}
+
+/** Splits `2026-03-14T09:30` into its date and its time ('' for a date alone). */
+function splitDateTime(v: string): [string, string] {
+  const at = v.indexOf('T');
+  return at < 0 ? [v, ''] : [v.slice(0, at), v.slice(at + 1)];
+}
+
+// Sync external props into internal state: the model as the mode holds it, and the range props.
+// An empty model ('' or null: a form reset, a parent clearing it) empties what the mode holds, as
+// clear() does without announcing; the TypeScript version skipped it and left the old date on show.
+$effect(() => {
+  const v = value as string | string[] | null;
+  const rs = rangeStart as string;
+  const re = rangeEnd as string;
+  untracked(() => {
+    if (Array.isArray(v)) {
+      if (modeStr() === 'multi') internalMulti = [...v as string[]];
+      else {
+        const [sd, st] = splitDateTime((v[0] as string) ?? '');
+        const [ed, et] = splitDateTime((v[1] as string) ?? '');
+        internalRangeStart = sd;
+        internalRangeEnd = ed;
+        if (st) timeValue = st;
+        if (et) timeEndValue = et;
+      }
+    } else if (typeof v === 'string' && v) {
+      if (modeStr() === 'time') { timeValue = v; timeSet = true; }
+      else {
+        const [d, t] = splitDateTime(v);
+        internalValue = d;
+        if (t) timeValue = t;
+      }
+    } else {
+      if (modeStr() === 'time') timeSet = false;
+      else if (modeStr() === 'multi') internalMulti = [];
+      else {
+        internalValue = '';
+        if (holdsRange()) { internalRangeStart = ''; internalRangeEnd = ''; }
+      }
+    }
+    if (rs) internalRangeStart = rs;
+    if (re) internalRangeEnd = re;
+  });
+});
+
+// ─── Calendar Events ───────────────────────────────
+
+/** The calendar's model event, which does not bubble: the picker announces its own. */
+function onCalendarChange(e: CustomEvent<{ value: string | string[] }>): void {
+  const v = e.detail.value;
+  const m = modeStr();
+
+  if (Array.isArray(v)) {
+    if (m === 'multi') {
+      internalMulti = [...v];
+      announce();
+      return;
+    }
+    // A range, or a week: update the internal range at once, for the calendar to re-render.
+    const start = v[0] ?? '';
+    const end = v[1] ?? '';
+    internalRangeStart = start;
+    internalRangeEnd = end;
+    reflectRange(start, end);
+    announce();
+    // Close only when range is complete (both ends selected)
+    if (end && !hasTime()) closePopover();
+  } else if (v) {
+    internalValue = v;
+    // A month, a year or a quarter covers a range, which the calendar holds.
+    const [rs, re] = (e.currentTarget as HTMLElement & { getRange(): [string, string] }).getRange();
+    if (m !== 'date' && m !== 'datetime' && rs) {
+      internalRangeStart = rs;
+      internalRangeEnd = re;
+      reflectRange(rs, re);
+    }
+    announce();
+    if (!hasTime() && m !== 'range') closePopover();
+  }
+}
+
+/** What the calendar is drawn from that does not change with the selection. */
+function calendarSetup() {
+  return {
+    mode: calendarMode(),
+    numberOfMonths: autoNumMonths(),
+    locale: localeNow(),
+    calendar: calendar as string,
+    min: min as string,
+    max: max as string,
+    fiscalStartMonth: fiscalStartMonth as number,
+    weekNumbers: weekNumbers as boolean,
+    firstDay: firstDay as number,
+    fixedWeeks: fixedWeeks as boolean,
+    disabledDates: disabledDates as unknown,
+    highlightedDates: highlightedDates as unknown,
+  };
+}
+
+/** The calendar, wired to this picker. Built by both the panel and the inline form. */
+function makeCalendar(): HTMLElement {
+  const cal = document.createElement('pdx-calendar');
+  cal.setAttribute('inline', '');
+  cal.setAttribute('data-part', 'calendar');
+  initCalendarStructuralProps(cal, calendarSetup());
+  cal.addEventListener('value-change', onCalendarChange as EventListener);
+  return cal;
+}
+
+/** The time row: one picker, or two with a separator for a range. */
+function makeTimeRow(loc: string): HTMLElement {
+  const timeWrap = document.createElement('div');
+  timeWrap.className = 'pdx-date-picker-time';
+  const opts = { format: timeFormat as string, showSeconds: showSeconds as boolean, step: timeStep as number };
+  timeEl = makeTimePicker(loc, opts, onTimeChange) as HTMLElement & { value: string };
+  timeWrap.appendChild(timeEl);
+  if (isRange()) {
+    const sep = document.createElement('span');
+    sep.className = 'pdx-date-picker-time-sep';
+    sep.textContent = '—';
+    timeWrap.appendChild(sep);
+    timeWrap.appendChild(makeTimePicker(loc, opts, onTimeEndChange));
+  }
+  return timeWrap;
+}
+
+/** The time picker's model event, which does not bubble. A time with no date yet waits for it. */
+function onTimeChange(e: CustomEvent<{ value: string }>): void {
+  timeValue = e.detail.value;
+  if (isTimeOnly()) timeSet = true;
+  if (isTimeOnly() || internalValue.peek() || internalRangeStart.peek() || internalRangeEnd.peek()) announce();
+}
+
+function onTimeEndChange(e: CustomEvent<{ value: string }>): void {
+  timeEndValue = e.detail.value;
+  // The end time is announced, not only collected: otherwise the consumer could not
+  // receive it.
+  if (internalRangeStart.peek() || internalRangeEnd.peek()) announce();
+}
+
+function onPresetClick(chosen: DatePreset): void {
+  // The internals updated the way onCalendarChange does: without it, in
+  // uncontrolled use the display would not change after a preset.
+  if (Array.isArray(chosen.value)) {
+    internalRangeStart = chosen.value[0];
+    internalRangeEnd = chosen.value[1];
+    internalValue = chosen.value[0];
+    reflectRange(chosen.value[0], chosen.value[1]);
+  } else {
+    internalValue = chosen.value;
+  }
+  announce();
+  closePopover();
+}
+
+function onClear(): void {
+  internalValue = '';
+  internalRangeStart = '';
+  internalRangeEnd = '';
+  internalMulti = [];
+  timeSet = false;
+  timeValue = '00:00';
+  timeEndValue = '00:00'; // reopening without a stale time
+  reflectRange('', '');
+  announce();
+  pdxClear();
+}
+
+function onTodayClick(): void {
+  internalValue = today();
+  announce();
+  if (!hasTime()) closePopover();
+}
+
+/** On open, focus goes into the dialog: the day the calendar holds its tab stop on (the value,
+ *  or today clamped into min/max), the month or year shown in those modes — once the calendar
+ *  has drawn, which an early `openPopover()` can precede. A time-only picker has no calendar:
+ *  its first control. Focus does not stay on the trigger. */
+function focusIntoPanel(): void {
+  const cal = calendarEl as (HTMLElement & { focusView?: () => void }) | null;
+  if (cal?.focusView) { cal.focusView(); return; }
+  panelEl?.querySelector<HTMLElement>('button:not([disabled]), input:not([type="hidden"]), [tabindex="0"]')?.focus();
+}
+
+// `open-change` is announced from `onOpenChange` and nowhere else, because that is the one
+// place that runs only when the state actually CHANGES: `usePopover.setOpen` opens with
+// `if (_isOpen.peek() === open) return`. Emitting here instead would announce work that has
+// not happened — a second `show()` on an open picker would re-fire it, and `closePopover()`
+// would fire it twice, once itself and once through the callback it has just triggered: the
+// Done button would emit two.
+function closePopover(): void {
+  popover?.close();
+}
+
+/** Open-only and idempotent: `show()`, which the contract scenario `date-picker-open` calls to
+ *  reach its state. A toggle here would make that scenario open and immediately close on a
+ *  second call. */
+function openPopover(): void {
+  if (disabled.peek() || readonly.peek()) return;
+  popover?.open();
+}
+
+/** What the TRIGGER does. A button carrying `aria-expanded` closes what it opened — it is
+ *  what the attribute means, and it is what `pdx-select` does (`onTriggerClick` →
+ *  `toggle()`). A listener that only called `openPopover()` would let Escape and an outside
+ *  click dismiss the calendar while the control that opened it could not. */
+function togglePopover(): void {
+  if (disabled.peek() || readonly.peek()) return;
+  popover?.toggle();
+}
+
+// ─── Imperative Render ─────────────────────────────
+// Two-phase: layout (once, a frame after mount) + update effect (reactive props to calendar)
+
+// The popover is born in the build's frame (outside the setup's ownership scope),
+// so usePopover's auto-dispose does not cover it: without this teardown the
+// document listeners would survive the unmount.
+onDestroy(() => { popover?.dispose(); popover = null; });
+
+let triggerEl: HTMLElement | null = null;
+/** The element with the combobox role: the trigger, or the editable input. */
+let comboEl: HTMLElement | null = null;
+let inputEl: HTMLInputElement | null = null;
+/** The input holds text the user typed and has not committed: the display must not replace it. */
+let typing = false;
+let textEl: HTMLElement | null = null;
+let clearEl: HTMLButtonElement | null = null;
+let panelEl: HTMLElement | null = null;
+
+/**
+ * pdx-blur when the focus leaves the COMPONENT — the input, its calendar button and the
+ * calendar are all inside it. A form marks the field touched on it, and shows the field's
+ * error then: without it a date that breaks a rule would say nothing until the submit.
+ * Heard on the host and on the panel, which the popover may move out of the host; one
+ * focusout bubbling through both is counted once.
+ */
+let lastFocusOut: Event | null = null;
+function onFocusOut(e: FocusEvent): void {
+  if (e === lastFocusOut) return;
+  lastFocusOut = e;
+  const to = e.relatedTarget as Node | null;
+  if (to && (el.contains(to) || panelEl?.contains(to))) return;
+  pdxBlur();
+}
+el.addEventListener('focusout', onFocusOut);
+/** The panel's time picker (datetime modes): a typed time is written back to it. */
+let timeEl: (HTMLElement & { value: string }) | null = null;
+let calendarEl: (HTMLElement & { disabledDates?: unknown; highlightedDates?: unknown }) | null = null;
+let built = false;
+/** The popup is open: the host's :state(open), set where the popover reports a change. */
+let isOpen = $signal(false);
+
+/** The trigger's name: aria-label, else the placeholder, else date-picker.choose — a string a
+ *  locale can reach, not a literal 'Choose date'. */
+const triggerName = (): string =>
+  (ariaLabel as string) || (placeholder as string) || getComponentString('date-picker', 'choose')();
+$effect(() => {
+  const n = triggerName();
+  if (comboEl) comboEl.setAttribute('aria-label', n);
+});
+
+/** The editable input's text, in the locale's numeric pattern — what it reads back. */
+function typedText(): string {
+  const val = internalValue.peek();
+  if (!val) return '';
+  const date = formatTypedDate(val, localeNow());
+  return modeStr() === 'datetime' ? `${date} ${timeValue.peek()}` : date;
+}
+
+/** A typed time as the time picker writes it: `HH:mm`, or `HH:mm:ss` with showSeconds. Null
+ *  for seconds the picker cannot show: dropping them would be a silent loss.
+ *  (The parameter's type is spelled out: naming typed-date's interface here would publish an
+ *  internal type among this component's shapes in the manifest.) */
+function typedTimeValue(t: { hours: number; minutes: number; seconds: number }): string | null {
+  const two = (n: number) => String(n).padStart(2, '0');
+  if (showSeconds.peek() as boolean) return `${two(t.hours)}:${two(t.minutes)}:${two(t.seconds)}`;
+  return t.seconds ? null : `${two(t.hours)}:${two(t.minutes)}`;
+}
+
+/** Commit what is typed (Enter, blur). Empty clears; a date that does not exist or cannot be
+ *  picked is aria-invalid, keeps the last good value and the text, and fires nothing; a new
+ *  valid date is the value, with one value-change. In datetime a time after the
+ *  date is read too — it sets the time, and one that is not a time is invalid; a date alone
+ *  keeps the time already set; the event carries `time` as the time picker's does. */
+function commitTyped(): void {
+  if (!inputEl) return;
+  const text = inputEl.value.trim();
+  const current = internalValue.peek();
+  if (!text) {
+    inputEl.removeAttribute('aria-invalid');
+    typing = false;
+    if (current) onClear();
+    return;
+  }
+  const typedWithTime = modeStr() === 'datetime';
+  const parsed = parseTypedDateTime(text, localeNow());
+  const rules = { min: min.peek() as string, max: max.peek() as string, disabledDates: disabledDates.peek() as unknown as ((iso: string) => boolean) | null };
+  const currentTime = timeValue.peek();
+  const time = parsed?.time ? (typedWithTime ? typedTimeValue(parsed.time) : null) : currentTime;
+  if (!parsed || !dateAllowed(parsed.date, rules) || time === null) {
+    inputEl.setAttribute('aria-invalid', 'true');
+    return;
+  }
+  const iso = parsed.date;
+  inputEl.removeAttribute('aria-invalid');
+  typing = false;
+  if (iso !== current || (typedWithTime && time !== currentTime)) {
+    internalValue = iso;
+    if (typedWithTime) {
+      timeValue = time;
+      if (timeEl) timeEl.value = time;
+    }
+    announce();
+  }
+  inputEl.value = typedText();
+}
+
+// Layout: build the DOM structure once, a frame after mount.
+onNextFrame(() => untracked(build));
+
+function build(): void {
+  if (built) return;
+  built = true;
+  const isDisabled = disabled.peek() as boolean;
+  const isReadonly = readonly.peek() as boolean;
+  const isInline = inline.peek() as boolean;
+  const timeOnly = isTimeOnly();
+  const showTimePicker = hasTime();
+  const presetList = presets.peek() as DatePreset[];
+  const withCompare = showCompare.peek() as boolean;
+  const loc = localeNow();
+  el.innerHTML = '';
+
+  if (isInline) {
+    // ⚠️ This branch must not return right after the calendar — about a hundred lines
+    // before the point where the panel builds its time picker. Then `inline` would
+    // silently drop `datetime`, `datetimerange`, `showTime`, and render `mode="time"`
+    // as a calendar and nothing else: the one thing that mode says it is not.
+    // Everything the panel shows below the calendar is built from the
+    // same three factories, so the two branches cannot drift apart.
+    if (!timeOnly) {
+      calendarEl = makeCalendar();
+      el.appendChild(calendarEl);
+    }
+    if (showTimePicker) el.appendChild(makeTimeRow(loc));
+    if (withCompare) el.appendChild(makeCompareRow((on) => { compareEnabled = on; }));
+    return;
+  }
+
+  // Trigger input
+  const trigger = document.createElement('div');
+  triggerEl = trigger;
+  // No state class: `disabled` and `readonly` are the host's :state() (#287).
+  trigger.className = 'pdx-date-picker-trigger pdx-input-wrap';
+  trigger.setAttribute('data-part', 'root');
+  // Editable: the text is an input, and the input is the combobox.
+  const isEditable = (editable.peek() as boolean) && (modeStr() === 'date' || modeStr() === 'datetime');
+  let combo: HTMLElement;
+  if (isEditable) {
+    const field = document.createElement('input');
+    inputEl = field;
+    field.type = 'text';
+    field.className = 'pdx-date-picker-input';
+    field.setAttribute('data-part', 'input');
+    field.autocomplete = 'off';
+    field.disabled = isDisabled;
+    field.readOnly = isReadonly;
+    combo = field;
+  } else {
+    combo = trigger;
+    combo.setAttribute('tabindex', isDisabled ? '-1' : '0');
+  }
+  comboEl = combo;
+  combo.setAttribute('role', 'combobox');
+  combo.setAttribute('aria-expanded', 'false');
+  combo.setAttribute('aria-haspopup', 'dialog');
+  // An accessible name always present: aria-label="" would leave the combobox unnamed
+  // (axe aria-input-field-name). It falls back to the placeholder or a sensible default.
+  combo.setAttribute('aria-label', triggerName());
+
+  const icon = makeTriggerIcon(timeOnly, isEditable, isDisabled || isReadonly);
+  trigger.appendChild(icon);
+
+  if (inputEl) {
+    trigger.appendChild(inputEl);
+  } else {
+    textEl = document.createElement('span');
+    textEl.className = 'pdx-date-picker-placeholder';
+    trigger.appendChild(textEl);
+  }
+
+  const clearBtn = document.createElement('button') as HTMLButtonElement;
+  clearEl = clearBtn;
+  clearBtn.type = 'button';
+  clearBtn.className = 'pdx-input-clear pdx-input-suffix-interactive';
+  clearBtn.setAttribute('data-part', 'clear');
+  clearBtn.textContent = '×';
+  clearBtn.setAttribute('aria-label', getComponentString('date-picker', 'clear')());
+  clearBtn.setAttribute('tabindex', '-1');
+  clearBtn.style.display = 'none';
+  clearBtn.addEventListener('click', (e) => { e.stopPropagation(); onClear(); });
+  trigger.appendChild(clearBtn);
+
+  if (inputEl) {
+    const field = inputEl;
+    icon.addEventListener('click', (e) => { e.stopPropagation(); togglePopover(); });
+    field.addEventListener('input', () => { typing = true; });
+    field.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' && e.altKey) { e.preventDefault(); openPopover(); }
+      else if (e.key === 'Enter') { e.preventDefault(); commitTyped(); }
+    });
+    field.addEventListener('blur', commitTyped);
+  } else {
+    trigger.addEventListener('click', togglePopover);
+    trigger.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') && !disabled.peek() && !readonly.peek()) {
+        e.preventDefault();
+        openPopover();
+      }
+    });
+  }
+  el.appendChild(trigger);
+
+  // Panel
+  const panel = document.createElement('div');
+  panelEl = panel;
+  panel.className = 'pdx-date-picker-panel';
+  panel.setAttribute('data-part', 'popup');
+  panel.id = generatedId('pdx-dp-panel');
+  panel.style.display = 'none';
+  // The dialog the trigger's aria-haspopup announces, with a role and a name.
+  panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-label', getComponentString('date-picker', timeOnly ? 'chooseTime' : 'choose')());
+  // role=combobox requires an aria-controls pointing at the popup (axe aria-required-attr).
+  combo.setAttribute('aria-controls', panel.id);
+  // Prevent clicks inside panel from propagating to trigger (would re-toggle popover)
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  // The panel may be moved out of the host by the popover: a focus leaving from inside
+  // it is heard here too.
+  panel.addEventListener('focusout', onFocusOut);
+
+  const panelInner = document.createElement('div');
+  panelInner.className = 'pdx-date-picker-panel-inner' + (presetList.length ? ' pdx-date-picker-has-presets' : '');
+  if (presetList.length) panelInner.appendChild(makePresets(presetList, onPresetClick));
+
+  const main = document.createElement('div');
+  main.className = 'pdx-date-picker-main';
+  if (!timeOnly) {
+    calendarEl = makeCalendar();
+    main.appendChild(calendarEl);
+  }
+  if (showTimePicker) main.appendChild(makeTimeRow(loc));
+  if (withCompare) main.appendChild(makeCompareRow((on) => { compareEnabled = on; }));
+
+  panelInner.appendChild(main);
+  panel.appendChild(panelInner);
+  panel.appendChild(makeFooter({ timeOnly, withDone: showTimePicker || isRange() }, onTodayClick, closePopover));
+  el.appendChild(panel);
+
+  // Setup popover
+  if (popover) popover.dispose();
+  popover = usePopover({
+    trigger: 'manual',
+    placement: 'bottom-start',
+    dismissOnOutside: true,
+    dismissOnEscape: true,
+    container: el,
+    // Below the sheet breakpoint the stylesheet owns the panel (a bottom sheet); the
+    // popover positions it only above.
+    positioned: () => !window.matchMedia(DATE_PICKER_SHEET_QUERY).matches,
+    onOpenChange(nowOpen) {
+      // Whether the user was inside the panel when it closes: a pick, Done, a
+      // preset or Today close it from there, and hiding the focused day would drop
+      // focus to <body>. Every close from inside returns it, as Escape
+      // does. An outside click closes on pointerdown, and the click
+      // then moves focus on to what was clicked, as it would have anyway.
+      const focusWasInside = !nowOpen && !!panelEl?.contains(document.activeElement);
+      if (panelEl) panelEl.style.display = nowOpen ? '' : 'none';
+      if (comboEl) comboEl.setAttribute('aria-expanded', String(nowOpen));
+      isOpen = nowOpen;
+      if (nowOpen) {
+        focusIntoPanel();
+        openChange({ value: true });
+      }
+      if (focusWasInside) comboEl?.focus();
+      if (!nowOpen) {
+        // Discard an INCOMPLETE range on dismiss (start picked, no end): otherwise the
+        // dangling start lingers as a selection that was never committed as a value
+        // ("the pre-order is left dangling outside"). Reverts to the committed rangeStart prop.
+        if (internalRangeStart.peek() && !internalRangeEnd.peek()) internalRangeStart = '';
+        openChange({ value: false });
+      }
+    },
+  });
+  popover.setTrigger(trigger);
+  popover.setContent(panel);
+}
+
+// Reactive structural props: post-mount changes of
+// locale/min/max/mode/etc. are re-applied to the calendar through attributes.
+$effect(() => {
+  void locale; void calendar; void min; void max;
+  void mode; void numberOfMonths; void fiscalStartMonth;
+  void firstDay; void weekNumbers; void fixedWeeks;
+  if (!built) return;
+  requestAnimationFrame(() => {
+    if (calendarEl) initCalendarStructuralProps(calendarEl, untracked(calendarSetup));
+  });
+});
+
+// Update effect: sync only selection state to existing DOM (no structural props that cause rebuild)
+$effect(() => {
+  const display = displayValue();
+  const ph = getPlaceholder();
+  const isClearable = clearable as boolean;
+  const isDisabled = disabled as boolean;
+  const isReadonly = readonly as boolean;
+  const val = internalValue as string;
+  const rStart = (internalRangeStart as string) || rangeStart as string;
+  const rEnd = (internalRangeEnd as string) || rangeEnd as string;
+  const cStart = compareStart as string;
+  const cEnd = compareEnd as string;
+
+  requestAnimationFrame(() => {
+    // Update trigger display text
+    if (textEl) {
+      textEl.textContent = display || ph;
+      textEl.className = 'pdx-date-picker-text' + (display ? '' : ' pdx-date-picker-placeholder');
+    }
+    // Editable: the committed value in the locale's pattern, unless the user is typing.
+    if (inputEl) {
+      inputEl.placeholder = ph;
+      if (!typing) inputEl.value = display ? typedText() : '';
+    }
+    // `disabled` and `readonly` set after the build: the combobox leaves the tab order, the
+    // editable input follows (#287).
+    if (comboEl && comboEl === triggerEl) comboEl.setAttribute('tabindex', isDisabled ? '-1' : '0');
+    if (inputEl) { inputEl.disabled = isDisabled; inputEl.readOnly = isReadonly; }
+    // Toggle clear button
+    if (clearEl) {
+      clearEl.style.display = (isClearable && display && !isDisabled && !isReadonly) ? '' : 'none';
+    }
+    // Sync selection props via setAttribute (lowercased camelCase matches observedAttributes)
+    if (calendarEl) {
+      calendarEl.setAttribute('value', val || '');
+      calendarEl.setAttribute('rangestart', rStart || '');
+      calendarEl.setAttribute('rangeend', rEnd || '');
+      calendarEl.setAttribute('comparestart', cStart || '');
+      calendarEl.setAttribute('compareend', cEnd || '');
+    }
+  });
+});
+
+/** The date chosen, ISO: the range's start in a range or week mode; '' with none. */
+function getDate(): string { return holdsRange() ? internalRangeStart.peek() : internalValue.peek(); }
+/** The range chosen, or the one a week, month, quarter or year covers: `[start, end]`, ISO dates. */
+function getRange(): [string, string] { return [internalRangeStart.peek(), internalRangeEnd.peek()]; }
+/** The time, `HH:mm[:ss]`: the start's in a range. */
+function getTime(): string { return timeValue.peek(); }
+/** The end's time in a range with times. */
+function getEndTime(): string { return timeEndValue.peek(); }
+function focus() { (el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); }
+function blur() { (el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); }
+function clear() { onClear(); }
+/** Open the popup; open already, it stays open. */
+function show() { openPopover(); }
+/** Close the popup. */
+function close() { closePopover(); }
+/** Open the popup when closed, close it when open. */
+function toggle() { togglePopover(); }
+</script>
