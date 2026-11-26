@@ -193,6 +193,28 @@ describe('lazy branches — the shape the library already has', () => {
         expect(loadChildren, 'the branch was fetched again on re-open').toHaveBeenCalledTimes(1);
     });
 
+    // The twisty is drawn by the design system from the row's state (#1279): the row in flight is
+    // aria-busy, which turns its arrow into the loading ring, and the twisty carries no glyph.
+    it('the row in flight is aria-busy, and the twisty holds no text', async () => {
+        let resolve!: (kids: unknown[]) => void;
+        const loadChildren = vi.fn(() => new Promise<unknown[]>((r) => { resolve = r; }));
+        document.body.innerHTML = '';
+        const el = document.createElement('pdx-tree') as HTMLElement & Record<string, unknown>;
+        el.nodes = [{ id: 'remote', label: 'remote', isBranch: true }];
+        el.loadChildren = loadChildren;
+        document.body.appendChild(el);
+        await new Promise(r => requestAnimationFrame(() => r(null)));
+        expect(byLabel(el, 'remote').querySelector('.pdx-tree-twisty')!.textContent).toBe('');
+
+        byLabel(el, 'remote').click();
+        await vi.waitFor(() => expect(byLabel(el, 'remote').getAttribute('aria-busy')).toBe('true'));
+        expect(byLabel(el, 'remote').querySelector('.pdx-tree-twisty')!.textContent).toBe('');
+
+        resolve([{ id: 'late', label: 'loaded.pdx' }]);
+        await vi.waitFor(() => expect(byLabel(el, 'loaded.pdx')).toBeTruthy());
+        expect(byLabel(el, 'remote').hasAttribute('aria-busy')).toBe(false);
+    });
+
     it('a branch whose load fails stays askable, and says so', async () => {
         const loadChildren = vi.fn(async () => { throw new Error('offline'); });
         document.body.innerHTML = '';
