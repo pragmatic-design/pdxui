@@ -14,7 +14,7 @@ import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader.pdx';
 import '../../src/tree-select/pdx-tree-select.pdx';
 import '../../src/transfer/pdx-transfer.pdx';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/calendar/pdx-calendar.pdx';
 import '../../src/color-picker/pdx-color-picker.pdx';

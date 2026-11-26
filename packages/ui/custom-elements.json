@@ -9979,7 +9979,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/date-picker/pdx-date-picker.ts",
+      "path": "src/date-picker/pdx-date-picker.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -10782,7 +10782,7 @@
           "name": "pdx-date-picker",
           "declaration": {
             "name": "PdxDatePicker",
-            "module": "src/date-picker/pdx-date-picker.ts"
+            "module": "src/date-picker/pdx-date-picker.pdx"
           }
         }
       ]

@@ -497,7 +497,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 479.3 → 479.5 (the same standing OK): pdx-calendar moves to .pdx, 0.91× alone with its two
 // modules (5308 against 5835 B), and the total still grew 0.2 KB, the cause not isolated: 479.3 KB
 // measured locally, held to CI's figure as above.
-const BUDGET_KB = { entry: 43.6, js: 479.5, css: 67, blocking: 102.9 };
+// js 479.5 → 480.0 (the same standing OK): pdx-date-picker moves to .pdx, 0.88× alone with its
+// modules (6944 against 7882 B, typed-date counted on both sides), but its chunk grows 398 B gzip
+// with the same file count; the per-chunk diff and the cause are on #1287. 479.8 KB measured locally,
+// held to CI's figure as above.
+const BUDGET_KB = { entry: 43.6, js: 480.0, css: 67, blocking: 102.9 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

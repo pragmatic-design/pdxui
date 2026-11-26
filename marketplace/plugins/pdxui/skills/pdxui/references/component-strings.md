@@ -186,25 +186,25 @@ placeholders, filled at render: keep them in the translation.
 | `data-grid` | `toolbar.reload` | `Reload` | `@pdxui/ui/src/data-grid/grid-i18n.ts` |
 | `data-grid` | `toolbar.search` | `Search` | `@pdxui/ui/src/data-grid/grid-i18n.ts` |
 | `data-grid` | `toolbar.sort` | `Sort` | `@pdxui/ui/src/data-grid/grid-i18n.ts` |
-| `date-picker` | `apply` | `Apply` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `cancel` | `Cancel` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `choose` | `Choose date` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `chooseTime` | `Choose time` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `clear` | `Clear` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `close` | `Close` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `compareToggle` | `Compare` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `done` | `Done` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `endDate` | `End date` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `nextMonth` | `Next month` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `placeholder` | `Select date` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `placeholderRange` | `Start — End` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `placeholderTime` | `Select time` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `prevMonth` | `Previous month` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `selectMonth` | `Select month` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `selectYear` | `Select year` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `startDate` | `Start date` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `today` | `Today` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
-| `date-picker` | `weekNumber` | `W` | `@pdxui/ui/src/date-picker/pdx-date-picker.ts` |
+| `date-picker` | `apply` | `Apply` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `cancel` | `Cancel` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `choose` | `Choose date` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `chooseTime` | `Choose time` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `clear` | `Clear` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `close` | `Close` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `compareToggle` | `Compare` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `done` | `Done` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `endDate` | `End date` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `nextMonth` | `Next month` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `placeholder` | `Select date` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `placeholderRange` | `Start — End` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `placeholderTime` | `Select time` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `prevMonth` | `Previous month` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `selectMonth` | `Select month` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `selectYear` | `Select year` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `startDate` | `Start date` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `today` | `Today` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
+| `date-picker` | `weekNumber` | `W` | `@pdxui/ui/src/date-picker/date-picker-strings.ts` |
 | `dialog` | `close` | `Close dialog` | `@pdxui/ui/src/shared/i18n.ts` |
 | `dialog` | `label` | `Dialog` | `@pdxui/ui/src/shared/i18n.ts` |
 | `drawer` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |

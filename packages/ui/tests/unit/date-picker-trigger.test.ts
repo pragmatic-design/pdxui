@@ -13,7 +13,7 @@
  */
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 
 /** The panel is hidden with `display:none` and shown by clearing it (onOpenChange). */
 function isPanelOpen(el: HTMLElement): boolean {

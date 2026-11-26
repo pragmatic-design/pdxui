@@ -105,7 +105,7 @@
       "import": "./dist/calendar/pdx-calendar.js"
     },
     "./date-picker": {
-      "development": "./src/date-picker/pdx-date-picker.ts",
+      "development": "./src/date-picker/pdx-date-picker.pdx",
       "types": "./dist/date-picker/pdx-date-picker.d.ts",
       "import": "./dist/date-picker/pdx-date-picker.js"
     },
@@ -674,6 +674,7 @@
     "dist/carousel/carousel-icons.js",
     "dist/cascader/cascader-strings.js",
     "dist/data-grid/grid-i18n.js",
+    "dist/date-picker/date-picker-strings.js",
     "dist/empty-state/empty-state-icons.js",
     "dist/entity-grid/entity-grid-icons.js",
     "dist/fab/fab-icons.js",
@@ -695,6 +696,7 @@
     "src/carousel/carousel-icons.ts",
     "src/cascader/cascader-strings.ts",
     "src/data-grid/grid-i18n.ts",
+    "src/date-picker/date-picker-strings.ts",
     "src/empty-state/empty-state-icons.ts",
     "src/entity-grid/entity-grid-icons.ts",
     "src/fab/fab-icons.ts",

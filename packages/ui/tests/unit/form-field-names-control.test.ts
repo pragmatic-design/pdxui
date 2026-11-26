@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/input/pdx-input.pdx';
-import '../../src/date-picker/pdx-date-picker';
+import '../../src/date-picker/pdx-date-picker.pdx';
 import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/time-picker/pdx-time-picker.pdx';
 import '../../src/tag-input/pdx-tag-input.pdx';

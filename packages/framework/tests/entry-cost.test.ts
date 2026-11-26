@@ -129,7 +129,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 344.9 after pdx-cascader (measured here: 344.8): 0.85× alone with its three modules, the entry
     // +0.2 KB, as for the two above; the built component carries no setup return, so the growth is
     // not a DEV branch left in. Listed in #1287 as a cost the moves share.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 344.9 },
+    // 345.2 after pdx-date-picker (measured here: 345.1): 0.88× alone with its modules, the entry
+    // +0.2 KB, as for the moves above (#1287).
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 345.2 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -150,8 +152,8 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (measured here: 334.4). 334.9 after pdx-alert-dialog (measured here: 334.8). 335.4 after
     // pdx-mention (measured here: 335.3), as for the entry above. 335.6 after pdx-transfer (measured
     // here: 335.5), as for the entry above. 335.9 after pdx-cascader (measured here: 335.8), as for
-    // the entry above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 335.9 },
+    // the entry above. 336.2 after pdx-date-picker (measured here: 336.1), as for the entry above.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 336.2 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
