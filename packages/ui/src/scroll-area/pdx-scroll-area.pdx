@@ -32,11 +32,12 @@ import '@pdxui/design/components/scroll-area';
 /** The viewport scrolled: where it is, and how big the content and the viewport are. */
 @event 'pdx-scroll': { scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number };
 // On the host as custom states (#132, #290), in place of the `data-at-*` attributes it wrote:
-// scroll-area.css fades the edges that have more content past them from these.
-@state at-top = atTop;
-@state at-bottom = atBottom;
-@state at-left = atLeft;
-@state at-right = atRight;
+// scroll-area.css fades the edges that have more content past them from these. Set from the scroll
+// handler, as the TypeScript version set them (#1436), each by its camelCase: atTop = … (#1441).
+@state at-top;
+@state at-bottom;
+@state at-left;
+@state at-right;
 @part viewport;
 // The track and the thumb useScrollbar draws.
 @part(external) scrollbar, thumb;
@@ -59,10 +60,6 @@ import '@pdxui/design/components/scroll-area';
 // are native Element methods; flattening them onto the host would shadow the natives.
 @expose scrollArea;
 
-let atTop = $signal(false);
-let atBottom = $signal(false);
-let atLeft = $signal(false);
-let atRight = $signal(false);
 let _built = false;
 let _scrollbar: ScrollbarReturn | null = null;
 let _viewportEl: HTMLElement | null = null;
