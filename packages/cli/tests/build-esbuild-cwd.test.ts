@@ -32,8 +32,12 @@ describe('an in-process pdx build', () => {
             exitSpy.mockRestore();
         }
         expect(existsSync(join(root, 'dist', 'index.html'))).toBe(true);
-        // Throws, naming the holder, if a process sits in the project.
-        removeTree(root);
-        expect(existsSync(root)).toBe(false);
+        // Throws, naming the holder, if a process sits in the project: that is this test's claim. When
+        // nothing in the project refuses a rename, the root included, no process sits in it, and a
+        // directory still there is held from outside this process tree, an on-access scan or the
+        // indexer reading what the build has just written (#699): removeTree warns and says so, and
+        // the claim holds (#1245, three times on the gate with `holders: none`).
+        const removed = removeTree(root);
+        expect(existsSync(root), 'removeTree says it removed the project, and the project is still there').toBe(!removed);
     }, 60_000);
 });
