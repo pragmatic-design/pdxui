@@ -7,6 +7,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { component } from '../src/component/component';
+import { PdxElement } from '../src/component/element';
 import { html } from '../src/renderer/template';
 import { signal } from '../src/reactivity/signal';
 
@@ -57,17 +58,16 @@ describe('a declared state', () => {
         expect([...statesOf(el)!]).toEqual([]);
     });
 
-    it('ctx.states keeps each state in step with its function, each tracked on its own (#1207)', () => {
+    it('ctx.states keeps each state in step with its own function (#1207)', () => {
         const name = tag();
         const open = signal(false);
         const count = signal(0);
-        let runs = { open: 0, busy: 0 };
         component(name, {
             states: ['open', 'busy'],
             setup(ctx) {
                 ctx.states({
-                    open: () => { runs.open++; return open(); },
-                    busy: () => { runs.busy++; return count() > 0; },
+                    open: () => open(),
+                    busy: () => count() > 0,
                 });
             },
             render: () => html`<p>x</p>`,
@@ -80,10 +80,30 @@ describe('a declared state', () => {
         expect([...statesOf(el)!].sort()).toEqual(['busy', 'open']);
         open.set(false);
         expect([...statesOf(el)!]).toEqual(['busy']);
-        // One effect per state: a change of `count` did not re-run `open`'s function.
-        runs = { open: 0, busy: 0 };
-        count.set(3);
-        expect(runs).toEqual({ open: 0, busy: 1 });
+        count.set(0);
+        expect([...statesOf(el)!]).toEqual([]);
+    });
+
+    it('ctx.states tracks all its states in one effect, whatever their number (#1432)', () => {
+        // Each effect is paid at every mount; a TypeScript component set its states in one track or
+        // none, so a compiled @state must not cost one per state.
+        const proto = PdxElement.prototype as unknown as { track: (...args: unknown[]) => unknown };
+        const tracks = vi.spyOn(proto, 'track');
+        const countTracks = (states: string[], map: (flag: () => boolean) => Record<string, () => unknown>) => {
+            const name = tag();
+            const flag = signal(false);
+            component(name, {
+                states,
+                setup(ctx) { if (states.length > 0) ctx.states(map(flag)); },
+                render: () => html`<p>x</p>`,
+            });
+            tracks.mockClear();
+            mount(name);
+            return tracks.mock.calls.length;
+        };
+        const none = countTracks([], () => ({}));
+        const three = countTracks(['a', 'b', 'c'], flag => ({ a: () => flag(), b: () => !flag(), c: () => flag() }));
+        expect(three - none).toBe(1);
     });
 
     it('a component that declares no state attaches no internals', () => {

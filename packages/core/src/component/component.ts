@@ -121,9 +121,9 @@ export interface ComponentContextBase {
      */
     state(name: string, on: boolean): void;
     /**
-     * Keep each declared state in `map` on while its function returns a truthy value (#1207): one
-     * tracked effect per state, as `ctx.track(() => ctx.state(name, …))` would be. What a compiled
-     * `@state` emits.
+     * Keep each declared state in `map` on while its function returns a truthy value (#1207), all of
+     * them in one tracked effect (#1432): a change of any input re-reads every function. What a
+     * compiled `@state` emits.
      */
     states(map: Record<string, () => unknown>): void;
 }
@@ -500,11 +500,13 @@ export function defineComponent<P extends PropMap, E extends EventMap, M extends
                 // every context of the class has one shape: a property added after it would change it.
                 expose: expose ? (api: Record<string, unknown>) => expose(this, api) : undefined,
                 state: setState,
+                // One effect for all the states (#1432): an effect is paid at every mount, and a
+                // change re-reads a handful of functions; setting a state to its value is a no-op.
                 states: (map: Record<string, () => unknown>) => {
-                    for (const name of Object.keys(map)) {
-                        const read = map[name];
-                        this.track(() => { setState(name, Boolean(read())); });
-                    }
+                    const names = Object.keys(map);
+                    this.track(() => {
+                        for (const name of names) setState(name, Boolean(map[name]()));
+                    });
                 },
             };
             // Form-associated: expose form methods on context

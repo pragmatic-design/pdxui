@@ -762,8 +762,8 @@ The analyzer's form: `@state name = booleanExpression;`
 A visual state of the host, held in the platform's custom states (`ElementInternals.states`): the
 descriptor declares it (`states: ['name']`), the host attaches its internals once, and an effect sets
 the state from the expression whenever what the expression reads changes
-(one `ctx.states({ name: () => …, … })` for all of a component's states, each tracked in its own
-effect). A name may hold a hyphen, as a CSS custom state's does (#1230): `@state label-left = pos ===
+(one `ctx.states({ name: () => …, … })` for all of a component's states, tracked in one effect: a
+change of anything one expression reads re-evaluates them all, #1432). A name may hold a hyphen, as a CSS custom state's does (#1230): `@state label-left = pos ===
 'left';` is the state `label-left`. CSS matches it with `:state(name)` — a theme, a page or
 the component itself — instead of a class or an attribute each component names its own way. The
 manifest lists a component's states.
