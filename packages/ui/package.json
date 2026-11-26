@@ -125,7 +125,7 @@
       "import": "./dist/cascader/pdx-cascader.js"
     },
     "./tree": {
-      "development": "./src/tree/pdx-tree.ts",
+      "development": "./src/tree/pdx-tree.pdx",
       "types": "./dist/tree/pdx-tree.d.ts",
       "import": "./dist/tree/pdx-tree.js"
     },

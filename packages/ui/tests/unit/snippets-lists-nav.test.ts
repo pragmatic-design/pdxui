@@ -19,7 +19,7 @@ import '../../src/nav-menu/pdx-nav-menu';
 import '../../src/pagination/pdx-pagination.pdx';
 import '../../src/sortable-list/pdx-sortable-list.pdx';
 import '../../src/timeline/pdx-timeline.pdx';
-import '../../src/tree/pdx-tree';
+import '../../src/tree/pdx-tree.pdx';
 
 type Scope = Record<string, unknown>;
 type Args = unknown[];

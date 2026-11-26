@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-tree
  *
- * Written against the source (packages/ui/src/tree/pdx-tree.ts) and the CSS
+ * Written against the source (packages/ui/src/tree/pdx-tree.pdx) and the CSS
  * (packages/design/src/components/tree.css).
  *
  * DOM, host vs inner:

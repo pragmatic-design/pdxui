@@ -112,7 +112,6 @@ export const NO_IMPORT_TAGS: readonly string[] = [
     'pdx-toolbar',
     'pdx-tooltip',
     'pdx-transfer',
-    'pdx-tree',
     'pdx-tree-select',
     'pdx-visually-hidden',
     'pdx-wizard',

@@ -5,7 +5,7 @@
 // gone, and the focus with it. Lookups by id and check states each walked the tree as well.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import '../../src/tree/pdx-tree';
+import '../../src/tree/pdx-tree.pdx';
 
 const NODES = [
     {

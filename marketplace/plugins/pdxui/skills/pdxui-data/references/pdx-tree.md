@@ -32,7 +32,7 @@ row. It shares the
 | `label` | `label` | string | `''` | Accessible name for the tree. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 
-**Events:** `pdx-check` → `detail: { checked }` — `{ checked: string[] }` — the ids fully checked (a mixed parent is not one).; `pdx-expand` → `detail: { id, expanded }` — `{ id, expanded }` — one branch opened or closed.; `pdx-load-error` → `detail: { id, error }` — `{ id, error }` — `loadChildren` rejected; the branch stays askable.; `pdx-select` → `detail: { selected }` — `{ selected: string[] }` — the ids selected, after the change.
+**Events:** `pdx-check` → `detail: { checked: string[] }` — `{ checked: string[] }` — the ids fully checked (a mixed parent is not one).; `pdx-expand` → `detail: { id: string; expanded: boolean }` — `{ id, expanded }` — one branch opened or closed.; `pdx-load-error` → `detail: { id: string; error: unknown }` — `{ id, error }` — `loadChildren` rejected; the branch stays askable.; `pdx-select` → `detail: { selected: string[] }` — `{ selected: string[] }` — the ids selected, after the change.
 
 **Renders:** roles `group` · `tree` · `treeitem`
 

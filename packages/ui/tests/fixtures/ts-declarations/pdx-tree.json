@@ -1,0 +1,281 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxTree",
+  "tagName": "pdx-tree",
+  "category": "Specialized Inputs",
+  "order": 42,
+  "description": "A hierarchy the user navigates.",
+  "generics": [
+    "T"
+  ],
+  "members": [
+    {
+      "kind": "field",
+      "name": "nodes",
+      "description": "The roots. Children are read from `childrenField`.",
+      "type": {
+        "text": "T[]"
+      },
+      "default": "[]"
+    },
+    {
+      "kind": "field",
+      "name": "idField",
+      "description": "The field that identifies a node.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'",
+      "attribute": "idfield"
+    },
+    {
+      "kind": "field",
+      "name": "labelField",
+      "description": "The field rendered as the node's text, when there is no `node` slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'",
+      "attribute": "labelfield"
+    },
+    {
+      "kind": "field",
+      "name": "childrenField",
+      "description": "The field holding a node's children.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'children'",
+      "attribute": "childrenfield"
+    },
+    {
+      "kind": "field",
+      "name": "selectionMode",
+      "description": "'none' | 'single' | 'multiple'.",
+      "type": {
+        "text": "'none' | 'single' | 'multiple'"
+      },
+      "default": "'none'",
+      "attribute": "selectionmode"
+    },
+    {
+      "kind": "field",
+      "name": "checkable",
+      "description": "Show a checkbox per node, tri-state over a branch's subtree.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "checkable"
+    },
+    {
+      "kind": "field",
+      "name": "defaultExpandAll",
+      "description": "Open every branch on first render.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "defaultexpandall"
+    },
+    {
+      "kind": "field",
+      "name": "loadChildren",
+      "description": "Fetch a branch's children the first time it opens.",
+      "type": {
+        "text": "((...args: unknown[]) => unknown) | null"
+      },
+      "default": "null"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Accessible name for the tree.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    }
+  ],
+  "events": [
+    {
+      "name": "pdx-select",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "`{ selected: string[] }` — the ids selected, after the change.",
+      "detail": "{ selected: string[] }"
+    },
+    {
+      "name": "pdx-expand",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "`{ id, expanded }` — one branch opened or closed.",
+      "detail": "{ id: string; expanded: boolean }"
+    },
+    {
+      "name": "pdx-check",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "`{ checked: string[] }` — the ids fully checked (a mixed parent is not one).",
+      "detail": "{ checked: string[] }"
+    },
+    {
+      "name": "pdx-load-error",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "`{ id, error }` — `loadChildren` rejected; the branch stays askable.",
+      "detail": "{ id: string; error: unknown }"
+    }
+  ],
+  "roles": [
+    "group",
+    "tree",
+    "treeitem"
+  ],
+  "attributes": [
+    {
+      "name": "idfield",
+      "fieldName": "idField",
+      "description": "The field that identifies a node.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'id'"
+    },
+    {
+      "name": "labelfield",
+      "fieldName": "labelField",
+      "description": "The field rendered as the node's text, when there is no `node` slot.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'label'"
+    },
+    {
+      "name": "childrenfield",
+      "fieldName": "childrenField",
+      "description": "The field holding a node's children.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'children'"
+    },
+    {
+      "name": "selectionmode",
+      "fieldName": "selectionMode",
+      "description": "'none' | 'single' | 'multiple'.",
+      "type": {
+        "text": "'none' | 'single' | 'multiple'"
+      },
+      "default": "'none'"
+    },
+    {
+      "name": "checkable",
+      "fieldName": "checkable",
+      "description": "Show a checkbox per node, tri-state over a branch's subtree.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "defaultexpandall",
+      "fieldName": "defaultExpandAll",
+      "description": "Open every branch on first render.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Accessible name for the tree.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "TreeNode",
+      "fields": [
+        "isBranch?: boolean"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "node",
+      "description": "Renders one node's label: a snippet `node(node, level, expanded)`.",
+      "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The `role=\"tree\"`: one click and one keydown listener serve every row."
+    },
+    {
+      "name": "item",
+      "description": "A row, `role=\"treeitem\"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3)."
+    },
+    {
+      "name": "group",
+      "description": "The `role=\"group\"` of an open branch's children."
+    },
+    {
+      "name": "twisty",
+      "description": "A branch's open/closed marker."
+    },
+    {
+      "name": "check",
+      "description": "A row's checkbox, with `checkable`."
+    },
+    {
+      "name": "label",
+      "description": "A row's label."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "loading",
+      "description": "A lazy branch is loading: the tree is `aria-busy` too (A4)."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set: a click opens and selects nothing."
+    }
+  ],
+  "cssProperties": [
+    {
+      "name": "--pdx-tree-level"
+    }
+  ]
+}

@@ -33777,7 +33777,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/tree/pdx-tree.ts",
+      "path": "src/tree/pdx-tree.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -33897,7 +33897,7 @@
                 "text": "CustomEvent"
               },
               "description": "`{ selected: string[] }` — the ids selected, after the change.",
-              "detail": "{ selected }"
+              "detail": "{ selected: string[] }"
             },
             {
               "name": "pdx-expand",
@@ -33905,7 +33905,7 @@
                 "text": "CustomEvent"
               },
               "description": "`{ id, expanded }` — one branch opened or closed.",
-              "detail": "{ id, expanded }"
+              "detail": "{ id: string; expanded: boolean }"
             },
             {
               "name": "pdx-check",
@@ -33913,7 +33913,7 @@
                 "text": "CustomEvent"
               },
               "description": "`{ checked: string[] }` — the ids fully checked (a mixed parent is not one).",
-              "detail": "{ checked }"
+              "detail": "{ checked: string[] }"
             },
             {
               "name": "pdx-load-error",
@@ -33921,7 +33921,7 @@
                 "text": "CustomEvent"
               },
               "description": "`{ id, error }` — `loadChildren` rejected; the branch stays askable.",
-              "detail": "{ id, error }"
+              "detail": "{ id: string; error: unknown }"
             }
           ],
           "roles": [
@@ -34067,7 +34067,7 @@
           "name": "pdx-tree",
           "declaration": {
             "name": "PdxTree",
-            "module": "src/tree/pdx-tree.ts"
+            "module": "src/tree/pdx-tree.pdx"
           }
         }
       ]
