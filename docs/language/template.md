@@ -1665,7 +1665,11 @@ block is removed. With `@error`, an exception the body throws while it renders l
 - Both names are in the `@error` body's scope, whatever they are called. The error is `unknown` to
   the editor, as a TypeScript `catch` binding is (#122): narrow it before reading a member,
   `err instanceof Error ? err.message : String(err)`.
-- The timing block is recognised only when it contains `minMs` or `maxMs`; it is not an expression.
+- The timing block is the block right after `@await (…)` that another block follows: a body is
+  followed by `@loading`, `@error` or nothing, never by a block, so the shape decides and the words
+  inside do not, as for `@try`'s options. It is not an expression: it holds `minMs` and `maxMs`, each
+  at most once, each a non-negative integer of milliseconds in digits. An unknown key, a key twice, a
+  key with no value or another value stops the compile at its line (#1369).
 - `pdx migrate` parenthesises an alpha `@await (x as T)` whose name is a type, and flags every
   `@await` with `maxMs` and every one whose operand is neither a declared source nor a promise.
 
