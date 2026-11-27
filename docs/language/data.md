@@ -521,6 +521,13 @@ component. `onMount(fn)` runs once the store is created, its persisted state res
 runs when the store is disposed, by `disposeStore('name')` or `clearStores()` from `@pdxui/core`, which
 also stop its effects. The next `useName()` after a dispose creates the store anew.
 
+Under `pdx dev`, a store file saved is a store created again (#1468): the previous one is disposed —
+its `onDestroy` runs, its effects stop — and the edited factory creates the new one, which takes the
+values its top-level `$signal`s had, as a component's HMR keeps its signals' values. A `$store` object
+and a `$derived` start from the new factory, and a signal the edit removed is dropped. The components
+that read the store are run again by the same update and read the new one. Before, the module's second
+run found the store in the registry and kept the old one, old effects included, until a full reload.
+
 #### Rules
 
 - Any other form — `@store name = { … }`, an option other than `persist` — is

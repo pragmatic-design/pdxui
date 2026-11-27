@@ -62,9 +62,57 @@ export function createGlobalStore<T>(
     // The inspector lists it at level 2: `__pdx_debug.stores()`.
     if (DEV) registerStore(id, instance);
 
+    // A store created again by HMR takes the values its previous version's signals had (#1468).
+    const carried = hotValues.get(id);
+    if (carried) {
+        hotValues.delete(id);
+        restoreSignals(instance, carried);
+    }
+
     // Registered first: an onMount that reads the store through its own hook gets this instance.
     for (const fn of mounted) untracked(fn);
     return instance;
+}
+
+/** The signal values of a store disposed by HMR, for the store its module creates next (#1468). */
+const hotValues = new Map<string, Map<string, unknown>>();
+
+/** What a module's `import.meta.hot` gives this: its `data`, which survives from one run of the module to the next. */
+interface HotContext {
+    data: Record<string, unknown>;
+}
+
+/** The store's signals — the members a caller writes with `.set` — by name. */
+function signalsOf(instance: unknown): [string, { (): unknown; set(v: unknown): void }][] {
+    if (!instance || typeof instance !== 'object') return [];
+    return Object.entries(instance as Record<string, unknown>)
+        .filter((e): e is [string, { (): unknown; set(v: unknown): void }] => typeof e[1] === 'function' && 'set' in e[1]);
+}
+
+/** Set each signal of `instance` that `values` has a value for; a signal it no longer has is dropped. */
+function restoreSignals(instance: unknown, values: Map<string, unknown>): void {
+    for (const [name, sig] of signalsOf(instance)) if (values.has(name)) sig.set(values.get(name));
+}
+
+/**
+ * HMR of a `@store` module (#1468), called by the module before it creates its store: the plugin puts
+ * `__pdx_store_hot('name', import.meta.hot)` there in dev, and nothing in a build.
+ *
+ * The module's first run marks its hot data. On a later run — the file edited, the module executed
+ * again — the store its previous version created is disposed (its onDestroy, its effects stopped), and
+ * its signals' values are kept for the store `createGlobalStore` now creates from the new factory: as
+ * a component's HMR keeps its signals' values. Without this, the call found the name in the registry
+ * and returned the old instance, and the edit did nothing until a full reload. Internal.
+ */
+export function __pdx_store_hot(id: string, hot: HotContext | undefined): void {
+    if (!hot) return;
+    if (hot.data.__pdxStore === true && registry.has(id)) {
+        const values = new Map<string, unknown>();
+        for (const [name, sig] of signalsOf(registry.get(id))) values.set(name, untracked(() => sig()));
+        hotValues.set(id, values);
+        disposeStore(id);
+    }
+    hot.data.__pdxStore = true;
 }
 
 /**

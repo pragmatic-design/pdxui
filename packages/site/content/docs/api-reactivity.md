@@ -7,9 +7,26 @@ parent: api
 
 # Reactivity API
 
-Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 72 exports, from `@pdxui/core`.
+Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 73 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
+
+## `__pdx_store_hot`
+
+```ts
+import { __pdx_store_hot } from '@pdxui/core';
+
+function __pdx_store_hot(id: string, hot: HotContext | undefined): void
+```
+
+HMR of a `@store` module (#1468), called by the module before it creates its store: the plugin puts
+`__pdx_store_hot('name', import.meta.hot)` there in dev, and nothing in a build.
+
+The module's first run marks its hot data. On a later run — the file edited, the module executed
+again — the store its previous version created is disposed (its onDestroy, its effects stopped), and
+its signals' values are kept for the store `createGlobalStore` now creates from the new factory: as
+a component's HMR keeps its signals' values. Without this, the call found the name in the registry
+and returned the old instance, and the edit did nothing until a full reload. Internal.
 
 ## `ActionDisabledError`
 

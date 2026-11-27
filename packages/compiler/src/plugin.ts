@@ -609,6 +609,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // source a save is compared with is the client's.
                 if (isDevMode && !ssr) {
                     if (tagMatch) output = injectHMR(output, tagMatch[1]);
+                    else output = injectStoreHMR(output);
                     compiledSources.set(id, code);
                 }
 
@@ -1252,6 +1253,25 @@ ${styleSwapListener()}  import.meta.hot.accept(() => {
   });
 }
 `;
+}
+
+/**
+ * HMR of a `@store` module (#1468): `__pdx_store_hot('name', import.meta.hot)` before the store is
+ * created. Re-executed after an edit, the module's createGlobalStore found the name in the registry
+ * and returned the old store, its old effects running, until a full reload; core disposes the previous
+ * store there and carries its signals' values to the one the new factory creates. Written on the lines
+ * that are there — the call before the declaration, the name in the core import — so the source map
+ * does not move. A module that is no store is returned as it is.
+ */
+function injectStoreHMR(code: string): string {
+    // Match: the store's declaration, `const __store_cart = createGlobalStore(`. Groups: [1]=the store's name
+    const decl = /\bconst __store_([\w$]+) = createGlobalStore\(/.exec(code);
+    if (!decl) return code;
+    // Match: the module's core import's specifier list. Groups: [1]=the specifiers
+    const coreImport = /import \{([^}]*)\} from '@pdxui\/core';/;
+    if (!coreImport.test(code)) return code;
+    const withImport = code.replace(coreImport, (_m, names: string) => `import {${names.trimEnd()}, __pdx_store_hot } from '@pdxui/core';`);
+    return withImport.replace(decl[0], `__pdx_store_hot(${jsQuote(decl[1])}, import.meta.hot); ${decl[0]}`);
 }
 
 /**
