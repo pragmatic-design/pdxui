@@ -619,10 +619,16 @@ class InlineGen {
         // A plain element's binding is one call to core's (#1207): the effect, the last value and the
         // write are the same in every binding, and written out each was the heaviest construct of a
         // compiled component. Which of the three writes it is stays decided here.
-        // In the block's group (#1275): one effect runs every binding of the block. A `:style` beside a
-        // `:style.x` keeps its own, at its place: written last with the group, it would wipe that one.
+        // In the block's group (#1275): one effect runs every binding of the block, and reads each value
+        // again when anything another reads changes. An attribute, a style or a URL writes a string, the
+        // same for an equal value: it joins. A property or a component's prop is assigned the value as
+        // it is, and a new object at each read — `[10, 20, 50]` — would be assigned again, the component
+        // starting over: it joins only when its value is a primitive. A `:style` beside a `:style.x`
+        // keeps its own, at its place: written last with the group, it would wipe that one.
         const name = this.boundName(prop, kind);
-        const grouped = !(this.styleParts && !kind.custom && name === 'style');
+        const writesString = URL_BINDINGS.has(name.toLowerCase()) || (!kind.custom && name === 'style') || isAttributeBinding(name, kind);
+        const grouped = !(this.styleParts && !kind.custom && name === 'style')
+            && (writesString || (!preRewritten && isTextExpression(expr, this.ctx)));
         const helper = this.boundAttributeCall(el, name, value, kind, false, grouped);
         if (helper !== null) {
             // Counted only when its line is written: a value given for a discarded one would land on

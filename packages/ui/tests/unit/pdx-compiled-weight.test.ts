@@ -54,7 +54,7 @@
 // binding, and `bindGroup`/`bindText` imported. The trade is the effects: pdx-fieldset written
 // declaratively went from 1.41× its TypeScript version's mount to 1.01×. Then the values the bindings
 // have with the props at their defaults go into the static markup and to `bindGroup`, which writes only
-// what differs: the switch 1276 → 1287 B, the select 7703 → 7725 B, for the fieldset's whole mount,
+// what differs: the switch 1276 → 1287 B, the select 7703 → 7724 B, for the fieldset's whole mount,
 // the frame after it included, 0.70–0.76× its TypeScript version's.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
@@ -73,7 +73,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1287,
-    'src/select/pdx-select.pdx': 7725,
+    'src/select/pdx-select.pdx': 7724,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

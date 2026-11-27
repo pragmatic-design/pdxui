@@ -109,7 +109,8 @@ describe('a block\'s bindings in one effect', () => {
     });
 
     it('the control: a binding whose default is not known keeps a group with nothing given', () => {
-        const code = full('<div :title="node" :lang="items"></div>');
+        // A call is not evaluated: its value at mount is not known.
+        const code = full('<div :aria-label="legend.trim()" :data-items="items.join(\',\')"></div>');
         expect(code).toMatch(/bindGroup\(__g\);/);
     });
 
@@ -117,6 +118,21 @@ describe('a block\'s bindings in one effect', () => {
         const code = full('<div :style="legend" :style.color="label" :title="legend" :lang="label"></div>');
         expect(code).toMatch(/bindStyleText\(__el\d+, \(\)\s*=>[^;]+\);/);
         expect(code).not.toMatch(/bindStyleText\([^;]+__g\)/);
+    });
+
+    // In the group a getter is read again when anything the block reads changes. `[10, 20, 50]` given to
+    // a component's prop is a new array at each read: assigned again, the component started over — the
+    // showcase's tickets grid lost its search when the total changed. A property or a component's prop
+    // joins the group when its value is a primitive; an attribute or a style writes a string, the same
+    // for an equal value, and joins it always.
+    it('a component prop or a property whose value may be an object keeps its own effect', () => {
+        const code = render('<pdx-x :sizes="[10, 20]" :items="items" :label="legend" :count="count"></pdx-x><div :title="legend" :hidden="open"></div>');
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "sizes", \(\)=>\[10, 20\]\);/);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "items", \(\)=>ctx\.items\(\)\);/);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "label", \(\)=>ctx\.legend\(\), __g\);/);
+        expect(code).toMatch(/bindComponentProp\(__el\d+, "count", \(\)=>ctx\.count\(\), __g\);/);
+        const plain = render('<input :value="items" :title="legend" :hidden="open" />');
+        expect(plain).toMatch(/bindNativeProperty\(__el\d+, "value", "value", \(\)=>ctx\.items\(\)\);/);
     });
 
     it('each block has its own group: a branch of an @if gathers its bindings apart from the root\'s', () => {
