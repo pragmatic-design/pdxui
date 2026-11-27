@@ -42,6 +42,9 @@
 // (a key dropped, a filter left on its source); one list over the rows of the three modes, as the
 // pilot's rewrite had it, took it to 7627 B. The pilot's rewrite weighed 7391 B: the 236 B between
 // the two are not established here (#1287).
+// With #1461 the select's caret rules moved to their own stylesheet, caret.css, which the cascader and
+// the tree-select share: the select imports `@pdxui/design/components/caret`, one more import line,
+// 7627 → 7632 B. Not codegen: the module's own import, which an app's bundle resolves to the stylesheet.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -59,7 +62,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1256,
-    'src/select/pdx-select.pdx': 7627,
+    'src/select/pdx-select.pdx': 7632,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

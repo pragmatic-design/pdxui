@@ -1,0 +1,31 @@
+/* The caret of a picker's trigger — an SVG chevron in a box, themed by custom properties.
+ *
+ * pdx-select, pdx-cascader and pdx-tree-select draw the same caret (#1461): each imports this
+ * stylesheet, and a theme sizes it on `.pdx-select-caret` (`--pdx-select-caret-size`,
+ * `--pdx-select-caret-stroke`) for all three at once. The cascader and the tree-select drew a ▾ text
+ * glyph that no theme's font carries: a few pixels of fallback ink beside the select's chevron.
+ * Each component turns it when open in its own stylesheet.
+ *
+ * The selector names the three: the caret is theirs, and `:where()` keeps it at one class's weight,
+ * as it was in select.css. */
+
+:where(pdx-select, pdx-cascader, pdx-tree-select) .pdx-select-caret {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--pdx-select-caret-size, 1.25rem);
+    height: var(--pdx-select-caret-size, 1.25rem);
+    transition: transform var(--pdx-transition);
+    pointer-events: none;
+}
+/* Inline SVG styling */
+:where(pdx-select, pdx-cascader, pdx-tree-select) .pdx-select-caret svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--pdx-color-muted);
+    stroke-width: var(--pdx-select-caret-stroke, 2);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}

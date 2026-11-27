@@ -33,6 +33,8 @@ type Decl = {
 // invalid, success and warning states reads the frame's tokens for them as well.
 const FRAME = ['--pdx-input-border-color', '--pdx-input-border-color-focus', '--pdx-input-border-width', '--pdx-input-focus-ring', '--pdx-input-min-height'];
 const FRAME_STATES = [...FRAME, '--pdx-input-border-color-invalid', '--pdx-input-border-color-success', '--pdx-input-border-color-warning'];
+// The trigger's caret, pdx-select's, which the cascader and the tree-select draw too (#1461).
+const CARET = ['--pdx-select-caret-size', '--pdx-select-caret-stroke'];
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
@@ -88,7 +90,7 @@ const DONE: Row[] = [
         // getValue/setValue duplicated the model, which is the way (#287); openCascader/closeCascader
         // were set on the element undeclared, and are the overlay verbs.
         removedMethods: ['getValue', 'setValue', 'openCascader', 'closeCascader'],
-        tokens: FRAME,
+        tokens: [...FRAME, ...CARET],
     },
     {
         tag: 'pdx-tree-select',
@@ -99,7 +101,7 @@ const DONE: Row[] = [
         popup: true,
         methods: ['getLabel', 'clear', 'show', 'close', 'toggle'],
         removedMethods: ['getValue', 'setValue', 'openTreeSelect', 'closeTreeSelect'],
-        tokens: FRAME,
+        tokens: [...FRAME, ...CARET],
     },
     {
         tag: 'pdx-transfer',

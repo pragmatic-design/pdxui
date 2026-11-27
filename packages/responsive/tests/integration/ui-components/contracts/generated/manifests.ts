@@ -311,6 +311,7 @@ export const scenarioPage: Record<string, string> = {
     "cascader-closed": "tier-3",
     "cascader-open": "tier-3",
     "cascader-disabled": "tier-3",
+    "cascader-caret-parity": "tier-3",
     "cascader-frame-tokens": "tier-3",
     "cascader-size-md": "tier-3",
     "cascader-size-xs": "tier-3",

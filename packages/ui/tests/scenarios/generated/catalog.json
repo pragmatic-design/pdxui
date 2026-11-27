@@ -740,6 +740,10 @@
           "title": "Cascader — Disabled"
         },
         {
+          "id": "cascader-caret-parity",
+          "title": "Cascader — its caret beside the select's and the tree-select's"
+        },
+        {
           "id": "cascader-frame-tokens",
           "title": "Cascader — the text input's frame tokens, set on one element"
         },
