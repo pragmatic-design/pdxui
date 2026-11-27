@@ -77,8 +77,10 @@ const NO_STATES: ReadonlyMap<string, string> = new Map();
  * @param stateNames the states declared `@state name;` (#1436), binding → state name (#1441):
  *   `atTop = on` is `ctx.state('at-top', !!(on))`. A read of one is PDX_STATE_READ's, reported by
  *   validation; it is left as written here.
+ * @param untrackedName the local name of core's `untracked` in this script, when it imports it:
+ *   `untracked(() => x)` of a signal, a prop or a derived is `x.peek()` (#1287).
  */
-export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false, stateNames: ReadonlyMap<string, string> = NO_STATES): string {
+export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false, stateNames: ReadonlyMap<string, string> = NO_STATES, untrackedName?: string): string {
     if (signalNames.size === 0 && callableNames.size === 0 && stateNames.size === 0) return code;
     // Edits whose start falls inside a protected [start,end) range are dropped — used to skip
     // @raw regions while still parsing the WHOLE body as one unit (so multiline statements
@@ -101,7 +103,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         const wrapped = `(${code})`;
         if (parsesCleanly(wrapped)) {
             const shifted = protectedRanges?.map(([s, e]): [number, number] => [s + 1, e + 1]);
-            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink, untracked, stateNames).slice(1, -1);
+            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink, untracked, stateNames, untrackedName).slice(1, -1);
         }
         if (mentionsAnyName(code, signalNames)) {
             reportFallback(_filename, 'unparseable fragment that names a signal', withoutOrigins(code).slice(0, 80), sink);
@@ -192,6 +194,25 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.expression) && node.name.text === 'peek' &&
             callableNames.has(node.expression.text) && !shadowed(node.expression.text)) {
             return true;
+        }
+
+        // `untracked(() => x)` with core's untracked, x a $signal, a prop or a $derived: x's value now,
+        // subscribing nothing, which is `x.peek()` — no closure handed to untracked at every read
+        // (#1287: 15.7 ns against 2.8). Any other body is left to untracked.
+        if (untrackedName && ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === untrackedName &&
+            !shadowed(untrackedName) && node.arguments.length === 1) {
+            const arg = node.arguments[0];
+            if (ts.isArrowFunction(arg) && arg.parameters.length === 0 && !ts.isBlock(arg.body)) {
+                let body: ts.Expression = arg.body;
+                while (ts.isParenthesizedExpression(body)) body = body.expression;
+                if (ts.isIdentifier(body) && !shadowed(body.text)) {
+                    const read = signalNames.has(body.text) ? `__${body.text}` : callableNames.has(body.text) ? body.text : null;
+                    if (read !== null) {
+                        edits.push({ start: node.getStart(sf), end: node.getEnd(), text: `${read}.peek()` });
+                        return true;
+                    }
+                }
+            }
         }
 
         // `x(args)` with `x` a $signal: read the value, then call it (decision 17, #187).

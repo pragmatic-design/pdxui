@@ -134,7 +134,9 @@ console.log(count);            console.log(__count());
 - **the signal's own methods**: `count.peek()`, `count.setRaw(v)`;
 - **a `$signal` that is called**: `handler(a)` → `__handler()(a)`;
 - **callable reads**: a prop, a `$derived` or a typed route param → `total()`; its `total.peek()` is
-  left as written, the signal's own method.
+  left as written, the signal's own method;
+- **an untracked read**: `untracked(() => count)` with core's `untracked` → `__count.peek()`, and
+  `untracked(() => total)` → `total.peek()`.
 
 The full table, with the self-read that an assignment makes untracked, is in [docs/language/script.md](../language/script.md#the-script-and-its-rewrite). The walk visits:
 
