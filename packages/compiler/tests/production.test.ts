@@ -697,10 +697,12 @@ let first = $signal('John');
 let last = $signal('Doe');
 </script>`;
         const { code } = compile(source, 'inline-multi-interp.pdx', [], undefined, { production: true });
-        // Two text nodes, each following its own signal
-        expect(code).toContain('()=>ctx.first())');
-        expect(code).toContain('()=>ctx.last())');
-        expect((code.match(/bindInterpolation\(/g) || []).length).toBe(2);
+        // Two text nodes, each reading its own signal, in the block's one effect (#1275): both are text
+        // (a $signal of a string), so both are bindText in the block's group, which bindGroup runs.
+        expect(code).toMatch(/bindText\(__t\d+,\(\)=>ctx\.first\(\),__g\)/);
+        expect(code).toMatch(/bindText\(__t\d+,\(\)=>ctx\.last\(\),__g\)/);
+        expect((code.match(/bindGroup\(/g) || []).length).toBe(1);
+        expect(code).not.toContain('bindInterpolation(');
     });
 
     it('handles @switch control flow', () => {

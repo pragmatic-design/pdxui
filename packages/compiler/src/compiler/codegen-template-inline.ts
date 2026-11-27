@@ -28,6 +28,9 @@ import { arrowOf, jsQuote, jsString } from './js-literal';
 import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey, withRowValue } from './codegen-constant-bindings';
+import { isTextExpression } from './codegen-text-bindings';
+import { mountValue } from './codegen-mount-values';
+import { GROUP, groupLines } from './inline-bind-group';
 import { isStaticRow, isValueRow } from './static-rows';
 import { specialisedClassBinding } from './inline-class-binding';
 import { delegableHandler } from './inline-event-delegation';
@@ -47,6 +50,13 @@ export const VOID_ELEMENTS = new Set([
  * because the compiler does not import core; `inline-url-binding.test.ts` fails if they differ.
  */
 export const URL_BINDINGS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 'poster']);
+
+/**
+ * Properties that are false when their attribute is absent, by attribute name: a binding of one whose
+ * value at mount is `false` has nothing to write into the markup (#1275). Any other property's default
+ * is the element's, which the compiler does not know: `:value` false would write "false".
+ */
+const BOOLEAN_PROPERTIES = new Set(['disabled', 'checked', 'hidden', 'readonly', 'required', 'multiple', 'selected', 'open', 'inert', 'autofocus']);
 
 /**
  * HTML attribute names whose DOM property is spelled differently. A copy of core's `ATTR_TO_PROP`
@@ -206,6 +216,17 @@ class InlineGen {
     private li = new Map<string, string>();
     /** The top-level generator's binding deduplication; a block body's generator has none. */
     dedup: BindingDedup | null = null;
+    /** The bindings written with this block's group (#1275; inline-bind-group), resolved when it is done. */
+    private grouped = 0;
+    /**
+     * For each of them, in order, the value the static markup holds for it — a JS literal — or null when
+     * none is known (#1275; codegen-mount-values). `bindGroup` takes them as written.
+     */
+    private held: Array<string | null> = [];
+    /** The static attributes of the element whose attributes are being read, by lower-case name. */
+    private staticNames = new Set<string>();
+    /** Whether that element has a `:style.x`, which a grouped `:style` written last would wipe. */
+    private styleParts = false;
 
     constructor(imports: Set<string>, startIdx: number, ctx: CompileContext | undefined, baseSvg: boolean, hoists: TemplateHoists, baseTable = false, baseOpaque = false) {
         this.imports = imports;
@@ -499,6 +520,13 @@ class InlineGen {
         // Match: a `:class.x` binding, after the object expansion above. Groups: [1]=the class
         const toggled = [...s.matchAll(/\s:class\.([\w-]+)/g)].map(t => t[1]);
         if (staticClass) this.tree.attribute(el, 'class', staticClassValue);
+        // What a binding of this element may write into the markup (#1275): not an attribute the tag
+        // writes itself, on either side of it. A word of a quoted value may read as a name here, and
+        // only keeps a value out of the markup.
+        // Match: a name not preceded by `:` or `@`, before `=`, a space or the end. Groups: [1]=name
+        this.staticNames = new Set([...s.matchAll(/(?:^|\s)([A-Za-z][\w:-]*)(?=[\s=]|$)/g)].map(x => x[1].toLowerCase()));
+        // Match: a `:style.x` binding. A `:style` beside one keeps its own effect, at its place.
+        this.styleParts = /\s:style\./.test(s);
         let m;
         while ((m = re.exec(s)) !== null) {
             const n = m[1];
@@ -591,8 +619,21 @@ class InlineGen {
         // A plain element's binding is one call to core's (#1207): the effect, the last value and the
         // write are the same in every binding, and written out each was the heaviest construct of a
         // compiled component. Which of the three writes it is stays decided here.
-        const helper = this.boundAttributeCall(el, this.boundName(prop, kind), value, kind);
-        if (helper !== null) { this.out(helper); return; }
+        // In the block's group (#1275): one effect runs every binding of the block. A `:style` beside a
+        // `:style.x` keeps its own, at its place: written last with the group, it would wipe that one.
+        const name = this.boundName(prop, kind);
+        const grouped = !(this.styleParts && !kind.custom && name === 'style');
+        const helper = this.boundAttributeCall(el, name, value, kind, false, grouped);
+        if (helper !== null) {
+            // Counted only when its line is written: a value given for a discarded one would land on
+            // the next binding's entry.
+            if (grouped && !this.tree.discarding()) {
+                this.grouped++;
+                this.held.push(preRewritten ? null : this.heldValue(el, name, expr, kind));
+            }
+            this.out(helper);
+            return;
+        }
         this.imports.add('effect');
         // The value this binding wrote last, as core's binding keeps it (`template.ts`): the effect
         // re-runs when anything it READ changes — the row object a field comes from, replaced after
@@ -625,12 +666,14 @@ class InlineGen {
      * `once` (#1270): a value that cannot change, or a `:name.once`, is written with no effect — the
      * same call with its flag, and then `value` is passed as the value, not as a getter: a getter cost
      * an allocation per row for nothing.
+     * `grouped` (#1275): the binding is added to the block's group, run with the block's other bindings
+     * in one effect; written as GROUP until the block is done (`groupLines`).
      */
-    private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind, once = false): string | null {
+    private boundAttributeCall(el: string, prop: string, value: string, kind: ElementKind, once = false, grouped = false): string | null {
         // Parenthesised when the value starts with `{`: `() => { a: 'x' }['a']` is a block (render-parity).
         // As a plain argument, `{ a: 'x' }['a']` is an expression already.
         const getter = once ? value : arrowOf(value);
-        const flag = once ? ', 1' : '';
+        const flag = once ? ', 1' : grouped ? `, ${GROUP}` : '';
         const attribute = isAttributeBinding(prop, kind);
         // A URL (#1346): sanitised, and a refused or null value removes the attribute. The property it
         // goes to, or null where the name is only an attribute.
@@ -642,7 +685,7 @@ class InlineGen {
         if (kind.custom && !attribute) {
             if (once) return null;
             this.imports.add('bindComponentProp');
-            return `bindComponentProp(${el}, ${jsString(propName(prop, kind))}, ${getter});`;
+            return `bindComponentProp(${el}, ${jsString(propName(prop, kind))}, ${getter}${flag});`;
         }
         // `:style="expr"` writes `style.cssText`, HTML and SVG alike (#1240): not the property, which
         // only a browser forwards to cssText.
@@ -661,6 +704,34 @@ class InlineGen {
         }
         this.imports.add('bindAttributeOrProperty');
         return `bindAttributeOrProperty(${el}, ${jsString(prop)}, ${p}, ${getter}${flag});`;
+    }
+
+    /**
+     * The value a grouped binding has at mount with the props at their defaults, written into the
+     * static markup, as the JS literal `bindGroup` is given; null when it is not known, or not one the
+     * markup can hold as the write would (#1275; codegen-mount-values). An attribute: the attribute, or
+     * nothing for null and false. `:style`: the style attribute. A property: only `false` of one that is
+     * false when its attribute is absent. A URL is sanitised at its write, a component's prop is the
+     * component's: neither. Not when hydrating — the markup is the server's — nor over an attribute the
+     * tag writes itself.
+     */
+    private heldValue(el: string, prop: string, expr: string, kind: ElementKind): string | null {
+        if (this.ctx.hydrate || this.staticNames.has(prop.toLowerCase())) return null;
+        if (URL_BINDINGS.has(prop.toLowerCase())) return null;
+        const at = mountValue(expr, this.ctx);
+        if (!at.known || at.value === undefined) return null;
+        const v = at.value;
+        if (!kind.custom && prop === 'style') {
+            if (typeof v === 'string') { if (v !== '') this.tree.attribute(el, 'style', v); return jsString(v); }
+            return v === null ? 'null' : null;
+        }
+        if (isAttributeBinding(prop, kind)) {
+            if (v === null || v === false) return String(v);
+            this.tree.attribute(el, prop, v === true ? '' : String(v));
+            return typeof v === 'string' ? jsString(v) : String(v);
+        }
+        if (kind.custom) return null;
+        return v === false && BOOLEAN_PROPERTIES.has(prop.toLowerCase()) ? 'false' : null;
     }
 
     /**
@@ -937,10 +1008,21 @@ class InlineGen {
             this.tree.hole(arrowOf(node.pipes?.length > 0 ? pipeChain(expr, node.pipes, this.ctx) : expr));
             return;
         }
-        this.imports.add('bindInterpolation');
         const t = this.v('t');
         this.tree.anchor(t, true);
         this.pending = templateMark(this.ctx, node.exprOffset);
+        // Text the compiler can see is text joins the block's group (#1275): one effect for the block.
+        // `bindInterpolation` when it is the block's only binding (`groupLines`), which adds its import.
+        if (!(node.pipes?.length > 0) && !isConstantBinding(node.expr, this.ctx) && isTextExpression(node.expr, this.ctx)) {
+            this.grouped++;
+            // The markup holds an empty marker there: a value that renders no text needs no write.
+            const at = this.ctx.hydrate ? null : mountValue(node.expr, this.ctx);
+            const none = at?.known && (at.value === '' || at.value === null || at.value === false);
+            this.held.push(none && at.known ? (at.value === '' ? "''" : String(at.value)) : null);
+            this.out(`bindText(${t},${arrowOf(this.shared(expr))},${GROUP});`);
+            return;
+        }
+        this.imports.add('bindInterpolation');
         if (node.pipes?.length > 0) {
             // The same chain as the template path, the value first in every pipe (#199).
             this.imports.add('templatePipe');
@@ -965,17 +1047,24 @@ class InlineGen {
         if (sole) {
             g.sole = null;
             g.walk([sole.node]);
+            const lines = g.finishedLines(g.lines);
             this.idx = g.idx;
             for (const t of g.tags) this.tags.add(t);
             // The whitespace around it is the block's edge, which keeps none (#907).
             const empty = this.ctx.ssr ? this.serverEmpty() : 'document.createDocumentFragment()';
-            return { code: `${g.lines.join('')}return ${g.sole ?? empty};`, tags: g.tags };
+            return { code: `${lines.join('')}return ${g.sole ?? empty};`, tags: g.tags };
         }
         g.walk(nodes);
+        const lines = g.finishedLines(g.lines);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
-        if (this.ctx.ssr) return { code: `${g.lines.join('')}return ${g.tree.serverLiteral(this.imports)};`, tags: g.tags };
-        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix).join('')}${g.lines.join('')}return ${this.blockResult()};`, tags: g.tags };
+        if (this.ctx.ssr) return { code: `${lines.join('')}return ${g.tree.serverLiteral(this.imports)};`, tags: g.tags };
+        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate, this.ctx.tagPrefix).join('')}${lines.join('')}return ${this.blockResult()};`, tags: g.tags };
+    }
+
+    /** `lines` with this block's group resolved (#1275): named and run, or given back to a lone binding. */
+    private finishedLines(lines: readonly string[]): string[] {
+        return groupLines(lines, this.grouped, this.held, this.imports);
     }
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
@@ -1331,6 +1420,8 @@ class InlineGen {
             if (shared.decls.length > 0) this.imports.add('computed');
             lines = [...shared.decls, ...shared.lines];
         }
+        // After the deduplication, which reads the bindings' values as they are written (#1275).
+        lines = this.finishedLines(lines);
         // On the server (#160) the render returns its markup as html``, with no builder or walk. A root
         // that is one control-flow node returns it, and has no markup of its own (`root`, #1354).
         const sole = this.sole !== undefined;

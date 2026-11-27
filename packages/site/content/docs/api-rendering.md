@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 90 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 92 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -165,34 +165,37 @@ class AwaitTimeoutError
 ```ts
 import { bindAttribute } from '@pdxui/core';
 
-function bindAttribute(el: Element, attr: string, value: unknown, once?: 1): void
+function bindAttribute(el: Element, attr: string, value: unknown, mode?: 1 | BindGroup): void
 ```
 
 `:attr` that is an attribute — `aria-*`, `data-*`, a hyphenated name, `role` on SVG.
-With `once`, `value` is the value itself, written once with no effect (#1270).
+With `once`, `value` is the value itself, written once with no effect (#1270); with a group, the
+binding is added to it (#1275).
 
 ## `bindAttributeOrProperty`
 
 ```ts
 import { bindAttributeOrProperty } from '@pdxui/core';
 
-function bindAttributeOrProperty(el: Element, attr: string, prop: string, value: unknown, once?: 1): void
+function bindAttributeOrProperty(el: Element, attr: string, prop: string, value: unknown, mode?: 1 | BindGroup): void
 ```
 
 `:attr` on an element that may or may not have the property: asked at each write, as core's
 `bindProperty` asks (`prop in el`). A name the element does not have — `:itemprop`, `:for` on a
-<div> — is its attribute; assigning it would set an expando nothing reads. With `once`, `value` is the value itself, written once with no effect (#1270).
+<div> — is its attribute; assigning it would set an expando nothing reads. With `once`, `value` is the
+value itself, written once with no effect (#1270); with a group, the binding is added to it (#1275).
 
 ## `bindComponentProp`
 
 ```ts
 import { bindComponentProp } from '@pdxui/core';
 
-function bindComponentProp(el: Element, prop: string, value: () => unknown): void
+function bindComponentProp(el: Element, prop: string, value: () => unknown, group?: BindGroup): void
 ```
 
 `:prop` on a component (#1346): its value assigned through `assignBoundProperty`, which works before
-the component is upgraded. Written out, each one was its own effect. A URL prop is `bindUrl`'s.
+the component is upgraded. Written out, each one was its own effect. A URL prop is `bindUrl`'s. With
+a group, the binding is added to it (#1275).
 
 ## `bindGesture`
 
@@ -206,6 +209,23 @@ Wire a gesture directive the compiler emits — `@__swipe` with `[direction, han
 and `@__pinch` with a handler — to the pointer gesture it names. `name` is the attribute without
 its `@`. False for any other name, which is an ordinary event. Both render paths call it: the
 template path's `bindAttribute` before its generic event branch, the inline path directly (#99).
+
+## `bindGroup`
+
+```ts
+import { bindGroup } from '@pdxui/core';
+
+function bindGroup(g: BindGroup, held?: readonly unknown[]): void
+```
+
+Run the bindings of `g` in one effect: each getter read, and its write made when the value differs
+from the one it wrote last. A signal one binding reads re-runs them all; the others read their value
+again and write nothing. The writes are those of each binding alone, in the order they were added.
+
+`held`, one per binding in the order they were added: the value the static markup already holds for
+it, which the compiler wrote there — the value with the props at their defaults (#1275). The first
+run then writes only a binding whose value differs from it. Undefined, or a hole, is not known: that
+binding is written at the first run.
 
 ## `bindInterpolation`
 
@@ -229,11 +249,12 @@ it reads does not subscribe the render it sits in.
 ```ts
 import { bindNativeProperty } from '@pdxui/core';
 
-function bindNativeProperty(el: Element, attr: string, prop: string, value: unknown, once?: 1): void
+function bindNativeProperty(el: Element, attr: string, prop: string, value: unknown, mode?: 1 | BindGroup): void
 ```
 
 `:attr` that the element certainly has as a property (`disabled` on an <input>), bound as `attr`.
-With `once`, `value` is the value itself, written once with no effect (#1270).
+With `once`, `value` is the value itself, written once with no effect (#1270); with a group, the
+binding is added to it (#1275).
 
 ## `bindParts`
 
@@ -271,13 +292,29 @@ branch of an `@if`/`@else` does. A value that is not a signal is ignored. Both r
 ```ts
 import { bindStyleText } from '@pdxui/core';
 
-function bindStyleText(el: Element, value: unknown, once?: 1): void
+function bindStyleText(el: Element, value: unknown, mode?: 1 | BindGroup): void
 ```
 
 `:style="expr"` on a plain element, HTML or SVG (#1240): the string is written to `style.cssText`,
 null or undefined as `''`. Assigning `el.style` relies on the browser forwarding it to `cssText`
 ([PutForwards=cssText]), and throws where `style` is a bare getter — happy-dom, for SVG.
-With `once`, `value` is the value itself, written once with no effect (#1270).
+With `once`, `value` is the value itself, written once with no effect (#1270); with a group, the
+binding is added to it (#1275).
+
+## `bindText`
+
+```ts
+import { bindText } from '@pdxui/core';
+
+function bindText(anchor: ChildNode, value: () => unknown, group: BindGroup): void
+```
+
+`{{ expr }}` the compiler knows is text — a string, number or boolean prop, a literal, a template
+string (#1275) — added to a block's group: its text is put in place of `anchor`, the empty marker the
+static markup holds there, and then written to that text node. As `bindInterpolation` renders a
+primitive: null, undefined and false are the empty text, which replaces the marker too. An interpolation
+that may render nodes keeps `bindInterpolation`, whose value is re-read only when what IT reads
+changes: in a group, an unrelated change would build its nodes again.
 
 ## `bindTwoWay`
 
@@ -301,7 +338,7 @@ everything, and `::value` was one-way on a component in a production build (#97)
 ```ts
 import { bindUrl } from '@pdxui/core';
 
-function bindUrl(el: Element, attr: string, prop: string | null, value: unknown, once?: 1): void
+function bindUrl(el: Element, attr: string, prop: string | null, value: unknown, mode?: 1 | BindGroup): void
 ```
 
 `:href`, `:src`, `:action`, `:formaction`, `:poster`, `:xlink:href` (#1346): the value goes through
@@ -311,7 +348,8 @@ never becomes a live link. Written out, each one was its own effect of about 120
 `prop` is the property the URL is written to: a component's prop (assigned before its upgrade, as
 `assignBoundProperty` does) or a plain element's own property (`href` on an <a>). A plain element
 that does not have it, and `null` for a name that is only an attribute (`xlink:href`, SVG), write
-the attribute. With `once`, `value` is the value itself, written once with no effect (#1270).
+the attribute. With `once`, `value` is the value itself, written once with no effect (#1270); with a
+group, the binding is added to it (#1275).
 
 ## `blockAnimation`
 
