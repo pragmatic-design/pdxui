@@ -3,8 +3,7 @@
 // phone-intl must not assume a two-digit country code — 15551234567 is not "+15 (551) 234-567";
 // the time preset opens a numeric keyboard; and the date preset does not take "13/45/2024" as a
 // complete, valid value.
-import { describe, it, expect, beforeEach } from 'vitest';
-import { cleanup, tick } from './helpers';
+import { describe, it, expect, beforeEach, vi } from 'vitest';import { cleanup, tick } from './helpers';
 
 import '../../src/masked-input/pdx-masked-input.pdx';
 
@@ -163,6 +162,20 @@ describe('pdx-masked-input — a pending frame does not undo a later write', () 
         expect(input.value, 'the letter stays in the field until the next frame').toBe('(5');
         expect(el.getFormatted()).toBe('(5');
         expect(el.value).toBe('5');
+    });
+
+    // With `::value` the formatted text is written back in the keystroke's own event (above), so the
+    // frame that wrote it again a frame later did no work (#1287): a keystroke asks for none.
+    it('a keystroke schedules no frame: the event has written the field already', async () => {
+        const { input } = await mountMask('phone');
+        // Spied over the keystroke's own events only: `tick` waits with a frame of its own.
+        const frames = vi.spyOn(window, 'requestAnimationFrame');
+        input.value = '5551234567';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        expect(frames, 'a keystroke asked for a frame to write the field again').not.toHaveBeenCalled();
+        frames.mockRestore();
+        expect(input.value).toBe('(555) 123-4567');
     });
 
     it('the exposed clear() survives a pending frame', async () => {
