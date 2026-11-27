@@ -3,7 +3,7 @@
  *
  * Contracts DERIVED by inspecting the source + CSS:
  *
- *   - Source: packages/ui/src/wizard/pdx-wizard.ts
+ *   - Source: packages/ui/src/wizard/pdx-wizard.pdx
  *       · Compound: the CE discovers the [data-wizard-step] children (discoverSteps, lines 51-60) and
  *         auto-generates the stepper header + the navigation footer in a rAF.
  *       · render() = <slot></slot>: the step panels are projected as direct children

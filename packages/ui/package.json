@@ -140,7 +140,7 @@
       "import": "./dist/tree-select/pdx-tree-select.js"
     },
     "./wizard": {
-      "development": "./src/wizard/pdx-wizard.ts",
+      "development": "./src/wizard/pdx-wizard.pdx",
       "types": "./dist/wizard/pdx-wizard.d.ts",
       "import": "./dist/wizard/pdx-wizard.js"
     },
@@ -692,6 +692,7 @@
     "dist/toast/toast-icons.js",
     "dist/transfer/transfer-strings.js",
     "dist/tree-select/tree-select-strings.js",
+    "dist/wizard/wizard-strings.js",
     "dist/shared/i18n.js",
     "dist/icon/pragmatic-all.js",
     "src/index.ts",
@@ -714,6 +715,7 @@
     "src/toast/toast-icons.ts",
     "src/transfer/transfer-strings.ts",
     "src/tree-select/tree-select-strings.ts",
+    "src/wizard/wizard-strings.ts",
     "src/shared/i18n.ts",
     "src/icon/pragmatic-all.ts"
   ],

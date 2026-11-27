@@ -34,7 +34,7 @@ describe('a .pdx component in the manifest, against its TypeScript version', () 
     });
 
     it('the control: a TypeScript component is read as before', () => {
-        expect(declarationOf('src/wizard/pdx-wizard.ts').map((d) => d.tagName)).toEqual(['pdx-wizard']);
+        expect(declarationOf('src/form-template/pdx-form-template.ts').map((d) => d.tagName)).toEqual(['pdx-form-template']);
     });
 });
 

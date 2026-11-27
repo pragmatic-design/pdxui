@@ -42,7 +42,7 @@ import '../color-picker/pdx-color-picker.pdx';
 import '../file-upload/pdx-file-upload.pdx';
 import '../tag-input/pdx-tag-input.pdx';
 import '../otp-input/pdx-otp-input.pdx';
-import '../wizard/pdx-wizard';
+import '../wizard/pdx-wizard.pdx';
 import { format } from '../shared/i18n';
 import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the

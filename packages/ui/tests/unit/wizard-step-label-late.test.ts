@@ -20,7 +20,7 @@
 // labels.
 import { describe, it, expect, afterEach } from 'vitest';
 import { refreshStepMeta, applyStepLabels, stepName, type StepMeta } from '../../src/wizard/wizard-step-labels';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 /** A stepper of the shape `buildStepper()` produces, which is what the refresh writes into. */
 function buildFixture(labels: { label: string; description?: string }[]): {

@@ -86,18 +86,18 @@ describe('component definition', () => {
     });
 
     it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
-        // A library component still in TypeScript (#1210 moves the library to .pdx). pdx-affix, then
-        // pdx-breadcrumb were this component until they moved; pdx-wizard is held in TypeScript until
-        // #1287's pass. The file must exist: a moved one would leave the jump nowhere to land.
+        // A library component still in TypeScript (#1210 moves the library to .pdx). pdx-affix,
+        // pdx-breadcrumb, then pdx-wizard were this component until they moved; pdx-form-template is
+        // the last (#1454). The file must exist: a moved one would leave the jump nowhere to land.
         const root = join(__dirname, '..', '..', '..');
-        const filePath = join(root, 'packages', 'ui', 'src', 'wizard', 'pdx-wizard.ts');
+        const filePath = join(root, 'packages', 'ui', 'src', 'form-template', 'pdx-form-template.ts');
         expect(existsSync(filePath), `${filePath} moved to .pdx: name another component still in TypeScript`).toBe(true);
-        const real = new Map([['pdx-wizard', { ...button, tag: 'pdx-wizard', filePath }]]);
-        // tag → its component('pdx-wizard' call, past the file's header
-        const tagLoc = resolveComponentDefinition('pdx-wizard', real, []);
+        const real = new Map([['pdx-form-template', { ...button, tag: 'pdx-form-template', filePath }]]);
+        // tag → its component('pdx-form-template' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-form-template', real, []);
         expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `linear:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-wizard', real, [], 'linear');
+        // member → the `showActions:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-form-template', real, [], 'showActions');
         expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
     });
 

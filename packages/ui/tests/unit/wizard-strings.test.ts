@@ -5,7 +5,7 @@
 // literal-string guard does not see a textContent assigned a conditional of two literals.
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { setComponentStrings, clearComponentStrings } from '@pdxui/core';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 function mountWizard(steps = 2): HTMLElement {
     const el = document.createElement('pdx-wizard');

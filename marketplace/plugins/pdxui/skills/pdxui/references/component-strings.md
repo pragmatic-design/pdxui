@@ -564,10 +564,10 @@ placeholders, filled at render: keep them in the translation.
 | `tree-select` | `noMatch` | `No match` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
 | `tree-select` | `placeholder` | `Select...` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
 | `tree-select` | `search` | `Search...` | `@pdxui/ui/src/tree-select/tree-select-strings.ts` |
-| `wizard` | `back` | `Back` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
-| `wizard` | `complete` | `Complete` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
+| `wizard` | `back` | `Back` | `@pdxui/ui/src/wizard/wizard-strings.ts` |
+| `wizard` | `complete` | `Complete` | `@pdxui/ui/src/wizard/wizard-strings.ts` |
 | `wizard` | `navigation` | `Wizard navigation` | `@pdxui/ui/src/shared/i18n.ts` |
-| `wizard` | `next` | `Next` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
+| `wizard` | `next` | `Next` | `@pdxui/ui/src/wizard/wizard-strings.ts` |
 | `wizard` | `stepAnnounce` | `Step {current} of {total}: {label}` | `@pdxui/ui/src/shared/i18n.ts` |
-| `wizard` | `stepOf` | `Step {current} of {total}` | `@pdxui/ui/src/wizard/pdx-wizard.ts` |
+| `wizard` | `stepOf` | `Step {current} of {total}` | `@pdxui/ui/src/wizard/wizard-strings.ts` |
 | `wizard` | `steps` | `Wizard steps` | `@pdxui/ui/src/shared/i18n.ts` |
