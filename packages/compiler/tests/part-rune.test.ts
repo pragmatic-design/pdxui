@@ -70,6 +70,35 @@ describe('a @part nothing reads has no ref (#1268)', () => {
         }
     });
 
+    // A local, a parameter or a destructured binding of the part's name is another variable: reading it
+    // reads that one (#1287, item F). pdx-input's `const input = inputEl` kept the `input` part's ref —
+    // a signal and a bindRef at every mount — for nothing; 11 parts of 9 library components the same.
+    it('a name a local, a parameter, a destructured binding or a catch declares is no read of the part', () => {
+        const script = [
+            '@part root, label;',
+            'function clear(inputEl: HTMLElement) { const label = inputEl; label.focus(); }',
+            'function f(root) { return root.id; }',
+            'function g({ label }) { return label; }',
+            'const each = (xs: any[]) => xs.map((root) => root.x);',
+            'function h() { try { return 1; } catch (label) { return label; } }',
+        ].join('\n');
+        const { code } = compile(pdx(template, script), 'test.pdx');
+        expect(code).not.toMatch(/const __(root|label) = signal/);
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.(root|label)\)/);
+    });
+
+    it('control — a read outside the scope that shadows the name keeps the ref', () => {
+        const reads = [
+            'function f() { { const root = 1; void root; } return root?.id; }',
+            'function f(x) { const g = (root) => root; return g(x) ?? root; }',
+            'function f() { return label?.focus(); }',
+        ];
+        for (const read of reads) {
+            const { code } = compile(pdx(template, `@part root, label;\n${read}`), 'test.pdx');
+            expect(code, read).toMatch(/bindRef\(__el\d+,ctx\.(root|label)\)/);
+        }
+    });
+
     it('a part @host or @expose reads keeps its ref', () => {
         const host = compile(pdx(template, '@part root, label;\n@host { :title="root?.id" }'), 'test.pdx').code;
         expect(host).toMatch(/bindRef\(__el\d+,ctx\.root\)/);
