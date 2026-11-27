@@ -39,6 +39,11 @@
       "types": "./dist/icon/pdx-icon.d.ts",
       "import": "./dist/icon/pdx-icon.js"
     },
+    "./icon/icon-map": {
+      "development": "./src/icon/icon-map.ts",
+      "types": "./dist/icon/icon-map.d.ts",
+      "import": "./dist/icon/icon-map.js"
+    },
     "./icon/pragmatic-icons": {
       "development": "./src/icon/pragmatic-icons.ts",
       "types": "./dist/icon/pragmatic-icons.d.ts",

@@ -30,6 +30,11 @@ semver.
   `dialog`, `ErrorContext`) keeps them when it moves to `.pdx`. An export of a value the script makes
   stays `PDX_SCRIPT_EXPORT`.
 
+- `@pdxui/ui/icon/icon-map` is a module of its own (#1264): `defineIcons`, the map an imported icon is
+  handed to. The compiler imports it from there for the icons a template or script names, where it named
+  pdx-icon's module, so registering a page's icons no longer goes through the component's.
+  `import { defineIcons } from '@pdxui/ui/icon/pdx-icon'` still works.
+
 - `@prop … { attribute: string }` (or `number`, `boolean`, `json`) says how a prop's attribute is read,
   apart from its type, as on a `@model` (#1347): `@prop columns: number | 'auto' = 3 { attribute: string };`
   reads `columns="2"` as `'2'` and keeps `number | 'auto'` in the `.d.ts` and the manifest. A prop whose

@@ -16,12 +16,15 @@ import { join } from 'node:path';
 
 /**
  * The icons the compiled module puts on the page: each icon module imported, and handed by name to
- * pdx-icon's `defineIcons`. Both halves, or the icon is imported and never drawn from the map.
+ * `defineIcons`. Both halves, or the icon is imported and never drawn from the map. `defineIcons` comes
+ * from the module that owns the map, `@pdxui/ui/icon/icon-map`, not from the component's (#1264): a
+ * page whose icons are imported does not need pdx-icon's module to register them.
  */
 function iconImports(code: string): string[] {
     const imported = new Map([...code.matchAll(/import (__pdxIcon\d+) from ['"]@pdxui\/ui\/icons\/([\w-]+)['"]/g)].map(m => [m[1], m[2]]));
     if (imported.size === 0) return [];
-    expect(code, 'icons imported, and no defineIcons imported from pdx-icon').toMatch(/import \{ defineIcons as __pdxDefineIcons \} from ['"]@pdxui\/ui\/icon\/pdx-icon['"]/);
+    expect(code, 'icons imported, and no defineIcons imported from the icon map').toMatch(/import \{ defineIcons as __pdxDefineIcons \} from ['"]@pdxui\/ui\/icon\/icon-map['"]/);
+    expect(code, 'defineIcons imported from the component module').not.toMatch(/import \{[^}]*defineIcons[^}]*\} from ['"]@pdxui\/ui\/icon\/pdx-icon['"]/);
     const call = code.match(/__pdxDefineIcons\(\{([^}]*)\}\);/);
     expect(call, 'icons imported, and never handed to defineIcons').not.toBeNull();
     const defined = [...call![1].matchAll(/"([\w-]+)": (__pdxIcon\d+)/g)];
