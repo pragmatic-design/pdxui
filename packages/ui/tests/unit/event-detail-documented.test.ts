@@ -68,12 +68,23 @@ function emitsWithDetail(file: string, text: string): { name: string; tag?: stri
     return found;
 }
 
-/** The tags an emit belongs to: its own component() statement, its file's, or its directory's. */
+/** The tags of the `.pdx` components in a directory: `pdx-{name}.pdx` is `<pdx-{name}>`. */
+function pdxTagsIn(dir: string): string[] {
+    return readdirSync(dir).filter((e) => /^pdx-[\w-]+\.pdx$/.test(e)).map((e) => e.slice(0, -'.pdx'.length));
+}
+
+/**
+ * The tags an emit belongs to: its own component() statement, its file's, or its directory's — a
+ * TypeScript component's, or a `.pdx` one's. A helper module beside a component moved to `.pdx`
+ * (#1210) still emits for it (the data grid's `grid-edit.ts`), and its detail still has to be in the
+ * manifest.
+ */
 function ownersOf(file: string, tag: string | undefined, all: Map<string, string>): string[] {
     if (tag) return [tag];
     const own = tagsIn(all.get(file)!);
     if (own.length) return own;
-    return [...all].filter(([f]) => dirname(f) === dirname(file)).flatMap(([, t]) => tagsIn(t));
+    const siblings = [...all].filter(([f]) => dirname(f) === dirname(file)).flatMap(([, t]) => tagsIn(t));
+    return siblings.length ? siblings : pdxTagsIn(dirname(file));
 }
 
 const files = new Map(sourceFiles(SRC).map(f => [f, readFileSync(f, 'utf-8')] as const));
@@ -96,10 +107,11 @@ describe('an event with a detail says what is in it', () => {
         // The control: a scan that finds nothing makes the next assertion pass by default. Named emits,
         // not a count: a count falls each time a batch of #125 removes alpha emits, and a threshold
         // lowered to follow it guards less every time. The names are emits still written in TypeScript:
-        // a component moved to .pdx (#1210) declares each event's detail with its `@event` type, so it
-        // leaves the scan, and its name leaves this list.
+        // a component moved to .pdx (#1210) declares each event's detail with its `@event` type, so its
+        // own emits leave the scan; a helper module beside it that emits for it stays (#1454).
         expect(checks).toEqual(expect.arrayContaining([
-            'pdx-wizard pdx-complete',
+            'pdx-data-grid pdx-row-click',
+            'pdx-data-grid pdx-cell-edit-end',
         ]));
     });
 

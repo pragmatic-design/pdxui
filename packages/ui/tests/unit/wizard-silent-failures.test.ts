@@ -1,7 +1,7 @@
 // Two ways a `<pdx-wizard>` could render a page with no wizard in it, and say nothing.
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 /** A wizard whose panels are children of `el`, the arrangement that always worked. */
 function flatWizard(stepCount = 3): HTMLElement {

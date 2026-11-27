@@ -1,0 +1,299 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxWizard",
+  "tagName": "pdx-wizard",
+  "category": "Forms",
+  "order": 53,
+  "description": "A multi-step wizard with a stepper header, back/next navigation in linear or free mode, and a\nvalidation guard before moving on.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "linear",
+      "description": "Sequential navigation — can't skip ahead",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true",
+      "attribute": "linear"
+    },
+    {
+      "kind": "field",
+      "name": "orientation",
+      "description": "Stepper orientation",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'",
+      "attribute": "orientation"
+    },
+    {
+      "kind": "field",
+      "name": "hideNav",
+      "description": "Hide the auto-generated navigation footer",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "hidenav"
+    },
+    {
+      "kind": "field",
+      "name": "hideStepper",
+      "description": "Hide the stepper header",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "hidestepper"
+    },
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disabled state — no interaction",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "The step numbers' size: md (the default) or sm.",
+      "type": {
+        "text": "'md' | 'sm'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "Current step (0-based index)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0",
+      "attribute": "value"
+    },
+    {
+      "kind": "method",
+      "name": "goTo",
+      "parameters": [
+        {
+          "name": "targetIndex",
+          "type": {
+            "text": "number"
+          }
+        }
+      ],
+      "description": "Go to a step by index. Returns false, and moves nothing, when the step is not reachable yet or a `pdx-before-change` listener cancels."
+    },
+    {
+      "kind": "method",
+      "name": "next",
+      "parameters": [],
+      "description": "The next step, through the same guards as `goTo`; false at the last one."
+    },
+    {
+      "kind": "method",
+      "name": "prev",
+      "parameters": [],
+      "description": "The previous step, through the same guards as `goTo`; false at the first one."
+    },
+    {
+      "kind": "method",
+      "name": "complete",
+      "parameters": [],
+      "description": "Emit `pdx-complete` for the step in view. It does not advance, validate or close anything."
+    }
+  ],
+  "models": [
+    "value"
+  ],
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-stepper-md",
+        "sm": ".pdx-stepper-sm"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "value": "$event.detail.value"
+  },
+  "events": [
+    {
+      "name": "pdx-before-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Before a move, cancellable: `preventDefault()` keeps the wizard where it is.",
+      "detail": "{ value: number; previous: number }"
+    },
+    {
+      "name": "pdx-complete",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Next on the last step, or `complete()`.",
+      "detail": "{ value: number }"
+    },
+    {
+      "name": "value-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `value`. Does not bubble.",
+      "detail": "{ value: number }"
+    }
+  ],
+  "roles": [
+    "navigation",
+    "status",
+    "tab",
+    "tablist",
+    "tabpanel"
+  ],
+  "attributes": [
+    {
+      "name": "linear",
+      "fieldName": "linear",
+      "description": "Sequential navigation — can't skip ahead",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "true"
+    },
+    {
+      "name": "orientation",
+      "fieldName": "orientation",
+      "description": "Stepper orientation",
+      "type": {
+        "text": "string"
+      },
+      "default": "'horizontal'"
+    },
+    {
+      "name": "hidenav",
+      "fieldName": "hideNav",
+      "description": "Hide the auto-generated navigation footer",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "hidestepper",
+      "fieldName": "hideStepper",
+      "description": "Hide the stepper header",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disabled state — no interaction",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "The step numbers' size: md (the default) or sm.",
+      "type": {
+        "text": "'md' | 'sm'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "Current step (0-based index)",
+      "type": {
+        "text": "number"
+      },
+      "default": "0"
+    }
+  ],
+  "shapes": [
+    {
+      "name": "StepMeta",
+      "fields": [
+        "index: number",
+        "label: string",
+        "description: string",
+        "icon: string",
+        "el: HTMLElement"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The stepper, the `role=\"tablist\"` element (`.pdx-stepper`)."
+    },
+    {
+      "name": "step",
+      "description": "A step's button in the stepper; the current one is `aria-current=\"step\"`."
+    },
+    {
+      "name": "connector",
+      "description": "The line between two steps of a horizontal stepper."
+    },
+    {
+      "name": "panel",
+      "description": "A step's panel, an element with `data-wizard-step`."
+    },
+    {
+      "name": "nav",
+      "description": "The footer with Back, the position and Next."
+    },
+    {
+      "name": "back",
+      "description": "The Back button."
+    },
+    {
+      "name": "next",
+      "description": "The Next button, Complete on the last step."
+    },
+    {
+      "name": "indicator",
+      "description": "The \"Step 2 of 4\" text of the footer."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "ready",
+      "description": "Its steps are found and its stepper is drawn."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set: no step can be reached."
+    },
+    {
+      "name": "vertical",
+      "description": "`orientation=\"vertical\"`: the stepper beside the panels."
+    }
+  ]
+}

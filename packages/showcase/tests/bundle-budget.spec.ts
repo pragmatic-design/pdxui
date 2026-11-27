@@ -536,7 +536,14 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // writes only what differs — the fieldset's whole mount, the frame after it included, 0.70–0.76× its
 // TypeScript version's. 485.2 KB and 103.1 KB measured locally, held to CI's js figure, 485.4; the
 // entry unchanged at 43.6.
-const BUDGET_KB = { entry: 43.7, js: 485.4, css: 67, blocking: 103.1 };
+// js 485.4 → 486.0 (#1210's standing OK, its last moves in #1454): pdx-wizard moves to .pdx. Its own
+// code is not what grows: the TypeScript wizard imported core's `model()`, whose module imports
+// `form/form-model.ts`, and with that importer gone Rollup takes form-model (889 B) out of the
+// pdx-dropdown-menu chunk (-714 B) into a chunk of its own, which each of ~30 form-component and page
+// chunks now imports by one more statement (+18 to +35 B each). +1051 B over 472 files against 471;
+// blocking falls 103.1 → 102.5. 486.0 KB measured locally against 484.9 on main; the entry unchanged
+// at 43.7.
+const BUDGET_KB = { entry: 43.7, js: 486.0, css: 67, blocking: 103.1 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

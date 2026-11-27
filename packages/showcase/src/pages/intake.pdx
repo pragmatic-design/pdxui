@@ -177,7 +177,7 @@ function resumeDraft() {
   customerName = v.customerName ?? '';
   assetCustomerId = Number(v.customerId ?? 0);
   // The wizard's `value` track moves the step WITHOUT re-running `pdx-before-change`
-  // (a parent's write of the model, pdx-wizard.ts), so restoring step 2 does not have to pass step 1's guard on the way —
+  // (a parent's write of the model, pdx-wizard.pdx), so restoring step 2 does not have to pass step 1's guard on the way —
   // which is right: those answers are the ones being restored.
   step = found.step ?? 0;
 }

@@ -6,7 +6,7 @@
 // the violations, so this test is the guard.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/wizard/pdx-wizard';
+import '../../src/wizard/pdx-wizard.pdx';
 
 function wizardHtml(prefix: string, panelIds: string[] = []): string {
     return `<pdx-wizard>${['One', 'Two', 'Three'].map((label, i) =>

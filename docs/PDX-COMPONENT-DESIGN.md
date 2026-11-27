@@ -800,7 +800,7 @@ cut, and the cut is done when the before/after test counts are equal.
   wired to that form as a section.
 
   **Measure before building:** `pdx-wizard` finds its steps with
-  `querySelectorAll('[data-wizard-step]')` (`ui/src/wizard/pdx-wizard.ts:77`), and a nested panel is
+  `querySelectorAll('[data-wizard-step]')` (`ui/src/wizard/pdx-wizard.pdx:110`), and a nested panel is
   the case that can escape it. Each step component must render the `data-wizard-step` element as the
   wizard's direct panel, or the wizard must learn to find panels inside custom elements. Prove that
   first with one step.
