@@ -450,8 +450,8 @@ export { useScroll, scrollTo, saveScrollPosition, restoreScrollPosition } from '
 export type { ScrollState, ScrollRestoration } from './browser/scroll';
 
 // Global Store (compiler-generated from @store rune)
-export { createGlobalStore, getStore, clearStores } from './reactivity/global-store';
-export type { GlobalStoreOptions } from './reactivity/global-store';
+export { createGlobalStore, getStore, clearStores, disposeStore } from './reactivity/global-store';
+export type { GlobalStoreOptions, StoreLifecycle } from './reactivity/global-store';
 
 // Gestures (touch + mouse + pen)
 export { onSwipe, onLongpress, onPinch } from './component/gestures';

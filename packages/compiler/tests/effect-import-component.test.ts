@@ -37,11 +37,11 @@ describe('controls — where $effect compiles to effect()', () => {
         expect(coreImport(code)).toContain('effect');
     });
 
-    // A @store's $effect compiles to ctx.track() with no ctx in the factory: #1458. Its module keeps
-    // importing `effect` as it did, from compileStoreMode's own line.
-    it('a @store module still imports effect', () => {
+    // A @store's $effect is effect(), owned by the store (#1458): its module imports and calls it.
+    it('a @store module imports and calls effect', () => {
         const src = '<script>\n@store cart;\nlet items = $signal([]);\n$effect(() => { console.log(items); });\n</script>';
         const { code } = compile(src, 'cart.pdx');
+        expect(code).toMatch(/\beffect\(/);
         expect(coreImport(code)).toContain('effect');
     });
 });

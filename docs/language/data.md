@@ -514,6 +514,13 @@ the store in `localStorage`, any other value in `sessionStorage`, under `__pdx_s
 store's top-level `$signal`s are restored when it is created and written 100 ms after they change. A
 `$store` object and a `$derived` are not persisted.
 
+A store has a lifecycle of its own, not a component's (#1458). The factory runs in a scope of the
+store's, outside the component whose `useName()` created it: what it starts — an `$effect`, which is
+`effect()` here, a `$watch`, the persistence write — lives as long as the store, not as long as that
+component. `onMount(fn)` runs once the store is created, its persisted state restored; `onDestroy(fn)`
+runs when the store is disposed, by `disposeStore('name')` or `clearStores()` from `@pdxui/core`, which
+also stop its effects. The next `useName()` after a dispose creates the store anew.
+
 #### Rules
 
 - Any other form — `@store name = { … }`, an option other than `persist` — is
@@ -522,6 +529,9 @@ store's top-level `$signal`s are restored when it is created and written 100 ms 
   level, outside the factory. An export that reads none of them is moved as it is.
 - A `persist` value other than `'local'` or `'session'` is `PDX_UNKNOWN_DECLARATION` (error), and
   the store is not persisted; it used to be kept in `sessionStorage` whatever was written (#278).
+- `$effect`, `onMount` and `onDestroy` are the store's: `$effect` compiled to `ctx.track(…)` and the
+  hooks were left as written, none of them defined in the factory, so the store threw a
+  `ReferenceError` when first used (#1458).
 - A `<template>` in a store file is ignored, and none of the template checks run. Not checked today.
 - Two files that declare the same store name share one instance. Not checked today.
 

@@ -94,15 +94,24 @@ function setupSourceText(analysis: ScriptAnalysis): string {
 }
 
 /**
+ * What a setup body is compiled for, which decides what `$effect`, `onMount` and `onDestroy` become:
+ * - `component` — a component's setup: `ctx.track()`, and core's hooks on the component's scope;
+ * - `module` — a script-only `.pdx.ts`: `effect()`, `onMount` called at once, no `onDestroy`;
+ * - `store` — a `@store`'s factory (#1458): `effect()`, owned by the store, and the hooks of the
+ *   `StoreLifecycle` the factory is given, `__store.onMount()` / `__store.onDestroy()`.
+ */
+export type SetupTarget = 'component' | 'module' | 'store';
+
+/**
  * Build all parts of the setup() function body for new mode.
- * @param scriptOnly - When true, emit standalone effect()/cleanup instead of ctx.track()
+ * @param target - What the body is compiled for (SetupTarget)
  */
 export function buildSetupBody(
     analysis: ScriptAnalysis,
     filename: string,
     descriptor?: SFCDescriptor,
     production = false,
-    scriptOnly = false,
+    target: SetupTarget = 'component',
     /** Codegen diagnostics sink — CompileContext.warnings. Omitted by direct callers in tests. */
     sink?: WarningSink,
     /** In a build, the names the code outside the setup reads off the context: the return keeps only these (#1289). */
@@ -587,33 +596,39 @@ export function buildSetupBody(
         const at = analysis.origins?.effects[k];
         const name = runeName(analysis.runeLines?.effects[k]);
         const opts = name ? `, { name: ${name} }` : '';
-        if (scriptOnly) {
-            // Plain module: use effect() directly (no ctx)
-            parts.push(markCall(`    effect(${rewriteAll(eff)}${opts});`, at));
-        } else {
+        if (target === 'component') {
             parts.push(markCall(`    ctx.track(${rewriteAll(eff)}${opts});`, at));
+        } else {
+            // A module or a store has no ctx: effect() itself. In a store it is owned by the store's
+            // scope, and stops when the store is disposed (#1458).
+            parts.push(markCall(`    effect(${rewriteAll(eff)}${opts});`, at));
         }
     });
 
     // Lifecycle: onMount — invoke as one-shot callback, NOT reactive effect.
     analysis.lifecycle.onMount.forEach((body, k) => {
         const at = analysis.origins?.onMount[k];
-        if (scriptOnly) {
+        if (target === 'component') {
+            parts.push(markCall(`    onMount(${rewriteAll(body)});`, at));
+        } else if (target === 'store') {
+            // Once the store is created, its persisted state restored (#1458).
+            parts.push(markCall(`    __store.onMount(${rewriteAll(body)});`, at));
+        } else {
             // Plain module: call immediately (no mount lifecycle)
             parts.push(markCall(`    (${rewriteAll(body)})();`, at));
-        } else {
-            parts.push(markCall(`    onMount(${rewriteAll(body)});`, at));
         }
     });
 
     // Lifecycle: onDestroy — core's hook, registered on the component's scope (#1407). It was an effect
     // returning the callback as its cleanup: one effect created and run at every mount, for nothing.
     analysis.lifecycle.onDestroy.forEach((body, k) => {
-        if (scriptOnly) {
-            // Plain module: no destroy lifecycle — skip (modules don't unmount)
-        } else {
+        if (target === 'component') {
             parts.push(markCall(`    onDestroy(${rewriteAll(body)});`, analysis.origins?.onDestroy[k]));
+        } else if (target === 'store') {
+            // When the store is disposed: disposeStore(id), clearStores() (#1458).
+            parts.push(markCall(`    __store.onDestroy(${rewriteAll(body)});`, analysis.origins?.onDestroy[k]));
         }
+        // Plain module: no destroy lifecycle — skip (modules don't unmount)
     });
 
     // @expose — expose declared names on the host element (#752). A reactive name becomes an accessor
@@ -644,7 +659,7 @@ export function buildSetupBody(
     // `ctx.track(() => { ctx.state(…) })` per state did, written out once per state.
     // A state with no expression (#1436) is not here: the script's assignments set it.
     const followed = analysis.states.filter((s): s is { name: string; expr: string } => s.expr !== undefined);
-    if (!scriptOnly && followed.length > 0) {
+    if (target === 'component' && followed.length > 0) {
         const entries = followed.map(s =>
             `${/^[A-Za-z_$][\w$]*$/.test(s.name) ? s.name : jsQuote(s.name)}: ${arrowOf(rewriteAll(s.expr))}`);
         parts.push(`    ctx.states({ ${entries.join(', ')} });`);

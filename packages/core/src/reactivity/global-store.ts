@@ -1,14 +1,25 @@
 // Global Store — Singleton reactive stores with optional persistence.
 // Used by @store rune: the compiler generates createGlobalStore() calls.
 
-import { effect } from './signal';
+import { effect, collectDisposers, untracked, unowned } from './signal';
+import type { Dispose } from '../utils/types';
 import { registerStore, unregisterStores } from '../debug/inspector';
 import { DEV } from '../utils/env';
 
 const registry = new Map<string, unknown>();
+/** Each store's teardown: its onDestroy callbacks, then the effects its factory created (#1458). */
+const teardowns = new Map<string, Dispose>();
 
 export interface GlobalStoreOptions {
     persist?: 'local' | 'session';
+}
+
+/** The lifecycle a store's factory registers on: what `onMount` and `onDestroy` compile to in a `@store`. */
+export interface StoreLifecycle {
+    /** Run `fn` once the store is created, its persisted state restored. */
+    onMount(fn: () => void): void;
+    /** Run `fn` when the store is disposed: `disposeStore(id)`, or `clearStores()`. */
+    onDestroy(fn: () => void): void;
 }
 
 /**
@@ -16,22 +27,63 @@ export interface GlobalStoreOptions {
  * The setup function runs only once per store ID.
  * If persist is set, the store's signals are synced to storage.
  *
+ * The factory runs in a scope of the store's own, outside the caller's (#1458): an effect it
+ * creates — an `$effect`, a `$watch`, the persistence write — lives as long as the store, not as long
+ * as the first component that asked for it, and is disposed with the store.
+ *
  * @param id - Unique store identifier (compiler uses the @store name)
- * @param setupFn - Factory function that returns the store's public API
+ * @param setupFn - Factory function that returns the store's public API, given its lifecycle
  * @param options - Optional persistence config
  * @returns The store instance (same reference for same ID)
  */
 export function createGlobalStore<T>(
     id: string,
-    setupFn: () => T,
+    setupFn: (store: StoreLifecycle) => T,
     options?: GlobalStoreOptions,
 ): T {
     // Singleton: return existing instance if already created
     const existing = registry.get(id);
     if (existing !== undefined) return existing as T;
 
+    const mounted: (() => void)[] = [];
+    const destroyed: (() => void)[] = [];
+    const lifecycle: StoreLifecycle = {
+        onMount: (fn) => { mounted.push(fn); },
+        onDestroy: (fn) => { destroyed.push(fn); },
+    };
+    // Unowned, then a scope of its own: the caller's scope — a component's setup — neither owns nor
+    // tracks what the factory creates.
+    const [instance, disposeEffects] = unowned(() => collectDisposers(() => setUp(id, setupFn, lifecycle, options)));
+    teardowns.set(id, () => {
+        for (const fn of destroyed) untracked(fn);
+        disposeEffects();
+    });
+
+    // The inspector lists it at level 2: `__pdx_debug.stores()`.
+    if (DEV) registerStore(id, instance);
+
+    // Registered first: an onMount that reads the store through its own hook gets this instance.
+    for (const fn of mounted) untracked(fn);
+    return instance;
+}
+
+/**
+ * Dispose the store `id`: its `onDestroy` callbacks run, the effects its factory created stop, and the
+ * next `createGlobalStore(id, …)` creates it anew. Whether there was a store to dispose.
+ */
+export function disposeStore(id: string): boolean {
+    const teardown = teardowns.get(id);
+    if (!teardown) return false;
+    teardowns.delete(id);
+    registry.delete(id);
+    teardown();
+    return true;
+}
+
+/** The store's factory run, the instance registered, its persisted state restored and synced. */
+function setUp<T>(id: string, setupFn: (store: StoreLifecycle) => T, lifecycle: StoreLifecycle, options?: GlobalStoreOptions): T {
     // Run setup (only once)
-    const instance = setupFn();
+    const instance = setupFn(lifecycle);
     registry.set(id, instance);
 
     // Persistence: load from storage, then sync changes
@@ -99,9 +151,6 @@ export function createGlobalStore<T>(
         }
     }
 
-    // The inspector lists it at level 2: `__pdx_debug.stores()`.
-    if (DEV) registerStore(id, instance);
-
     return instance;
 }
 
@@ -113,9 +162,11 @@ export function getStore<T = unknown>(id: string): T | undefined {
 }
 
 /**
- * Clear all registered stores (for testing).
+ * Dispose every store (for testing): each one's `onDestroy` runs and its effects stop. It emptied the
+ * registry and left every effect running, one more set per test (#1458).
  */
 export function clearStores(): void {
+    for (const id of [...teardowns.keys()]) disposeStore(id);
     registry.clear();
     if (DEV) unregisterStores();
 }

@@ -213,7 +213,7 @@ export function compileNewMode(
     const returnOnly = production && !scriptOnly
         ? namesReadOffCtx([renderCode, hostCode, ...ctx.hoistedSlots.map(([, code]) => code)].join('\n'))
         : undefined;
-    let setupParts = buildSetupBody(body === analysis.body ? analysis : { ...analysis, body }, filename, descriptor, production, scriptOnly, ctx.warnings, returnOnly);
+    let setupParts = buildSetupBody(body === analysis.body ? analysis : { ...analysis, body }, filename, descriptor, production, scriptOnly ? 'module' : 'component', ctx.warnings, returnOnly);
 
     // Post-setup: detect i18n helpers used in setup body (functions with _ prefix skip feature detection)
     if (setupParts.includes('$t(')) imports.add('$t');
@@ -320,8 +320,10 @@ export function compileStoreMode(
         exports: analysis.exports.filter(e => !lifted.names.has(e.name)),
     };
 
-    // Build the store factory body (same rewrite as component setup)
-    const factoryBody = buildSetupBody(storeAnalysis, filename, descriptor);
+    // Build the store factory body (same rewrite as component setup); its $effect, onMount and
+    // onDestroy are the store's own (#1458), registered on the StoreLifecycle the factory is given.
+    const factoryBody = buildSetupBody(storeAnalysis, filename, descriptor, false, 'store');
+    const usesLifecycle = analysis.lifecycle.onMount.length > 0 || analysis.lifecycle.onDestroy.length > 0;
 
     // Build options
     const optParts: string[] = [];
@@ -336,7 +338,7 @@ export function compileStoreMode(
     if (analysis.userImports.length > 0) code += analysis.userImports.join('\n') + '\n';
     code += '\n';
     if (lifted.statements.length > 0) code += lifted.statements.join('\n') + '\n\n';
-    code += `const __store_${store.name} = createGlobalStore(${jsQuote(store.name)}, () => {\n`;
+    code += `const __store_${store.name} = createGlobalStore(${jsQuote(store.name)}, (${usesLifecycle ? '__store' : ''}) => {\n`;
     code += factoryBody + '\n';
     code += `}${optsStr});\n`;
     code += '\n';

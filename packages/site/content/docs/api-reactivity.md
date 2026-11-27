@@ -7,7 +7,7 @@ parent: api
 
 # Reactivity API
 
-Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 71 exports, from `@pdxui/core`.
+Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 72 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -69,7 +69,8 @@ import { clearStores } from '@pdxui/core';
 function clearStores(): void
 ```
 
-Clear all registered stores (for testing).
+Dispose every store (for testing): each one's `onDestroy` runs and its effects stop. It emptied the
+registry and left every effect running, one more set per test (#1458).
 
 ## `collectDisposers`
 
@@ -138,15 +139,19 @@ isolate a subsystem, or in a test that must not share state with another.
 ```ts
 import { createGlobalStore } from '@pdxui/core';
 
-function createGlobalStore(id: string, setupFn: () => T, options?: GlobalStoreOptions): T
+function createGlobalStore(id: string, setupFn: (store: StoreLifecycle) => T, options?: GlobalStoreOptions): T
 ```
 
 Create or retrieve a singleton global store.
 The setup function runs only once per store ID.
 If persist is set, the store's signals are synced to storage.
 
+The factory runs in a scope of the store's own, outside the caller's (#1458): an effect it
+creates — an `$effect`, a `$watch`, the persistence write — lives as long as the store, not as long
+as the first component that asked for it, and is disposed with the store.
+
 @param id - Unique store identifier (compiler uses the @store name)
-@param setupFn - Factory function that returns the store's public API
+@param setupFn - Factory function that returns the store's public API, given its lifecycle
 @param options - Optional persistence config
 @returns The store instance (same reference for same ID)
 
@@ -175,6 +180,17 @@ Usage:
   const search = signal('');
   const debouncedSearch = debounced(() => search(), 300);
   effect(() => fetchResults(debouncedSearch()));
+
+## `disposeStore`
+
+```ts
+import { disposeStore } from '@pdxui/core';
+
+function disposeStore(id: string): boolean
+```
+
+Dispose the store `id`: its `onDestroy` callbacks run, the effects its factory created stop, and the
+next `createGlobalStore(id, …)` creates it anew. Whether there was a store to dispose.
 
 ## `distinct`
 
