@@ -24,8 +24,8 @@ function options(code: string): string | undefined {
 }
 
 const FORMS: Array<[string, string, string]> = [
-    ['@if with enter and exit', `@if (on) @transition('fade', 'out') { <p>x</p> }`, "{ enter: 'fade', exit: 'out' }"],
-    ['@if with @mode', `@if (on) @transition('fade') @mode('out-in') { <p>x</p> } @else { <p>y</p> }`, "{ enter: 'fade', exit: 'fade', mode: 'out-in' }"],
+    ['@if with enter and exit', `@if (on) @transition('fade', 'out') { <p>x</p> }`, "{ enter: 'fade', exit: 'out', block: blockAnimation }"],
+    ['@if with @mode', `@if (on) @transition('fade') @mode('out-in') { <p>x</p> } @else { <p>y</p> }`, "{ enter: 'fade', exit: 'fade', mode: 'out-in', block: blockAnimation }"],
     ['@for with @stagger', `@for (list as x; track x) @transition('fade') @stagger(50) { <p>{{ x }}</p> }`, "{ enter: 'fade', exit: 'fade', stagger: 50, animate: listAnimation }"],
     ['@for with @move alone', `@for (list as x; track x) @move(200) { <p>{{ x }}</p> }`, "{ move: '200', animate: listAnimation }"],
     ['@for with @empty', `@for (list as x; track x) @transition('fade') { <p>{{ x }}</p> } @empty { <p>none</p> }`, "{ enter: 'fade', exit: 'fade', animate: listAnimation }"],
@@ -46,8 +46,25 @@ describe('transitions reach the runtime', () => {
         expect(/import \{[^}]*\blistAnimation\b[^}]*\} from '@pdxui\/core'/.test(animated)).toBe(true);
         const plain = compiled(`@for (list as x; track x) { <p>{{ x }}</p> }`).inline;
         expect(plain).not.toContain('listAnimation');
-        // An @if's transition is when()'s, which does not read an animation.
+        // An @if's transition runs with blockAnimation, not the list's.
         expect(compiled(`@if (on) @transition('fade') { <p>x</p> }`).inline).not.toContain('listAnimation');
+    });
+
+    // An @if is core's whenBlock, which carries no animation of its own; one with a transition names
+    // blockAnimation, which an app whose blocks have none does not carry (#1259).
+    it('an @if is whenBlock: with a transition it imports blockAnimation, without one nothing', () => {
+        const coreImport = (code: string) => code.match(/import \{([^}]*)\} from '@pdxui\/core'/)?.[1].split(',').map((s) => s.trim()) ?? [];
+        const animated = compiled(`@if (on) @transition('fade') { <p>x</p> }`).inline;
+        expect(coreImport(animated)).toEqual(expect.arrayContaining(['whenBlock', 'blockAnimation']));
+        expect(animated).toMatch(/=whenBlock\(/);
+        const plain = compiled('@if (on) { <p>x</p> }').inline;
+        expect(coreImport(plain)).toContain('whenBlock');
+        expect(coreImport(plain)).not.toContain('when');
+        expect(coreImport(plain)).not.toContain('blockAnimation');
+        // A chain with a transition falls back to nested blocks (if-chain.ts), each with the animation.
+        const chain = compiled(`@if (on) @transition('fade') { <p>a</p> } @else if (list.length) { <p>b</p> } @else { <p>c</p> }`).inline;
+        expect(chain).not.toMatch(/[=,(]when\(/);
+        expect(coreImport(chain)).toContain('blockAnimation');
     });
 
     it('a block with no transition passes no options', () => {

@@ -982,14 +982,16 @@ IfBlock        ::= "@if" S? Paren S? BlockTransition? Block ( S? "@else" S? ( ( 
 
 #### Semantics
 
-`when(() => cond, () => html\`…\`, () => html\`…\`, options)`: the body is rendered while the
+`whenBlock(() => cond, () => html\`…\`, () => html\`…\`, options)`: the body is rendered while the
 condition is truthy, the `@else` body while it is not, and a branch is built again only when the
-truthiness changes. A branch's effects are disposed with it. A chain, `@if` followed by one or more
+truthiness changes. A branch's effects are disposed with it. `whenBlock` is core's `when` with no
+animation of its own: an `@if` with a `@transition` names `blockAnimation` in its options, and one
+without brings no animation code into the app (#1259), as a `@for` does with `listAnimation`. A chain, `@if` followed by one or more
 `@else if (…)`, is one choice among its branches: `whenChain(() => c1 ? 0 : c2 ? 1 : …, [branches])`
 renders the first branch whose condition holds, or the `@else`, and builds a branch again only when
-the choice changes (#685). A chain with a `@transition` on any of its links nests a `when` per link
-instead, which runs the transitions. `@else { @if (…) }` with text beside the `@if` is a second
-`when` in the else branch. In a production build a literal `true` or `false` condition is folded away
+the choice changes (#685). A chain with a `@transition` on any of its links nests a `whenBlock` per
+link instead, which runs the transitions. `@else { @if (…) }` with text beside the `@if` is a second
+`whenBlock` in the else branch. In a production build a literal `true` or `false` condition is folded away
 (#236).
 
 #### Rules
@@ -1221,8 +1223,9 @@ The page transition is `@page`'s `transition` option, in [routing.md](routing.md
 
 #### Semantics
 
-They become the last argument of the block's `when` / `each` / `eachRow`:
-`{ enter, exit, stagger, mode, move }`. `@transition('fade')` uses one name for both,
+They become the last argument of the block's `whenBlock` / `each` / `eachRow`:
+`{ enter, exit, stagger, mode, move }`, with the animation that runs them — `block: blockAnimation` on
+an `@if` (#1259), `animate: listAnimation` on a `@for` (#1246). `@transition('fade')` uses one name for both,
 `@transition('slide-up', 'fade')` names enter and exit. Entering, an element gets the classes
 `pdx-<name> pdx-enter-from`, then `pdx-enter-active` until its `transitionend`; leaving,
 `pdx-<name> pdx-exit-from`, then `pdx-exit-active`, and it is removed after. `@stagger(ms)` delays
@@ -1233,7 +1236,7 @@ one enters. `@move(ms)` animates a `@for` row that changes index, with FLIP; `@m
 
 - `@stagger` and `@mode` are read only after a `@transition`; alone they stop the compile with
   `Expected '{'`. `@move` may stand alone.
-- **What the runtime reads differs by block.** On `@if`, `when` reads `enter`, `exit`, `stagger` (over
+- **What the runtime reads differs by block.** On `@if`, `whenBlock` reads `enter`, `exit`, `stagger` (over
   the branch's top-level nodes) and `mode` — only `'out-in'` sequences, any other is simultaneous —
   and ignores `move`. On `@for` the list reconciler reads all five: the n-th row that arrives in an
   update waits `n × stagger` ms (its `transition-delay`, cleared once it has entered); `'out-in'`

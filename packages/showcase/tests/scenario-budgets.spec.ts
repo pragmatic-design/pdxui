@@ -108,9 +108,15 @@ import { scenarioDist } from './scenarios-build';
  * pdx-form-field moves to .pdx (#1210, the same standing OK): crud reads 52.3 KB on CI, budget 52.2 →
  * 52.6. Its form's fields are pdx-form-field, compiled now (1.02× alone with its wiring module), while
  * html`` stays for the TypeScript components beside them. hello, benchmark and dashboard use no field.
+ *
+ * #1259, a conditional's transitions run with the animation its options name, as a list's do: hello's
+ * counter is given an `@if`, so the check below that it carries no transitions.ts measures something —
+ * without one it passed on main too. hello 6.6 → 7.0 KB for the `@if` and its block, budget the
+ * measurement + 0.3; the same app on main also reads 7.0 KB, with transitions.ts in it, which the
+ * feature check refuses. benchmark, crud and dashboard stay within their budgets.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
-    hello: { js: 6.9, css: 0 },
+    hello: { js: 7.3, css: 0 },
     benchmark: { js: 11.2, css: 0 },
     crud: { js: 52.6, css: 1.6 },
     dashboard: { js: 18.5, css: 21.9 },
@@ -206,8 +212,9 @@ const DEBUG_CODE = [
 /**
  * The features of a component's definition (#1246, part 3c), each a module a compiled component names
  * when it declares it: `@expose`, `@host` and `@variants`, a form model, a `<slot>`; and a list's
- * transitions, which a `@for` with `@transition` names as its `animate`. The hello and benchmark apps
- * declare none.
+ * transitions, which a `@for` with `@transition` names as its `animate`, and a conditional's, which an
+ * `@if` with `@transition` names as its `block` (#1259) — hello's counter has an `@if` without one. The
+ * hello and benchmark apps declare none.
  */
 const FEATURE_MODULES = [
     'packages/core/src/component/channel.ts',

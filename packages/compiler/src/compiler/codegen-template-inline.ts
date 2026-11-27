@@ -1008,13 +1008,17 @@ class InlineGen {
     ifN(node: IfNode): void {
         const chain = ifChain(node);
         if (chain) { this.ifChainN(node, chain); return; }
-        this.imports.add('when');
+        // core's whenBlock, which carries no animation; one with a transition names blockAnimation, which
+        // an app whose blocks have none does not carry (#1259).
+        this.imports.add('whenBlock');
+        const transition = generateTransition(node.transition, 'block');
+        if (transition) this.imports.add('blockAnimation');
         const cond = callSignals(prefixCtx(node.condition, this.ctx), this.ctx);
         const then = this.sub(node.body);
         const els = node.elseBody ? `()=>{${this.sub(node.elseBody)}}` : 'null';
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
-        this.out(`const ${cf}=when(${arrowOf(cond)},()=>{${then}},${els}${generateTransition(node.transition)});`);
+        this.out(`const ${cf}=whenBlock(${arrowOf(cond)},()=>{${then}},${els}${transition});`);
         this.place(cf);
     }
 
@@ -1090,7 +1094,7 @@ class InlineGen {
         const params = node.index ? `${node.item},${node.index}` : node.item;
         // A list's transitions run with core's listAnimation, named here (#1246): a list with none
         // brings no animation code into the bundle.
-        const transition = generateTransition(node.transition, true);
+        const transition = generateTransition(node.transition, 'list');
         if (transition) this.imports.add('listAnimation');
         const cf = this.v('cf');
 

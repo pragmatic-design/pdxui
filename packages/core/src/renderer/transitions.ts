@@ -322,3 +322,17 @@ export interface ListAnimation {
 
 /** The animation a list with transitions is given. */
 export const listAnimation: ListAnimation = { enterRow, exit, recordPositions, flipAnimate };
+
+/**
+ * What a conditional block runs its `@transition` and `@mode` with (#1259): given as its transition
+ * options' `block`, by the compiler for an `@if` that declares one and by the hand-written `when()`
+ * itself, so the conditional in helpers.ts imports none of this module and an app whose blocks declare
+ * no transition does not carry it — the pattern #1246 set for lists.
+ */
+export interface BlockAnimation {
+    insert: typeof insertWithTransition;
+    remove: typeof removeWithTransition;
+}
+
+/** The animation a conditional block with transitions is given. */
+export const blockAnimation: BlockAnimation = { insert: insertWithTransition, remove: removeWithTransition };

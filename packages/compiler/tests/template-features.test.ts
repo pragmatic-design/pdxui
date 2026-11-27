@@ -34,7 +34,7 @@ describe('@empty — fallback for empty lists', () => {
 <script>
   let items = $signal([]);
 </script>`);
-        expect(code).not.toContain('when(');
+        expect(code).not.toMatch(/\bwhen(Block)?\(/);
         expect(code).toMatch(/eachStatic\(\(\)=>\(ctx\.items\(\)\)\?\?\[\],'id',.*,undefined,listEmpty\(\(\)=>\{const __frag=__blk\d+\(\);return __frag;\}\)\);/);
         expect(code).toContain('No items yet');
     });
@@ -50,7 +50,7 @@ describe('@empty — fallback for empty lists', () => {
   let items = $signal([]);
 </script>`);
         expect(code).toContain('eachStatic(');
-        expect(code).not.toContain('when(');
+        expect(code).not.toMatch(/\bwhen(Block)?\(/);
     });
 });
 

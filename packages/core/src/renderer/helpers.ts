@@ -6,8 +6,10 @@ import { effect, signal, collectDisposers, onDispose } from '../reactivity/signa
 import { repeat, mountList, type RepeatOptions } from './list';
 import { staticRowRenderer } from './list-static';
 import type { ListEmpty } from './list-empty';
-import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
-import type { ListAnimation } from './transitions';
+// `enter`/`exit` for portal(), a hand-written API the compiler does not emit, dropped with it when an
+// app does not use it; `blockAnimation` for the hand-written when() alone (#1259).
+import { enter, exit, blockAnimation } from './transitions';
+import type { ListAnimation, BlockAnimation } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
@@ -36,14 +38,26 @@ export interface TransitionOptions {
     /**
      * What a keyed list runs these with (#1246): `listAnimation`. The compiler names it for a `@for`
      * that declares a transition, and the hand-written `repeat()`, `repeatRows()` and `each()` give it
-     * themselves, so a list with no transition carries none of transitions.ts. `when()` does not read it.
+     * themselves, so a list with no transition carries none of transitions.ts. A conditional reads `block`.
      */
     animate?: ListAnimation;
+    /**
+     * What a conditional block runs these with (#1259): `blockAnimation`. The compiler names it for an
+     * `@if` that declares a transition, and the hand-written `when()` gives it itself, so a block with
+     * no transition carries none of transitions.ts. A list reads `animate`.
+     */
+    block?: BlockAnimation;
+}
+
+/** Whether `options` ask a block for an animation: an enter, an exit, a move or a mode. */
+function hasTransitions(options: TransitionOptions | undefined): boolean {
+    return !!options && !!(options.enter || options.exit || options.move || options.mode);
 }
 
 /**
  * Conditional rendering. Reactively shows thenFn or elseFn based on condition.
- * Supports enter/exit transitions when TransitionOptions are provided.
+ * Supports enter/exit transitions when TransitionOptions are provided: the hand-written entry, which
+ * gives them `blockAnimation` itself (#1259). What the compiler emits for `@if` is `whenBlock`.
  *
  * Usage:
  *   ${when(() => isOpen(), () => html`<span>Open!</span>`)}
@@ -51,6 +65,21 @@ export interface TransitionOptions {
  *          { enter: 'fade-in', exit: 'fade-out' })}
  */
 export function when(
+    condition: () => boolean,
+    thenFn: () => Node | DocumentFragment,
+    elseFn?: (() => Node | DocumentFragment | null) | null,
+    options?: TransitionOptions
+): DocumentFragment {
+    const animated = hasTransitions(options) && !options!.block ? { ...options, block: blockAnimation } : options;
+    return whenBlock(condition, thenFn, elseFn, animated);
+}
+
+/**
+ * Conditional rendering as the compiler emits it for `@if` (#1259): its transitions run with the
+ * animation its options name, `block`, which the compiler names for an `@if` that declares one. With
+ * none, its branches are placed and removed as they are, and this module brings in no animation code.
+ */
+export function whenBlock(
     condition: () => boolean,
     thenFn: () => Node | DocumentFragment,
     elseFn?: (() => Node | DocumentFragment | null) | null,
@@ -89,6 +118,20 @@ export function followWhen(
     // A generation token: a .then() of an out-in exit overtaken by a more recent run
     // must neither render stale content nor overwrite the disposer.
     let renderGen = 0;
+    // The animation the options name (#1259); with none, the branches are placed and removed as they are.
+    const animation = options?.block;
+    if (DEV && !animation && hasTransitions(options)) {
+        console.warn('[pdx] A conditional block was given transitions and no animation to run them with, so it renders without them: pass block: blockAnimation, or render it with when(), which gives it.');
+    }
+    const insert = (parent: Node, nodes: Node[]): void => {
+        if (animation) animation.insert(parent, nodes, end, options);
+        else for (const n of nodes) placePartNode(parent, n, end);
+    };
+    const remove = (nodes: Node[]): Promise<void> => {
+        if (animation) return animation.remove(nodes, options);
+        for (const n of nodes) n.parentNode?.removeChild(n);
+        return Promise.resolve();
+    };
 
     const render = (parent: Node, show: boolean): void => {
         childDispose?.(); // dispose the branch we're replacing
@@ -101,7 +144,7 @@ export function followWhen(
             const nodes = content instanceof DocumentFragment
                 ? Array.from(content.childNodes)
                 : [content];
-            insertWithTransition(parent, nodes, end, options);
+            insert(parent, nodes);
         }
     };
 
@@ -130,7 +173,7 @@ export function followWhen(
         if (oldNodes.length > 0 && mode === 'out-in') {
             // Sequenced: exit old, THEN enter new (only if this run is still the latest).
             childDispose?.(); childDispose = null;
-            removeWithTransition(oldNodes, options).then(() => {
+            remove(oldNodes).then(() => {
                 if (gen !== renderGen) return; // superseded
                 const newParent = end.parentNode;
                 if (newParent) render(newParent, show);
@@ -139,7 +182,7 @@ export function followWhen(
         }
 
         // Default: simultaneous exit + enter.
-        if (oldNodes.length > 0) removeWithTransition(oldNodes, options);
+        if (oldNodes.length > 0) void remove(oldNodes);
         render(parent, show);
     });
 

@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 88 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 90 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -312,6 +312,16 @@ never becomes a live link. Written out, each one was its own effect of about 120
 `assignBoundProperty` does) or a plain element's own property (`href` on an <a>). A plain element
 that does not have it, and `null` for a name that is only an attribute (`xlink:href`, SVG), write
 the attribute. With `once`, `value` is the value itself, written once with no effect (#1270).
+
+## `blockAnimation`
+
+```ts
+import { blockAnimation } from '@pdxui/core';
+
+const blockAnimation: BlockAnimation
+```
+
+The animation a conditional block with transitions is given.
 
 ## `cancelPrefetches`
 
@@ -1193,12 +1203,25 @@ function when(condition: () => boolean, thenFn: () => Node | DocumentFragment, e
 ```
 
 Conditional rendering. Reactively shows thenFn or elseFn based on condition.
-Supports enter/exit transitions when TransitionOptions are provided.
+Supports enter/exit transitions when TransitionOptions are provided: the hand-written entry, which
+gives them `blockAnimation` itself (#1259). What the compiler emits for `@if` is `whenBlock`.
 
 Usage:
   ${when(() => isOpen(), () => html`<span>Open!</span>`)}
   ${when(() => isOpen(), () => html`<span>Yes</span>`, () => html`<span>No</span>`,
          { enter: 'fade-in', exit: 'fade-out' })}
+
+## `whenBlock`
+
+```ts
+import { whenBlock } from '@pdxui/core';
+
+function whenBlock(condition: () => boolean, thenFn: () => Node | DocumentFragment, elseFn?: (() => Node | DocumentFragment | null) | null, options?: TransitionOptions): DocumentFragment
+```
+
+Conditional rendering as the compiler emits it for `@if` (#1259): its transitions run with the
+animation its options name, `block`, which the compiler names for an `@if` that declares one. With
+none, its branches are placed and removed as they are, and this module brings in no animation code.
 
 ## `whenChain`
 

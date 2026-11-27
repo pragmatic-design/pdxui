@@ -45,6 +45,9 @@
 // With #1461 the select's caret rules moved to their own stylesheet, caret.css, which the cascader and
 // the tree-select share: the select imports `@pdxui/design/components/caret`, one more import line,
 // 7627 → 7632 B. Not codegen: the module's own import, which an app's bundle resolves to the stylesheet.
+// With #1259 an `@if` compiles to `whenBlock`, which carries no animation, where it was `when`: 7632 →
+// 7633 B, the longer name, imported and called; weighed here with every import external it stays as
+// written, and in an app's bundle it is a local identifier.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -62,7 +65,7 @@ const UI = join(__dirname, '..', '..');
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
     'src/switch-toggle/pdx-switch.pdx': 1256,
-    'src/select/pdx-select.pdx': 7632,
+    'src/select/pdx-select.pdx': 7633,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

@@ -251,7 +251,7 @@ describe('constant condition elimination', () => {
 </script>`;
         const { code } = compile(source, 'const-if.pdx', [], undefined, { production: true });
         expect(code).toContain('Always visible');
-        expect(code).not.toContain('when(');
+        expect(code).not.toContain('whenBlock(');
     });
 
     it('production eliminates @if(false) entirely', () => {
@@ -267,7 +267,7 @@ describe('constant condition elimination', () => {
 </script>`;
         const { code } = compile(source, 'const-if-false.pdx', [], undefined, { production: true });
         expect(code).not.toContain('Never visible');
-        expect(code).not.toContain('when(');
+        expect(code).not.toContain('whenBlock(');
         expect(code).toContain('Before');
         expect(code).toContain('After');
     });
@@ -286,7 +286,7 @@ describe('constant condition elimination', () => {
         const { code } = compile(source, 'const-else.pdx', [], undefined, { production: true });
         expect(code).not.toContain('Hidden');
         expect(code).toContain('Fallback');
-        expect(code).not.toContain('when(');
+        expect(code).not.toContain('whenBlock(');
     });
 
     it('production inlines @show(true)', () => {
@@ -327,7 +327,7 @@ describe('constant condition elimination', () => {
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'dev-const.pdx', [], undefined, { production: false });
-        expect(code).toContain('when(');
+        expect(code).toContain('whenBlock(');
     });
 
     it('dynamic conditions are NOT eliminated in production', () => {
@@ -340,7 +340,7 @@ describe('constant condition elimination', () => {
 let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'dyn-if.pdx', [], undefined, { production: true });
-        expect(code).toContain('when(');
+        expect(code).toContain('whenBlock(');
     });
 });
 
@@ -537,7 +537,7 @@ let count = $signal(0);
 let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'inline-if.pdx', [], undefined, { production: true });
-        expect(code).toContain('when(');
+        expect(code).toContain('whenBlock(');
         expect(builds(code, 'div')).toBe(true);
     });
 
@@ -808,9 +808,9 @@ let dead3 = $signal([]);
         const { code: devCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: false });
         const { code: prodCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: true });
         // Dev has when() and the display binding of a one-element @show; prod inlines/eliminates them
-        expect(devCode).toContain('when(');
+        expect(devCode).toContain('whenBlock(');
         expect(devCode).toContain('.style.display=(true)');
-        expect(prodCode).not.toContain('when(');
+        expect(prodCode).not.toContain('whenBlock(');
         expect(prodCode).not.toContain('.style.display=');
         expect(prodCode.length).toBeLessThan(devCode.length);
     });
