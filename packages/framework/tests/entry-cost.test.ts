@@ -145,7 +145,10 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (19866 against 19844 B) but compresses worse (6782 against 5760 B gzip): the compiled template is
     // static markup and walks, text that differs block to block, where html`` repeated one shape per
     // binding (#1287).
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 347.1 },
+    // 347.2 after #1462 (CI's figure, from 347.1): pdx-tree opens and closes a branch in place —
+    // openInPlace, closeInPlace, markBusy and the shared renderRows / buildGroup — where every expand
+    // rebuilt the visible rows, which is what let its arrow's rotation animate.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 347.2 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -171,8 +174,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // pdx-bulk-actions (measured here: 336.6), as for the entry above. 336.8 after pdx-autocomplete
     // (measured here: 336.7, on the ceiling), as for the entry above. 337.4 after pdx-data-grid
     // (measured here: 337.3), as for the entry above. 338.0 after pdx-select (measured here: 337.9), as
-    // for the entry above.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 338.0 },
+    // for the entry above. 338.2 after #1462 (CI's figure), as for the entry above: pdx-tree's
+    // in-place expand.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 338.2 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
