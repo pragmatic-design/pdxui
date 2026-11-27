@@ -19,7 +19,7 @@ import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 // The generated code imports them from core; the harness hands it the real ones, so the stub cases
 // measure the rule both builds share, not a copy of it.
 import { clearBoundProperty, assignBoundProperty, interpolationText } from '../../core/src/renderer/template';
-import { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp } from '../../core/src/renderer/bound-attribute';
+import { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp, bindGroup, bindText } from '../../core/src/renderer/bound-attribute';
 import { signal, effect, batch } from '../../core/src/reactivity/signal';
 import type { Signal } from '../../core/src/utils/types';
 
@@ -37,12 +37,13 @@ function parses(code: string): void {
  * A plain element's property write (#1207): one call to core's binding of the property `prop`, bound
  * as `attr`, reading `read` — `bindNativeProperty` where the element certainly has it,
  * `bindAttributeOrProperty` where it is asked. Core keeps the value it wrote last (#44) and hands null
- * to `clearBoundProperty`; the `live` cases below run that.
+ * to `clearBoundProperty`; the `live` cases below run that. With the block's other bindings it is in
+ * the block's group (#1275), the call's last argument.
  */
 function writesProperty(code: string, attr: string, prop: string, read: string): void {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     expect(code).toMatch(new RegExp(
-        `bind(?:NativeProperty|AttributeOrProperty)\\(__el\\d+, "${attr}", "${prop}", \\(\\)=>${esc(read)}\\);`,
+        `bind(?:NativeProperty|AttributeOrProperty)\\(__el\\d+, "${attr}", "${prop}", \\(\\)=>${esc(read)}(?:, __g)?\\);`,
     ));
 }
 
@@ -117,9 +118,9 @@ function live(template: string, values: Record<string, unknown>): { el: StubElem
         createTextNode: (t: string) => ({ data: t }),
     }, (n) => (n instanceof StubElement ? Object.assign(new StubElement(n.tagName), { attrs: new Map(n.attrs) }) : { ...n }));
     const frag = new Function('document', 'staticBlock', 'effect', 'ctx', 'clearBoundProperty', 'assignBoundProperty', 'interpolationText',
-        'bindAttribute', 'bindNativeProperty', 'bindAttributeOrProperty', 'bindComponentProp', `return ${iife};`)(
+        'bindAttribute', 'bindNativeProperty', 'bindAttributeOrProperty', 'bindComponentProp', 'bindGroup', 'bindText', `return ${iife};`)(
         document, stubStaticBlock(document), effect, ctx, clearBoundProperty, assignBoundProperty, interpolationText,
-        bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp) as StubElement;
+        bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindComponentProp, bindGroup, bindText) as StubElement;
     return {
         el: frag.children[0],
         set(next) {

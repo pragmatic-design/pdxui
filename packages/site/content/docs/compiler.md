@@ -41,7 +41,7 @@ function reset() { count = 5; }
 and here is what the compiler emits for it — not a paraphrase, the actual output:
 
 ```js
-import { bindInterpolation, computed, defineComponent, exposeOnElement, prop, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindText, computed, defineComponent, exposeOnElement, prop, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
 
 // the template's static markup, as HTML → parsed once, on first render, then copied;
 // each <!----> is an empty text node the render binds
@@ -72,9 +72,11 @@ defineComponent('app-counter', {
   render: (ctx) => (() => {                                    // the template → a copy of its markup
     const __frag=__blk0();
     const [__t1,__t2,__t3]=__walk0(__frag);
-    bindInterpolation(__t1,()=>ctx.label());                   // {{ label }} → a text node that follows it
-    bindInterpolation(__t2,()=>ctx.count());
-    bindInterpolation(__t3,()=>ctx.doubled());
+    const __g=[];                                              // the block's bindings, run by one effect
+    bindText(__t1,()=>ctx.label(),__g);                        // {{ label }} → a text node that follows it;
+    bindText(__t2,()=>ctx.count(),__g);                        //   a string prop and a number signal are text
+    bindInterpolation(__t3,()=>ctx.doubled());                 // a $derived may be nodes: its own effect
+    bindGroup(__g);
     return __frag;
   })(),
 }, { expose: exposeOnElement });                               // the features it uses: @expose's
@@ -101,6 +103,24 @@ same call given the value and a last argument, `bindAttribute(el, 'id', ctx.cont
 writes once by the same rule; a `.once` passes its value read through `untracked`. A handler is `eventHandler(fn, ctx.el, 'click')`, which runs it in one batch and routes what it
 throws; the `@state` runes are one `ctx.states({ … })`. Written out in every component, each of these
 weighed more than the component's own markup.
+
+The bindings of one block share one effect. A block with two or more passes each the block's group
+as its last argument, `bindAttribute(el, 'aria-label', () => …, __g)`, and `bindGroup(__g)` runs them
+all: each reads its value and writes it when it differs from the one it wrote last. A block's effect
+per binding was the cost of a declarative template, more than the writes themselves. A block with one
+binding keeps its own call. An interpolation joins the group as `bindText` when the compiler can see it
+is text — a prop or `$signal` of a primitive type, a literal, a template string — and keeps
+`bindInterpolation` when it may render nodes, whose value is read again only when what it reads
+changes.
+
+What a binding is with the props at their defaults is often known when the component compiles:
+`legend || collapsible ? '' : 'display:none'` is `'display:none'` with `legend = ''` and
+`collapsible = false`. The compiler writes such a value into the static markup and gives it to the
+group, `bindGroup(__g, ['display:none', , 'true'])`, a hole for each value it does not know, and the
+first run writes only what differs. It is a prediction that costs a write when it is wrong — an
+attribute on the host, a signal the setup changed — never a wrong page. It reads literals, props with
+a literal default and `$signal`s with a literal initial value, through `!`, comparisons, `+`,
+`a ? b : c`, `||`, `&&` and `??`.
 
 A module can also be compiled to take over markup that static generation wrote for it, instead of
 building its own: that is hydration. Then each block's render starts with `hydrationRange()`, the

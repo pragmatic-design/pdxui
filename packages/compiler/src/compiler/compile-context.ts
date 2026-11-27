@@ -4,6 +4,7 @@
 
 import type { TemplateDirectiveHandler } from '../plugin-system';
 import type { ValidationWarning } from './validate';
+import type { MountValue } from './codegen-mount-values';
 import { DEFAULT_TAG_PREFIX } from './tag-prefix';
 
 export interface CompileContext {
@@ -40,6 +41,12 @@ export interface CompileContext {
 
     /** The script's top-level `const`s whose value is literals only: constant in the template (#110). */
     literalConsts: Set<string>;
+
+    /** The names the script declares as text — a primitive prop or signal (#1275; codegen-text-bindings). */
+    textNames: Set<string>;
+
+    /** The value at mount of a prop with a literal default or a literal `$signal` (#1275; codegen-mount-values). */
+    mountValues: Map<string, MountValue>;
 
     /** The event types this component delegates to one listener each (#113; inline-event-delegation). */
     delegatedEvents: Set<string>;
@@ -199,6 +206,8 @@ export function createCompileContext(options?: {
         rowVars: new Set(),
         rowKeys: [],
         literalConsts: new Set(),
+        textNames: new Set(),
+        mountValues: new Map(),
         delegatedEvents: new Set(),
         rowHandlers: null,
         parts: new Set(),

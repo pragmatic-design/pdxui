@@ -48,6 +48,14 @@
 // With #1259 an `@if` compiles to `whenBlock`, which carries no animation, where it was `when`: 7632 →
 // 7633 B, the longer name, imported and called; weighed here with every import external it stays as
 // written, and in an app's bundle it is a local identifier.
+// With #1275 a block's bindings run in one effect: each binding passes the block's group, `__g`, and the
+// block declares it and runs it with `bindGroup`, where each binding made its own effect. The switch
+// 1256 → 1276 B, the select 7633 → 7703 B: the group's declaration and run per block, `, __g` per
+// binding, and `bindGroup`/`bindText` imported. The trade is the effects: pdx-fieldset written
+// declaratively went from 1.41× its TypeScript version's mount to 1.01×. Then the values the bindings
+// have with the props at their defaults go into the static markup and to `bindGroup`, which writes only
+// what differs: the switch 1276 → 1287 B, the select 7703 → 7724 B, for the fieldset's whole mount,
+// the frame after it included, 0.70–0.76× its TypeScript version's.
 //
 // A ratchet, at what was measured: a codegen change that makes either module heavier fails here, and a
 // change that makes it lighter lowers the ceiling in the same pull request.
@@ -64,8 +72,8 @@ const UI = join(__dirname, '..', '..');
 
 /** The gzip ceiling of each module, in bytes: its weight when the ratchet last moved. */
 const CEILINGS = {
-    'src/switch-toggle/pdx-switch.pdx': 1256,
-    'src/select/pdx-select.pdx': 7633,
+    'src/switch-toggle/pdx-switch.pdx': 1287,
+    'src/select/pdx-select.pdx': 7724,
 } as const;
 
 /** Build `entry` alone, as the pilot weighed it, and return its minified code. */

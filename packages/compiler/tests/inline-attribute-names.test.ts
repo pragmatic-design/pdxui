@@ -36,9 +36,10 @@ describe('inlineBindings: bound names with - or :', () => {
     it(':aria-label and :data-id compile to core\'s attribute binding, in a module that parses', () => {
         const code = inline('<div :aria-label="label" :data-id="id"></div>');
         parses(code);
-        // bindAttribute sets it, and removes it for null or false (#1207; bound-attribute.ts).
-        expect(code).toMatch(/bindAttribute\(\w+, "aria-label", \(\)=>ctx\.label\(\)\)/);
-        expect(code).toMatch(/bindAttribute\(\w+, "data-id", \(\)=>ctx\.id\(\)\)/);
+        // bindAttribute sets it, and removes it for null or false (#1207; bound-attribute.ts). Two
+        // bindings of one block: in its group, the last argument (#1275).
+        expect(code).toMatch(/bindAttribute\(\w+, "aria-label", \(\)=>ctx\.label\(\)(?:, __g)?\)/);
+        expect(code).toMatch(/bindAttribute\(\w+, "data-id", \(\)=>ctx\.id\(\)(?:, __g)?\)/);
         expect(code, 'the name was cut at the hyphen').not.toMatch(/\["aria"\]|\["data"\]|"-label"|"-id"/);
     });
 
@@ -111,14 +112,14 @@ describe('the controls', () => {
     it(':disabled and :value still assign the property', () => {
         const code = inline('<input :disabled="id" :value="label" />');
         parses(code);
-        expect(code).toMatch(/bindNativeProperty\(\w+, "disabled", "disabled", \(\)=>ctx\.id\(\)\)/);
-        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.label\(\)\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "disabled", "disabled", \(\)=>ctx\.id\(\)(?:, __g)?\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.label\(\)(?:, __g)?\)/);
     });
 
     it('a camelCase DOM property keeps the property path, on HTML and on SVG: :textContent', () => {
         const code = inline('<p :textContent="label"></p><svg><text :textContent="label"></text></svg>');
         parses(code);
-        expect(code.match(/bindAttributeOrProperty\(\w+, "textContent", "textContent", \(\)=>ctx\.label\(\)\)/g)).toHaveLength(2);
+        expect(code.match(/bindAttributeOrProperty\(\w+, "textContent", "textContent", \(\)=>ctx\.label\(\)(?:, __g)?\)/g)).toHaveLength(2);
     });
 
     it('an HTML element is still created with createElement', () => {

@@ -47,8 +47,8 @@ describe('the controls', () => {
     it(':title and :value still compile to a direct assignment, with no sanitiser', () => {
         const code = inline('<input :title="url" :value="url" />');
         // Core's property binding (#1207): null goes to clearBoundProperty, anything else is assigned.
-        expect(code).toMatch(/bindNativeProperty\(\w+, "title", "title", \(\)=>ctx\.url\(\)\)/);
-        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.url\(\)\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "title", "title", \(\)=>ctx\.url\(\)(?:, __g)?\)/);
+        expect(code).toMatch(/bindNativeProperty\(\w+, "value", "value", \(\)=>ctx\.url\(\)(?:, __g)?\)/);
         expect(code).not.toContain('sanitizeBoundUrl');
     });
 });

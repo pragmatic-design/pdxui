@@ -16,6 +16,8 @@ import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } fro
 import { builtinAttachmentsToImport } from './attach-names';
 import { foldConstantConditions } from './fold-constant-conditions';
 import { literalConstNames } from './codegen-constant-bindings';
+import { textNames } from './codegen-text-bindings';
+import { mountValues } from './codegen-mount-values';
 import { delegatedEventTypes } from './inline-event-delegation';
 import { assembleModule, detectDeadSignals, extractTag, renderReturnIndex } from './codegen-shared';
 import { jsQuote } from './js-literal';
@@ -130,6 +132,10 @@ export function compileNewMode(
     const templateHoists = { lines: ctx.moduleHoists, count: 0 };
     // A `const MAX = 10` the template reads is written once, with no effect (#110).
     ctx.literalConsts = literalConstNames(descriptor.script?.content ?? '');
+    // An interpolation of a primitive prop or signal is text, and joins its block's group (#1275).
+    ctx.textNames = textNames(analysis.props, analysis.signals);
+    // What those read at mount with the props at their defaults, written into the markup (#1275).
+    ctx.mountValues = mountValues(analysis.props, analysis.signals);
     // Bubbling events inside a @for are delegated to one listener per type (#113).
     ctx.delegatedEvents = delegatedEventTypes(ast);
     // A literal `data-part` naming a declared part is also that part's ref (#134), when the part's
@@ -162,6 +168,8 @@ export function compileNewMode(
     for (const [i, code] of snippetFunctions.entries()) ctx.hoistedSlots.push([analysis.snippets[i].name, code]);
     const renderCode = generateInlineNodes(ast, imports, ctx, templateHoists);
     ctx.literalConsts = new Set();
+    ctx.textNames = new Set();
+    ctx.mountValues = new Map();
     ctx.delegatedEvents = new Set();
     // The `html` import is dropped LATER, once the whole module is assembled — see below, not here.
     // The inline path emits no tagged template — a scoped slot's hoisted function included, since

@@ -39,7 +39,7 @@ describe('@prop for as htmlFor', () => {
         expect(r.warnings.filter((w) => w.severity === 'error')).toEqual([]);
         expect(r.code).toContain("for: prop('')");
         expect(r.code).toContain('const htmlFor = ctx.for;');
-        expect(r.code).toMatch(/bindNativeProperty\(__el\d+, "for", "htmlFor", \(\)=>ctx\.htmlFor\(\) \|\| null\)/);
+        expect(r.code).toMatch(/bindNativeProperty\(__el\d+, "for", "htmlFor", \(\)=>ctx\.htmlFor\(\) \|\| null(?:, __g)?\)/);
         expect(r.code).toMatch(/return \{[^}]*\bhtmlFor\b/);
         expect(() => new Function(r.code.replace(/^import .*$/gm, '')), 'the module parses').not.toThrow();
     });

@@ -134,7 +134,8 @@ export { DEV } from './utils/env';
 
 // Renderer
 export { html, clearBoundProperty, assignBoundProperty, bindTwoWay, bindInterpolation, bindRef, interpolationText } from './renderer/template';
-export { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindStyleText, bindUrl, bindComponentProp } from './renderer/bound-attribute';
+export { bindAttribute, bindNativeProperty, bindAttributeOrProperty, bindStyleText, bindUrl, bindComponentProp, bindGroup, bindText } from './renderer/bound-attribute';
+export type { BindGroup } from './renderer/bound-attribute';
 export { bindParts } from './renderer/bind-parts';
 export { attach, autofocus, trapFocus, clickOutside } from './renderer/attach';
 export type { Attachment } from './renderer/attach';

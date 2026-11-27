@@ -4,7 +4,7 @@ exports[`compile golden — demo corpus > color-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindStyleText, bindTwoWay, computed, defineComponent, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindStyleText, bindText, bindTwoWay, computed, defineComponent, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tdfsr4");
@@ -30,13 +30,15 @@ defineComponent('app-color-card', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el2,__t4,__el8,__t10,__el11,__t13,__el14]=__walk0(__frag);
-    bindStyleText(__el2, ()=>ctx.previewStyle());
-    bindInterpolation(__t4,()=>ctx.emoji());
+    const __g=[];
+    bindStyleText(__el2, ()=>ctx.previewStyle(), __g);
+    bindText(__t4,()=>ctx.emoji(),__g);
     bindTwoWay(__el8, 'value', ctx.color);
-    bindInterpolation(__t10,()=>ctx.radius());
+    bindText(__t10,()=>ctx.radius(),__g);
     bindTwoWay(__el11, 'value.number', ctx.radius);
     bindInterpolation(__t13,()=>ctx.scale());
     bindTwoWay(__el14, 'value.number', ctx.scalePercent);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -170,7 +172,7 @@ exports[`compile golden — demo corpus > effect-test.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, computed, defineComponent, eventHandler, onMount, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindText, computed, defineComponent, eventHandler, onMount, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tt8bks");
@@ -205,10 +207,12 @@ function inc() { __count.set(__v => __v + 1); }
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__t3,__t5,__t7,__el8]=__walk0(__frag);
-    bindInterpolation(__t3,()=>ctx.count());
+    const __g=[];
+    bindText(__t3,()=>ctx.count(),__g);
     bindInterpolation(__t5,()=>ctx.doubled());
-    bindInterpolation(__t7,()=>ctx.mountMsg());
+    bindText(__t7,()=>ctx.mountMsg(),__g);
     __el8.addEventListener('click', eventHandler(ctx.inc, ctx.el, 'click'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -259,7 +263,7 @@ exports[`compile golden — demo corpus > infra/demo-a11y.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindInterpolation, bindRef, createLiveRegion, defineComponent, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup, useActiveDescendant, useRovingTabindex } from '@pdxui/core';
+import { bindAttribute, bindGroup, bindRef, bindText, createLiveRegion, defineComponent, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup, useActiveDescendant, useRovingTabindex } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-oibbx5");
@@ -267,7 +271,7 @@ import { bindAttribute, bindInterpolation, bindRef, createLiveRegion, defineComp
   __pdx_style.textContent = "\\n  @scope ([data-pdx-oibbx5]) to ([data-pdx-root] \\u003E *) {:scope .demo { max-width: 600px; display: flex; flex-direction: column; gap: 20px; }\\n  :scope h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }\\n  :scope h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }\\n  :scope .desc { color: #666; font-size: 0.85rem; margin: 0; }\\n  :scope section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }\\n  :scope .row { display: flex; gap: 8px; }\\n  :scope .input { padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }\\n  :scope .listbox { list-style: none; padding: 0; margin: 8px 0 0; border: 1px solid #e0e0e0; border-radius: 6px; max-height: 160px; overflow-y: auto; }\\n  :scope .listbox li { padding: 8px 12px; cursor: pointer; font-size: 0.9rem; }\\n  :scope .listbox li:hover { background: #f5f5f7; }\\n  :scope .listbox li[data-active] { background: #3b82f6; color: white; }\\n  :scope .toolbar { display: flex; gap: 4px; padding: 8px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }\\n  :scope .toolbar button { padding: 6px 14px; border: 1px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }\\n  :scope .toolbar button:focus { outline: 2px solid #3b82f6; outline-offset: 2px; }\\n  :scope .toolbar button[aria-disabled=\\"true\\"] { opacity: 0.4; cursor: not-allowed; }\\n  :scope .log { font-size: 0.85rem; margin-top: 8px; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<div class="demo"><h2>Advanced Accessibility</h2> <p class="desc">Active Descendant, Roving Tabindex, Live Region — three a11y primitives.</p>  <section><h3>Active Descendant (Combobox pattern)</h3> <p class="desc">Type in the input. Arrow keys navigate the list. Enter selects. Escape clears.</p> <input class="input" type="text" role="combobox" aria-expanded="true" autocomplete="off" placeholder="Search fruits..."> <ul class="listbox" role="listbox"><li role="option" id="fruit-0">Apple</li> <li role="option" id="fruit-1">Banana</li> <li role="option" id="fruit-2">Cherry</li> <li role="option" id="fruit-3">Date</li> <li role="option" id="fruit-4">Elderberry</li> <li role="option" id="fruit-5">Fig</li> <li role="option" id="fruit-6">Grape</li></ul> <div class="log">Active: <strong><!----></strong> | Selected: <strong><!----></strong></div></section>  <section><h3>Roving Tabindex (Toolbar pattern)</h3> <p class="desc">Tab into the toolbar, then Arrow keys to navigate. Only the active button is tab-focusable.</p> <div class="toolbar" role="toolbar" aria-label="Formatting"><button role="tab">Bold</button> <button role="tab">Italic</button> <button role="tab">Underline</button> <button role="tab" aria-disabled="true">Strikethrough (disabled)</button> <button role="tab">Code</button></div> <div class="log">Active index: <strong><!----></strong></div></section>  <section><h3>Live Region (Screen Reader)</h3> <p class="desc">Click buttons to announce messages. Check with a screen reader or inspect the DOM for aria-live elements.</p> <div class="row"><button class="pdx-primary">Announce (polite)</button> <button style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Announce (assertive)</button> <button style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Clear</button></div> <div class="log">Last: <strong><!----></strong></div></section></div>'));
+const __blk0=staticBlock(staticMarkup('<div class="demo"><h2>Advanced Accessibility</h2> <p class="desc">Active Descendant, Roving Tabindex, Live Region — three a11y primitives.</p>  <section><h3>Active Descendant (Combobox pattern)</h3> <p class="desc">Type in the input. Arrow keys navigate the list. Enter selects. Escape clears.</p> <input class="input" type="text" role="combobox" aria-expanded="true" aria-activedescendant autocomplete="off" placeholder="Search fruits..."> <ul class="listbox" role="listbox"><li role="option" id="fruit-0">Apple</li> <li role="option" id="fruit-1">Banana</li> <li role="option" id="fruit-2">Cherry</li> <li role="option" id="fruit-3">Date</li> <li role="option" id="fruit-4">Elderberry</li> <li role="option" id="fruit-5">Fig</li> <li role="option" id="fruit-6">Grape</li></ul> <div class="log">Active: <strong><!----></strong> | Selected: <strong><!----></strong></div></section>  <section><h3>Roving Tabindex (Toolbar pattern)</h3> <p class="desc">Tab into the toolbar, then Arrow keys to navigate. Only the active button is tab-focusable.</p> <div class="toolbar" role="toolbar" aria-label="Formatting"><button role="tab">Bold</button> <button role="tab">Italic</button> <button role="tab">Underline</button> <button role="tab" aria-disabled="true">Strikethrough (disabled)</button> <button role="tab">Code</button></div> <div class="log">Active index: <strong><!----></strong></div></section>  <section><h3>Live Region (Screen Reader)</h3> <p class="desc">Click buttons to announce messages. Check with a screen reader or inspect the DOM for aria-live elements.</p> <div class="row"><button class="pdx-primary">Announce (polite)</button> <button style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Announce (assertive)</button> <button style="background:#666;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Clear</button></div> <div class="log">Last: <strong><!----></strong></div></section></div>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n3=n2.nextSibling.nextSibling;const n4=n3.nextSibling.nextSibling;const n5=n4.firstChild.nextSibling;const n6=n5.firstChild;const n7=n5.nextSibling.nextSibling;const n8=n7.firstChild;const n9=n1.nextSibling.nextSibling;const n10=n9.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n11=n10.nextSibling.nextSibling;const n12=n11.firstChild.nextSibling;const n13=n12.firstChild;const n14=n9.nextSibling.nextSibling;const n15=n14.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n16=n15.firstChild;const n17=n16.nextSibling.nextSibling;const n18=n17.nextSibling.nextSibling;const n19=n15.nextSibling.nextSibling;const n20=n19.firstChild.nextSibling;const n21=n20.firstChild;return [n2,n3,n6,n8,n10,n13,n16,n17,n18,n21];};
 defineComponent('app-demo-a11y', {
   props: {},
@@ -322,17 +326,19 @@ defineComponent('app-demo-a11y', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el6,__el7,__t17,__t19,__el23,__t31,__el36,__el37,__el38,__t41]=__walk0(__frag);
+    const __g=[];
     bindRef(__el6,ctx.adInputRef);
-    bindAttribute(__el6, "aria-activedescendant", ()=>ctx.adActiveId());
+    bindAttribute(__el6, "aria-activedescendant", ()=>ctx.adActiveId(), __g);
     bindRef(__el7,ctx.adListRef);
-    bindInterpolation(__t17,()=>ctx.adActiveId());
-    bindInterpolation(__t19,()=>ctx.adSelected());
+    bindText(__t17,()=>ctx.adActiveId(),__g);
+    bindText(__t19,()=>ctx.adSelected(),__g);
     bindRef(__el23,ctx.rovingRef);
-    bindInterpolation(__t31,()=>ctx.rovingIndex());
+    bindText(__t31,()=>ctx.rovingIndex(),__g);
     __el36.addEventListener('click', eventHandler(ctx.announcePolite, ctx.el, 'click'));
     __el37.addEventListener('click', eventHandler(ctx.announceAssertive, ctx.el, 'click'));
     __el38.addEventListener('click', eventHandler(ctx.clearLive, ctx.el, 'click'));
-    bindInterpolation(__t41,()=>ctx.liveMsg());
+    bindText(__t41,()=>ctx.liveMsg(),__g);
+    bindGroup(__g,["",'',,,'']);
     return __frag;
   })(),
 });
@@ -371,7 +377,7 @@ exports[`compile golden — demo corpus > infra/demo-container.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, computed, defineComponent, effect, eventHandler, interpolationText, measure, measureRelative, onDestroy, onMount, signal, staticBlock, staticMarkup, useContainerSize, whenBlock } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, computed, defineComponent, effect, eventHandler, interpolationText, measure, measureRelative, onDestroy, onMount, signal, staticBlock, staticMarkup, useContainerSize, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-hnq9is");
@@ -439,10 +445,11 @@ defineComponent('app-demo-container', {
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__el6,__t10,__t13,__el15,__el16,__el17,__m20,__m25,__m31,__el35,__el36,__el37,__t39]=__walk3(__frag);
+    const __g=[];
     { const __s = new Set(["resize-box"]); let __w = []; effect(() => { const __n = interpolationText(ctx.bpClass()).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el6.classList.remove(__t); for (const __t of __n) __el6.classList.add(__t); __w = __n; }); }
     bindRef(__el6,ctx.resizeRef);
-    bindInterpolation(__t10,()=>ctx.width());
-    bindInterpolation(__t13,()=>ctx.height());
+    bindText(__t10,()=>ctx.width(),__g);
+    bindText(__t13,()=>ctx.height(),__g);
     effect(()=>{const __c=!!(ctx.isCompact());__el15.classList.toggle("on",__c);});
     effect(()=>{const __c=!!(ctx.isMedium());__el16.classList.toggle("on",__c);});
     effect(()=>{const __c=!!(ctx.isWide());__el17.classList.toggle("on",__c);});
@@ -455,7 +462,8 @@ defineComponent('app-demo-container', {
     bindRef(__el35,ctx.boxARef);
     bindRef(__el36,ctx.boxBRef);
     __el37.addEventListener('click', eventHandler(ctx.doMeasure, ctx.el, 'click'));
-    bindInterpolation(__t39,()=>ctx.measureLog());
+    bindText(__t39,()=>ctx.measureLog(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -466,7 +474,7 @@ exports[`compile golden — demo corpus > infra/demo-datasource.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, createDataSource, defineComponent, eachStatic, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, bindText, createDataSource, defineComponent, eachStatic, effect, eventHandler, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-oxc18m");
@@ -634,6 +642,7 @@ defineComponent('app-demo-datasource', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__el7,__el10,__t11,__el12,__t13,__m23,__el25,__t27,__t28,__t29,__el30,__t33,__t35,__t37,__el42,__el43,__el44,__t47,__t48,__t49,__t51]=__walk1(__frag);
+    const __g=[];
     __el7.addEventListener('input', eventHandler(ctx.onFilter, ctx.el, 'input'));
     __el10.addEventListener('click', eventHandler(ctx.sortById, ctx.el, 'click'));
     bindInterpolation(__t11,()=>ctx.sortIcon('id'));
@@ -642,24 +651,25 @@ defineComponent('app-demo-datasource', {
     const __cf22=eachStatic(()=>ctx.rows(),'id',(row)=>{const __frag=__blk0();const [__t17,__t19,__t21]=__walk0(__frag);bindInterpolation(__t17,()=>row().id,true);bindInterpolation(__t19,()=>row().name);bindInterpolation(__t21,()=>row().email);return __frag;});
     __m23.replaceWith(__cf22);
     __el25.addEventListener('click', eventHandler(ctx.prevPage, ctx.el, 'click'));
-    bindNativeProperty(__el25, "disabled", "disabled", ()=>ctx.currentPage() <= 1);
-    bindInterpolation(__t27,()=>ctx.currentPage());
-    bindInterpolation(__t28,()=>ctx.totalPages());
-    bindInterpolation(__t29,()=>ctx.totalItems());
+    bindNativeProperty(__el25, "disabled", "disabled", ()=>ctx.currentPage() <= 1, __g);
+    bindText(__t27,()=>ctx.currentPage(),__g);
+    bindText(__t28,()=>ctx.totalPages(),__g);
+    bindText(__t29,()=>ctx.totalItems(),__g);
     __el30.addEventListener('click', eventHandler(ctx.nextPage, ctx.el, 'click'));
-    bindNativeProperty(__el30, "disabled", "disabled", ()=>ctx.currentPage() >= ctx.totalPages());
-    bindInterpolation(__t33,()=>ctx.loading());
-    bindInterpolation(__t35,()=>ctx.sortDesc());
-    bindInterpolation(__t37,()=>ctx.filterDesc());
+    bindNativeProperty(__el30, "disabled", "disabled", ()=>ctx.currentPage() >= ctx.totalPages(), __g);
+    bindText(__t33,()=>ctx.loading(),__g);
+    bindText(__t35,()=>ctx.sortDesc(),__g);
+    bindText(__t37,()=>ctx.filterDesc(),__g);
     __el42.addEventListener('click', eventHandler(ctx.addItem, ctx.el, 'click'));
     __el43.addEventListener('click', eventHandler(ctx.syncChanges, ctx.el, 'click'));
-    bindNativeProperty(__el43, "disabled", "disabled", ()=>!ctx.dirty());
+    bindNativeProperty(__el43, "disabled", "disabled", ()=>!ctx.dirty(), __g);
     __el44.addEventListener('click', eventHandler(ctx.cancelAll, ctx.el, 'click'));
-    bindNativeProperty(__el44, "disabled", "disabled", ()=>!ctx.dirty());
-    bindInterpolation(__t47,()=>ctx.addedCount());
-    bindInterpolation(__t48,()=>ctx.updatedCount());
-    bindInterpolation(__t49,()=>ctx.removedCount());
-    bindInterpolation(__t51,()=>ctx.dirty());
+    bindNativeProperty(__el44, "disabled", "disabled", ()=>!ctx.dirty(), __g);
+    bindText(__t47,()=>ctx.addedCount(),__g);
+    bindText(__t48,()=>ctx.updatedCount(),__g);
+    bindText(__t49,()=>ctx.removedCount(),__g);
+    bindText(__t51,()=>ctx.dirty(),__g);
+    bindGroup(__g,[,,,,,false,,,,,,,,false]);
     return __frag;
   })(),
 });
@@ -670,7 +680,7 @@ exports[`compile golden — demo corpus > infra/demo-drag.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, defineComponent, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useDrag, useDropZone } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, defineComponent, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useDrag, useDropZone } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-m0jy7p");
@@ -837,11 +847,12 @@ defineComponent('app-demo-drag', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__t11,__t14,__t16,__t19,__el24,__el26,__el33,__el34,__el35,__el36,__el39,__el40,__t42,__el51,__el55,__el56]=__walk0(__frag);
+    const __g=[];
     bindRef(__el7,ctx.freeRef);
-    bindInterpolation(__t11,()=>ctx.freeDragging());
-    bindInterpolation(__t14,()=>ctx.freeX());
-    bindInterpolation(__t16,()=>ctx.freeY());
-    bindInterpolation(__t19,()=>ctx.freeVel());
+    bindText(__t11,()=>ctx.freeDragging(),__g);
+    bindText(__t14,()=>ctx.freeX(),__g);
+    bindText(__t16,()=>ctx.freeY(),__g);
+    bindText(__t19,()=>ctx.freeVel(),__g);
     bindRef(__el24,ctx.xRef);
     bindRef(__el26,ctx.yRef);
     bindRef(__el33,ctx.zoneARef);
@@ -850,10 +861,11 @@ defineComponent('app-demo-drag', {
     bindRef(__el36,ctx.c3Ref);
     bindRef(__el39,ctx.zoneBRef);
     bindRef(__el40,ctx.c4Ref);
-    bindInterpolation(__t42,()=>ctx.dropLog());
+    bindText(__t42,()=>ctx.dropLog(),__g);
     bindRef(__el51,ctx.kbRef);
     bindRef(__el55,ctx.scrollRef);
     bindRef(__el56,ctx.scrollItemRef);
+    bindGroup(__g,[false]);
     return __frag;
   })(),
 });
@@ -864,7 +876,7 @@ exports[`compile golden — demo corpus > infra/demo-focus.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, defineComponent, eachStatic, effect, eventHandler, focusGroup, focusRestore, focusTrap, manageFocusOrder, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindRef, bindText, defineComponent, eachStatic, effect, eventHandler, focusGroup, focusRestore, focusTrap, manageFocusOrder, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4zdqcj");
@@ -990,15 +1002,16 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__el6,__el7,__el12,__t14,__el18,__m22,__t24,__el28,__m32,__el36,__m40,__el45,__el46,__el47,__el49,__el50,__el51,__t53]=__walk3(__frag);
+    const __g=[];
     __el6.addEventListener('click', eventHandler(ctx.activateTrap, ctx.el, 'click'));
     effect(()=>{const __c=!!(ctx.trapActive());__el7.classList.toggle("active",__c);});
     bindRef(__el7,ctx.trapContainer);
     __el12.addEventListener('click', eventHandler(ctx.deactivateTrap, ctx.el, 'click'));
-    bindInterpolation(__t14,()=>ctx.trapLog());
+    bindText(__t14,()=>ctx.trapLog(),__g);
     bindRef(__el18,ctx.verticalRef);
     const __cf21=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el19,__t20]=__walk0(__frag);{ const __v = fruit() === 'Cherry' ? 'true' : null; if (__v == null || __v === false) __el19.removeAttribute("aria-disabled"); else { __el19.setAttribute("aria-disabled", __v === true ? '' : String(__v)); } }bindInterpolation(__t20,()=>fruit(),true);return __frag;});
     __m22.replaceWith(__cf21);
-    bindInterpolation(__t24,()=>ctx.groupLog());
+    bindText(__t24,()=>ctx.groupLog(),__g);
     bindRef(__el28,ctx.horizontalRef);
     const __cf31=eachStatic(()=>ctx.tabNames,(tab) => tab,(tab)=>{const __frag=__blk1();const [__t30]=__walk1(__frag);bindInterpolation(__t30,()=>tab(),true);return __frag;});
     __m32.replaceWith(__cf31);
@@ -1011,7 +1024,8 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry'];
     __el49.addEventListener('click', eventHandler(ctx.saveFocus, ctx.el, 'click'));
     __el50.addEventListener('click', eventHandler(ctx.restoreFocus, ctx.el, 'click'));
     bindRef(__el51,ctx.restoreInputRef);
-    bindInterpolation(__t53,()=>ctx.restoreLog());
+    bindText(__t53,()=>ctx.restoreLog(),__g);
+    bindGroup(__g,['','']);
     return __frag;
   })(),
 });
@@ -1022,7 +1036,7 @@ exports[`compile golden — demo corpus > infra/demo-i18n-mobile.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, bindStyleText, defineComponent, direction, effect, eventHandler, getComponentString, injectSafeAreaCSS, isRTL, onDestroy, onMount, registerComponentStrings, setComponentStrings, setDirection, setLocaleStrings, signal, staticBlock, staticMarkup, useBottomSheet, useSafeArea } from '@pdxui/core';
+import { bindGroup, bindRef, bindStyleText, bindText, defineComponent, direction, effect, eventHandler, getComponentString, injectSafeAreaCSS, isRTL, onDestroy, onMount, registerComponentStrings, setComponentStrings, setDirection, setLocaleStrings, signal, staticBlock, staticMarkup, useBottomSheet, useSafeArea } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-y860fw");
@@ -1030,7 +1044,7 @@ import { bindInterpolation, bindRef, bindStyleText, defineComponent, direction, 
   __pdx_style.textContent = "\\n  @scope ([data-pdx-y860fw]) to ([data-pdx-root] \\u003E *) {:scope .demo { max-width: 600px; display: flex; flex-direction: column; gap: 20px; }\\n  :scope h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }\\n  :scope h3 { font-size: 1rem; font-weight: 600; margin: 0 0 8px; }\\n  :scope .desc { color: #666; font-size: 0.85rem; margin: 0; }\\n  :scope section { padding: 16px; border: 1px solid #e0e0e0; border-radius: 8px; background: white; }\\n  :scope .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }\\n  :scope .mock-select { margin-top: 12px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; display: flex; flex-direction: column; gap: 4px; }\\n  :scope .placeholder { color: #999; font-size: 0.9rem; }\\n  :scope .no-results { color: #999; font-size: 0.8rem; font-style: italic; }\\n  :scope .log { font-size: 0.8rem; margin-top: 8px; font-family: monospace; }\\n  :scope .rtl-box { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid #e0e0e0; border-radius: 8px; margin-top: 8px; }\\n  :scope .icon { font-size: 1.2rem; }\\n  :scope .action { margin-inline-start: auto; font-size: 1.2rem; }\\n  :scope .sheet { background: white; border-radius: 16px 16px 0 0; box-shadow: 0 -4px 24px rgba(0,0,0,0.15); overflow: hidden; }\\n  :scope .sheet-handle { width: 40px; height: 5px; background: #d0d0d0; border-radius: 3px; margin: 10px auto; cursor: grab; }\\n  :scope .sheet-content { padding: 16px 24px 32px; }\\n  :scope .sheet-content h4 { margin: 0 0 8px; }\\n  :scope .sheet-content p { margin: 0 0 8px; font-size: 0.9rem; color: #666; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<div class="demo"><h2>i18n + Mobile</h2> <p class="desc">Component strings, RTL, Bottom Sheet, Pull-to-Refresh, Safe Area.</p>  <section><h3>Component String Registry</h3> <p class="desc">Translatable default strings for components. Switch locale to see changes.</p> <div class="row"><button class="pdx-primary">English</button> <button style="background:#22c55e;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Italiano</button> <button style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">العربية (RTL)</button></div> <div class="mock-select"><span class="placeholder"><!----></span> <span class="no-results"><!----></span></div> <div class="log">Direction: <strong><!----></strong> | RTL: <strong><!----></strong></div></section>  <section><h3>RTL Layout</h3> <p class="desc">The box below respects direction. Text alignment and icon position flip.</p> <div class="rtl-box"><span class="icon">📌</span> <span>This text follows <!----> direction</span> <span class="action">→</span></div></section>  <section><h3>Bottom Sheet</h3> <p class="desc">Drag the handle to resize. Snap to 25%, 50%, 100%. Swipe down to close.</p> <div class="row"><button class="pdx-primary">Open Bottom Sheet</button></div></section> <div class="sheet"><div class="sheet-handle"></div> <div class="sheet-content"><h4>Bottom Sheet Content</h4> <p>Drag the handle bar above to resize. Detents: 25%, 50%, 100%.</p> <p>Height: <!---->px | Detent: <!----></p> <button>Close</button></div></div>  <section><h3>Safe Area Insets</h3> <p class="desc">Reads env(safe-area-inset-*). On desktop these are 0. On mobile devices with notch, they show real values.</p> <div class="log">Top: <strong><!----></strong>px |\\n        Right: <strong><!----></strong>px |\\n        Bottom: <strong><!----></strong>px |\\n        Left: <strong><!----></strong>px |\\n        Has insets: <strong><!----></strong></div></section></div>'));
+const __blk0=staticBlock(staticMarkup('<div class="demo"><h2>i18n + Mobile</h2> <p class="desc">Component strings, RTL, Bottom Sheet, Pull-to-Refresh, Safe Area.</p>  <section><h3>Component String Registry</h3> <p class="desc">Translatable default strings for components. Switch locale to see changes.</p> <div class="row"><button class="pdx-primary">English</button> <button style="background:#22c55e;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">Italiano</button> <button style="background:#f59e0b;color:white;border:none;padding:6px 14px;border-radius:6px;cursor:pointer">العربية (RTL)</button></div> <div class="mock-select"><span class="placeholder"><!----></span> <span class="no-results"><!----></span></div> <div class="log">Direction: <strong><!----></strong> | RTL: <strong><!----></strong></div></section>  <section><h3>RTL Layout</h3> <p class="desc">The box below respects direction. Text alignment and icon position flip.</p> <div class="rtl-box" style="direction:ltr"><span class="icon">📌</span> <span>This text follows <!----> direction</span> <span class="action">→</span></div></section>  <section><h3>Bottom Sheet</h3> <p class="desc">Drag the handle to resize. Snap to 25%, 50%, 100%. Swipe down to close.</p> <div class="row"><button class="pdx-primary">Open Bottom Sheet</button></div></section> <div class="sheet"><div class="sheet-handle"></div> <div class="sheet-content"><h4>Bottom Sheet Content</h4> <p>Drag the handle bar above to resize. Detents: 25%, 50%, 100%.</p> <p>Height: <!---->px | Detent: <!----></p> <button>Close</button></div></div>  <section><h3>Safe Area Insets</h3> <p class="desc">Reads env(safe-area-inset-*). On desktop these are 0. On mobile devices with notch, they show real values.</p> <div class="log">Top: <strong><!----></strong>px |\\n        Right: <strong><!----></strong>px |\\n        Bottom: <strong><!----></strong>px |\\n        Left: <strong><!----></strong>px |\\n        Has insets: <strong><!----></strong></div></section></div>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n3=n2.firstChild;const n4=n3.nextSibling.nextSibling;const n5=n4.nextSibling.nextSibling;const n6=n2.nextSibling.nextSibling;const n7=n6.firstChild;const n8=n7.firstChild;const n9=n7.nextSibling.nextSibling;const n10=n9.firstChild;const n11=n6.nextSibling.nextSibling;const n12=n11.firstChild.nextSibling;const n13=n12.firstChild;const n14=n12.nextSibling.nextSibling;const n15=n14.firstChild;const n16=n1.nextSibling.nextSibling;const n17=n16.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n18=n17.firstChild.nextSibling.nextSibling;const n19=n18.firstChild.nextSibling;const n20=n16.nextSibling.nextSibling;const n21=n20.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n22=n21.firstChild;const n23=n20.nextSibling.nextSibling;const n24=n23.firstChild.nextSibling.nextSibling;const n25=n24.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n26=n25.firstChild.nextSibling;const n27=n26.nextSibling.nextSibling;const n28=n25.nextSibling.nextSibling;const n29=n23.nextSibling.nextSibling;const n30=n29.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n31=n30.firstChild.nextSibling;const n32=n31.firstChild;const n33=n31.nextSibling.nextSibling;const n34=n33.firstChild;const n35=n33.nextSibling.nextSibling;const n36=n35.firstChild;const n37=n35.nextSibling.nextSibling;const n38=n37.firstChild;const n39=n37.nextSibling.nextSibling;const n40=n39.firstChild;return [n3,n4,n5,n8,n10,n13,n15,n17,n19,n22,n23,n26,n27,n28,n32,n34,n36,n38,n40];};
 defineComponent('app-demo-i18n-mobile', {
   props: {},
@@ -1128,25 +1142,27 @@ defineComponent('app-demo-i18n-mobile', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__el8,__el9,__t12,__t14,__t17,__t19,__el23,__t26,__el32,__el33,__t39,__t40,__el41,__t47,__t49,__t51,__t53,__t55]=__walk0(__frag);
+    const __g=[];
     __el7.addEventListener('click', eventHandler(ctx.setEnglish, ctx.el, 'click'));
     __el8.addEventListener('click', eventHandler(ctx.setItalian, ctx.el, 'click'));
     __el9.addEventListener('click', eventHandler(ctx.setArabic, ctx.el, 'click'));
-    bindInterpolation(__t12,()=>ctx.selectPlaceholder());
-    bindInterpolation(__t14,()=>ctx.selectNoResults());
-    bindInterpolation(__t17,()=>ctx.dir());
-    bindInterpolation(__t19,()=>ctx.rtl());
-    bindStyleText(__el23, ()=>'direction:' + ctx.dir());
-    bindInterpolation(__t26,()=>ctx.dir());
+    bindText(__t12,()=>ctx.selectPlaceholder(),__g);
+    bindText(__t14,()=>ctx.selectNoResults(),__g);
+    bindText(__t17,()=>ctx.dir(),__g);
+    bindText(__t19,()=>ctx.rtl(),__g);
+    bindStyleText(__el23, ()=>'direction:' + ctx.dir(), __g);
+    bindText(__t26,()=>ctx.dir(),__g);
     __el32.addEventListener('click', eventHandler(ctx.openSheet, ctx.el, 'click'));
     bindRef(__el33,ctx.sheetRef);
-    bindInterpolation(__t39,()=>ctx.sheetHeight());
-    bindInterpolation(__t40,()=>ctx.sheetDetent());
+    bindText(__t39,()=>ctx.sheetHeight(),__g);
+    bindText(__t40,()=>ctx.sheetDetent(),__g);
     __el41.addEventListener('click', eventHandler(ctx.closeSheet, ctx.el, 'click'));
-    bindInterpolation(__t47,()=>ctx.safeTop());
-    bindInterpolation(__t49,()=>ctx.safeRight());
-    bindInterpolation(__t51,()=>ctx.safeBottom());
-    bindInterpolation(__t53,()=>ctx.safeLeft());
-    bindInterpolation(__t55,()=>ctx.hasInsets());
+    bindText(__t47,()=>ctx.safeTop(),__g);
+    bindText(__t49,()=>ctx.safeRight(),__g);
+    bindText(__t51,()=>ctx.safeBottom(),__g);
+    bindText(__t53,()=>ctx.safeLeft(),__g);
+    bindText(__t55,()=>ctx.hasInsets(),__g);
+    bindGroup(__g,[,,,false,"direction:ltr",,,,,,,,false]);
     return __frag;
   })(),
 });
@@ -1283,7 +1299,7 @@ exports[`compile golden — demo corpus > infra/demo-overlay.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, createBackdrop, createBottomSheet, createPortal, defineComponent, effect, eventHandler, onDestroy, onMount, overlayStack, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindText, createBackdrop, createBottomSheet, createPortal, defineComponent, effect, eventHandler, onDestroy, onMount, overlayStack, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-bohzvf");
@@ -1453,6 +1469,7 @@ let counter = 0;
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__el8,__el10,__el11,__el12,__el13,__el14,__t18,__t21,__t24,__t26,__el31,__el32,__el37,__el38,__el43,__el47]=__walk0(__frag);
+    const __g=[];
     __el7.addEventListener('click', eventHandler(ctx.pushTooltip, ctx.el, 'click'));
     __el8.addEventListener('click', eventHandler(ctx.pushDialog, ctx.el, 'click'));
     __el10.addEventListener('click', eventHandler(ctx.popTopTooltip, ctx.el, 'click'));
@@ -1460,16 +1477,17 @@ let counter = 0;
     __el12.addEventListener('click', eventHandler(ctx.popAllTooltips, ctx.el, 'click'));
     __el13.addEventListener('click', eventHandler(ctx.popAllDialogs, ctx.el, 'click'));
     __el14.addEventListener('click', eventHandler(ctx.popAll, ctx.el, 'click'));
-    bindInterpolation(__t18,()=>ctx.count());
-    bindInterpolation(__t21,()=>ctx.modals());
-    bindInterpolation(__t24,()=>ctx.topName());
-    bindInterpolation(__t26,()=>ctx.logText());
+    bindText(__t18,()=>ctx.count(),__g);
+    bindText(__t21,()=>ctx.modals(),__g);
+    bindText(__t24,()=>ctx.topName(),__g);
+    bindText(__t26,()=>ctx.logText(),__g);
     __el31.addEventListener('click', eventHandler(ctx.showPortal, ctx.el, 'click'));
     __el32.addEventListener('click', eventHandler(ctx.hidePortal, ctx.el, 'click'));
     __el37.addEventListener('click', eventHandler(ctx.showBdPlain, ctx.el, 'click'));
     __el38.addEventListener('click', eventHandler(ctx.showBdBlur, ctx.el, 'click'));
     __el43.addEventListener('click', eventHandler(ctx.openBottomSheet, ctx.el, 'click'));
     __el47.addEventListener('click', eventHandler(ctx.openNested, ctx.el, 'click'));
+    bindGroup(__g,[,,,'']);
     return __frag;
   })(),
 });
@@ -1480,7 +1498,7 @@ exports[`compile golden — demo corpus > infra/demo-positioning.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { autoUpdate, bindInterpolation, bindRef, computeFloatingPosition, defineComponent, delegate, eachRow, effect, eventHandler, flip, hideMiddleware, offset, onDestroy, onMount, selector, shift, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
+import { autoUpdate, bindGroup, bindInterpolation, bindRef, bindText, computeFloatingPosition, defineComponent, delegate, eachRow, effect, eventHandler, flip, hideMiddleware, offset, onDestroy, onMount, selector, shift, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-cpxaos");
@@ -1689,20 +1707,22 @@ const placements = [
     const __frag=__blk2();
     const [__m13,__el14,__el15,__el18,__t21,__el27,__el29,__el31,__el36,__t38,__el42]=__walk2(__frag);
     const __sel_currentPlacement=selector(()=>ctx.currentPlacement());
+    const __g=[];
     const __rh8=eventHandler((__e,p)=>(() => ctx.setPlacement(p()))(__e), ctx.el, 'click');
     const __cf12=eachRow(()=>ctx.placements,(p) => p,(p)=>{const __cf11=whenBlock(()=>p(),()=>{const __frag=__blk0();const [__el7,__t9]=__walk0(__frag);delegate(ctx.el,__el7,'click',__rh8,p);effect(()=>{const __c=!!(__sel_currentPlacement.is(p()));__el7.classList.toggle("active",__c);});bindInterpolation(__t9,()=>p(),true);return __frag;},()=>{const __frag=__blk1();return __frag;});return __cf11;});
     __m13.replaceWith(__cf12);
     bindRef(__el14,ctx.arenaEl);
     bindRef(__el15,ctx.arenaScrollEl);
     bindRef(__el18,ctx.refBoxRef);
-    bindInterpolation(__t21,()=>ctx.posLog());
+    bindText(__t21,()=>ctx.posLog(),__g);
     __el27.addEventListener('change', eventHandler(ctx.toggleOffset, ctx.el, 'change'));
     __el29.addEventListener('change', eventHandler(ctx.toggleFlip, ctx.el, 'change'));
     __el31.addEventListener('change', eventHandler(ctx.toggleShift, ctx.el, 'change'));
     bindRef(__el36,ctx.iframeRef);
-    bindInterpolation(__t38,()=>ctx.iframeLog());
+    bindText(__t38,()=>ctx.iframeLog(),__g);
     __el42.addEventListener('pointermove', eventHandler(ctx.onCursorMove, ctx.el, 'pointermove'));
     __el42.addEventListener('pointerleave', eventHandler(ctx.onCursorLeave, ctx.el, 'pointerleave'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -1713,7 +1733,7 @@ exports[`compile golden — demo corpus > infra/demo-scrollbar.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, defineComponent, delegate, eachStatic, effect, eventHandler, onDestroy, onMount, selector, signal, staticBlock, staticMarkup, useScrollbar } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindRef, bindText, defineComponent, delegate, eachStatic, effect, eventHandler, onDestroy, onMount, selector, signal, staticBlock, staticMarkup, useScrollbar } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4mmvf3");
@@ -1784,8 +1804,9 @@ const options = [
     const __frag=__blk1();
     const [__el6,__t25,__el30,__el31,__el32,__el33,__el56,__el68,__m73,__t76]=__walk1(__frag);
     const __sel_selected=selector(()=>ctx.selected());
+    const __g=[];
     bindRef(__el6,ctx.box1Ref);
-    bindInterpolation(__t25,()=>ctx.scrollTop1());
+    bindText(__t25,()=>ctx.scrollTop1(),__g);
     delegate(ctx.el,__el30,'click',eventHandler(ctx.scrollToTop, ctx.el, 'click'));
     delegate(ctx.el,__el31,'click',eventHandler(ctx.scrollToBottom, ctx.el, 'click'));
     delegate(ctx.el,__el32,'click',eventHandler(ctx.scrollToItem10, ctx.el, 'click'));
@@ -1795,7 +1816,8 @@ const options = [
     const __rh70=eventHandler((__e,opt)=>(() => ctx.selectOption(opt()))(__e), ctx.el, 'click');
     const __cf72=eachStatic(()=>ctx.options,(opt) => opt,(opt)=>{const __frag=__blk0();const [__el69,__t71]=__walk0(__frag);delegate(ctx.el,__el69,'click',__rh70,opt);effect(()=>{const __c=!!(__sel_selected.is(opt()));__el69.classList.toggle("active",__c);});bindInterpolation(__t71,()=>opt(),true);return __frag;});
     __m73.replaceWith(__cf72);
-    bindInterpolation(__t76,()=>ctx.selected());
+    bindText(__t76,()=>ctx.selected(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -1806,7 +1828,7 @@ exports[`compile golden — demo corpus > infra/demo-selection.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, createSelection, defineComponent, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, bindText, createSelection, defineComponent, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-wzxjxl");
@@ -1922,21 +1944,23 @@ const fruits = ['Apple', 'Banana', 'Cherry', 'Date', 'Elderberry', 'Fig', 'Grape
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__m12,__t14,__m25,__el27,__el28,__t30,__el37,__m55,__t57]=__walk3(__frag);
+    const __g=[];
     const __rh9=eventHandler((__e,fruit)=>(() => ctx.singleSel.select(fruit()))(__e), ctx.el, 'click');
     const __cf11=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el8,__t10]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.singleClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el8.classList.remove(__t); for (const __t of __n) __el8.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el8,'click',__rh9,fruit);bindInterpolation(__t10,()=>fruit(),true);return __frag;});
     __m12.replaceWith(__cf11);
-    bindInterpolation(__t14,()=>ctx.singleInfo());
+    bindText(__t14,()=>ctx.singleInfo(),__g);
     const __rh22=eventHandler((__e,fruit)=>(ctx.handleMultiClick)(__e), ctx.el, 'click');
     const __cf24=eachStatic(()=>ctx.fruits,(fruit) => fruit,(fruit)=>{const __frag=__blk0();const [__el21,__t23]=__walk0(__frag);{ const __s = new Set(["item"]); let __w = []; effect(() => { const __n = interpolationText(ctx.multiClass(fruit())).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el21.classList.remove(__t); for (const __t of __n) __el21.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el21,'click',__rh22,fruit);bindInterpolation(__t23,()=>fruit(),true);return __frag;});
     __m25.replaceWith(__cf24);
     delegate(ctx.el,__el27,'click',eventHandler(() => ctx.multiSel.selectAll(ctx.enabledFruits), ctx.el, 'click'));
     delegate(ctx.el,__el28,'click',eventHandler(() => ctx.multiSel.clear(), ctx.el, 'click'));
-    bindInterpolation(__t30,()=>ctx.multiInfo());
+    bindText(__t30,()=>ctx.multiInfo(),__g);
     __el37.addEventListener('change', eventHandler(ctx.handleCheckAll, ctx.el, 'change'));
     const __rh45=eventHandler((__e,p)=>(ctx.handleGridClick)(__e), ctx.el, 'click');
     const __cf54=eachStatic(()=>ctx.people,'id',(p)=>{const __frag=__blk2();const [__el44,__el47,__t49,__t51,__t53]=__walk2(__frag);{ const __s = new Set(["grid-row"]); let __w = []; effect(() => { const __n = interpolationText(ctx.gridClass(p().id)).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el44.classList.remove(__t); for (const __t of __n) __el44.classList.add(__t); __w = __n; }); }delegate(ctx.el,__el44,'click',__rh45,p);bindNativeProperty(__el47, "checked", "checked", ()=>ctx.gridIsSelected(p().id));bindInterpolation(__t49,()=>p().name);bindInterpolation(__t51,()=>p().role);bindInterpolation(__t53,()=>p().status);return __frag;});
     __m55.replaceWith(__cf54);
-    bindInterpolation(__t57,()=>ctx.gridInfo());
+    bindText(__t57,()=>ctx.gridInfo(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -2036,7 +2060,7 @@ exports[`compile golden — demo corpus > infra/demo-tier0c.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, computed, createFormEngine, defineComponent, effect, eventHandler, hideSkeleton, onDestroy, onMount, showSkeleton, signal, staticBlock, staticMarkup, useAdaptive, useScrollAnimation, whenBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindRef, bindText, computed, createFormEngine, defineComponent, effect, eventHandler, hideSkeleton, onDestroy, onMount, showSkeleton, signal, staticBlock, staticMarkup, useAdaptive, useScrollAnimation, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-d4xbl6");
@@ -2175,22 +2199,23 @@ defineComponent('app-demo-tier0c', {
   render: (ctx) => (() => {
     const __frag=__blk2();
     const [__el9,__t11,__el14,__t16,__el18,__el19,__t22,__t24,__t26,__t28,__t34,__t35,__m39,__el43,__el44,__el52,__el54,__el56,__el58,__t62]=__walk2(__frag);
+    const __g=[];
     bindRef(__el9,ctx.nameRef);
     __el9.addEventListener('input', eventHandler(ctx.onNameInput, ctx.el, 'input'));
     __el9.addEventListener('blur', eventHandler(ctx.onNameBlur, ctx.el, 'blur'));
-    bindInterpolation(__t11,()=>ctx.nameError());
+    bindText(__t11,()=>ctx.nameError(),__g);
     bindRef(__el14,ctx.emailRef);
     __el14.addEventListener('input', eventHandler(ctx.onEmailInput, ctx.el, 'input'));
     __el14.addEventListener('blur', eventHandler(ctx.onEmailBlur, ctx.el, 'blur'));
-    bindInterpolation(__t16,()=>ctx.emailError());
+    bindText(__t16,()=>ctx.emailError(),__g);
     __el18.addEventListener('click', eventHandler(ctx.submitForm, ctx.el, 'click'));
     __el19.addEventListener('click', eventHandler(ctx.resetForm, ctx.el, 'click'));
-    bindInterpolation(__t22,()=>ctx.formDirty());
-    bindInterpolation(__t24,()=>ctx.formValid());
-    bindInterpolation(__t26,()=>ctx.formSubmitted());
-    bindInterpolation(__t28,()=>ctx.submitResult());
-    bindInterpolation(__t34,()=>ctx.adaptiveMode());
-    bindInterpolation(__t35,()=>ctx.adaptiveWidth());
+    bindText(__t22,()=>ctx.formDirty(),__g);
+    bindText(__t24,()=>ctx.formValid(),__g);
+    bindText(__t26,()=>ctx.formSubmitted(),__g);
+    bindText(__t28,()=>ctx.submitResult(),__g);
+    bindText(__t34,()=>ctx.adaptiveMode(),__g);
+    bindText(__t35,()=>ctx.adaptiveWidth(),__g);
     const __cf38=whenBlock(()=>ctx.adaptiveMobile(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m39.replaceWith(__cf38);
     __el43.addEventListener('click', eventHandler(ctx.toggleSkeleton, ctx.el, 'click'));
@@ -2200,6 +2225,7 @@ defineComponent('app-demo-tier0c', {
     bindRef(__el56,ctx.scrollTarget2);
     bindRef(__el58,ctx.scrollTarget3);
     bindInterpolation(__t62,()=>ctx.scrollInView());
+    bindGroup(__g,['','',false,,false,'']);
     return __frag;
   })(),
 });
@@ -2210,7 +2236,7 @@ exports[`compile golden — demo corpus > infra/demo-utilities.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, createToastQueue, defineComponent, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup, useClipboard, useResizeHandle } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindRef, bindText, createToastQueue, defineComponent, delegate, eachStatic, effect, eventHandler, interpolationText, onDestroy, onMount, signal, staticBlock, staticMarkup, useClipboard, useResizeHandle } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-drx6xh");
@@ -2310,14 +2336,15 @@ defineComponent('app-demo-utilities', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__el7,__el8,__el9,__t13,__t16,__t19,__el24,__t26,__el27,__el34,__el35,__el36,__el37,__el38,__m47,__t50]=__walk1(__frag);
+    const __g=[];
     bindRef(__el7,ctx.clipInputRef);
     delegate(ctx.el,__el8,'click',eventHandler(ctx.doCopy, ctx.el, 'click'));
     delegate(ctx.el,__el9,'click',eventHandler(ctx.doPaste, ctx.el, 'click'));
-    bindInterpolation(__t13,()=>ctx.clipCopied());
-    bindInterpolation(__t16,()=>ctx.clipPasted());
-    bindInterpolation(__t19,()=>ctx.clipSupported());
+    bindText(__t13,()=>ctx.clipCopied(),__g);
+    bindText(__t16,()=>ctx.clipPasted(),__g);
+    bindText(__t19,()=>ctx.clipSupported(),__g);
     bindRef(__el24,ctx.panelRef);
-    bindInterpolation(__t26,()=>ctx.panelSize());
+    bindText(__t26,()=>ctx.panelSize(),__g);
     bindRef(__el27,ctx.handleRef);
     delegate(ctx.el,__el34,'click',eventHandler(ctx.addSuccess, ctx.el, 'click'));
     delegate(ctx.el,__el35,'click',eventHandler(ctx.addInfo, ctx.el, 'click'));
@@ -2327,7 +2354,8 @@ defineComponent('app-demo-utilities', {
     const __rh45=eventHandler((__e,t)=>(() => ctx.dismissToast(t().id))(__e), ctx.el, 'click');
     const __cf46=eachStatic(()=>ctx.toasts(),'id',(t)=>{const __frag=__blk0();const [__el40,__t42,__t43,__el44]=__walk0(__frag);{ const __s = new Set(["toast-item"]); let __w = []; effect(() => { const __n = interpolationText('toast-' + t().type).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el40.classList.remove(__t); for (const __t of __n) __el40.classList.add(__t); __w = __n; }); }bindInterpolation(__t42,()=>t().type.toUpperCase());bindInterpolation(__t43,()=>t().message);delegate(ctx.el,__el44,'click',__rh45,t);return __frag;});
     __m47.replaceWith(__cf46);
-    bindInterpolation(__t50,()=>ctx.toastCount());
+    bindText(__t50,()=>ctx.toastCount(),__g);
+    bindGroup(__g,['','',false]);
     return __frag;
   })(),
 });
@@ -2338,7 +2366,7 @@ exports[`compile golden — demo corpus > infra/demo-virtualizer.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, createVirtualizer, defineComponent, effect, eventHandler, html, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, createVirtualizer, defineComponent, effect, eventHandler, html, onDestroy, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-njh8i4");
@@ -2437,16 +2465,18 @@ const COUNT1 = 10000;
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__t8,__t11,__el13,__el14,__el15,__el16,__el17,__t23,__el24,__el25]=__walk0(__frag);
-    bindInterpolation(__t8,()=>ctx.rendered1());
-    bindInterpolation(__t11,()=>ctx.totalH1());
+    const __g=[];
+    bindText(__t8,()=>ctx.rendered1(),__g);
+    bindText(__t11,()=>ctx.totalH1(),__g);
     __el13.addEventListener('click', eventHandler(ctx.scrollTop1, ctx.el, 'click'));
     __el14.addEventListener('click', eventHandler(ctx.scrollMid1, ctx.el, 'click'));
     __el15.addEventListener('click', eventHandler(ctx.scrollEnd1, ctx.el, 'click'));
     bindRef(__el16,ctx.scroll1Ref);
     bindRef(__el17,ctx.inner1Ref);
-    bindInterpolation(__t23,()=>ctx.rendered2());
+    bindText(__t23,()=>ctx.rendered2(),__g);
     bindRef(__el24,ctx.scroll2Ref);
     bindRef(__el25,ctx.inner2Ref);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -2457,7 +2487,7 @@ exports[`compile golden — demo corpus > paginated-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, defineComponent, eventHandler, linkedSignal, signal, staticBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, bindText, defineComponent, eventHandler, linkedSignal, signal, staticBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-q8y824");
@@ -2489,15 +2519,17 @@ const page = linkedSignal({
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el6,__el7,__el9,__t11,__el12,__t14]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('change', eventHandler(ctx.onCategory, ctx.el, 'change'));
-    bindNativeProperty(__el5, "selected", "selected", ()=>ctx.category() === 'Books');
-    bindNativeProperty(__el6, "selected", "selected", ()=>ctx.category() === 'Movies');
-    bindNativeProperty(__el7, "selected", "selected", ()=>ctx.category() === 'Music');
+    bindNativeProperty(__el5, "selected", "selected", ()=>ctx.category() === 'Books', __g);
+    bindNativeProperty(__el6, "selected", "selected", ()=>ctx.category() === 'Movies', __g);
+    bindNativeProperty(__el7, "selected", "selected", ()=>ctx.category() === 'Music', __g);
     __el9.addEventListener('click', eventHandler(ctx.prevPage, ctx.el, 'click'));
-    bindNativeProperty(__el9, "disabled", "disabled", ()=>ctx.page() <= 1);
+    bindNativeProperty(__el9, "disabled", "disabled", ()=>ctx.page() <= 1, __g);
     bindInterpolation(__t11,()=>ctx.page());
     __el12.addEventListener('click', eventHandler(ctx.nextPage, ctx.el, 'click'));
-    bindInterpolation(__t14,()=>ctx.category());
+    bindText(__t14,()=>ctx.category(),__g);
+    bindGroup(__g,[,false,false]);
     return __frag;
   })(),
 });
@@ -2573,7 +2605,7 @@ exports[`compile golden — demo corpus > pdx-showcase/pages/page-badge.pdx 1`] 
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+import { bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup, useHead } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4qwklb");
@@ -2596,10 +2628,12 @@ function increment() { __badgeCount.set(__v => __v + 1); }
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__t9,__el10,__t13]=__walk0(__frag);
+    const __g=[];
     __el7.addEventListener('click', eventHandler(ctx.decrement, ctx.el, 'click'));
-    bindInterpolation(__t9,()=>ctx.badgeCount());
+    bindText(__t9,()=>ctx.badgeCount(),__g);
     __el10.addEventListener('click', eventHandler(ctx.increment, ctx.el, 'click'));
-    bindInterpolation(__t13,()=>ctx.badgeCount() > 99 ? '99+' : ctx.badgeCount());
+    bindText(__t13,()=>ctx.badgeCount() > 99 ? '99+' : ctx.badgeCount(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -2615,7 +2649,7 @@ exports[`compile golden — demo corpus > pdx-showcase/pages/page-button.pdx 1`]
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
+import { bindGroup, bindNativeProperty, bindText, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-63wg72");
@@ -2661,6 +2695,7 @@ function flash(e) {
   render: (ctx) => (() => {
     const __frag=__blk4();
     const [__el7,__el8,__el9,__el13,__el14,__el15,__el16,__el20,__el21,__el22,__el27,__m29,__el30,__m32,__el42,__el43,__el44,__t46]=__walk4(__frag);
+    const __g=[];
     __el7.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     __el8.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     __el9.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
@@ -2672,19 +2707,20 @@ function flash(e) {
     __el21.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     __el22.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     effect(()=>{const __c=!!(ctx.loading1());__el27.classList.toggle("pdx-loading",__c);});
-    bindNativeProperty(__el27, "disabled", "disabled", ()=>ctx.loading1());
+    bindNativeProperty(__el27, "disabled", "disabled", ()=>ctx.loading1(), __g);
     __el27.addEventListener('click', eventHandler(ctx.doLoad1, ctx.el, 'click'));
     const __cf28=whenBlock(()=>ctx.loading1(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m29.replaceWith(__cf28);
     effect(()=>{const __c=!!(ctx.loading2());__el30.classList.toggle("pdx-loading",__c);});
-    bindNativeProperty(__el30, "disabled", "disabled", ()=>ctx.loading2());
+    bindNativeProperty(__el30, "disabled", "disabled", ()=>ctx.loading2(), __g);
     __el30.addEventListener('click', eventHandler(ctx.doLoad2, ctx.el, 'click'));
     const __cf31=whenBlock(()=>ctx.loading2(),()=>{const __frag=__blk2();return __frag;},()=>{const __frag=__blk3();return __frag;});
     __m32.replaceWith(__cf31);
     __el42.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     __el43.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
     __el44.addEventListener('click', eventHandler(ctx.flash, ctx.el, 'click'));
-    bindInterpolation(__t46,()=>ctx.log());
+    bindText(__t46,()=>ctx.log(),__g);
+    bindGroup(__g,[false,false]);
     return __frag;
   })(),
 });
@@ -2761,7 +2797,7 @@ exports[`compile golden — demo corpus > pdx-showcase/pages/page-input.pdx 1`] 
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, bindText, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-1yonx6");
@@ -2798,9 +2834,10 @@ function clearSearch() { __search.setRaw(''); }
   render: (ctx) => (() => {
     const __frag=__blk4();
     const [__el8,__t10,__el16,__el17,__m19,__el25,__m28,__m32,__el38,__el39,__el40,__t42,__el47,__t49]=__walk4(__frag);
+    const __g=[];
     bindTwoWay(__el8, 'value', ctx.name);
-    bindInterpolation(__t10,()=>ctx.name());
-    bindNativeProperty(__el16, "type", "type", ()=>ctx.showPw() ? 'text' : 'password');
+    bindText(__t10,()=>ctx.name(),__g);
+    bindNativeProperty(__el16, "type", "type", ()=>ctx.showPw() ? 'text' : 'password', __g);
     __el17.addEventListener('click', eventHandler(ctx.togglePw, ctx.el, 'click'));
     const __cf18=whenBlock(()=>ctx.showPw(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m19.replaceWith(__cf18);
@@ -2810,14 +2847,15 @@ function clearSearch() { __search.setRaw(''); }
     const __cf31=whenBlock(()=>ctx.search(),()=>{const __frag=__blk3();const [__t30]=__walk3(__frag);bindInterpolation(__t30,()=>ctx.search());return __frag;},null);
     __m32.replaceWith(__cf31);
     __el38.addEventListener('click', eventHandler(ctx.decNum, ctx.el, 'click'));
-    bindNativeProperty(__el38, "disabled", "disabled", ()=>ctx.num() <= 0);
+    bindNativeProperty(__el38, "disabled", "disabled", ()=>ctx.num() <= 0, __g);
     bindTwoWay(__el39, 'value.number', ctx.num);
     __el39.addEventListener('input', eventHandler(ctx.clampNum, ctx.el, 'input'));
     __el40.addEventListener('click', eventHandler(ctx.incNum, ctx.el, 'click'));
-    bindNativeProperty(__el40, "disabled", "disabled", ()=>ctx.num() >= 100);
-    bindInterpolation(__t42,()=>ctx.num());
+    bindNativeProperty(__el40, "disabled", "disabled", ()=>ctx.num() >= 100, __g);
+    bindText(__t42,()=>ctx.num(),__g);
     __el47.addEventListener('input', eventHandler(ctx.onDescInput, ctx.el, 'input'));
-    bindInterpolation(__t49,()=>ctx.descLen());
+    bindText(__t49,()=>ctx.descLen(),__g);
+    bindGroup(__g,['',,false,false]);
     return __frag;
   })(),
 });
@@ -2874,7 +2912,7 @@ exports[`compile golden — demo corpus > showcase/_404.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { $t, bindInterpolation, defineComponent, eventHandler, prop, staticBlock, staticMarkup } from '@pdxui/core';
+import { $t, bindGroup, bindText, defineComponent, eventHandler, prop, staticBlock, staticMarkup } from '@pdxui/core';
 import { navigate } from '@pdxui/router';
 
 {
@@ -2900,10 +2938,12 @@ function goHome() {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__t3,__t6,__el7,__t8]=__walk0(__frag);
-    bindInterpolation(__t3,()=>$t('error.notFound'));
-    bindInterpolation(__t6,()=>ctx.path());
+    const __g=[];
+    bindText(__t3,()=>$t('error.notFound'),__g);
+    bindText(__t6,()=>ctx.path(),__g);
     __el7.addEventListener('click', eventHandler(ctx.goHome, ctx.el, 'click'));
-    bindInterpolation(__t8,()=>$t('error.backHome'));
+    bindText(__t8,()=>$t('error.backHome'),__g);
+    bindGroup(__g,[,'']);
     return __frag;
   })(),
 });
@@ -2983,7 +3023,7 @@ exports[`compile golden — demo corpus > showcase/app-shell.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { $n, $t, awaitBlock, bindInterpolation, computed, defineComponent, effect, eventHandler, getLocale, initI18n, loadTranslations, setLocale, setPermissions, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
+import { $n, $t, awaitBlock, bindGroup, bindInterpolation, bindText, computed, defineComponent, effect, eventHandler, getLocale, initI18n, loadTranslations, setLocale, setPermissions, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
 import { navigate, currentPath, onBeforeNavigate, onAfterNavigate } from '@pdxui/router';
 import { useTasks } from './task-store.pdx';
 import '@pdxui/router/outlet';
@@ -3070,7 +3110,7 @@ defineComponent('app-shell', {
     return { appReady: __appReady, navigating: __navigating, currentPage, store, taskCount, formattedRevenue, activeLang: __activeLang, goTo, goToUser, switchLocale };
   },
   render: (ctx) => (() => {
-    const __cf33=awaitBlock(()=>ctx.appReady(),()=>{const __frag=__blk1();const [__el3,__t4,__el5,__t6,__el7,__t8,__el9,__el10,__el11,__el13,__el14,__m18,__t23,__t25,__t26,__t28]=__walk1(__frag);__el3.addEventListener('click', eventHandler(() => ctx.goTo('/dashboard'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/dashboard');__el3.classList.toggle("active",__c);});bindInterpolation(__t4,()=>$t('nav.dashboard'));__el5.addEventListener('click', eventHandler(() => ctx.goTo('/create'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/create');__el5.classList.toggle("active",__c);});bindInterpolation(__t6,()=>$t('nav.newTask'));__el7.addEventListener('click', eventHandler(() => ctx.goTo('/settings'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/settings');__el7.classList.toggle("active",__c);});bindInterpolation(__t8,()=>$t('nav.settings'));__el9.addEventListener('click', eventHandler(() => ctx.goToUser(1), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage().startsWith('/users'));__el9.classList.toggle("active",__c);});__el10.addEventListener('click', eventHandler(() => ctx.goTo('/admin'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/admin');__el10.classList.toggle("active",__c);});__el11.addEventListener('click', eventHandler(() => ctx.goTo('/components'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/components');__el11.classList.toggle("active",__c);});__el13.addEventListener('click', eventHandler(() => ctx.switchLocale('en'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.activeLang() === 'en');__el13.classList.toggle("lang-active",__c);});__el14.addEventListener('click', eventHandler(() => ctx.switchLocale('it'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.activeLang() === 'it');__el14.classList.toggle("lang-active",__c);});const __cf17=whenBlock(()=>ctx.navigating(),()=>{const __frag=__blk0();const [__t16]=__walk0(__frag);bindInterpolation(__t16,()=>$t('app.navigating'));return __frag;},null);__m18.replaceWith(__cf17);bindInterpolation(__t23,()=>$t('footer.brand'));bindInterpolation(__t25,()=>$t('common.items', { count: ctx.taskCount() }));bindInterpolation(__t26,()=>ctx.formattedRevenue());bindInterpolation(__t28,()=>ctx.currentPage());return __frag;},()=>{const __frag=__blk2();const [__t32]=__walk2(__frag);bindInterpolation(__t32,()=>$t('app.loading'));return __frag;},null);
+    const __cf33=awaitBlock(()=>ctx.appReady(),()=>{const __frag=__blk1();const [__el3,__t4,__el5,__t6,__el7,__t8,__el9,__el10,__el11,__el13,__el14,__m18,__t23,__t25,__t26,__t28]=__walk1(__frag);const __g=[];__el3.addEventListener('click', eventHandler(() => ctx.goTo('/dashboard'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/dashboard');__el3.classList.toggle("active",__c);});bindText(__t4,()=>$t('nav.dashboard'),__g);__el5.addEventListener('click', eventHandler(() => ctx.goTo('/create'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/create');__el5.classList.toggle("active",__c);});bindText(__t6,()=>$t('nav.newTask'),__g);__el7.addEventListener('click', eventHandler(() => ctx.goTo('/settings'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/settings');__el7.classList.toggle("active",__c);});bindText(__t8,()=>$t('nav.settings'),__g);__el9.addEventListener('click', eventHandler(() => ctx.goToUser(1), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage().startsWith('/users'));__el9.classList.toggle("active",__c);});__el10.addEventListener('click', eventHandler(() => ctx.goTo('/admin'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/admin');__el10.classList.toggle("active",__c);});__el11.addEventListener('click', eventHandler(() => ctx.goTo('/components'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.currentPage() === '/components');__el11.classList.toggle("active",__c);});__el13.addEventListener('click', eventHandler(() => ctx.switchLocale('en'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.activeLang() === 'en');__el13.classList.toggle("lang-active",__c);});__el14.addEventListener('click', eventHandler(() => ctx.switchLocale('it'), ctx.el, 'click'));effect(()=>{const __c=!!(ctx.activeLang() === 'it');__el14.classList.toggle("lang-active",__c);});const __cf17=whenBlock(()=>ctx.navigating(),()=>{const __frag=__blk0();const [__t16]=__walk0(__frag);bindInterpolation(__t16,()=>$t('app.navigating'));return __frag;},null);__m18.replaceWith(__cf17);bindText(__t23,()=>$t('footer.brand'),__g);bindText(__t25,()=>$t('common.items', { count: ctx.taskCount() }),__g);bindInterpolation(__t26,()=>ctx.formattedRevenue());bindInterpolation(__t28,()=>ctx.currentPage());bindGroup(__g);return __frag;},()=>{const __frag=__blk2();const [__t32]=__walk2(__frag);bindInterpolation(__t32,()=>$t('app.loading'));return __frag;},null);
     return __cf33;
   })(),
 });
@@ -3081,7 +3121,7 @@ exports[`compile golden — demo corpus > showcase/components-page.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
+import { bindGroup, bindNativeProperty, bindText, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7lnk9y");
@@ -3127,6 +3167,7 @@ function flashBtn(e) {
   render: (ctx) => (() => {
     const __frag=__blk4();
     const [__el8,__el9,__el10,__el13,__el14,__el15,__el16,__el19,__el20,__el21,__el24,__m26,__el27,__m29,__el37,__el38,__el39,__t41]=__walk4(__frag);
+    const __g=[];
     __el8.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     __el9.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     __el10.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
@@ -3138,19 +3179,20 @@ function flashBtn(e) {
     __el20.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     __el21.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     effect(()=>{const __c=!!(ctx.loading1());__el24.classList.toggle("pdx-loading",__c);});
-    bindNativeProperty(__el24, "disabled", "disabled", ()=>ctx.loading1());
+    bindNativeProperty(__el24, "disabled", "disabled", ()=>ctx.loading1(), __g);
     __el24.addEventListener('click', eventHandler(ctx.doLoad1, ctx.el, 'click'));
     const __cf25=whenBlock(()=>ctx.loading1(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m26.replaceWith(__cf25);
     effect(()=>{const __c=!!(ctx.loading2());__el27.classList.toggle("pdx-loading",__c);});
-    bindNativeProperty(__el27, "disabled", "disabled", ()=>ctx.loading2());
+    bindNativeProperty(__el27, "disabled", "disabled", ()=>ctx.loading2(), __g);
     __el27.addEventListener('click', eventHandler(ctx.doLoad2, ctx.el, 'click'));
     const __cf28=whenBlock(()=>ctx.loading2(),()=>{const __frag=__blk2();return __frag;},()=>{const __frag=__blk3();return __frag;});
     __m29.replaceWith(__cf28);
     __el37.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     __el38.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
     __el39.addEventListener('click', eventHandler(ctx.flashBtn, ctx.el, 'click'));
-    bindInterpolation(__t41,()=>ctx.btnLog());
+    bindText(__t41,()=>ctx.btnLog(),__g);
+    bindGroup(__g,[false,false]);
     return __frag;
   })(),
 });
@@ -3206,7 +3248,7 @@ exports[`compile golden — demo corpus > showcase/stats-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindStyleText, computed, defineComponent, prop, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindStyleText, bindText, computed, defineComponent, prop, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-u033yi");
@@ -3233,11 +3275,13 @@ defineComponent('app-stats-card', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__t5,__t9,__t13,__t17,__el20]=__walk0(__frag);
-    bindInterpolation(__t5,()=>ctx.total());
-    bindInterpolation(__t9,()=>ctx.done());
+    const __g=[];
+    bindText(__t5,()=>ctx.total(),__g);
+    bindText(__t9,()=>ctx.done(),__g);
     bindInterpolation(__t13,()=>ctx.pending());
     bindInterpolation(__t17,()=>ctx.percent());
-    bindStyleText(__el20, ()=>ctx.barStyle());
+    bindStyleText(__el20, ()=>ctx.barStyle(), __g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -3248,7 +3292,7 @@ exports[`compile golden — demo corpus > showcase/task-form.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, computed, createForm, defineComponent, effect, eventHandler, minLength, required, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, computed, createForm, defineComponent, effect, eventHandler, minLength, required, staticBlock, staticMarkup, useHead, whenBlock } from '@pdxui/core';
 import { useTasks } from './task-store.pdx';
 
 {
@@ -3293,6 +3337,7 @@ const store = useTasks();
   render: (ctx) => (() => {
     const __frag=__blk5();
     const [__el2,__el5,__m9,__el12,__el14,__el15,__el16,__m20,__el22,__m24,__el25,__t27,__m30]=__walk5(__frag);
+    const __g=[];
     __el2.addEventListener('submit', eventHandler(ctx.handleSubmit, ctx.el, 'submit'));
     bindNativeProperty(__el5, "value", "value", ()=>ctx.task.text.value());
     __el5.addEventListener('input', eventHandler(ctx.onTextInput, ctx.el, 'input'));
@@ -3302,9 +3347,9 @@ const store = useTasks();
     __m9.replaceWith(__cf8);
     __el12.addEventListener('change', eventHandler(ctx.onCatChange, ctx.el, 'change'));
     __el12.addEventListener('blur', eventHandler(ctx.onCatBlur, ctx.el, 'blur'));
-    bindNativeProperty(__el14, "selected", "selected", ()=>ctx.task.category.value() === 'design');
-    bindNativeProperty(__el15, "selected", "selected", ()=>ctx.task.category.value() === 'dev');
-    bindNativeProperty(__el16, "selected", "selected", ()=>ctx.task.category.value() === 'test');
+    bindNativeProperty(__el14, "selected", "selected", ()=>ctx.task.category.value() === 'design', __g);
+    bindNativeProperty(__el15, "selected", "selected", ()=>ctx.task.category.value() === 'dev', __g);
+    bindNativeProperty(__el16, "selected", "selected", ()=>ctx.task.category.value() === 'test', __g);
     const __cf19=whenBlock(()=>ctx.task.category.error(),()=>{const __frag=__blk0();const [__t18]=__walk0(__frag);bindInterpolation(__t18,()=>ctx.task.category.error());return __frag;},null);
     __m20.replaceWith(__cf19);
     bindNativeProperty(__el22, "disabled", "disabled", ()=>ctx.task.submitting());
@@ -3314,6 +3359,7 @@ const store = useTasks();
     bindInterpolation(__t27,()=>ctx.statusText());
     const __cf29=whenBlock(()=>ctx.task.state() === 'success',()=>{const __frag=__blk4();return __frag;},null);
     __m30.replaceWith(__cf29);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -3329,7 +3375,7 @@ exports[`compile golden — demo corpus > showcase/task-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindNativeProperty, computed, defineComponent, delegate, eachRow, effect, eventHandler, linkedSignal, prop, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindNativeProperty, bindText, computed, defineComponent, delegate, eachRow, effect, eventHandler, linkedSignal, prop, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
 import { useTasks } from './task-store.pdx';
 
 {
@@ -3377,15 +3423,16 @@ const store = useTasks();
   render: (ctx) => (() => {
     const __frag=__blk4();
     const [__t3,__t5,__el8,__el9,__el10,__el11,__t13,__el14,__el15,__m18,__m31]=__walk4(__frag);
-    bindInterpolation(__t3,()=>ctx.title());
+    const __g=[];
+    bindText(__t3,()=>ctx.title(),__g);
     bindInterpolation(__t5,()=>ctx.taskCount());
     __el8.addEventListener('change', eventHandler(ctx.onFilter, ctx.el, 'change'));
-    bindNativeProperty(__el9, "selected", "selected", ()=>ctx.store.filter() === 'all');
-    bindNativeProperty(__el10, "selected", "selected", ()=>ctx.store.filter() === 'pending');
-    bindNativeProperty(__el11, "selected", "selected", ()=>ctx.store.filter() === 'done');
+    bindNativeProperty(__el9, "selected", "selected", ()=>ctx.store.filter() === 'all', __g);
+    bindNativeProperty(__el10, "selected", "selected", ()=>ctx.store.filter() === 'pending', __g);
+    bindNativeProperty(__el11, "selected", "selected", ()=>ctx.store.filter() === 'done', __g);
     bindInterpolation(__t13,()=>ctx.page());
     delegate(ctx.el,__el14,'click',eventHandler(ctx.prevPage, ctx.el, 'click'));
-    bindNativeProperty(__el14, "disabled", "disabled", ()=>ctx.page() <= 1);
+    bindNativeProperty(__el14, "disabled", "disabled", ()=>ctx.page() <= 1, __g);
     delegate(ctx.el,__el15,'click',eventHandler(ctx.nextPage, ctx.el, 'click'));
     const __cf17=whenBlock(()=>ctx.store.filtered().length === 0,()=>{const __frag=__blk0();return __frag;},null);
     __m18.replaceWith(__cf17);
@@ -3393,6 +3440,7 @@ const store = useTasks();
     const __rh29=eventHandler((__e,task)=>(() => ctx.removeTask(task().id))(__e), ctx.el, 'click');
     const __cf30=eachRow(()=>ctx.store.filtered(),'id',(task)=>{const __frag=__blk3();const [__el19,__el20,__m23,__t25,__t27,__el28]=__walk3(__frag);effect(()=>{const __c=!!(task().done);__el19.classList.toggle("done",__c);});delegate(ctx.el,__el20,'click',__rh21,task);const __cf22=whenBlock(()=>task().done,()=>{const __frag=__blk1();return __frag;},()=>{const __frag=__blk2();return __frag;});__m23.replaceWith(__cf22);bindInterpolation(__t25,()=>task().text);bindInterpolation(__t27,()=>task().category);delegate(ctx.el,__el28,'click',__rh29,task);return __frag;});
     __m31.replaceWith(__cf30);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -3469,7 +3517,7 @@ exports[`compile golden — demo corpus > showcase/theme-picker.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindStyleText, bindTwoWay, computed, currentTheme, debounced, defineComponent, effect, eventHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindStyleText, bindText, bindTwoWay, computed, currentTheme, debounced, defineComponent, effect, eventHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7pjpe2");
@@ -3504,6 +3552,7 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6,__el7,__t10,__el15,__el17,__el18,__t20,__t21,__el24,__t27,__t29]=__walk0(__frag);
+    const __g=[];
     __el5.addEventListener('click', eventHandler(ctx.setLight, ctx.el, 'click'));
     effect(()=>{const __c=!!(ctx.theme() === 'light');__el5.classList.toggle("active",__c);});
     __el6.addEventListener('click', eventHandler(ctx.setDark, ctx.el, 'click'));
@@ -3512,12 +3561,13 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
     bindInterpolation(__t10,()=>ctx.theme());
     bindTwoWay(__el15, 'value', ctx.primary);
     bindTwoWay(__el17, 'value', ctx.accent);
-    bindStyleText(__el18, ()=>ctx.previewStyle());
-    bindInterpolation(__t20,()=>ctx.primary());
-    bindInterpolation(__t21,()=>ctx.accent());
+    bindStyleText(__el18, ()=>ctx.previewStyle(), __g);
+    bindText(__t20,()=>ctx.primary(),__g);
+    bindText(__t21,()=>ctx.accent(),__g);
     bindTwoWay(__el24, 'value', ctx.searchRaw);
-    bindInterpolation(__t27,()=>ctx.searchRaw());
+    bindText(__t27,()=>ctx.searchRaw(),__g);
     bindInterpolation(__t29,()=>ctx.searchDebounced());
+    bindGroup(__g,[,,,'']);
     return __frag;
   })(),
 });
@@ -9770,7 +9820,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-l
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7vfvc6");
@@ -9778,7 +9828,7 @@ import { bindAttribute, bindComponentProp, bindInterpolation, defineComponent, e
   __pdx_style.textContent = "\\n@scope ([data-pdx-7vfvc6], [data-pdx-7vfvc6-in]) to ([data-pdx-root] \\u003E *) {:scope .shell-hamburger, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-hamburger) {\\n  display: flex;\\n  align-items: center;\\n  justify-content: center;\\n  background: none;\\n  border: none;\\n  cursor: pointer;\\n  color: var(--pdx-color-muted);\\n  padding: 2px;\\n  border-radius: var(--pdx-radius-sm);\\n}\\n:scope .shell-hamburger:hover, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-hamburger:hover) { background: var(--pdx-color-inset); }\\n:scope .shell-hamburger pdx-icon, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-hamburger pdx-icon) { display: inline-flex; }\\n:scope .shell-aside, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-aside) { padding: var(--pdx-space-md); font-size: var(--pdx-text-sm); }\\n:scope .shell-footer, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-footer) {\\n  display: flex;\\n  align-items: center;\\n  padding: 0 var(--pdx-space-md);\\n  height: 100%;\\n}\\n\\n  \\n  :scope .page, :where(:not([data-pdx-7vfvc6])):scope:is(.page) { }\\n  :scope .demo-shell, :where(:not([data-pdx-7vfvc6])):scope:is(.demo-shell) {\\n  height: 350px;\\n  border: 1px solid var(--pdx-color-border);\\n  border-radius: var(--pdx-radius-md);\\n  overflow: hidden;\\n  min-width: 500px;\\n}\\n  }@media (max-width: 600px) { @scope ([data-pdx-7vfvc6], [data-pdx-7vfvc6-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell, :where(:not([data-pdx-7vfvc6])):scope:is(.demo-shell) { min-width: auto; height: 300px; overflow-x: auto; } }}\\n  @scope ([data-pdx-7vfvc6], [data-pdx-7vfvc6-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell pdx-app-layout, :where(:not([data-pdx-7vfvc6])):scope:is(.demo-shell pdx-app-layout) { height: 100%; }\\n  :scope .shell-header, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-header) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-sm);\\n  padding: 0 var(--pdx-space-md);\\n  font-size: var(--pdx-text-sm);\\n  height: 100%;\\n}\\n  :scope .shell-nav, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-nav) {\\n  display: flex;\\n  flex-direction: column;\\n  gap: 2px;\\n  padding: var(--pdx-space-sm);\\n  font-size: var(--pdx-text-sm);\\n}\\n  :scope .shell-nav-item, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-nav-item) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-xs);\\n  width: 100%;\\n  padding: var(--pdx-space-xs) var(--pdx-space-sm);\\n  border: none;\\n  border-radius: var(--pdx-radius-sm);\\n  background: none;\\n  font: inherit;\\n  text-align: left;\\n  cursor: pointer;\\n  color: var(--pdx-color-muted);\\n}\\n  :scope .shell-nav-item:hover, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-nav-item:hover) { background: var(--pdx-color-inset); color: var(--pdx-color-text); }\\n  :scope .shell-nav-item:focus-visible, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-nav-item:focus-visible) { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }\\n  :scope pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item, :where(:not([data-pdx-7vfvc6])):scope:is(pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item) { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }\\n  :scope .shell-nav-item[aria-current=\\"page\\"], :where(:not([data-pdx-7vfvc6])):scope:is(.shell-nav-item[aria-current=\\"page\\"]) {\\n  background: var(--pdx-color-inset);\\n  color: var(--pdx-color-primary);\\n  font-weight: var(--pdx-weight-medium);\\n}\\n  :scope .shell-main, :where(:not([data-pdx-7vfvc6])):scope:is(.shell-main) { padding: var(--pdx-space-lg); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Full Layout</h2> <p class="pdx-txt-small pdx-ink-muted">Header + navbar + main + aside + footer. The hamburger collapses the navbar to its icon rail by binding\\n      <code>:navbarCollapsed</code>; it says what it controls and whether the navigation is expanded.</p> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="160px" asidewidth="120px" footerheight="36px"><div class="shell-header" data-region="header" data-pdx-7vfvc6-in><button class="shell-hamburger" type="button" aria-label="Toggle navigation" aria-controls="demo-nav-1" data-pdx-7vfvc6-in><pdx-icon name="menu" size="14" data-pdx-7vfvc6-in></pdx-icon></button> <pdx-icon name="package" size="16" data-pdx-7vfvc6-in></pdx-icon> <strong data-pdx-7vfvc6-in>My App</strong></div> <div class="shell-nav" data-region="navbar" id="demo-nav-1" data-pdx-7vfvc6-in><button class="shell-nav-item" type="button" data-pdx-7vfvc6-in><pdx-icon name="home" size="14" data-pdx-7vfvc6-in></pdx-icon> Dashboard</button> <button class="shell-nav-item" type="button" data-pdx-7vfvc6-in><pdx-icon name="users" size="14" data-pdx-7vfvc6-in></pdx-icon> Users</button> <button class="shell-nav-item" type="button" data-pdx-7vfvc6-in><pdx-icon name="settings" size="14" data-pdx-7vfvc6-in></pdx-icon> Settings</button></div> <div class="shell-main" data-pdx-7vfvc6-in><h3 data-pdx-7vfvc6-in><!----></h3> <p class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>This is the primary content area. It takes up the remaining space.</p></div> <div class="shell-aside" data-region="aside" data-pdx-7vfvc6-in><strong class="pdx-txt-small" data-pdx-7vfvc6-in>Details</strong> <p class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>Right panel info</p></div> <div class="shell-footer" data-region="footer" data-pdx-7vfvc6-in><span class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>Footer content</span></div></pdx-app-layout></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-app-layout headerheight="44px" navbarwidth="160px"\\n  asidewidth="120px" footerheight="36px" :navbarCollapsed="!navOpen"&gt;\\n  &lt;div data-region="header"&gt;\\n    &lt;button type="button" aria-label="Toggle navigation" aria-controls="app-nav"\\n      :aria-expanded="navOpen ? \\'true\\' : \\'false\\'" @click="navOpen = !navOpen"&gt;☰&lt;/button&gt;\\n    My App\\n  &lt;/div&gt;\\n  &lt;div data-region="navbar" id="app-nav"&gt;\\n    &lt;button type="button" :aria-current="page === \\'Dashboard\\' ? \\'page\\' : null"\\n      @click="page = \\'Dashboard\\'"&gt;Dashboard&lt;/button&gt;\\n    …\\n  &lt;/div&gt;\\n  &lt;div&gt;Main content (no slot = main)&lt;/div&gt;\\n  &lt;div data-region="aside"&gt;Right panel&lt;/div&gt;\\n  &lt;div data-region="footer"&gt;Footer&lt;/div&gt;\\n&lt;/pdx-app-layout&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Full Layout</h2> <p class="pdx-txt-small pdx-ink-muted">Header + navbar + main + aside + footer. The hamburger collapses the navbar to its icon rail by binding\\n      <code>:navbarCollapsed</code>; it says what it controls and whether the navigation is expanded.</p> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="160px" asidewidth="120px" footerheight="36px"><div class="shell-header" data-region="header" data-pdx-7vfvc6-in><button class="shell-hamburger" type="button" aria-label="Toggle navigation" aria-controls="demo-nav-1" aria-expanded="true" data-pdx-7vfvc6-in><pdx-icon name="menu" size="14" data-pdx-7vfvc6-in></pdx-icon></button> <pdx-icon name="package" size="16" data-pdx-7vfvc6-in></pdx-icon> <strong data-pdx-7vfvc6-in>My App</strong></div> <div class="shell-nav" data-region="navbar" id="demo-nav-1" data-pdx-7vfvc6-in><button class="shell-nav-item" type="button" aria-current="page" data-pdx-7vfvc6-in><pdx-icon name="home" size="14" data-pdx-7vfvc6-in></pdx-icon> Dashboard</button> <button class="shell-nav-item" type="button" data-pdx-7vfvc6-in><pdx-icon name="users" size="14" data-pdx-7vfvc6-in></pdx-icon> Users</button> <button class="shell-nav-item" type="button" data-pdx-7vfvc6-in><pdx-icon name="settings" size="14" data-pdx-7vfvc6-in></pdx-icon> Settings</button></div> <div class="shell-main" data-pdx-7vfvc6-in><h3 data-pdx-7vfvc6-in><!----></h3> <p class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>This is the primary content area. It takes up the remaining space.</p></div> <div class="shell-aside" data-region="aside" data-pdx-7vfvc6-in><strong class="pdx-txt-small" data-pdx-7vfvc6-in>Details</strong> <p class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>Right panel info</p></div> <div class="shell-footer" data-region="footer" data-pdx-7vfvc6-in><span class="pdx-txt-small pdx-ink-muted" data-pdx-7vfvc6-in>Footer content</span></div></pdx-app-layout></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-app-layout headerheight="44px" navbarwidth="160px"\\n  asidewidth="120px" footerheight="36px" :navbarCollapsed="!navOpen"&gt;\\n  &lt;div data-region="header"&gt;\\n    &lt;button type="button" aria-label="Toggle navigation" aria-controls="app-nav"\\n      :aria-expanded="navOpen ? \\'true\\' : \\'false\\'" @click="navOpen = !navOpen"&gt;☰&lt;/button&gt;\\n    My App\\n  &lt;/div&gt;\\n  &lt;div data-region="navbar" id="app-nav"&gt;\\n    &lt;button type="button" :aria-current="page === \\'Dashboard\\' ? \\'page\\' : null"\\n      @click="page = \\'Dashboard\\'"&gt;Dashboard&lt;/button&gt;\\n    …\\n  &lt;/div&gt;\\n  &lt;div&gt;Main content (no slot = main)&lt;/div&gt;\\n  &lt;div data-region="aside"&gt;Right panel&lt;/div&gt;\\n  &lt;div data-region="footer"&gt;Footer&lt;/div&gt;\\n&lt;/pdx-app-layout&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.firstChild;const n4=n3.firstChild;const n5=n3.nextSibling.nextSibling;const n6=n5.firstChild;const n7=n6.nextSibling.nextSibling;const n8=n7.nextSibling.nextSibling;const n9=n5.nextSibling.nextSibling;const n10=n9.firstChild;const n11=n10.firstChild;return [n2,n4,n6,n7,n8,n11];};
 defineComponent('app-demo-comp-app-layout-full', {
   props: {},
@@ -9793,16 +9843,18 @@ defineComponent('app-demo-comp-app-layout-full', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el7,__el12,__el14,__el16,__t20]=__walk0(__frag);
-    bindComponentProp(__el5, "navbarCollapsed", ()=>!ctx.navOpen());
-    bindAttribute(__el7, "aria-expanded", ()=>ctx.navOpen() ? 'true' : 'false');
+    const __g=[];
+    bindComponentProp(__el5, "navbarCollapsed", ()=>!ctx.navOpen(), __g);
+    bindAttribute(__el7, "aria-expanded", ()=>ctx.navOpen() ? 'true' : 'false', __g);
     __el7.addEventListener('click', eventHandler(() => ctx.navOpen.setRaw(!ctx.navOpen()), ctx.el, 'click'));
-    bindAttribute(__el12, "aria-current", ()=>ctx.page() === 'Dashboard' ? 'page' : null);
+    bindAttribute(__el12, "aria-current", ()=>ctx.page() === 'Dashboard' ? 'page' : null, __g);
     __el12.addEventListener('click', eventHandler(() => ctx.page.setRaw('Dashboard'), ctx.el, 'click'));
-    bindAttribute(__el14, "aria-current", ()=>ctx.page() === 'Users' ? 'page' : null);
+    bindAttribute(__el14, "aria-current", ()=>ctx.page() === 'Users' ? 'page' : null, __g);
     __el14.addEventListener('click', eventHandler(() => ctx.page.setRaw('Users'), ctx.el, 'click'));
-    bindAttribute(__el16, "aria-current", ()=>ctx.page() === 'Settings' ? 'page' : null);
+    bindAttribute(__el16, "aria-current", ()=>ctx.page() === 'Settings' ? 'page' : null, __g);
     __el16.addEventListener('click', eventHandler(() => ctx.page.setRaw('Settings'), ctx.el, 'click'));
-    bindInterpolation(__t20,()=>ctx.page());
+    bindText(__t20,()=>ctx.page(),__g);
+    bindGroup(__g,[,"true","page",null,null]);
     return __frag;
   })(),
 });
@@ -9813,7 +9865,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-l
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-8hqshn");
@@ -9821,7 +9873,7 @@ import { bindAttribute, bindInterpolation, defineComponent, eventHandler, signal
   __pdx_style.textContent = "\\n@scope ([data-pdx-8hqshn], [data-pdx-8hqshn-in]) to ([data-pdx-root] \\u003E *) {:scope .shell-spacer, :where(:not([data-pdx-8hqshn])):scope:is(.shell-spacer) { flex: 1; }\\n\\n  \\n  :scope .page, :where(:not([data-pdx-8hqshn])):scope:is(.page) { }\\n  :scope .demo-shell, :where(:not([data-pdx-8hqshn])):scope:is(.demo-shell) {\\n  height: 350px;\\n  border: 1px solid var(--pdx-color-border);\\n  border-radius: var(--pdx-radius-md);\\n  overflow: hidden;\\n  min-width: 500px;\\n}\\n  }@media (max-width: 600px) { @scope ([data-pdx-8hqshn], [data-pdx-8hqshn-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell, :where(:not([data-pdx-8hqshn])):scope:is(.demo-shell) { min-width: auto; height: 300px; overflow-x: auto; } }}\\n  @scope ([data-pdx-8hqshn], [data-pdx-8hqshn-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell pdx-app-layout, :where(:not([data-pdx-8hqshn])):scope:is(.demo-shell pdx-app-layout) { height: 100%; }\\n  :scope .shell-header, :where(:not([data-pdx-8hqshn])):scope:is(.shell-header) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-sm);\\n  padding: 0 var(--pdx-space-md);\\n  font-size: var(--pdx-text-sm);\\n  height: 100%;\\n}\\n  :scope .shell-nav, :where(:not([data-pdx-8hqshn])):scope:is(.shell-nav) {\\n  display: flex;\\n  flex-direction: column;\\n  gap: 2px;\\n  padding: var(--pdx-space-sm);\\n  font-size: var(--pdx-text-sm);\\n}\\n  :scope .shell-nav-item, :where(:not([data-pdx-8hqshn])):scope:is(.shell-nav-item) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-xs);\\n  width: 100%;\\n  padding: var(--pdx-space-xs) var(--pdx-space-sm);\\n  border: none;\\n  border-radius: var(--pdx-radius-sm);\\n  background: none;\\n  font: inherit;\\n  text-align: left;\\n  cursor: pointer;\\n  color: var(--pdx-color-muted);\\n}\\n  :scope .shell-nav-item:hover, :where(:not([data-pdx-8hqshn])):scope:is(.shell-nav-item:hover) { background: var(--pdx-color-inset); color: var(--pdx-color-text); }\\n  :scope .shell-nav-item:focus-visible, :where(:not([data-pdx-8hqshn])):scope:is(.shell-nav-item:focus-visible) { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }\\n  :scope pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item, :where(:not([data-pdx-8hqshn])):scope:is(pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item) { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }\\n  :scope .shell-nav-item[aria-current=\\"page\\"], :where(:not([data-pdx-8hqshn])):scope:is(.shell-nav-item[aria-current=\\"page\\"]) {\\n  background: var(--pdx-color-inset);\\n  color: var(--pdx-color-primary);\\n  font-weight: var(--pdx-weight-medium);\\n}\\n  :scope .shell-main, :where(:not([data-pdx-8hqshn])):scope:is(.shell-main) { padding: var(--pdx-space-lg); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Header + Navbar Only</h2> <p class="pdx-txt-small pdx-ink-muted">Most common pattern. No aside, no footer.</p> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="200px"><div class="shell-header" data-region="header" data-pdx-8hqshn-in><pdx-icon name="package" size="16" data-pdx-8hqshn-in></pdx-icon> <strong data-pdx-8hqshn-in>Dashboard</strong> <span class="shell-spacer" data-pdx-8hqshn-in></span> <pdx-icon name="bell" size="16" data-pdx-8hqshn-in></pdx-icon> <pdx-icon name="user" size="16" data-pdx-8hqshn-in></pdx-icon></div> <div class="shell-nav" data-region="navbar" data-pdx-8hqshn-in><button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="home" size="14" data-pdx-8hqshn-in></pdx-icon> Overview</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="bar-chart" size="14" data-pdx-8hqshn-in></pdx-icon> Analytics</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="folder" size="14" data-pdx-8hqshn-in></pdx-icon> Projects</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="users" size="14" data-pdx-8hqshn-in></pdx-icon> Team</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="settings" size="14" data-pdx-8hqshn-in></pdx-icon> Settings</button></div> <div class="shell-main" data-pdx-8hqshn-in><h3 data-pdx-8hqshn-in><!----></h3> <p class="pdx-txt-small pdx-ink-muted" data-pdx-8hqshn-in>Welcome back. Here\\'s your dashboard.</p></div></pdx-app-layout></div></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Header + Navbar Only</h2> <p class="pdx-txt-small pdx-ink-muted">Most common pattern. No aside, no footer.</p> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="200px"><div class="shell-header" data-region="header" data-pdx-8hqshn-in><pdx-icon name="package" size="16" data-pdx-8hqshn-in></pdx-icon> <strong data-pdx-8hqshn-in>Dashboard</strong> <span class="shell-spacer" data-pdx-8hqshn-in></span> <pdx-icon name="bell" size="16" data-pdx-8hqshn-in></pdx-icon> <pdx-icon name="user" size="16" data-pdx-8hqshn-in></pdx-icon></div> <div class="shell-nav" data-region="navbar" data-pdx-8hqshn-in><button class="shell-nav-item" type="button" aria-current="page" data-pdx-8hqshn-in><pdx-icon name="home" size="14" data-pdx-8hqshn-in></pdx-icon> Overview</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="bar-chart" size="14" data-pdx-8hqshn-in></pdx-icon> Analytics</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="folder" size="14" data-pdx-8hqshn-in></pdx-icon> Projects</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="users" size="14" data-pdx-8hqshn-in></pdx-icon> Team</button> <button class="shell-nav-item" type="button" data-pdx-8hqshn-in><pdx-icon name="settings" size="14" data-pdx-8hqshn-in></pdx-icon> Settings</button></div> <div class="shell-main" data-pdx-8hqshn-in><h3 data-pdx-8hqshn-in><!----></h3> <p class="pdx-txt-small pdx-ink-muted" data-pdx-8hqshn-in>Welcome back. Here\\'s your dashboard.</p></div></pdx-app-layout></div></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.firstChild.nextSibling.nextSibling;const n4=n3.firstChild;const n5=n4.nextSibling.nextSibling;const n6=n5.nextSibling.nextSibling;const n7=n6.nextSibling.nextSibling;const n8=n7.nextSibling.nextSibling;const n9=n3.nextSibling.nextSibling;const n10=n9.firstChild;const n11=n10.firstChild;return [n4,n5,n6,n7,n8,n11];};
 defineComponent('app-demo-comp-app-layout-header-navbar', {
   props: {},
@@ -9833,17 +9885,19 @@ defineComponent('app-demo-comp-app-layout-header-navbar', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el12,__el14,__el16,__el18,__el20,__t24]=__walk0(__frag);
-    bindAttribute(__el12, "aria-current", ()=>ctx.page2() === 'Overview' ? 'page' : null);
+    const __g=[];
+    bindAttribute(__el12, "aria-current", ()=>ctx.page2() === 'Overview' ? 'page' : null, __g);
     __el12.addEventListener('click', eventHandler(() => ctx.page2.setRaw('Overview'), ctx.el, 'click'));
-    bindAttribute(__el14, "aria-current", ()=>ctx.page2() === 'Analytics' ? 'page' : null);
+    bindAttribute(__el14, "aria-current", ()=>ctx.page2() === 'Analytics' ? 'page' : null, __g);
     __el14.addEventListener('click', eventHandler(() => ctx.page2.setRaw('Analytics'), ctx.el, 'click'));
-    bindAttribute(__el16, "aria-current", ()=>ctx.page2() === 'Projects' ? 'page' : null);
+    bindAttribute(__el16, "aria-current", ()=>ctx.page2() === 'Projects' ? 'page' : null, __g);
     __el16.addEventListener('click', eventHandler(() => ctx.page2.setRaw('Projects'), ctx.el, 'click'));
-    bindAttribute(__el18, "aria-current", ()=>ctx.page2() === 'Team' ? 'page' : null);
+    bindAttribute(__el18, "aria-current", ()=>ctx.page2() === 'Team' ? 'page' : null, __g);
     __el18.addEventListener('click', eventHandler(() => ctx.page2.setRaw('Team'), ctx.el, 'click'));
-    bindAttribute(__el20, "aria-current", ()=>ctx.page2() === 'Settings' ? 'page' : null);
+    bindAttribute(__el20, "aria-current", ()=>ctx.page2() === 'Settings' ? 'page' : null, __g);
     __el20.addEventListener('click', eventHandler(() => ctx.page2.setRaw('Settings'), ctx.el, 'click'));
-    bindInterpolation(__t24,()=>ctx.page2());
+    bindText(__t24,()=>ctx.page2(),__g);
+    bindGroup(__g,["page",null,null,null,null]);
     return __frag;
   })(),
 });
@@ -9854,7 +9908,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-l
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindAttribute, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindAttribute, bindGroup, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7dsl7s");
@@ -9862,7 +9916,7 @@ import { assignBoundProperty, bindAttribute, defineComponent, eventHandler, sign
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-7dsl7s], [data-pdx-7dsl7s-in]) to ([data-pdx-root] \\u003E *) {:scope .page, :where(:not([data-pdx-7dsl7s])):scope:is(.page) { }\\n  :scope .demo-shell, :where(:not([data-pdx-7dsl7s])):scope:is(.demo-shell) {\\n  height: 350px;\\n  border: 1px solid var(--pdx-color-border);\\n  border-radius: var(--pdx-radius-md);\\n  overflow: hidden;\\n  min-width: 500px;\\n}\\n  }@media (max-width: 600px) { @scope ([data-pdx-7dsl7s], [data-pdx-7dsl7s-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell, :where(:not([data-pdx-7dsl7s])):scope:is(.demo-shell) { min-width: auto; height: 300px; overflow-x: auto; } }}\\n  @scope ([data-pdx-7dsl7s], [data-pdx-7dsl7s-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-shell pdx-app-layout, :where(:not([data-pdx-7dsl7s])):scope:is(.demo-shell pdx-app-layout) { height: 100%; }\\n  :scope .shell-header, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-header) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-sm);\\n  padding: 0 var(--pdx-space-md);\\n  font-size: var(--pdx-text-sm);\\n  height: 100%;\\n}\\n  :scope .shell-nav, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-nav) {\\n  display: flex;\\n  flex-direction: column;\\n  gap: 2px;\\n  padding: var(--pdx-space-sm);\\n  font-size: var(--pdx-text-sm);\\n}\\n  :scope .shell-nav-item, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-nav-item) {\\n  display: flex;\\n  align-items: center;\\n  gap: var(--pdx-space-xs);\\n  width: 100%;\\n  padding: var(--pdx-space-xs) var(--pdx-space-sm);\\n  border: none;\\n  border-radius: var(--pdx-radius-sm);\\n  background: none;\\n  font: inherit;\\n  text-align: left;\\n  cursor: pointer;\\n  color: var(--pdx-color-muted);\\n}\\n  :scope .shell-nav-item:hover, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-nav-item:hover) { background: var(--pdx-color-inset); color: var(--pdx-color-text); }\\n  :scope .shell-nav-item:focus-visible, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-nav-item:focus-visible) { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }\\n  :scope pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item, :where(:not([data-pdx-7dsl7s])):scope:is(pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item) { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }\\n  :scope .shell-nav-item[aria-current=\\"page\\"], :where(:not([data-pdx-7dsl7s])):scope:is(.shell-nav-item[aria-current=\\"page\\"]) {\\n  background: var(--pdx-color-inset);\\n  color: var(--pdx-color-primary);\\n  font-weight: var(--pdx-weight-medium);\\n}\\n  :scope .shell-main, :where(:not([data-pdx-7dsl7s])):scope:is(.shell-main) { padding: var(--pdx-space-lg); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Without Border</h2> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="180px"><div class="shell-header" data-region="header" style="background:var(--pdx-color-primary);color:var(--pdx-color-primary-text)" data-pdx-7dsl7s-in><strong data-pdx-7dsl7s-in>Branded App</strong></div> <div class="shell-nav" data-region="navbar" data-pdx-7dsl7s-in><button class="shell-nav-item" type="button" data-pdx-7dsl7s-in>Home</button> <button class="shell-nav-item" type="button" data-pdx-7dsl7s-in>About</button></div> <div class="shell-main" data-pdx-7dsl7s-in><p class="pdx-txt-small pdx-ink-muted" data-pdx-7dsl7s-in>No borders between regions.</p></div></pdx-app-layout></div></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Without Border</h2> <div class="demo-shell"><pdx-app-layout headerheight="44px" navbarwidth="180px"><div class="shell-header" data-region="header" style="background:var(--pdx-color-primary);color:var(--pdx-color-primary-text)" data-pdx-7dsl7s-in><strong data-pdx-7dsl7s-in>Branded App</strong></div> <div class="shell-nav" data-region="navbar" data-pdx-7dsl7s-in><button class="shell-nav-item" type="button" aria-current="page" data-pdx-7dsl7s-in>Home</button> <button class="shell-nav-item" type="button" data-pdx-7dsl7s-in>About</button></div> <div class="shell-main" data-pdx-7dsl7s-in><p class="pdx-txt-small pdx-ink-muted" data-pdx-7dsl7s-in>No borders between regions.</p></div></pdx-app-layout></div></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.firstChild.nextSibling.nextSibling;const n4=n3.firstChild;const n5=n4.nextSibling.nextSibling;return [n2,n4,n5];};
 defineComponent('app-demo-comp-app-layout-without-border', {
   props: {},
@@ -9874,11 +9928,13 @@ defineComponent('app-demo-comp-app-layout-without-border', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el7,__el8]=__walk0(__frag);
+    const __g=[];
     { assignBoundProperty(__el3, "withBorder", false); }
-    bindAttribute(__el7, "aria-current", ()=>ctx.page3() === 'Home' ? 'page' : null);
+    bindAttribute(__el7, "aria-current", ()=>ctx.page3() === 'Home' ? 'page' : null, __g);
     __el7.addEventListener('click', eventHandler(() => ctx.page3.setRaw('Home'), ctx.el, 'click'));
-    bindAttribute(__el8, "aria-current", ()=>ctx.page3() === 'About' ? 'page' : null);
+    bindAttribute(__el8, "aria-current", ()=>ctx.page3() === 'About' ? 'page' : null, __g);
     __el8.addEventListener('click', eventHandler(() => ctx.page3.setRaw('About'), ctx.el, 'click'));
+    bindGroup(__g,["page",null]);
     return __frag;
   })(),
 });
@@ -11368,7 +11424,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-block
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-s0rhuq");
@@ -11396,9 +11452,11 @@ function simulateFetch() {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el6,__t9]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(ctx.simulateFetch, ctx.el, 'click'));
-    bindComponentProp(__el6, "blocked", ()=>ctx.fetchLoading());
-    bindInterpolation(__t9,()=>ctx.fetchContent());
+    bindComponentProp(__el6, "blocked", ()=>ctx.fetchLoading(), __g);
+    bindText(__t9,()=>ctx.fetchContent(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -11678,7 +11736,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">No Handle</h2> <p class="pdx-txt-small pdx-ink-muted">Handle hidden — close via backdrop, Escape, or close button only. Fixed height.</p> <pdx-button variant="outline">Open Without Handle</pdx-button> <pdx-bottom-sheet showClose label="Fixed sheet"><span slot="header"><strong>Fixed Sheet</strong></span> <p>No drag handle — this sheet stays at its initial detent.</p> <p>Use the close button, backdrop click, or Escape to dismiss.</p></pdx-bottom-sheet></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.nextSibling.nextSibling;return [n1,n2];};
@@ -11700,10 +11758,12 @@ defineComponent('app-demo-comp-bottom-sheet-no-handle', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
+    const __g=[];
     __el3.addEventListener('click', eventHandler(ctx.openNoHandle, ctx.el, 'click'));
     bindTwoWay(__el4, 'open', ctx.noHandleOpen);
-    bindComponentProp(__el4, "showHandle", ()=>ctx.noHandle());
-    bindComponentProp(__el4, "closeOnSwipeDown", ()=>ctx.noSwipe());
+    bindComponentProp(__el4, "showHandle", ()=>ctx.noHandle(), __g);
+    bindComponentProp(__el4, "closeOnSwipeDown", ()=>ctx.noSwipe(), __g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -11944,7 +12004,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-bulk-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-9ufwpw");
@@ -11979,15 +12039,17 @@ const actions = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__t6,__el7,__el9,__el10,__t13]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(ctx.dec, ctx.el, 'click'));
-    bindInterpolation(__t6,()=>ctx.count());
+    bindText(__t6,()=>ctx.count(),__g);
     __el7.addEventListener('click', eventHandler(ctx.inc, ctx.el, 'click'));
-    bindComponentProp(__el9, "count", ()=>ctx.count());
+    bindComponentProp(__el9, "count", ()=>ctx.count(), __g);
     bindComponentProp(__el9, "actions", ()=>ctx.actions);
     __el9.addEventListener('pdx-action', eventHandler(ctx.onAction, ctx.el, 'pdx-action'));
     __el9.addEventListener('pdx-clear', eventHandler(ctx.onClear, ctx.el, 'pdx-clear'));
     effect(()=>{__el10.style.display=(ctx.last() !== '')?'':'none';});
-    bindInterpolation(__t13,()=>ctx.last());
+    bindText(__t13,()=>ctx.last(),__g);
+    bindGroup(__g,[,,'']);
     return __frag;
   })(),
 });
@@ -12163,7 +12225,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-butto
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, defineComponent, eventHandler, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
+import { bindComponentProp, bindGroup, defineComponent, eventHandler, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
 import { useButtonConsole } from './state.pdx';
 
 {
@@ -12219,18 +12281,20 @@ const buttonConsole = useButtonConsole();
   render: (ctx) => (() => {
     const __frag=__blk6();
     const [__el6,__m8,__el9,__m11,__el12,__m14]=__walk6(__frag);
-    bindComponentProp(__el6, "loading", ()=>ctx.loadingPrimary());
+    const __g=[];
+    bindComponentProp(__el6, "loading", ()=>ctx.loadingPrimary(), __g);
     __el6.addEventListener('click', eventHandler(ctx.toggleLoading, ctx.el, 'click'));
     const __cf7=whenBlock(()=>ctx.loadingPrimary(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m8.replaceWith(__cf7);
-    bindComponentProp(__el9, "loading", ()=>ctx.loadingSecondary());
+    bindComponentProp(__el9, "loading", ()=>ctx.loadingSecondary(), __g);
     __el9.addEventListener('click', eventHandler(ctx.toggleLoadingSec, ctx.el, 'click'));
     const __cf10=whenBlock(()=>ctx.loadingSecondary(),()=>{const __frag=__blk2();return __frag;},()=>{const __frag=__blk3();return __frag;});
     __m11.replaceWith(__cf10);
-    bindComponentProp(__el12, "loading", ()=>ctx.loadingDanger());
+    bindComponentProp(__el12, "loading", ()=>ctx.loadingDanger(), __g);
     __el12.addEventListener('click', eventHandler(ctx.toggleLoadingDanger, ctx.el, 'click'));
     const __cf13=whenBlock(()=>ctx.loadingDanger(),()=>{const __frag=__blk4();return __frag;},()=>{const __frag=__blk5();return __frag;});
     __m14.replaceWith(__cf13);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -14580,7 +14644,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-color
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-mn8i27");
@@ -14611,12 +14675,14 @@ defineComponent('app-demo-comp-color-picker-formats', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el8,__t10,__el14,__t16,__el20,__t22]=__walk0(__frag);
+    const __g=[];
     __el8.addEventListener('change', eventHandler(ctx.onHexChange, ctx.el, 'change'));
-    bindInterpolation(__t10,()=>ctx.hexOutput());
+    bindText(__t10,()=>ctx.hexOutput(),__g);
     __el14.addEventListener('change', eventHandler(ctx.onRgbChange, ctx.el, 'change'));
-    bindInterpolation(__t16,()=>ctx.rgbOutput());
+    bindText(__t16,()=>ctx.rgbOutput(),__g);
     __el20.addEventListener('change', eventHandler(ctx.onHslChange, ctx.el, 'change'));
-    bindInterpolation(__t22,()=>ctx.hslOutput());
+    bindText(__t22,()=>ctx.hslOutput(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -16453,7 +16519,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-data-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, computed, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindInterpolation, bindText, computed, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Cascading DataSources</h2> <p class="pdx-txt-small pdx-ink-muted">Second select filters reactively based on the first. Uses <code>$derived</code> to recompute\\n      options. Changing country resets the city selection.</p> <div class="demo-col"><div class="field"><label class="pdx-txt-small pdx-weight-medium">Country</label> <pdx-select clearable placeholder="Select country..."></pdx-select></div> <div class="field"><label class="pdx-txt-small pdx-weight-medium">City</label> <pdx-select labelField="name" valueField="id" searchable clearable placeholder="Select city..."></pdx-select></div> <p class="pdx-txt-small pdx-ink-muted">Selected: <!----> / <!----></p></div> <details class="source"><summary>Source</summary><pre><code>let pickedCountry = $signal(\\'\\');\\nlet pickedCity = $signal(null);\\n\\nconst filteredCityList = $derived(\\n  cities.filter(c =&gt; !pickedCountry || c.country === pickedCountry)\\n);\\n\\nfunction onCountryPick(e) {\\n  pickedCountry = e.detail.value ?? e.detail;\\n  pickedCity = null; // reset dependent\\n}\\n\\n&lt;pdx-select :options="countryList" clearable\\n  @value-change="onCountryPick" /&gt;\\n\\n&lt;pdx-select :options="filteredCityList" labelField="name"\\n  valueField="id" :value="pickedCity"\\n  :disabled="!pickedCountry" searchable clearable /&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.firstChild.nextSibling.nextSibling;const n4=n2.nextSibling.nextSibling;const n5=n4.firstChild.nextSibling.nextSibling;const n6=n4.nextSibling.nextSibling;const n7=n6.firstChild.nextSibling;const n8=n7.nextSibling.nextSibling;return [n3,n5,n7,n8];};
@@ -16497,14 +16563,16 @@ defineComponent('app-demo-comp-data-source-cascading', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__el10,__t12,__t13]=__walk0(__frag);
+    const __g=[];
     bindComponentProp(__el7, "options", ()=>ctx.countryList);
     __el7.addEventListener('value-change', eventHandler(ctx.onCountryPick, ctx.el, 'value-change'));
     bindComponentProp(__el10, "options", ()=>ctx.filteredCityList());
     bindComponentProp(__el10, "value", ()=>ctx.pickedCity());
-    bindComponentProp(__el10, "disabled", ()=>!ctx.pickedCountry());
+    bindComponentProp(__el10, "disabled", ()=>!ctx.pickedCountry(), __g);
     __el10.addEventListener('value-change', eventHandler(ctx.onCityPick, ctx.el, 'value-change'));
-    bindInterpolation(__t12,()=>ctx.pickedCountry() || '—');
+    bindText(__t12,()=>ctx.pickedCountry() || '—',__g);
     bindInterpolation(__t13,()=>ctx.pickedCityLabel() || '—');
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -17664,7 +17732,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-dialo
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, bindTwoWay, computed, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, bindTwoWay, computed, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-kiyszr");
@@ -17690,6 +17758,7 @@ function openSize(e) {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el6,__el7,__el8,__el9,__t12]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(ctx.openSize, ctx.el, 'click'));
     __el5.addEventListener('click', eventHandler(ctx.openSize, ctx.el, 'click'));
     __el6.addEventListener('click', eventHandler(ctx.openSize, ctx.el, 'click'));
@@ -17697,8 +17766,9 @@ function openSize(e) {
     __el8.addEventListener('click', eventHandler(ctx.openSize, ctx.el, 'click'));
     bindTwoWay(__el9, 'open', ctx.sizeOpen);
     bindComponentProp(__el9, "title", ()=>ctx.sizeTitle());
-    bindComponentProp(__el9, "size", ()=>ctx.currentSize());
-    bindInterpolation(__t12,()=>ctx.currentSize());
+    bindComponentProp(__el9, "size", ()=>ctx.currentSize(), __g);
+    bindText(__t12,()=>ctx.currentSize(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -17889,7 +17959,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-drawe
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ygj3jz");
@@ -17917,16 +17987,18 @@ defineComponent('app-demo-comp-drawer-positions', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el6,__el7,__el8,__t10,__t13,__el18,__el19]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(() => ctx.openDrawer('right'), ctx.el, 'click'));
     __el5.addEventListener('click', eventHandler(() => ctx.openDrawer('left'), ctx.el, 'click'));
     __el6.addEventListener('click', eventHandler(() => ctx.openDrawer('top'), ctx.el, 'click'));
     __el7.addEventListener('click', eventHandler(() => ctx.openDrawer('bottom'), ctx.el, 'click'));
     bindTwoWay(__el8, 'open', ctx.drawerOpen);
-    bindComponentProp(__el8, "position", ()=>ctx.drawerPos());
-    bindInterpolation(__t10,()=>ctx.drawerPos());
-    bindInterpolation(__t13,()=>ctx.drawerPos());
+    bindComponentProp(__el8, "position", ()=>ctx.drawerPos(), __g);
+    bindText(__t10,()=>ctx.drawerPos(),__g);
+    bindText(__t13,()=>ctx.drawerPos(),__g);
     __el18.addEventListener('click', eventHandler(ctx.closeDrawer, ctx.el, 'click'));
     __el19.addEventListener('click', eventHandler(ctx.closeDrawer, ctx.el, 'click'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -17937,7 +18009,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-drawe
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, bindTwoWay, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ogvwx3");
@@ -17965,14 +18037,16 @@ defineComponent('app-demo-comp-drawer-sizes', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el6,__el7,__t9,__t12,__el14]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(() => ctx.openSized('sm'), ctx.el, 'click'));
     __el5.addEventListener('click', eventHandler(() => ctx.openSized('md'), ctx.el, 'click'));
     __el6.addEventListener('click', eventHandler(() => ctx.openSized('lg'), ctx.el, 'click'));
     bindTwoWay(__el7, 'open', ctx.sizedOpen);
-    bindComponentProp(__el7, "size", ()=>ctx.sizedSize());
-    bindInterpolation(__t9,()=>ctx.sizedSize());
-    bindInterpolation(__t12,()=>ctx.sizedSize());
+    bindComponentProp(__el7, "size", ()=>ctx.sizedSize(), __g);
+    bindText(__t9,()=>ctx.sizedSize(),__g);
+    bindText(__t12,()=>ctx.sizedSize(),__g);
     __el14.addEventListener('click', eventHandler(ctx.closeSized, ctx.el, 'click'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -18180,7 +18254,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-edit-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, effect, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-4843ny");
@@ -18216,15 +18290,17 @@ const schema = { fields: [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el6,__el7,__t10,__el11]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(ctx.openNew, ctx.el, 'click'));
     __el6.addEventListener('click', eventHandler(ctx.openEdit, ctx.el, 'click'));
     effect(()=>{__el7.style.display=(ctx.lastSaved() !== '')?'':'none';});
-    bindInterpolation(__t10,()=>ctx.lastSaved());
-    bindComponentProp(__el11, "open", ()=>ctx.drawerOpen());
+    bindText(__t10,()=>ctx.lastSaved(),__g);
+    bindComponentProp(__el11, "open", ()=>ctx.drawerOpen(), __g);
     bindComponentProp(__el11, "schema", ()=>ctx.schema);
     bindComponentProp(__el11, "value", ()=>ctx.editing());
     __el11.addEventListener('pdx-save', eventHandler(ctx.onSave, ctx.el, 'pdx-save'));
     __el11.addEventListener('pdx-cancel', eventHandler(ctx.onCancel, ctx.el, 'pdx-cancel'));
+    bindGroup(__g,['']);
     return __frag;
   })(),
 });
@@ -18594,7 +18670,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-error
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup, whenBlock } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<div class="demo-widget"><button class="pdx-outline" size="sm">Load Users</button></div>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild;return [n1];};
@@ -18682,7 +18758,7 @@ defineComponent('app-demo-comp-error-boundary-network-fetch', {
     __m7.replaceWith(__cf6);
     const __cf11=whenBlock(()=>ctx.netState() === 'loading',()=>{const __frag=__blk1();return __frag;},null);
     __m12.replaceWith(__cf11);
-    const __cf26=whenBlock(()=>ctx.netState() === 'error',()=>{const __frag=__blk4();const [__t17,__m25]=__walk4(__frag);bindInterpolation(__t17,()=>ctx.netError());const __cf24=whenBlock(()=>ctx.netRetry() < 3,()=>{const __frag=__blk2();const [__t19,__t20]=__walk2(__frag);bindInterpolation(__t19,()=>ctx.netRetry());bindInterpolation(__t20,()=>ctx.netCountdown());return __frag;},()=>{const __frag=__blk3();const [__el23]=__walk3(__frag);__el23.addEventListener('click', eventHandler(ctx.resetNetworkDemo, ctx.el, 'click'));return __frag;});__m25.replaceWith(__cf24);return __frag;},null);
+    const __cf26=whenBlock(()=>ctx.netState() === 'error',()=>{const __frag=__blk4();const [__t17,__m25]=__walk4(__frag);bindInterpolation(__t17,()=>ctx.netError());const __cf24=whenBlock(()=>ctx.netRetry() < 3,()=>{const __frag=__blk2();const [__t19,__t20]=__walk2(__frag);const __g=[];bindText(__t19,()=>ctx.netRetry(),__g);bindText(__t20,()=>ctx.netCountdown(),__g);bindGroup(__g);return __frag;},()=>{const __frag=__blk3();const [__el23]=__walk3(__frag);__el23.addEventListener('click', eventHandler(ctx.resetNetworkDemo, ctx.el, 'click'));return __frag;});__m25.replaceWith(__cf24);return __frag;},null);
     __m27.replaceWith(__cf26);
     const __cf33=whenBlock(()=>ctx.netState() === 'success',()=>{const __frag=__blk5();const [__t31,__el32]=__walk5(__frag);bindInterpolation(__t31,()=>ctx.netRetry());__el32.addEventListener('click', eventHandler(ctx.resetNetworkDemo, ctx.el, 'click'));return __frag;},null);
     __m34.replaceWith(__cf33);
@@ -19163,7 +19239,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-field
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindComponentProp, bindInterpolation, createForm, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttributeOrProperty, bindComponentProp, bindGroup, bindText, createForm, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-6n3qd4");
@@ -19201,12 +19277,14 @@ const lineFields = [
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el6,__el8,__el10,__t11]=__walk0(__frag);
+    const __g=[];
     bindComponentProp(__el6, "form", ()=>ctx.orderForm);
     __el6.addEventListener('pdx-submit', eventHandler(ctx.submitOrder, ctx.el, 'pdx-submit'));
     bindComponentProp(__el8, "itemFields", ()=>ctx.lineFields);
     bindComponentProp(__el8, "itemDefault", ()=>ctx.lineDefault);
-    bindAttributeOrProperty(__el10, "hidden", "hidden", ()=>!ctx.orderValues());
-    bindInterpolation(__t11,()=>ctx.orderValues());
+    bindAttributeOrProperty(__el10, "hidden", "hidden", ()=>!ctx.orderValues(), __g);
+    bindText(__t11,()=>ctx.orderValues(),__g);
+    bindGroup(__g,[,'']);
     return __frag;
   })(),
 });
@@ -19254,7 +19332,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-field
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindComponentProp, bindInterpolation, createForm, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttributeOrProperty, bindComponentProp, bindGroup, bindText, createForm, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-iq2zco");
@@ -19304,13 +19382,15 @@ const people = [
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__el10,__el12,__el17,__t18]=__walk1(__frag);
+    const __g=[];
     bindComponentProp(__el10, "form", ()=>ctx.taskForm);
     __el10.addEventListener('pdx-submit', eventHandler(ctx.submitTasks, ctx.el, 'pdx-submit'));
     bindComponentProp(__el12, "itemFields", ()=>ctx.taskFields);
     bindComponentProp(__el12, "itemDefault", ()=>ctx.taskDefault);
     __el12['row']=(item,index)=>{const __frag=__blk0();const [__el14,__el15]=__walk0(__frag);bindComponentProp(__el14, "value", ()=>item.title);__el14.addEventListener('value-change', eventHandler(e => ctx.setTask(index, 'title', e.currentTarget.value), ctx.el, 'value-change'));bindComponentProp(__el15, "options", ()=>ctx.people);bindComponentProp(__el15, "value", ()=>item.assignee);__el15.addEventListener('value-change', eventHandler(e => ctx.setTask(index, 'assignee', e.detail.value), ctx.el, 'value-change'));return __frag;};
-    bindAttributeOrProperty(__el17, "hidden", "hidden", ()=>!ctx.taskValues());
-    bindInterpolation(__t18,()=>ctx.taskValues());
+    bindAttributeOrProperty(__el17, "hidden", "hidden", ()=>!ctx.taskValues(), __g);
+    bindText(__t18,()=>ctx.taskValues(),__g);
+    bindGroup(__g,[,'']);
     return __frag;
   })(),
 });
@@ -20691,7 +20771,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-form-
 "// 0 warning(s)
 
 ============================================================
-import { bindAttributeOrProperty, bindComponentProp, bindNativeProperty, bindStyleText, bindTwoWay, createForm, defineComponent, effect, eventHandler, formField, interpolationText, minLength, required, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttributeOrProperty, bindComponentProp, bindGroup, bindNativeProperty, bindStyleText, bindTwoWay, createForm, defineComponent, effect, eventHandler, formField, interpolationText, minLength, required, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-hqclme");
@@ -20733,6 +20813,7 @@ defineComponent('app-demo-comp-form-advanced-tab-wizard', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6,__el7,__el8,__el9,__el10,__el11,__el12,__el13,__el14,__el15,__el16,__el17,__el18,__el19,__el22,__el24,__el25,__el26]=__walk0(__frag);
+    const __g=[];
     effect(()=>{__el5.className=interpolationText(ctx.tabClass0());});
     __el5.addEventListener('click', eventHandler(() => ctx.goToStep(0), ctx.el, 'click'));
     effect(()=>{__el6.className=interpolationText(ctx.tabClass1());});
@@ -20740,17 +20821,17 @@ defineComponent('app-demo-comp-form-advanced-tab-wizard', {
     effect(()=>{__el7.className=interpolationText(ctx.tabClass2());});
     __el7.addEventListener('click', eventHandler(() => ctx.goToStep(2), ctx.el, 'click'));
     bindComponentProp(__el8, "form", ()=>ctx.wizardForm);
-    bindStyleText(__el9, ()=>ctx.step0Style());
+    bindStyleText(__el9, ()=>ctx.step0Style(), __g);
     bindComponentProp(__el10, "field", ()=>ctx.wizardForm.username);
     bindTwoWay(__el11, 'value', ctx.wizardForm.username);
     bindComponentProp(__el12, "field", ()=>ctx.wizardForm.password);
     bindTwoWay(__el13, 'value', ctx.wizardForm.password);
-    bindStyleText(__el14, ()=>ctx.step1Style());
+    bindStyleText(__el14, ()=>ctx.step1Style(), __g);
     bindComponentProp(__el15, "field", ()=>ctx.wizardForm.fullName);
     bindTwoWay(__el16, 'value', ctx.wizardForm.fullName);
     bindComponentProp(__el17, "field", ()=>ctx.wizardForm.avatar);
     bindTwoWay(__el18, 'value', ctx.wizardForm.avatar);
-    bindStyleText(__el19, ()=>ctx.step2Style());
+    bindStyleText(__el19, ()=>ctx.step2Style(), __g);
     bindAttributeOrProperty(__el22, "textContent", "textContent", ()=>ctx.wizardSummary());
     bindNativeProperty(__el24, "disabled", "disabled", ()=>ctx.isFirstStep());
     __el24.addEventListener('click', eventHandler(ctx.prevStep, ctx.el, 'click'));
@@ -20758,6 +20839,7 @@ defineComponent('app-demo-comp-form-advanced-tab-wizard', {
     effect(()=>{__el26.className=interpolationText(ctx.nextBtnClass());});
     __el26.addEventListener('click', eventHandler(ctx.nextStep, ctx.el, 'click'));
     bindNativeProperty(__el26, "textContent", "textContent", ()=>ctx.nextBtnText());
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -23564,7 +23646,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, bindInterpolation, bindRef, bindTwoWay, defineComponent, eachStatic, eventHandler, signal, staticBlock, staticMarkup, store, whenBlock } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, bindInterpolation, bindRef, bindText, bindTwoWay, defineComponent, eachStatic, eventHandler, signal, staticBlock, staticMarkup, store, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-1izf8x");
@@ -23684,16 +23766,18 @@ defineComponent('app-demo-comp-list-comment-thread', {
   render: (ctx) => (() => {
     const __frag=__blk6();
     const [__el0,__el14,__el52,__el53,__el56,__t58]=__walk6(__frag);
+    const __g=[];
     bindRef(__el0,ctx.root);
     bindComponentProp(__el14, "items", ()=>ctx.thread.comments);
-    __el14['item']=(c)=>{const __frag=__blk4();const [__el15,__el16,__t20,__el21,__t23,__el25,__m28,__m43,__m50]=__walk4(__frag);bindAttribute(__el15, "aria-label", ()=>c.author + ', ' + c.text);bindComponentProp(__el16, "alt", ()=>c.author);bindInterpolation(__t20,()=>c.author);bindComponentProp(__el21, "datetime", ()=>c.at);bindInterpolation(__t23,()=>c.text);__el25.addEventListener('click', eventHandler(($event) => ctx.openReply(c, $event), ctx.el, 'click'));const __cf27=whenBlock(()=>c.author === ctx.ME,()=>{const __frag=__blk0();const [__el26]=__walk0(__frag);__el26.addEventListener('click', eventHandler(() => ctx.remove(c.id), ctx.el, 'click'));return __frag;},null);__m28.replaceWith(__cf27);const __cf42=whenBlock(()=>c.replies.length > 0,()=>{const __frag=__blk2();const [__m41]=__walk2(__frag);const __cf40=eachStatic(()=>c.replies,'id',(r)=>{const __frag=__blk1();const [__el31,__el32,__t36,__el37,__t39]=__walk1(__frag);bindAttribute(__el31, "aria-label", ()=>r().author + ', ' + r().text);bindComponentProp(__el32, "alt", ()=>r().author);bindInterpolation(__t36,()=>r().author);bindComponentProp(__el37, "datetime", ()=>r().at);bindInterpolation(__t39,()=>r().text);return __frag;});__m41.replaceWith(__cf40);return __frag;},null);__m43.replaceWith(__cf42);const __cf49=whenBlock(()=>ctx.replyTo() === c.id,()=>{const __frag=__blk3();const [__el44,__el45,__el47,__el48]=__walk3(__frag);__el44.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.sendReply(c.id), ctx.el, 'submit'))(e);});bindTwoWay(__el45, 'value', ctx.replyDraft);bindComponentProp(__el45, "ariaLabel", ()=>'Reply to ' + c.author);__el45.addEventListener('keydown', eventHandler(($event) => ctx.onReplyKey($event, c.id), ctx.el, 'keydown'));__el47.addEventListener('click', eventHandler(() => ctx.closeReply(), ctx.el, 'click'));bindComponentProp(__el48, "disabled", ()=>!ctx.replyDraft().trim());return __frag;},null);__m50.replaceWith(__cf49);return __frag;};
+    __el14['item']=(c)=>{const __frag=__blk4();const [__el15,__el16,__t20,__el21,__t23,__el25,__m28,__m43,__m50]=__walk4(__frag);bindAttribute(__el15, "aria-label", ()=>c.author + ', ' + c.text);bindComponentProp(__el16, "alt", ()=>c.author);bindInterpolation(__t20,()=>c.author);bindComponentProp(__el21, "datetime", ()=>c.at);bindInterpolation(__t23,()=>c.text);__el25.addEventListener('click', eventHandler(($event) => ctx.openReply(c, $event), ctx.el, 'click'));const __cf27=whenBlock(()=>c.author === ctx.ME,()=>{const __frag=__blk0();const [__el26]=__walk0(__frag);__el26.addEventListener('click', eventHandler(() => ctx.remove(c.id), ctx.el, 'click'));return __frag;},null);__m28.replaceWith(__cf27);const __cf42=whenBlock(()=>c.replies.length > 0,()=>{const __frag=__blk2();const [__m41]=__walk2(__frag);const __cf40=eachStatic(()=>c.replies,'id',(r)=>{const __frag=__blk1();const [__el31,__el32,__t36,__el37,__t39]=__walk1(__frag);bindAttribute(__el31, "aria-label", ()=>r().author + ', ' + r().text);bindComponentProp(__el32, "alt", ()=>r().author);bindInterpolation(__t36,()=>r().author);bindComponentProp(__el37, "datetime", ()=>r().at);bindInterpolation(__t39,()=>r().text);return __frag;});__m41.replaceWith(__cf40);return __frag;},null);__m43.replaceWith(__cf42);const __cf49=whenBlock(()=>ctx.replyTo() === c.id,()=>{const __frag=__blk3();const [__el44,__el45,__el47,__el48]=__walk3(__frag);const __g=[];__el44.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.sendReply(c.id), ctx.el, 'submit'))(e);});bindTwoWay(__el45, 'value', ctx.replyDraft);bindComponentProp(__el45, "ariaLabel", ()=>'Reply to ' + c.author, __g);__el45.addEventListener('keydown', eventHandler(($event) => ctx.onReplyKey($event, c.id), ctx.el, 'keydown'));__el47.addEventListener('click', eventHandler(() => ctx.closeReply(), ctx.el, 'click'));bindComponentProp(__el48, "disabled", ()=>!ctx.replyDraft().trim(), __g);bindGroup(__g);return __frag;},null);__m50.replaceWith(__cf49);return __frag;};
     __el14['empty']=()=>{const __frag=__blk5();return __frag;};
     __el52.addEventListener('submit',(e)=>{e.preventDefault();(eventHandler(() => ctx.send(), ctx.el, 'submit'))(e);});
     bindRef(__el53,ctx.composer);
     bindTwoWay(__el53, 'value', ctx.draft);
     __el53.addEventListener('keydown', eventHandler(($event) => ctx.onComposerKey($event), ctx.el, 'keydown'));
-    bindComponentProp(__el56, "disabled", ()=>!ctx.draft().trim());
-    bindInterpolation(__t58,()=>ctx.announcement());
+    bindComponentProp(__el56, "disabled", ()=>!ctx.draft().trim(), __g);
+    bindText(__t58,()=>ctx.announcement(),__g);
+    bindGroup(__g,[,'']);
     return __frag;
   })(),
 });
@@ -23848,7 +23932,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindComponentProp, bindInterpolation, computed, createDataSource, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindComponentProp, bindGroup, bindInterpolation, computed, createDataSource, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qkqj8x");
@@ -23917,13 +24001,15 @@ defineComponent('app-demo-comp-list-pagination', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__el4,__t16,__el17]=__walk1(__frag);
+    const __g=[];
     bindComponentProp(__el4, "source", ()=>ctx.pagedDS);
     __el4['item']=(item)=>{const __frag=__blk0();const [__t7,__t9,__t11,__t13]=__walk0(__frag);bindInterpolation(__t7,()=>item.id);bindInterpolation(__t9,()=>item.name);bindInterpolation(__t11,()=>item.email);bindInterpolation(__t13,()=>item.dept);return __frag;};
     bindInterpolation(__t16,()=>ctx.pagedInfo());
-    bindComponentProp(__el17, "total", ()=>ctx.pagedTotal());
+    bindComponentProp(__el17, "total", ()=>ctx.pagedTotal(), __g);
     { assignBoundProperty(__el17, "pageSize", 5); }
-    bindComponentProp(__el17, "page", ()=>ctx.pagedPage());
+    bindComponentProp(__el17, "page", ()=>ctx.pagedPage(), __g);
     __el17.addEventListener('page-change', eventHandler(ctx.onPageChange, ctx.el, 'page-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -24544,7 +24630,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-menu/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, bindInterpolation, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, bindInterpolation, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useMenuDemo } from './state.pdx';
 
 {
@@ -24583,13 +24669,15 @@ defineComponent('app-demo-comp-menu-basic', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6,__t8]=__walk0(__frag);
-    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'basic' ? 'true' : 'false');
+    const __g=[];
+    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'basic' ? 'true' : 'false', __g);
     __el5.addEventListener('click', eventHandler(() => ctx.show('basic'), ctx.el, 'click'));
-    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'basic');
+    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'basic', __g);
     bindComponentProp(__el6, "items", ()=>ctx.fileItems);
     __el6.addEventListener('pdx-select', eventHandler(ctx.onSelect, ctx.el, 'pdx-select'));
     __el6.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
     bindInterpolation(__t8,()=>ctx.menuLog());
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -24600,7 +24688,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-menu/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useMenuDemo } from './state.pdx';
 
 {
@@ -24642,16 +24730,18 @@ defineComponent('app-demo-comp-menu-checkbox-radio', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6,__el8,__el9]=__walk0(__frag);
-    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'format' ? 'true' : 'false');
+    const __g=[];
+    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'format' ? 'true' : 'false', __g);
     __el5.addEventListener('click', eventHandler(() => ctx.show('format'), ctx.el, 'click'));
-    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'format');
+    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'format', __g);
     bindComponentProp(__el6, "items", ()=>ctx.formatItems);
     __el6.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
-    bindAttribute(__el8, "aria-expanded", ()=>ctx.shown() === 'size' ? 'true' : 'false');
+    bindAttribute(__el8, "aria-expanded", ()=>ctx.shown() === 'size' ? 'true' : 'false', __g);
     __el8.addEventListener('click', eventHandler(() => ctx.show('size'), ctx.el, 'click'));
-    bindComponentProp(__el9, "open", ()=>ctx.shown() === 'size');
+    bindComponentProp(__el9, "open", ()=>ctx.shown() === 'size', __g);
     bindComponentProp(__el9, "items", ()=>ctx.sizeItems);
     __el9.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -24662,7 +24752,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-menu/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useMenuDemo } from './state.pdx';
 
 {
@@ -24698,12 +24788,14 @@ defineComponent('app-demo-comp-menu-danger-disabled', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6]=__walk0(__frag);
-    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'more' ? 'true' : 'false');
+    const __g=[];
+    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'more' ? 'true' : 'false', __g);
     __el5.addEventListener('click', eventHandler(() => ctx.show('more'), ctx.el, 'click'));
-    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'more');
+    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'more', __g);
     bindComponentProp(__el6, "items", ()=>ctx.dangerItems);
     __el6.addEventListener('pdx-select', eventHandler(ctx.onSelect, ctx.el, 'pdx-select'));
     __el6.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -24714,7 +24806,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-menu/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useMenuDemo } from './state.pdx';
 
 {
@@ -24750,12 +24842,14 @@ defineComponent('app-demo-comp-menu-icons-shortcuts', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6]=__walk0(__frag);
-    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'actions' ? 'true' : 'false');
+    const __g=[];
+    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'actions' ? 'true' : 'false', __g);
     __el5.addEventListener('click', eventHandler(() => ctx.show('actions'), ctx.el, 'click'));
-    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'actions');
+    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'actions', __g);
     bindComponentProp(__el6, "items", ()=>ctx.actionItems);
     __el6.addEventListener('pdx-select', eventHandler(ctx.onSelect, ctx.el, 'pdx-select'));
     __el6.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -24793,7 +24887,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-menu/
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindComponentProp, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindComponentProp, bindGroup, computed, defineComponent, eventHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { useMenuDemo } from './state.pdx';
 
 {
@@ -24836,12 +24930,14 @@ defineComponent('app-demo-comp-menu-submenus', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el6]=__walk0(__frag);
-    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'insert' ? 'true' : 'false');
+    const __g=[];
+    bindAttribute(__el5, "aria-expanded", ()=>ctx.shown() === 'insert' ? 'true' : 'false', __g);
     __el5.addEventListener('click', eventHandler(() => ctx.show('insert'), ctx.el, 'click'));
-    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'insert');
+    bindComponentProp(__el6, "open", ()=>ctx.shown() === 'insert', __g);
     bindComponentProp(__el6, "items", ()=>ctx.insertItems);
     __el6.addEventListener('pdx-select', eventHandler(ctx.onSelect, ctx.el, 'pdx-select'));
     __el6.addEventListener('open-change', eventHandler(($event) => { if ($event.detail.value) return; ctx.hide($event) }, ctx.el, 'open-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -27265,7 +27361,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-provi
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, context, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, context, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import '@pdxui/ui/provide';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Single Value</h2> <p class="pdx-txt-small pdx-ink-muted">Provide one value under a context token. Children inject it with <code>inject(Greeting, el)</code>.</p> <div class="demo-box"><pdx-provide><div class="demo-child">Child sees greeting: <strong><!----></strong></div> <div class="demo-controls"><button class="pdx-outline" size="sm">Change Greeting</button></div></pdx-provide></div> <details class="source"><summary>Source</summary><pre><code>// greeting.ts\\nexport const Greeting = context&lt;string&gt;(\\'greeting\\');\\n\\n&lt;pdx-provide :token="Greeting" :value="greetingMsg"&gt;\\n  &lt;!-- all descendants can inject(Greeting, el) --&gt;\\n  &lt;app-my-widget /&gt;\\n&lt;/pdx-provide&gt;\\n\\n// In app-my-widget setup:\\nconst greeting = inject(Greeting, ctx.el);</code></pre></details></section>'));
@@ -27286,10 +27382,12 @@ const Greeting = context        ('greeting');
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__t8,__el10]=__walk0(__frag);
+    const __g=[];
     bindComponentProp(__el5, "token", ()=>ctx.Greeting);
-    bindComponentProp(__el5, "value", ()=>ctx.greetingMsg());
-    bindInterpolation(__t8,()=>ctx.greetingMsg());
+    bindComponentProp(__el5, "value", ()=>ctx.greetingMsg(), __g);
+    bindText(__t8,()=>ctx.greetingMsg(),__g);
     __el10.addEventListener('click', eventHandler(ctx.changeGreeting, ctx.el, 'click'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -28679,7 +28777,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-sched
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { at } from './week.pdx';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Timeline</h2> <p class="pdx-txt-small pdx-ink-muted"><code>view="timeline"</code> puts each resource on a row along the period: <code>timeline-scale</code> is a day of slots, a week or a month of days, or a year of months. A resource\\'s <code>children</code> sit under it, and the parent opens and closes with a click, <kbd>Enter</kbd> or the arrows. Events that overlap stack in their row. Only the rows and columns in view are drawn, so this fleet of 200 vans costs what a screenful does.</p> <pdx-segmented label="Timeline scale" options="[&quot;day&quot;,&quot;week&quot;,&quot;month&quot;,&quot;year&quot;]"></pdx-segmented> <pdx-scheduler label="Fleet" view="timeline" scroll-to="08:00"></pdx-scheduler></section>'));
@@ -28711,13 +28809,15 @@ const today = at(1);
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__el8]=__walk0(__frag);
-    bindComponentProp(__el7, "value", ()=>ctx.scale());
+    const __g=[];
+    bindComponentProp(__el7, "value", ()=>ctx.scale(), __g);
     __el7.addEventListener('value-change', eventHandler(e => ctx.scale.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindComponentProp(__el8, "timelineScale", ()=>ctx.scale());
+    bindComponentProp(__el8, "timelineScale", ()=>ctx.scale(), __g);
     bindComponentProp(__el8, "date", ()=>ctx.today);
     bindComponentProp(__el8, "resources", ()=>ctx.fleet);
     bindComponentProp(__el8, "events", ()=>ctx.jobs);
     bindComponentProp(__el8, "views", ()=>['timeline']);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -31988,7 +32088,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-time-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Bound to a signal: the arrows, the wheel and typed digits all write its model, which emits <code>value-change</code> with the new value.\\n      An empty picker shows <code>--</code>, the way the native time input does — not midnight.</p> <div class="demo-row"><pdx-time-picker format="24h" aria-label="Meeting time"></pdx-time-picker> <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value"><!----></code></span></div> <div class="demo-row"><pdx-time-picker format="24h" aria-label="Unset time"></pdx-time-picker> <span class="pdx-txt-small pdx-ink-muted">No value yet</span></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker :value="meeting" format="24h" aria-label="Meeting time"\\n  @value-change="e =&gt; meeting = e.detail.value"&gt;&lt;/pdx-time-picker&gt;\\n\\nlet meeting = $signal(\\'09:30\\');</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.nextSibling.nextSibling;const n4=n3.firstChild.nextSibling;const n5=n4.firstChild;return [n2,n5];};
@@ -32001,9 +32101,11 @@ defineComponent('app-demo-comp-time-picker-basic', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el6,__t9]=__walk0(__frag);
-    bindComponentProp(__el6, "value", ()=>ctx.meeting());
+    const __g=[];
+    bindComponentProp(__el6, "value", ()=>ctx.meeting(), __g);
     __el6.addEventListener('value-change', eventHandler(e => ctx.meeting.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindInterpolation(__t9,()=>ctx.meeting() || '(empty)');
+    bindText(__t9,()=>ctx.meeting() || '(empty)',__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -32041,7 +32143,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-time-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindInterpolation, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7ax5wr");
@@ -32072,14 +32174,16 @@ function minutes(v) {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el7,__el9,__t12,__t14,__t15]=__walk0(__frag);
-    bindComponentProp(__el7, "value", ()=>ctx.start());
+    const __g=[];
+    bindComponentProp(__el7, "value", ()=>ctx.start(), __g);
     __el7.addEventListener('value-change', eventHandler(e => ctx.start.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindComponentProp(__el9, "value", ()=>ctx.end());
-    bindComponentProp(__el9, "min", ()=>ctx.start());
+    bindComponentProp(__el9, "value", ()=>ctx.end(), __g);
+    bindComponentProp(__el9, "min", ()=>ctx.start(), __g);
     __el9.addEventListener('value-change', eventHandler(e => ctx.end.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindInterpolation(__t12,()=>ctx.start());
-    bindInterpolation(__t14,()=>ctx.end());
+    bindText(__t12,()=>ctx.start(),__g);
+    bindText(__t14,()=>ctx.end(),__g);
     bindInterpolation(__t15,()=>ctx.duration());
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -32110,7 +32214,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-time-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Min and max</h2> <p class="pdx-txt-small pdx-ink-muted">Office hours, 09:00 to 18:00: arrows, the wheel and typed digits are all pulled back inside the range.\\n      An empty picker starts from <code>min</code> on the first arrow press.</p> <div class="demo-row"><pdx-time-picker format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours"></pdx-time-picker> <span class="pdx-txt-small pdx-ink-muted">value: <code><!----></code> · range 09:00–18:00</span></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker :value="office" format="24h" min="09:00" max="18:00" step="30"&gt;&lt;/pdx-time-picker&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.nextSibling.nextSibling;const n4=n3.firstChild.nextSibling;const n5=n4.firstChild;return [n2,n5];};
@@ -32123,9 +32227,11 @@ defineComponent('app-demo-comp-time-picker-min-max', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__t8]=__walk0(__frag);
-    bindComponentProp(__el5, "value", ()=>ctx.office());
+    const __g=[];
+    bindComponentProp(__el5, "value", ()=>ctx.office(), __g);
     __el5.addEventListener('value-change', eventHandler(e => ctx.office.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindInterpolation(__t8,()=>ctx.office() || '(empty)');
+    bindText(__t8,()=>ctx.office() || '(empty)',__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -32136,7 +32242,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-time-
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, bindInterpolation, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, bindText, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Seconds and step</h2> <p class="pdx-txt-small pdx-ink-muted"><code>showSeconds</code> adds a seconds segment. <code>step</code> is how far one arrow press moves\\n      the minutes (and seconds): <code>15</code> gives quarter hours.</p> <div class="demo-grid"><div class="demo-stack"><span class="pdx-txt-small pdx-weight-semibold">show-seconds</span> <pdx-time-picker value="08:15:30" format="24h" show-seconds aria-label="With seconds"></pdx-time-picker></div> <div class="demo-stack"><span class="pdx-txt-small pdx-weight-semibold">step 15 — press ↑ on the minutes</span> <pdx-time-picker format="24h" step="15" aria-label="Quarter hours"></pdx-time-picker> <span class="pdx-txt-small pdx-ink-muted">value: <code><!----></code></span></div></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-time-picker value="08:15:30" format="24h" show-seconds&gt;&lt;/pdx-time-picker&gt;\\n&lt;pdx-time-picker :value="quarter" format="24h" step="15"&gt;&lt;/pdx-time-picker&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild.nextSibling.nextSibling;const n3=n2.firstChild.nextSibling.nextSibling;const n4=n3.nextSibling.nextSibling;const n5=n4.firstChild.nextSibling;const n6=n5.firstChild;return [n3,n6];};
@@ -32149,9 +32255,11 @@ defineComponent('app-demo-comp-time-picker-seconds', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el12,__t15]=__walk0(__frag);
-    bindComponentProp(__el12, "value", ()=>ctx.quarter());
+    const __g=[];
+    bindComponentProp(__el12, "value", ()=>ctx.quarter(), __g);
     __el12.addEventListener('value-change', eventHandler(e => ctx.quarter.setRaw(e.detail.value), ctx.el, 'value-change'));
-    bindInterpolation(__t15,()=>ctx.quarter());
+    bindText(__t15,()=>ctx.quarter(),__g);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -32846,7 +32954,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-toggl
 "// 0 warning(s)
 
 ============================================================
-import { bindComponentProp, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindComponentProp, bindGroup, defineComponent, eventHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Standalone Toggle</h2> <p class="pdx-txt-small pdx-ink-muted">Click to toggle on/off.</p> <div class="demo-row"><pdx-toggle aria-label="Bold"><strong>B</strong></pdx-toggle> <pdx-toggle aria-label="Italic"><em>I</em></pdx-toggle></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;!-- aria-label names it by what it does: "B" alone is read as the letter --&gt;\\n&lt;pdx-toggle :pressed="bold" @pressed-change="onBold" aria-label="Bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-toggle&gt;\\n&lt;pdx-toggle :pressed="italic" @pressed-change="onItalic" aria-label="Italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-toggle&gt;</code></pre></details></section>'));
 const __walk0=(r)=>{const n0=r.firstChild;const n1=n0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const n2=n1.firstChild;const n3=n2.nextSibling.nextSibling;return [n2,n3];};
@@ -32867,10 +32975,12 @@ function onBold(e) {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el6]=__walk0(__frag);
-    bindComponentProp(__el4, "pressed", ()=>ctx.bold());
+    const __g=[];
+    bindComponentProp(__el4, "pressed", ()=>ctx.bold(), __g);
     __el4.addEventListener('pressed-change', eventHandler(ctx.onBold, ctx.el, 'pressed-change'));
-    bindComponentProp(__el6, "pressed", ()=>ctx.italic());
+    bindComponentProp(__el6, "pressed", ()=>ctx.italic(), __g);
     __el6.addEventListener('pressed-change', eventHandler(ctx.onItalic, ctx.el, 'pressed-change'));
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -38199,7 +38309,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/design-the
 "// 0 warning(s)
 
 ============================================================
-import { bindAttribute, bindInterpolation, bindStyleText, computed, defineComponent, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindAttribute, bindGroup, bindInterpolation, bindStyleText, bindText, computed, defineComponent, eachStatic, effect, staticBlock, staticMarkup } from '@pdxui/core';
 import { useThemeMeasure } from './state.pdx';
 
 {
@@ -38224,7 +38334,7 @@ defineComponent('app-demo-design-themes-contrast', {
   render: (ctx) => (() => {
     const __frag=__blk1();
     const [__m26]=__walk1(__frag);
-    const __cf25=eachStatic(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken);bindAttribute(__el15, "data-ratio", ()=>row().ratio);bindStyleText(__el16, ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')');bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindInterpolation(__t24,()=>row().pass ? 'AA' : 'fail');return __frag;});
+    const __cf25=eachStatic(()=>ctx.contrast(),'token',(row)=>{const __frag=__blk0();const [__el15,__el16,__t18,__t20,__t22,__el23,__t24]=__walk0(__frag);const __g=[];{ const __v = row().token; if (__v == null || __v === false) __el15.removeAttribute("data-token"); else { __el15.setAttribute("data-token", __v === true ? '' : String(__v)); } }bindAttribute(__el15, "data-text-token", ()=>row().textToken, __g);bindAttribute(__el15, "data-ratio", ()=>row().ratio, __g);bindStyleText(__el16, ()=>'background: var(' + row().token + '); color: var(' + row().textToken + ')', __g);bindInterpolation(__t18,()=>row().token,true);bindInterpolation(__t20,()=>row().textToken);bindInterpolation(__t22,()=>row().ratio);__el23.classList.add("ct-verdict");effect(()=>{const __c=!!(row().pass);__el23.classList.toggle("ok",__c);__el23.classList.toggle("bad",!__c);});bindText(__t24,()=>row().pass ? 'AA' : 'fail',__g);bindGroup(__g);return __frag;});
     __m26.replaceWith(__cf25);
     return __frag;
   })(),
@@ -38801,7 +38911,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-cont
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, computed, defineComponent, effect, interpolationText, onMount, signal, staticBlock, staticMarkup, useContainerSize, whenBlock } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, computed, defineComponent, effect, interpolationText, onMount, signal, staticBlock, staticMarkup, useContainerSize, whenBlock } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-nirhpg");
@@ -38847,10 +38957,11 @@ defineComponent('app-demo-infra-container-container-size', {
   render: (ctx) => (() => {
     const __frag=__blk3();
     const [__el3,__t7,__t10,__el12,__el13,__el14,__m17,__m22,__m28]=__walk3(__frag);
+    const __g=[];
     { const __s = new Set(["resize-box"]); let __w = []; effect(() => { const __n = interpolationText(ctx.bpClass()).split(/\\s+/).filter(Boolean); for (const __t of __w) if (!__n.includes(__t) && !__s.has(__t)) __el3.classList.remove(__t); for (const __t of __n) __el3.classList.add(__t); __w = __n; }); }
     bindRef(__el3,ctx.resizeRef);
-    bindInterpolation(__t7,()=>ctx.width());
-    bindInterpolation(__t10,()=>ctx.height());
+    bindText(__t7,()=>ctx.width(),__g);
+    bindText(__t10,()=>ctx.height(),__g);
     effect(()=>{const __c=!!(ctx.isCompact());__el12.classList.toggle("on",__c);});
     effect(()=>{const __c=!!(ctx.isMedium());__el13.classList.toggle("on",__c);});
     effect(()=>{const __c=!!(ctx.isWide());__el14.classList.toggle("on",__c);});
@@ -38860,6 +38971,7 @@ defineComponent('app-demo-infra-container-container-size', {
     __m22.replaceWith(__cf21);
     const __cf27=whenBlock(()=>ctx.isWide(),()=>{const __frag=__blk2();return __frag;},null);
     __m28.replaceWith(__cf27);
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -39141,7 +39253,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-drag
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, defineComponent, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useDrag } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, defineComponent, effect, onDestroy, onMount, signal, staticBlock, staticMarkup, useDrag } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-vubiff");
@@ -39185,11 +39297,13 @@ defineComponent('app-demo-infra-drag-free', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__t8,__t11,__t13,__t16]=__walk0(__frag);
+    const __g=[];
     bindRef(__el4,ctx.freeRef);
-    bindInterpolation(__t8,()=>ctx.freeDragging());
-    bindInterpolation(__t11,()=>ctx.freeX());
-    bindInterpolation(__t13,()=>ctx.freeY());
-    bindInterpolation(__t16,()=>ctx.freeVel());
+    bindText(__t8,()=>ctx.freeDragging(),__g);
+    bindText(__t11,()=>ctx.freeX(),__g);
+    bindText(__t13,()=>ctx.freeY(),__g);
+    bindText(__t16,()=>ctx.freeVel(),__g);
+    bindGroup(__g,[false]);
     return __frag;
   })(),
 });
@@ -39683,7 +39797,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-over
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, computed, defineComponent, effect, eventHandler, onDestroy, onMount, overlayStack, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindInterpolation, bindText, computed, defineComponent, effect, eventHandler, onDestroy, onMount, overlayStack, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import { useOverlayDemo } from './state.pdx';
 
 {
@@ -39728,6 +39842,7 @@ defineComponent('app-demo-infra-overlay-stack', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el5,__el7,__el8,__el9,__el10,__el11,__t15,__t18,__t21,__t23]=__walk0(__frag);
+    const __g=[];
     __el4.addEventListener('click', eventHandler(ctx.pushTooltip, ctx.el, 'click'));
     __el5.addEventListener('click', eventHandler(ctx.pushDialog, ctx.el, 'click'));
     __el7.addEventListener('click', eventHandler(ctx.popTopTooltip, ctx.el, 'click'));
@@ -39735,10 +39850,11 @@ defineComponent('app-demo-infra-overlay-stack', {
     __el9.addEventListener('click', eventHandler(ctx.popAllTooltips, ctx.el, 'click'));
     __el10.addEventListener('click', eventHandler(ctx.popAllDialogs, ctx.el, 'click'));
     __el11.addEventListener('click', eventHandler(ctx.popAll, ctx.el, 'click'));
-    bindInterpolation(__t15,()=>ctx.count());
-    bindInterpolation(__t18,()=>ctx.modals());
-    bindInterpolation(__t21,()=>ctx.topName());
+    bindText(__t15,()=>ctx.count(),__g);
+    bindText(__t18,()=>ctx.modals(),__g);
+    bindText(__t21,()=>ctx.topName(),__g);
     bindInterpolation(__t23,()=>ctx.logText());
+    bindGroup(__g);
     return __frag;
   })(),
 });
@@ -40271,7 +40387,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/infra-virt
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindRef, createVirtualizer, defineComponent, effect, eventHandler, html, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindGroup, bindRef, bindText, createVirtualizer, defineComponent, effect, eventHandler, html, onMount, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7vddnb");
@@ -40332,13 +40448,15 @@ const COUNT1 = 10000;
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__t5,__t8,__el10,__el11,__el12,__el13,__el14]=__walk0(__frag);
-    bindInterpolation(__t5,()=>ctx.rendered1());
-    bindInterpolation(__t8,()=>ctx.totalH1());
+    const __g=[];
+    bindText(__t5,()=>ctx.rendered1(),__g);
+    bindText(__t8,()=>ctx.totalH1(),__g);
     __el10.addEventListener('click', eventHandler(ctx.scrollTop1, ctx.el, 'click'));
     __el11.addEventListener('click', eventHandler(ctx.scrollMid1, ctx.el, 'click'));
     __el12.addEventListener('click', eventHandler(ctx.scrollEnd1, ctx.el, 'click'));
     bindRef(__el13,ctx.scroll1Ref);
     bindRef(__el14,ctx.inner1Ref);
+    bindGroup(__g);
     return __frag;
   })(),
 });

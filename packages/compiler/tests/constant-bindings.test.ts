@@ -130,10 +130,11 @@ describe('a value written once is core\'s binding with its once flag (#1270)', (
     it('a const whose value may be anything keeps its binding: a call, a name, a function, a $derived', () => {
         const script = "let rows = $signal([]);\nconst made = make();\nconst alias = made;\nconst f = () => rows;\nconst d = $derived(rows.length + 'x');";
         const out = render('<p :title="made" :lang="alias" :dir="f" :data-n="d"></p>', script);
-        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>ctx\.made\)/);
-        expect(out).toMatch(/bind\w+\(__el\d+, "lang", "lang", \(\)=>ctx\.alias\)/);
-        expect(out).toMatch(/bind\w+\(__el\d+, "dir", "dir", \(\)=>ctx\.f\)/);
-        expect(out).toMatch(/bindAttribute\(__el\d+, "data-n", \(\)=>ctx\.d\(\)\)/);
+        // Bindings, each a getter; the element's four are in its block's group (#1275).
+        expect(out).toMatch(/bind\w+\(__el\d+, "title", "title", \(\)=>ctx\.made(?:, __g)?\)/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "lang", "lang", \(\)=>ctx\.alias(?:, __g)?\)/);
+        expect(out).toMatch(/bind\w+\(__el\d+, "dir", "dir", \(\)=>ctx\.f(?:, __g)?\)/);
+        expect(out).toMatch(/bindAttribute\(__el\d+, "data-n", \(\)=>ctx\.d\(\)(?:, __g)?\)/);
     });
 
     it('a primitive const shadowed by a loop name is the loop name inside the loop', () => {

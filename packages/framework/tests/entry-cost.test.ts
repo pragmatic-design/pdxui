@@ -148,7 +148,12 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // 347.2 after #1462 (CI's figure, from 347.1): pdx-tree opens and closes a branch in place —
     // openInPlace, closeInPlace, markBusy and the shared renderRows / buildGroup — where every expand
     // rebuilt the visible rows, which is what let its arrow's rotation animate.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 347.2 },
+    // 349.0 after #1275 (CI's figure, measured here: 348.8): a block's bindings run in one effect, each
+    // passing the block's group and the block declaring and running it (`bindGroup`, `bindText`), and
+    // the values a binding has with the props at their defaults are in the static markup. The trade is
+    // the effects: pdx-fieldset written declaratively mounts at 0.83–0.91× its TypeScript version, where
+    // it was 1.41×.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 349.0 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -175,8 +180,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (measured here: 336.7, on the ceiling), as for the entry above. 337.4 after pdx-data-grid
     // (measured here: 337.3), as for the entry above. 338.0 after pdx-select (measured here: 337.9), as
     // for the entry above. 338.2 after #1462 (CI's figure), as for the entry above: pdx-tree's
-    // in-place expand.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 338.2 },
+    // in-place expand. 339.9 after #1275 (CI's figure, measured here: 339.8), as for the entry above: a
+    // block's bindings in one effect.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 339.9 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.
