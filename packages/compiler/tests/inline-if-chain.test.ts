@@ -33,9 +33,9 @@ describe('an @if chain', () => {
         expect(render('<p>@if (a) { <b>a</b> } @else { <u>c</u> }</p>')).not.toMatch(/whenChain\(/);
     });
 
-    it('control: a chain with a transition on any link stays nested when(), which runs transitions', () => {
+    it('control: a chain with a transition on any link stays nested whenBlock(), which runs transitions with blockAnimation (#1259)', () => {
         const code = render("<p>@if (a) { <b>a</b> } @else if (b) @transition('fade-in', 'fade-out') { <i>b</i> } @else { <u>c</u> }</p>");
         expect(code).not.toMatch(/whenChain\(/);
-        expect(count(code, /\bwhen\(/g)).toBe(2);
+        expect(count(code, /\bwhenBlock\(/g)).toBe(2);
     });
 });

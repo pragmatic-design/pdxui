@@ -8,7 +8,7 @@
 // The others are built as the client builds them and put in place of the server's copy.
 
 import { collectDisposers, signal, untracked } from '../reactivity/signal';
-import { when, match, show, portal, followWhen, followMatch, showNodes, caseFor } from '../renderer/helpers';
+import { whenBlock, match, show, portal, followWhen, followMatch, showNodes, caseFor } from '../renderer/helpers';
 import { whenChain, followChain } from '../renderer/when-chain';
 import { followList, mountList, rowIndex, type MappedItem, type RowRenderer, type RowSignals } from '../renderer/list';
 import { defer, followDefer } from '../renderer/defer';
@@ -178,7 +178,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
  */
 export function builders(build: (node: Node) => Node): BlockVisitor<DocumentFragment> {
     return {
-        when: (condition, thenFn, elseFn, options) => when(condition, thenFn, elseFn, options),
+        when: (condition, thenFn, elseFn, options) => whenBlock(condition, thenFn, elseFn, options),
         chain: (select, branches) => whenChain(select, branches),
         match: (value, cases) => match(value, cases),
         show: (condition, content) => show(condition, build(content)),

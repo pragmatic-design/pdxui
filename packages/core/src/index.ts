@@ -156,7 +156,7 @@ export { renderSnippet } from './renderer/render-snippet';
 // Helpers
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';
 export { listEmpty, type ListEmpty } from './renderer/list-empty';
-export { when, each, eachDestructured, eachRow, eachStatic, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';
+export { when, whenBlock, each, eachDestructured, eachRow, eachStatic, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';
 export type { TransitionOptions, DynamicOptions, PortalOptions } from './renderer/helpers';
 export { whenChain } from './renderer/when-chain';
 
@@ -164,8 +164,8 @@ export { whenChain } from './renderer/when-chain';
 export { pages } from './renderer/pages';
 
 // Transitions + FLIP
-export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions, listAnimation } from './renderer/transitions';
-export type { ListAnimation } from './renderer/transitions';
+export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions, listAnimation, blockAnimation } from './renderer/transitions';
+export type { ListAnimation, BlockAnimation } from './renderer/transitions';
 
 // Keyframe Animations
 export { keyframes, playKeyframes } from './renderer/keyframes';

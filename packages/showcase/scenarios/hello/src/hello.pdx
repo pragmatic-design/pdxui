@@ -4,4 +4,5 @@ let count = $signal(0);
 
 <template>
   <button @click="count++">Clicked {{ count }} times</button>
+  @if (count >= 10) { <p>That is a lot of clicks.</p> }
 </template>

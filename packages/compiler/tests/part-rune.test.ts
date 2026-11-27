@@ -167,7 +167,7 @@ describe('@part compiles into a ref and the descriptor', () => {
 
     it('a part inside a block is bound when the block renders', () => {
         const { code } = compile(pdx('<p>x</p>@if (open) { <div data-part="popup">y</div> }', '@part popup;\nlet open = $signal(false);\nfunction f() { popup?.focus(); }'), 'test.pdx');
-        expect(code).toMatch(/when\([\s\S]*bindRef\(__el\d+,ctx\.popup\)/);
+        expect(code).toMatch(/whenBlock\([\s\S]*bindRef\(__el\d+,ctx\.popup\)/);
     });
 
     it('the script reads the part as the element', () => {

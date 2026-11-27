@@ -2,7 +2,7 @@
 // Integrates with backend Pragmatic.Authorization permission strings.
 
 import { signal, computed } from '../reactivity/signal';
-import { when } from '../renderer/helpers';
+import { whenBlock } from '../renderer/helpers';
 import type { ReadonlySignal } from '../utils/types';
 
 type PermissionChecker = (permission: string) => boolean;
@@ -56,7 +56,7 @@ export function requirePermission(
     thenFn: () => Node | DocumentFragment,
     elseFn?: (() => Node | DocumentFragment | null) | null
 ): DocumentFragment {
-    return when(
+    return whenBlock(
         () => {
             _version();
             return checker(permission);

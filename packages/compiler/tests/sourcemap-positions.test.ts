@@ -191,7 +191,7 @@ function save() { throw new Error('nope'); }
             ['label }}', 'bindInterpolation(__t5,'],
             ['items as item', 'const __cf8=eachStatic('],
             ['item }}</li>', 'bindInterpolation(__t7,'],
-            ['show) {', 'const __cf11=when('],
+            ['show) {', 'const __cf11=whenBlock('],
         ])).toEqual([]);
     });
 
@@ -204,7 +204,7 @@ function save() { throw new Error('nope'); }
                 ['label }}', 'bindInterpolation(__t4,'],
                 ['items as item', 'const __cf7=eachStatic('],
                 ['item }}</li>', 'bindInterpolation(__t6,'],
-                ['show) {', 'const __cf10=when('],
+                ['show) {', 'const __cf10=whenBlock('],
             ])).toEqual([]);
         });
     }

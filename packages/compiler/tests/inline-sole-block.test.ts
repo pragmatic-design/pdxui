@@ -26,7 +26,7 @@ describe('a block that is one control-flow node alone', () => {
     it('returns the node itself: the whitespace around it is the block\'s edge, which keeps none (#907)', () => {
         const code = render('<p>@if (on) { <b>x</b> } @else { @if (!on) { <i>y</i> } }</p>');
         expect(markerOnlyBlocks(code)).toEqual([]);
-        expect(code).toMatch(/\(\)=>\{const __cf\d+=when\([^]*?\);return __cf\d+;\}/);
+        expect(code).toMatch(/\(\)=>\{const __cf\d+=whenBlock\([^]*?\);return __cf\d+;\}/);
         expect(code).not.toMatch(/__frag\.append\(/);
     });
 
