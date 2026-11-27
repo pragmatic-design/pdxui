@@ -85,30 +85,15 @@ import { applyMask, outOfRange, patternFor, stripMask } from './masked-input-mas
 
 let inputEl = $signal(null);
 let displayValue = $signal('');
-/** Bumped by every write to the field; a frame with a stale token does not write. */
-let writeGen = 0;
 
 function onInput(e: Event) {
   const input = e.target as HTMLInputElement;
-  const masked = applyMask(mask as string, input.value);
-  displayValue = masked;
-
-  // Restore cursor position.
-  //
-  // The frame carries a generation token, and a stale one drops its write. Without it the
-  // frame puts back the value captured when it was scheduled, undoing anything that has
-  // changed the field since — typing, then clear(), would leave the field reading what had
-  // been typed, because the keystroke's frame lands after and writes it again. Two
-  // keystrokes in one frame are safe on their own (the later frame runs last and wins); a
-  // write that does NOT come through here is not. (See renderGen in core's
-  // renderer/helpers.ts for the same guard against the same class.)
-  const gen = ++writeGen;
-  requestAnimationFrame(() => {
-    if (input && gen === writeGen) input.value = masked;
-  });
+  // `::value` writes the formatted text back to the field in this same event, a rejected
+  // keystroke included (#1303): no frame writes it again after (#1287).
+  displayValue = applyMask(mask as string, input.value);
 
   // `value` is the unmasked value, as the model is read (applyMask(value) is the display).
-  value = stripMask(mask as string, masked);
+  value = stripMask(mask as string, displayValue as string);
 }
 
 /** False while a complete date or time preset value is out of range. */
@@ -143,9 +128,6 @@ $effect(() => {
 function focus() { inputEl?.focus(); }
 function blur() { inputEl?.blur(); }
 function clear() {
-  // Invalidate any frame a keystroke left pending, or it writes the old value back
-  // after this line.
-  writeGen++;
   displayValue = '';
   const inp = inputEl as HTMLInputElement | null;
   if (inp) inp.value = '';
