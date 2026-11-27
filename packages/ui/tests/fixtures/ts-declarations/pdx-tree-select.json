@@ -379,6 +379,14 @@
     {
       "name": "--pdx-input-min-height",
       "description": "The frame's height, at the md size."
+    },
+    {
+      "name": "--pdx-select-caret-size",
+      "description": "The caret's box, pdx-select's caret (#1461): a theme sets it on `.pdx-select-caret` for the three pickers."
+    },
+    {
+      "name": "--pdx-select-caret-stroke",
+      "description": "The caret's stroke width."
     }
   ],
   "cssStates": [

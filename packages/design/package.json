@@ -71,6 +71,10 @@
       "development": "./src/components/layered/carousel.css",
       "default": "./dist/components/carousel.css"
     },
+    "./components/caret": {
+      "development": "./src/components/layered/caret.css",
+      "default": "./dist/components/caret.css"
+    },
     "./components/cascader": {
       "development": "./src/components/layered/cascader.css",
       "default": "./dist/components/cascader.css"

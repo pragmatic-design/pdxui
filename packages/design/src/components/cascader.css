@@ -40,13 +40,7 @@ pdx-cascader {
     color: var(--pdx-color-muted);
 }
 
-.pdx-cascader-icon {
-    flex-shrink: 0;
-    color: var(--pdx-color-muted);
-    font-size: var(--pdx-text-xs);
-    transition: transform 0.2s;
-}
-
+/* The caret is caret.css's `.pdx-select-caret` (#1461), on the same element; here it only turns. */
 .pdx-cascader-icon.open,
 :state(open) > .pdx-cascader-trigger > .pdx-cascader-icon {
     transform: rotate(180deg);

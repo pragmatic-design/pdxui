@@ -24,6 +24,8 @@
  * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
  * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
  * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ * @cssprop --pdx-select-caret-size - The caret's box, pdx-select's caret (#1461): a theme sets it on `.pdx-select-caret` for the three pickers.
+ * @cssprop --pdx-select-caret-stroke - The caret's stroke width.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -38,6 +40,7 @@
 import { generatedId, getComponentString, usePopover, onNextFrame, onDestroy } from '@pdxui/core';
 import { uiString, uiAttr } from '../shared/i18n';
 import { onPressOutside } from '../shared/press-outside';
+import { createCaret } from '../shared/caret';
 import { renderResults, renderColumns } from './cascader-dom';
 import type { PanelView } from './cascader-dom';
 import type { CascaderNode } from './cascader-types';
@@ -45,6 +48,8 @@ import './cascader-strings';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/cascader';
+// The trigger's caret, shared with pdx-select and pdx-tree-select (#1461).
+import '@pdxui/design/components/caret';
 
 // The node shape an app builds in TypeScript (`import type { CascaderNode } from '@pdxui/ui/cascader'`).
 export type { CascaderNode } from './cascader-types';
@@ -448,9 +453,7 @@ onNextFrame(() => {
     triggerEl.appendChild(clearEl);
   }
 
-  iconEl = document.createElement('span');
-  iconEl.className = 'pdx-cascader-icon';
-  iconEl.textContent = '▾';
+  iconEl = createCaret('pdx-cascader-icon');
   triggerEl.appendChild(iconEl);
 
   el.appendChild(triggerEl);

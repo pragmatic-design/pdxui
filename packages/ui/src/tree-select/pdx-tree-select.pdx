@@ -24,6 +24,8 @@
  * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
  * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
  * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ * @cssprop --pdx-select-caret-size - The caret's box, pdx-select's caret (#1461): a theme sets it on `.pdx-select-caret` for the three pickers.
+ * @cssprop --pdx-select-caret-stroke - The caret's stroke width.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -37,6 +39,7 @@
 // (tree-select-dom.ts draws the open tree).
 import { generatedId, getComponentString, usePopover, onNextFrame, onDestroy } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
+import { createCaret } from '../shared/caret';
 import { renderNodes } from './tree-select-dom';
 import type { TreeView, VisibleRow } from './tree-select-dom';
 import type { TreeSelectNode } from './tree-select-types';
@@ -44,6 +47,11 @@ import './tree-select-strings';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tree-select';
+// The trigger is the cascader's (`.pdx-cascader-trigger`), whose rules are in cascader.css: without
+// this import, an app that renders a tree-select and no cascader did not load them. Its caret is
+// shared with pdx-select and pdx-cascader (#1461).
+import '@pdxui/design/components/cascader';
+import '@pdxui/design/components/caret';
 
 // The node shape an app builds in TypeScript (`import type { TreeSelectNode } from '@pdxui/ui/tree-select'`).
 export type { TreeSelectNode } from './tree-select-types';
@@ -501,10 +509,7 @@ onNextFrame(() => {
     triggerEl.appendChild(clearEl);
   }
 
-  const icon = document.createElement('span');
-  icon.className = 'pdx-cascader-icon';
-  icon.textContent = '▾';
-  triggerEl.appendChild(icon);
+  triggerEl.appendChild(createCaret('pdx-cascader-icon'));
   el.appendChild(triggerEl);
 
   panelEl = document.createElement('div');

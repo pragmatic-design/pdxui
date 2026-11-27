@@ -201,6 +201,8 @@ import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/select';
+// The trigger's caret, shared with pdx-cascader and pdx-tree-select (#1461).
+import '@pdxui/design/components/caret';
 // The multi-select's tags are drawn with .pdx-chip, which chip.css owns.
 import '@pdxui/design/components/chip';
 

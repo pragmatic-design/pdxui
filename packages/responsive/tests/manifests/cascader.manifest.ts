@@ -84,7 +84,8 @@ export const cascader: ComponentManifest = {
     tag: 'pdx-cascader',
     tier: '3',
     status: 'wip',
-    imports: ['@pdxui/ui/cascader'],
+    // The select and the tree-select for the caret-parity scenario, which measures the three side by side.
+    imports: ['@pdxui/ui/cascader', '@pdxui/ui/select', '@pdxui/ui/tree-select'],
 
     // ── Scenarios ──
     scenarios: [
@@ -141,6 +142,19 @@ export const cascader: ComponentManifest = {
                 </pdx-cascader>`,
         },
         {
+            // The caret of the three pickers of a value, side by side (#1461): the cascader's and the
+            // tree-select's were a ▾ text glyph no theme's font carries, a few pixels of fallback ink
+            // beside pdx-select's SVG chevron. A theme sizes the caret on `.pdx-select-caret`, so the
+            // three are compared in each theme rather than against one number.
+            id: 'cascader-caret-parity',
+            title: 'Cascader — its caret beside the select\'s and the tree-select\'s',
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-select data-test="par-sel" value="it" options='[{"value":"it","label":"Italy"}]'></pdx-select>
+                ${FRAME_CASC('par-casc')}
+                <pdx-tree-select data-test="par-ts" value="it" options='[{"value":"it","label":"Italy"}]'></pdx-tree-select>
+            </div>`,
+        },
+        {
             id: 'cascader-frame-tokens',
             title: "Cascader — the text input's frame tokens, set on one element",
             html: `<div style="display: grid; gap: 12px; width: 320px;">
@@ -153,6 +167,23 @@ export const cascader: ComponentManifest = {
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'cascader-caret-parity': {
+                composition: [{
+                    description: 'the cascader\'s and the tree-select\'s caret are the select\'s box, in every theme',
+                    parent: 'body',
+                    children: {
+                        sel: 'section:not([hidden]) [data-test="par-sel"] .pdx-select-caret',
+                        casc: 'section:not([hidden]) [data-test="par-casc"] [data-part="root"] > :last-child',
+                        ts: 'section:not([hidden]) [data-test="par-ts"] [data-part="root"] > :last-child',
+                    },
+                    relations: [
+                        { description: 'cascader caret width', left: 'casc.width', op: '==', right: 'sel.width', tolerance: 1 },
+                        { description: 'cascader caret height', left: 'casc.height', op: '==', right: 'sel.height', tolerance: 1 },
+                        { description: 'tree-select caret width', left: 'ts.width', op: '==', right: 'sel.width', tolerance: 1 },
+                        { description: 'tree-select caret height', left: 'ts.height', op: '==', right: 'sel.height', tolerance: 1 },
+                    ],
+                }],
+            },
             'cascader-frame-tokens': {
                 composition: [{
                     description: '--pdx-input-min-height on the element makes its frame taller than the cascader beside it',
