@@ -17,6 +17,7 @@ runs from the repository root; the outputs are from one run on the `pilot-mount`
 | `tree.mjs <profile> <root> [minMs] [depth]` | the top-down call tree from a function, merged by function |
 | `callers.mjs <profile> <fn> [depth]` | bottom-up: the caller chains a function's self time is spent under |
 | `compare.mjs <action> <dirA> <dirB> […] [--samples <n>]` | several builds of one page, timed alternated in one run |
+| `compare-pairs.mjs <action> <base> <candidate> [--couples <n>] [--cpu <rate>]` | two builds timed as the port spec times a row on CI: fresh pages in couples of both orders |
 | `detached.mjs <dir> [tag …] [--mounts <n>]` | detached elements each component leaves alive after its removal ([Memory](#memory)) |
 | `retainers.mjs <dir> <tag> [paths] [--mounts <n>]` | the strong reference chains that keep a removed component alive |
 | `heap-diff.mjs <dir> <tag> [rounds]` | the kinds of object that grow between two heap snapshots of a tag's mounts |
@@ -165,6 +166,29 @@ packages/showcase/scenarios/dist/perf/pilot-pdx     97.50 ms  1.07×
 **A ratio is read only against a baseline timed in the same run**: two runs of the same pair move by
 about 10% against each other. To estimate a change before writing it, copy an unminified build, patch
 the copy's bundle by hand, and compare the copy with the build it was copied from.
+
+## compare-pairs.mjs
+
+```
+node packages/showcase/tools/perf/compare-pairs.mjs mount:pdx-fieldset,1000 <base dir> <candidate dir> [--couples 4] [--cpu 4]
+```
+
+Two builds timed as `scenario-port-mount.spec.ts` times a row on CI, with its own arithmetic
+(`tests/port-ratio.ts`, imported as it is: Node 22.18 or later strips its types). Each pair is two
+fresh pages, warmed up with 3 calls each. Pairs come in couples, one opened candidate first and one base
+first. Inside a pair the samples alternate, read in turns of two. The ratio is the median of the
+couples, candidate over base, and each couple's ratio is printed beside it.
+
+`compare.mjs` keeps one page per build for the whole run, and the page opened first reads slower:
+the same build read 1.28× and then 0.995× against itself, and reversing the order flipped the sign
+(#1280). With this tool, on one Windows machine (#1287):
+
+```
+mount:pdx-badge,1000: 4 couples; candidate / base = 0.99 (couples 0.994, 0.987, 1.018, 0.964)       — the same build on both sides
+mount:pdx-fieldset,1000: 4 couples; candidate / base = 1.30 (couples 1.278, 1.296, 1.318, 1.299)    — a declarative fieldset before #1275 against the TypeScript one
+```
+
+A change worth a few per cent is read here, not with `compare.mjs`.
 
 Neither a component's mount nor a pilot row is held to a recording: `scenario-component-mount.spec.ts`
 mounts each tag on `main`'s build beside this tree's (#950), and `scenario-pilot-mount.spec.ts` mounts `main`'s
