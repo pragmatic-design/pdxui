@@ -32,14 +32,15 @@ export function scriptIconNames(script: string): string[] {
     return names;
 }
 
-type IconResolver = Pick<ComponentResolver, 'iconImport' | 'iconPropsOf' | 'resolve'>;
+type IconResolver = Pick<ComponentResolver, 'iconImport' | 'iconPropsOf' | 'iconDefiner'>;
 
 /**
  * The lines that put on the page the icons `markup` names: each icon's module imported (it is data,
- * its SVG as the default export) and handed to `defineIcons`, which pdx-icon's module exports.
- * Nothing when the markup names no icon of a published set, or when no package provides pdx-icon.
+ * its SVG as the default export) and handed to `defineIcons`, which the icon map's module exports —
+ * not pdx-icon's, so the icons need no component to be registered (#1264). Nothing when the markup
+ * names no icon of a published set, or when no package publishes the map.
  *
- *     import { defineIcons as __pdxDefineIcons } from '@pdxui/ui/icon/pdx-icon';
+ *     import { defineIcons as __pdxDefineIcons } from '@pdxui/ui/icon/icon-map';
  *     import __pdxIcon0 from '@pdxui/ui/icons/check';
  *     __pdxDefineIcons({ "check": __pdxIcon0 });
  */
@@ -50,7 +51,7 @@ export function iconImportLines(markup: string, resolver: IconResolver, script =
         const path = resolver.iconImport(name);
         if (path && !icons.some(i => i.name === name)) icons.push({ name, path });
     }
-    const definer = resolver.resolve('pdx-icon')?.importPath;
+    const definer = resolver.iconDefiner();
     if (icons.length === 0 || !definer) return [];
     return [
         `import { defineIcons as __pdxDefineIcons } from ${JSON.stringify(definer)};`,

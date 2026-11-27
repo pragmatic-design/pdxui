@@ -75,6 +75,8 @@ export class ComponentResolver {
     private listeners = new ProjectListeners();
     /** The icons a component package publishes one module each (`./icons/*`): name → import path. */
     private icons = new Map<string, string>();
+    /** The module that owns the icon map and exports `defineIcons` (`./icon/icon-map`), from the package that publishes the icons. */
+    private iconDefinerPath: string | null = null;
     private _collisions: ValidationWarning[] = [];
     /** The component packages that registered something, in order. */
     private _packages: string[] = [];
@@ -358,6 +360,15 @@ export class ComponentResolver {
     }
 
     /**
+     * The module whose `defineIcons` puts an imported icon on the page (`@pdxui/ui/icon/icon-map`),
+     * published by the package that publishes the icons, or null when none does. The map's module, not
+     * pdx-icon's (#1264): registering the icons a page imports needs no component.
+     */
+    iconDefiner(): string | null {
+        return this.iconDefinerPath;
+    }
+
+    /**
      * The component packages the project depends on (see `componentPackages`): each one's manifest
      * → tag→import map, plus each component's settable props and prop enums. Returns how many
      * components it registered.
@@ -473,6 +484,8 @@ export class ComponentResolver {
     private _registerIconModules(pkg: ComponentPackage, exportsMap: Record<string, unknown>): void {
         const def = exportsMap['./icons/*'];
         if (!def) return;
+        // The map the icons are handed to travels with them: the first package that publishes both owns it.
+        if (!this.iconDefinerPath && exportsMap['./icon/icon-map']) this.iconDefinerPath = `${pkg.name}/icon/icon-map`;
         for (const target of exportTargets(def)) {
             // Match: a target pattern `dir/*.ext`. Groups: [1]=dir [2]=extension. `.d.ts` is types, not code.
             const m = target.match(/^(.*)\/\*(\.(?:js|mjs|ts))$/);

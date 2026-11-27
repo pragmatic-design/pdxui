@@ -710,7 +710,7 @@ export function injectComponentImports(
     }
 
     // Resolve imports for used tags, then for the icons the markup names (#47): one module each,
-    // handed to pdx-icon's `defineIcons`.
+    // handed to the icon map's `defineIcons` (#1264).
     const imports = [
         ...resolver.resolveImports(Array.from(usedTags), compiledCode, currentFile),
         ...iconImportLines(outsideDefer, resolver, scriptContent),
