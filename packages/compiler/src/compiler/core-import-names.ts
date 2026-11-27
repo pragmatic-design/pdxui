@@ -45,3 +45,16 @@ export function coreRuntimeNames(flatImport: string): string[] {
     if (names === null) return [];
     return names.split(',').map(n => n.trim()).filter(n => n && !/^type\s/.test(n));
 }
+
+/**
+ * The local name the script binds core's `untracked` to, given its core import specifiers
+ * (`coreRuntimeNames`): `untracked`, or `u` for `untracked as u`. Undefined when it does not import it.
+ */
+export function coreUntrackedName(specifiers: readonly string[]): string | undefined {
+    for (const spec of specifiers) {
+        // Match: `untracked`, or `untracked as local`. Groups: [1]=the local name, when aliased
+        const m = /^untracked(?:\s+as\s+([\w$]+))?$/.exec(spec);
+        if (m) return m[1] ?? 'untracked';
+    }
+    return undefined;
+}

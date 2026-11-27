@@ -17,6 +17,7 @@ import { arrowOf, jsQuote, jsString } from './js-literal';
 import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 import { splitUnion } from './model-options';
 import { escapeForRegExp } from './regexp-escape';
+import { coreUntrackedName } from './core-import-names';
 
 // ─── Public API ────────────────────────────────────────────────────
 
@@ -280,12 +281,15 @@ export function buildSetupBody(
     // @state name; (#1436): an assignment to its binding sets the state, `ctx.state('name', !!(on))` —
     // binding → state, `atTop` → `at-top` (#1441).
     const setStateNames = new Map(analysis.states.flatMap(s => s.binding !== undefined ? [[s.binding, s.name] as const] : []));
+    // The local name of core's `untracked`, when the script imports it (`untracked as u` too):
+    // `untracked(() => x)` is `x.peek()` (#1287).
+    const untrackedName = coreUntrackedName(analysis.coreImportNames);
 
     // Helper: rewrite signals (__name / .set) and callables (name()) in one AST pass. Declared
     // before the first statement that uses it: the sets above are consts, and a call ahead of them
     // would be in their temporal dead zone.
     function rewriteAll(code: string): string {
-        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink, false, setStateNames);
+        return rewriteAst(code, signalNames, callableNames, filename, undefined, sink, false, setStateNames, untrackedName);
     }
 
     // @fetch declarations → resource() calls with HttpClient
@@ -548,7 +552,7 @@ export function buildSetupBody(
                     }
                     offset += line.length + 1; // +1 for the '\n'
                 }
-                const rewritten = rewriteAst(setupBody, signalNames, callableNames, filename, protectedRanges, sink, false, setStateNames);
+                const rewritten = rewriteAst(setupBody, signalNames, callableNames, filename, protectedRanges, sink, false, setStateNames, untrackedName);
                 bodyCode = indent(rewritten.split(RAW_MARKER).join(''), 4);
             } else {
                 const rewrittenLines = setupBody.split('\n').map(line =>

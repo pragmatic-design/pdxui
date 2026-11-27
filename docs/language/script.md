@@ -72,6 +72,7 @@ every `@provide` value. A `$signal` named `count` lives in the module as `__coun
 | `{ count }` (shorthand property) | `{ count: __count() }` |
 | `total` (a prop or a `$derived`, read) | `total()` |
 | `total.peek()` (a prop or a `$derived`) | `total.peek()` — its own `peek`, the value untracked, as on a `$signal` (#676) |
+| `untracked(() => count)`, `untracked(() => total)` (core's `untracked`, imported by the script) | `__count.peek()`, `total.peek()` — the same value, read with no closure handed to `untracked` (#1287); any other body is left to `untracked` |
 
 An assignment stores its value; an update (`++`, `--` and the arithmetic and bitwise compound
 operators) computes the new value from the old one. So a `$signal` holds a function as it holds any
