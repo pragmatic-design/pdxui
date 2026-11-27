@@ -101,6 +101,45 @@ describe('expanding', () => {
         expect(byLabel(el, 'src').getAttribute('aria-expanded')).toBe('true');
     });
 
+    // An expand or a collapse updates the tree in place (#1462): it rebuilt every visible row, so the
+    // row just opened was a new element at its final rotation, and its arrow never animated.
+    it('opens a branch in place: the rows stay the same elements, and its group follows its row', async () => {
+        const el = await mount({});
+        const src = byLabel(el, 'src');
+        const readme = byLabel(el, 'README.md');
+        src.click();
+        await new Promise(r => requestAnimationFrame(() => r(null)));
+        expect(byLabel(el, 'src'), 'the opened row was built again').toBe(src);
+        expect(byLabel(el, 'README.md'), 'a sibling row was built again').toBe(readme);
+        const group = src.nextElementSibling as HTMLElement;
+        expect(group.getAttribute('role')).toBe('group');
+        expect(group.querySelector('[role="treeitem"]')?.getAttribute('aria-level')).toBe('2');
+        expect(group.nextElementSibling).toBe(readme);
+    });
+
+    it('closes a branch in place: its group goes, its row and the others stay', async () => {
+        const el = await mount({ defaultExpandAll: true });
+        const src = byLabel(el, 'src');
+        const readme = byLabel(el, 'README.md');
+        src.click();
+        await new Promise(r => requestAnimationFrame(() => r(null)));
+        expect(byLabel(el, 'src')).toBe(src);
+        expect(byLabel(el, 'README.md')).toBe(readme);
+        expect(src.getAttribute('aria-expanded')).toBe('false');
+        expect(src.nextElementSibling).toBe(readme);
+        expect(items(el).length).toBe(2);
+    });
+
+    it('closing a branch that holds the tab stop moves it to the branch', async () => {
+        const el = await mount({ defaultExpandAll: true });
+        const home = byLabel(el, 'home.pdx');
+        for (const r of items(el)) (r as HTMLElement).tabIndex = -1;
+        home.tabIndex = 0;
+        byLabel(el, 'src').click();
+        await new Promise(r => requestAnimationFrame(() => r(null)));
+        expect(items(el).filter(r => (r as HTMLElement).tabIndex === 0)).toEqual([byLabel(el, 'src')]);
+    });
+
     it('emits pdx-expand with the node and the new state', async () => {
         const el = await mount({});
         const seen: unknown[] = [];

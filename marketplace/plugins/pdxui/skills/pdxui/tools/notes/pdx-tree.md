@@ -8,7 +8,7 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 - Ids come out as strings: `pdx-select` and `pdx-check` carry `String(node[idField])`, so `7` arrives as `"7"`.
 - `pdx-check` lists the leaves and the fully-checked branches; a mixed parent is not in it.
 - No prop holds the selection or the checks: you learn them from the events.
-- It is not virtualized, and every expand or collapse rebuilds the visible rows; a select or a check
+- It is not virtualized. An expand or a collapse inserts or removes that branch's rows in place; a select or a check
   only marks again the rows on screen.
 
 **Composes with** — its `node` snippet, `@snippet node(node, level, expanded) { … }`, for a custom

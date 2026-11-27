@@ -214,12 +214,18 @@ function findNode(id: string): TreeNode | null {
 
 // ─── Expanding ──────────────────────────────────────────
 
+// An expand or a collapse changes the tree IN PLACE (#1462): the row's aria-expanded, and its group
+// inserted after it or removed. It rebuilt every visible row, so the row just opened was a new element
+// born at its final rotation — the twisty's transition had nothing to run from — and every row that
+// had not changed was thrown away and made again, its hover and its `node` snippet's DOM with it.
+// `rebuild()` stays for what changes the whole tree: the nodes, the mode, the label.
+
 async function toggle(n: TreeNode): Promise<void> {
   const id = idOf(n);
   if (expanded.has(id)) {
     expanded.delete(id);
     pdxExpand({ id, expanded: false });
-    rebuild();
+    closeInPlace(id);
     return;
   }
 
@@ -228,7 +234,7 @@ async function toggle(n: TreeNode): Promise<void> {
   if (needsLoad) {
     if (loadingIds.has(id)) return;
     loadingIds.add(id);
-    rebuild();
+    markBusy(id, true);
     try {
       loaded.set(id, await loader(n));
     } catch (error) {
@@ -236,15 +242,90 @@ async function toggle(n: TreeNode): Promise<void> {
       // retry, and the app never hears about it either.
       loadingIds.delete(id);
       pdxLoadError({ id, error });
-      rebuild();
+      markBusy(id, false);
       return;
     }
     loadingIds.delete(id);
+    markBusy(id, false);
+    // The loaded children are new nodes: the index is built again when next asked.
+    byId = null;
+    states = null;
   }
 
   expanded.add(id);
   pdxExpand({ id, expanded: true });
-  rebuild();
+  openInPlace(n);
+}
+
+/** The row of node `id` on screen, or null when it is not drawn (inside a closed branch). */
+function rowOf(id: string): HTMLElement | null {
+  if (!rootEl) return null;
+  for (const row of rowsOnScreen()) if (row.dataset.nodeId === id) return row;
+  return null;
+}
+
+/** Mark the row of `id` as loading or not, and the tree busy while any branch is (A4). */
+function markBusy(id: string, busy: boolean): void {
+  const row = rowOf(id);
+  if (row) {
+    if (busy) row.setAttribute('aria-busy', 'true');
+    else row.removeAttribute('aria-busy');
+  }
+  const any = loadingIds.size > 0;
+  loading = any;
+  if (any) rootEl?.setAttribute('aria-busy', 'true');
+  else rootEl?.removeAttribute('aria-busy');
+}
+
+/** Open the drawn row of `n`: aria-expanded, and its children's group right after it. */
+function openInPlace(n: TreeNode): void {
+  const row = rowOf(idOf(n));
+  if (!row) { rebuild(); return; }
+  row.setAttribute('aria-expanded', 'true');
+  const group = buildGroup(n, Number(row.getAttribute('aria-level')) + 1);
+  if (group) row.after(group);
+}
+
+/**
+ * Close the drawn row of `id`: aria-expanded, and its group removed. The tab stop inside the group
+ * moves to the row, or the tree would have no tab stop left.
+ */
+function closeInPlace(id: string): void {
+  const row = rowOf(id);
+  if (!row) { rebuild(); return; }
+  row.setAttribute('aria-expanded', 'false');
+  const group = row.nextElementSibling as HTMLElement | null;
+  if (!group || group.getAttribute('role') !== 'group') return;
+  const held = group.querySelector<HTMLElement>('[role="treeitem"][tabindex="0"]');
+  const hadFocus = group.contains(document.activeElement);
+  group.remove();
+  if (held || hadFocus) {
+    row.tabIndex = 0;
+    if (hadFocus) row.focus();
+  }
+}
+
+/** The `role="group"` of an open branch's children at `level`, or null when it has none. */
+function buildGroup(n: TreeNode, level: number): HTMLElement | null {
+  const kids = childrenOf(n) ?? [];
+  if (kids.length === 0) return null;
+  const groupEl = document.createElement('div');
+  groupEl.className = 'pdx-tree-group';
+  groupEl.dataset.part = 'group';
+  groupEl.setAttribute('role', 'group');
+  renderRows(kids, level, groupEl);
+  return groupEl;
+}
+
+/** The rows of `list` at `level` into `into`, each open branch followed by its group. */
+function renderRows(list: TreeNode[], level: number, into: HTMLElement): void {
+  list.forEach((n, i) => {
+    into.appendChild(buildRow(n, level, i + 1, list.length));
+    if (expanded.has(idOf(n))) {
+      const group = buildGroup(n, level + 1);
+      if (group) into.appendChild(group);
+    }
+  });
 }
 
 // ─── Selecting ──────────────────────────────────────────
@@ -390,22 +471,7 @@ function rebuild(): void {
   if (busy) rootEl.setAttribute('aria-busy', 'true');
   else rootEl.removeAttribute('aria-busy');
 
-  const render = (list: TreeNode[], level: number, into: HTMLElement) => {
-    list.forEach((n, i) => {
-      into.appendChild(buildRow(n, level, i + 1, list.length));
-      if (expanded.has(idOf(n))) {
-        const kids = childrenOf(n) ?? [];
-        if (kids.length === 0) return;
-        const groupEl = document.createElement('div');
-        groupEl.className = 'pdx-tree-group';
-        groupEl.dataset.part = 'group';
-        groupEl.setAttribute('role', 'group');
-        render(kids, level + 1, groupEl);
-        into.appendChild(groupEl);
-      }
-    });
-  };
-  render(nodes as TreeNode[], 1, rootEl);
+  renderRows(nodes as TreeNode[], 1, rootEl);
 
   // One tab stop for the tree, wherever the focus was: 500 nodes must not be 500 stops.
   const rows = Array.from(rootEl.querySelectorAll<HTMLElement>('[role="treeitem"]'));
