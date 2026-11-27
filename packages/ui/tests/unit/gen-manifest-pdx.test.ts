@@ -33,8 +33,19 @@ describe('a .pdx component in the manifest, against its TypeScript version', () 
         expect(declarationOf('src/select/pdx-select.pdx').map((d) => d.tagName)).toEqual(['pdx-select']);
     });
 
+    // The control: a TypeScript component is read as before. The library has none left (#1454), and an
+    // application may still write one with core's component(), so the reader is held on a source here.
     it('the control: a TypeScript component is read as before', () => {
-        expect(declarationOf('src/form-template/pdx-form-template.ts').map((d) => d.tagName)).toEqual(['pdx-form-template']);
+        const source = [
+            "import { component, prop, html } from '@pdxui/core';",
+            "component('pdx-probe', {",
+            "    props: { label: prop('') },",
+            '    render: () => html`<span></span>`,',
+            '});',
+        ].join('\n');
+        const mods = analyzeFile('src/probe/pdx-probe.ts', source, {}) as Module[];
+        expect(mods.map((m) => m.declarations[0].tagName)).toEqual(['pdx-probe']);
+        expect(mods[0].path).toBe('src/probe/pdx-probe.ts');
     });
 });
 

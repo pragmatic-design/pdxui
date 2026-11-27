@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-template/pdx-form-template';
+import '../../src/form-template/pdx-form-template.pdx';
 
 const schema = {
     layout: 'wizard',

@@ -85,20 +85,18 @@ describe('component definition', () => {
         expect(resolveComponentDefinition('pdx-nope', manifest, [])).toBeNull();
     });
 
-    it('jumps to the actual declaration LINE in the real source (not line 0)', () => {
-        // A library component still in TypeScript (#1210 moves the library to .pdx). pdx-affix,
-        // pdx-breadcrumb, then pdx-wizard were this component until they moved; pdx-form-template is
-        // the last (#1454). The file must exist: a moved one would leave the jump nowhere to land.
-        const root = join(__dirname, '..', '..', '..');
-        const filePath = join(root, 'packages', 'ui', 'src', 'form-template', 'pdx-form-template.ts');
-        expect(existsSync(filePath), `${filePath} moved to .pdx: name another component still in TypeScript`).toBe(true);
-        const real = new Map([['pdx-form-template', { ...button, tag: 'pdx-form-template', filePath }]]);
-        // tag → its component('pdx-form-template' call, past the file's header
-        const tagLoc = resolveComponentDefinition('pdx-form-template', real, []);
-        expect(tagLoc!.range.start.line).toBeGreaterThan(0);
-        // member → the `showActions:` field, on a later line than the component declaration
-        const memberLoc = resolveComponentDefinition('pdx-form-template', real, [], 'showActions');
-        expect(memberLoc!.range.start.line).toBeGreaterThan(tagLoc!.range.start.line);
+    it('jumps to the actual declaration LINE in a TypeScript component (not line 0)', () => {
+        // An application's component written with component(). The library's were this file until
+        // they all moved to .pdx (#1210, #1454); a fixture keeps the case without depending on one.
+        const filePath = join(__dirname, 'fixtures', 'ts-component', 'pdx-probe.ts');
+        expect(existsSync(filePath), `${filePath} is missing`).toBe(true);
+        const real = new Map([['pdx-probe', { ...button, tag: 'pdx-probe', filePath }]]);
+        // tag → its component('pdx-probe' call, past the file's header
+        const tagLoc = resolveComponentDefinition('pdx-probe', real, []);
+        expect(tagLoc!.range.start.line).toBe(6);
+        // member → the `linear:` field, on a later line than the component declaration
+        const memberLoc = resolveComponentDefinition('pdx-probe', real, [], 'linear');
+        expect(memberLoc!.range.start.line).toBe(9);
     });
 
     it('in a library component written in .pdx, a member jumps to its declaration line (#1210)', () => {

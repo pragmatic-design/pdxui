@@ -1,0 +1,403 @@
+<template>
+  <pdx-form data-part="form" :form="currentForm ?? form" :autocomplete="autocomplete" :formClass="formClass"
+    @pdx-submit="relaySubmit" @pdx-submit-error="relaySubmit">
+    <div class="pdx-form-template-content" data-part="content"></div>
+    @if (!wizardLayout) {
+      <slot name="actions">
+        @if (showActions) { <pdx-form-actions></pdx-form-actions> }
+      </slot>
+    }
+  </pdx-form>
+</template>
+
+<script>
+/**
+ * Renders a complete form from a FormSchema: each field type gets its control, validators run from
+ * the schema and sections become fieldsets. With `layout: 'wizard'` the sections are the steps of a
+ * `pdx-wizard`, and a step with an error is not left.
+ *
+ * @slot actions - Replaces the default actions (the `pdx-form-actions` shown when `showActions`). Not rendered in the wizard layout, which has its own navigation.
+ *
+ * @csspart form - The inner `pdx-form`.
+ * @csspart content - The box the generated fields go in.
+ * @csspart fields - The fields outside any section.
+ * @csspart section - A section's `<fieldset>`, outside the wizard layout.
+ * @csspart wizard - The `pdx-wizard` of the wizard layout; its panels are its `panel` parts.
+ */
+// pdx-form-template — Schema-driven form generator.
+// Takes a FormSchema (JSON) and renders a complete form with:
+//   - Correct pdx-* controls per field type
+//   - Form sections (collapsible fieldsets)
+//   - Grid layout (CSS grid with configurable columns)
+//   - Conditional visibility (reactive, based on form values)
+//   - Validators from schema
+//
+// Usage:
+//   <pdx-form-template :schema="mySchema" />
+//   <pdx-form-template :schema="mySchema" :form="existingForm" />
+//
+// The fields are built by form-template-fields.ts, in a frame after each schema or form, into the
+// content box; their containers' parts are on those elements (#1284).
+import { effect, createFormFromSchema, evaluateVisibility, formField, formFieldNames, generatedId } from '@pdxui/core';
+import type { Form, FormSchema, FormFieldSchema, FormSectionSchema } from '@pdxui/core';
+import { createFieldElement } from './form-template-fields';
+import './form-template-strings';
+// Self-contained: a schema can render ANY field control, so register the full form graph here (the
+// structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
+// — and everything composing it (edit-drawer, entity-grid, auto-form) — work outside the barrel.
+import '../form/pdx-form.pdx';
+import '../form-field/pdx-form-field.pdx';
+import '../form-actions/pdx-form-actions.pdx';
+import '../field-group/pdx-field-group.pdx';
+import '../field-list/pdx-field-list.pdx';
+import '../input/pdx-input.pdx';
+import '../textarea/pdx-textarea.pdx';
+import '../password-input/pdx-password-input.pdx';
+import '../search-input/pdx-search-input.pdx';
+import '../masked-input/pdx-masked-input.pdx';
+import '../number-input/pdx-number-input.pdx';
+import '../date-picker/pdx-date-picker.pdx';
+import '../select/pdx-select.pdx';
+import '../autocomplete/pdx-autocomplete.pdx';
+import '../checkbox/pdx-checkbox.pdx';
+import '../checkbox-group/pdx-checkbox-group.pdx';
+import '../radio/pdx-radio.pdx';
+import '../radio-group/pdx-radio-group.pdx';
+import '../switch-toggle/pdx-switch.pdx';
+import '../toggle/pdx-toggle.pdx';
+import '../segmented/pdx-segmented.pdx';
+import '../slider/pdx-slider.pdx';
+import '../rating/pdx-rating.pdx';
+import '../color-picker/pdx-color-picker.pdx';
+import '../file-upload/pdx-file-upload.pdx';
+import '../tag-input/pdx-tag-input.pdx';
+import '../otp-input/pdx-otp-input.pdx';
+import '../wizard/pdx-wizard.pdx';
+// This component's styles live in form.css — written where the
+// container is rather than where the component is. Imported explicitly so they travel anyway.
+import '@pdxui/design/components/form';
+
+// The inner pdx-form's, dispatched again from the host, where the app listens (#138).
+/** The form submitted and its values validate; an invalid submit fires nothing and scrolls to the first error. */
+@event 'pdx-submit': { values: Record<string, unknown>; saved?: boolean };
+/** The form's `source` refused the save. */
+@event 'pdx-submit-error': { error: unknown };
+// pdx-ignore PDX_PART_NAME_TAKEN: `form` is the theme's part on the inner pdx-form; the script's `form` is the prop
+@part form, content;
+@part(external) fields, section, wizard;
+@slot actions;
+
+/** FormSchema defining fields, sections, layout. */
+@prop schema: Record<string, unknown> | null = null;
+/** Optional pre-existing Form instance. If not provided, one is created from schema. */
+@prop form: Record<string, unknown> | null = null;
+/** HTML autocomplete attribute for the generated form. */
+@prop autocomplete: string = 'off';
+/** CSS class applied to the generated form. */
+@prop formClass: string = '';
+/** Show default submit/reset buttons. Override via slot="actions". */
+@prop showActions: boolean = true;
+
+@host el;
+
+// The navigation verbs of the library (#289), through the wizard and its gate: `next()`, `prev()`,
+// `goTo(n)`, each false when it did not move; and the form.
+@expose getForm, next, prev, goTo;
+
+// Resolve or create form from schema. An effect + a signal instead of a computed:
+// the factory inside a computed would create a NEW form on every recomputation without
+// ever disposing the previous one (orphaned timers/field arrays).
+let currentForm = $signal<Form<Record<string, unknown>> | null>(null);
+// Wizard manages its own navigation — the default actions are not rendered.
+const wizardLayout = $derived((schema as FormSchema | null)?.layout === 'wizard');
+$effect(() => {
+  const provided = form as Form<Record<string, unknown>> | null;
+  const s = schema as FormSchema | null;
+  const created = provided ? null : (s ? createFormFromSchema(s) : null);
+  currentForm = provided ?? created;
+  // Cleanup (on re-run and on destroy): ONLY the form we created is disposed.
+  return () => { created?.dispose(); };
+});
+
+// Build field visibility map (reactive)
+function isFieldVisible(field: FormFieldSchema): boolean {
+  if (!field.visibleWhen) return true;
+  const f = currentForm;
+  if (!f) return true;
+  return evaluateVisibility(field.visibleWhen, f.getValues());
+}
+
+// Get layout style — supports per-section override
+function layoutStyle(sectionOverride?: FormSectionSchema | null): string {
+  const s = schema as FormSchema | null;
+  if (!s) return '';
+  const layout = sectionOverride?.layout ?? s.layout ?? 'stack';
+  const cols = sectionOverride?.columns ?? s.columns ?? 12;
+  if (layout === 'grid') {
+    return `display: grid; grid-template-columns: repeat(${cols}, 1fr); gap: var(--pdx-space-md);`;
+  }
+  if (layout === 'horizontal') {
+    return 'display: flex; flex-wrap: wrap; gap: var(--pdx-space-md);';
+  }
+  return ''; // stack = default vertical
+}
+
+// Group fields by section
+function getFieldsBySection(): { section: FormSectionSchema | null; fields: FormFieldSchema[] }[] {
+  const s = schema as FormSchema | null;
+  if (!s) return [];
+
+  const sections = s.sections ?? [];
+  if (sections.length === 0) {
+    return [{ section: null, fields: s.fields }];
+  }
+
+  const groups: { section: FormSectionSchema | null; fields: FormFieldSchema[] }[] = [];
+  const sectionMap = new Map<string, FormFieldSchema[]>();
+  const unsectioned: FormFieldSchema[] = [];
+
+  for (const sec of sections) sectionMap.set(sec.name, []);
+  for (const f of s.fields) {
+    if (f.section && sectionMap.has(f.section)) {
+      sectionMap.get(f.section)!.push(f);
+    } else {
+      unsectioned.push(f);
+    }
+  }
+
+  if (unsectioned.length > 0) {
+    groups.push({ section: null, fields: unsectioned });
+  }
+  for (const sec of sections) {
+    const fields = sectionMap.get(sec.name) ?? [];
+    if (fields.length > 0) groups.push({ section: sec, fields });
+  }
+
+  return groups;
+}
+
+/** The ids a collapsible section's toggle points at, apart for two templates on one page. */
+const uid = generatedId('pdx-form-template');
+
+// ─── Wizard layout: a pdx-wizard (#293) ──────────────────
+// One stepper in the library: the wizard draws the steps, marks the current one
+// aria-current="step" and says «Step n of N» (A6). This component only refuses a move forward
+// from a step with an error.
+type Wizard = HTMLElement & { value: number; goTo(n: number): boolean; next(): boolean; prev(): boolean };
+let wizardEl: Wizard | null = null;
+/** A forward move this component validated, let through when the wizard asks again. */
+let allowed = -1;
+
+// Expand a step's schema fields to the leaf paths that are fields of the form.
+// A group/list field ('address', 'items') has NO own entry — the form is keyed by leaves
+// ('address.street', 'items.0.qty'), so an `f.name` lookup would silently skip them and
+// the gate would pass with invalid data.
+function stepLeafPaths(fields: FormFieldSchema[], f: Form<Record<string, unknown>>): string[] {
+  const keys = formFieldNames(f);
+  const paths: string[] = [];
+  for (const field of fields) {
+    if (field.type === 'group' || field.type === 'list') {
+      for (const k of keys) {
+        if (k === field.name || k.startsWith(field.name + '.')) paths.push(k);
+      }
+    } else {
+      paths.push(field.name);
+    }
+  }
+  return paths;
+}
+
+/** Whether the step at `index` has no error, its fields touched so the errors show. */
+async function stepValid(index: number): Promise<boolean> {
+  const group = getFieldsBySection()[index];
+  const f = currentForm;
+  if (!group || !f) return true;
+  const paths = stepLeafPaths(group.fields, f);
+  // Touch step fields so their errors become visible.
+  for (const p of paths) formField(f, p)?.onBlur();
+  // Await validation so ASYNC validators resolve before we read errors — reading
+  // field.error() synchronously right after onBlur would miss them.
+  await f.validate();
+  return !paths.some(p => !!formField(f, p)?.error());
+}
+
+// Move the wizard to `target`, through the gate: forward only once the current step is valid.
+// False when it did not move — an error on the step, or a step the wizard cannot reach.
+async function moveTo(target: number): Promise<boolean> {
+  const w = wizardEl;
+  if (!w) return false;
+  const from = w.value;
+  if (target > from && !(await stepValid(from))) return false;
+  allowed = target;
+  const moved = w.goTo(target);
+  allowed = -1;
+  return moved;
+}
+
+/**
+ * The wizard's cancellable `pdx-before-change` (#289): a move forward is held while the step it
+ * leaves is validated, and made again once it passes. Back is never held.
+ */
+function onBeforeChange(e: Event): void {
+  const { value, previous } = (e as CustomEvent<{ value: number; previous: number }>).detail;
+  if (value <= previous || value === allowed) return;
+  e.preventDefault();
+  void moveTo(value);
+}
+
+/** The last step's button: its step validated, the form submits as a form does. */
+async function onComplete(): Promise<void> {
+  const w = wizardEl;
+  if (!w || !(await stepValid(w.value))) return;
+  el.querySelector('form')?.requestSubmit();
+}
+
+/** The Form the template renders: the `form` prop, or the one created from the schema. */
+function getForm() {
+  return currentForm;
+}
+
+/** The next step, once the current one is valid. A promise: the validation may be async. */
+function next() {
+  return moveTo((wizardEl?.value ?? 0) + 1);
+}
+
+/** The previous step; never held. */
+function prev() {
+  return wizardEl?.prev() ?? false;
+}
+
+/** A step by index; forward only once the current step is valid. */
+function goTo(n: number) {
+  return moveTo(n);
+}
+
+// ─── Imperative rendering ────────────────────────────────
+const disposeVisibility: (() => void)[] = [];
+
+$effect(() => {
+  const s = schema as FormSchema | null;
+  const f = currentForm;
+  if (!s || !f) return;
+
+  // Cleanup previous visibility effects
+  for (const d of disposeVisibility) d();
+  disposeVisibility.length = 0;
+
+  requestAnimationFrame(() => {
+    const container = el.querySelector('.pdx-form-template-content');
+    if (!container) return;
+
+    // Clear previous content
+    container.innerHTML = '';
+
+    const groups = getFieldsBySection();
+
+    // The wizard layout: one pdx-wizard, a panel per section. It is built with the
+    // fields, once per schema and form; the wizard moves between its panels itself.
+    const isWizard = s.layout === 'wizard' && groups.length > 1;
+    wizardEl = null;
+    if (isWizard) {
+      const wizard = document.createElement('pdx-wizard') as Wizard;
+      wizard.setAttribute('data-part', 'wizard');
+      wizard.addEventListener('pdx-before-change', onBeforeChange);
+      wizard.addEventListener('pdx-complete', () => { void onComplete(); });
+      container.appendChild(wizard);
+      wizardEl = wizard;
+    }
+
+    for (let gi = 0; gi < groups.length; gi++) {
+      const group = groups[gi];
+
+      let sectionEl: HTMLElement;
+
+      if (group.section && !isWizard) {
+        // Standard section with fieldset
+        const fieldset = document.createElement('fieldset');
+        fieldset.className = 'pdx-form-section';
+        fieldset.setAttribute('data-part', 'section');
+
+        const legend = document.createElement('legend');
+        legend.className = 'pdx-form-section-legend';
+        const sectionContent = document.createElement('div');
+
+        if (group.section.collapsible) {
+          // The disclosure pattern (#847): a real button in the legend, which Tab reaches and
+          // Enter and Space press, naming the content it shows and hides. A legend with
+          // role="button" and a click listener was skipped by Tab.
+          fieldset.classList.add('pdx-form-section-collapsible');
+          sectionContent.id = `${uid}-section-${gi}`;
+          const toggle = document.createElement('button');
+          toggle.type = 'button';
+          toggle.className = 'pdx-form-section-toggle';
+          toggle.textContent = group.section.label;
+          toggle.setAttribute('aria-expanded', group.section.collapsed ? 'false' : 'true');
+          toggle.setAttribute('aria-controls', sectionContent.id);
+          toggle.addEventListener('click', () => {
+            const isHidden = sectionContent.hidden;
+            sectionContent.hidden = !isHidden;
+            toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            fieldset.classList.toggle('collapsed', !isHidden);
+          });
+          legend.appendChild(toggle);
+        } else {
+          legend.textContent = group.section.label;
+        }
+
+        fieldset.appendChild(legend);
+
+        sectionContent.className = 'pdx-form-section-content';
+        sectionContent.style.cssText = layoutStyle(group.section);
+        if (group.section.collapsed) {
+          sectionContent.hidden = true;
+          fieldset.classList.add('collapsed');
+        }
+        fieldset.appendChild(sectionContent);
+
+        sectionEl = sectionContent;
+        container.appendChild(fieldset);
+      } else if (wizardEl) {
+        // A step of the wizard: its panel, labelled with the section.
+        sectionEl = document.createElement('div');
+        sectionEl.className = 'pdx-wizard-step-content';
+        sectionEl.setAttribute('data-wizard-step', '');
+        sectionEl.setAttribute('data-label', group.section?.label ?? `${gi + 1}`);
+        sectionEl.style.cssText = layoutStyle(group.section);
+        wizardEl.appendChild(sectionEl);
+      } else {
+        // Unsectioned fields
+        sectionEl = document.createElement('div');
+        sectionEl.className = 'pdx-form-template-fields';
+        sectionEl.setAttribute('data-part', 'fields');
+        sectionEl.style.cssText = layoutStyle(group.section);
+        container.appendChild(sectionEl);
+      }
+
+      const totalCols = group.section?.columns ?? s.columns ?? 12;
+      for (const field of group.fields) {
+        const fieldWrapper = createFieldElement(field, f, totalCols);
+        sectionEl.appendChild(fieldWrapper);
+
+        // Reactive visibility
+        if (field.visibleWhen) {
+          const dispose = effect(() => {
+            const visible = isFieldVisible(field);
+            fieldWrapper.hidden = !visible;
+            fieldWrapper.style.display = visible ? '' : 'none';
+          });
+          disposeVisibility.push(dispose);
+        }
+      }
+    }
+
+  });
+});
+
+// The inner pdx-form's submit stays on it (#138): the template dispatches it again from its
+// host, which is where the app listens.
+function relaySubmit(e: Event) {
+  const detail = (e as CustomEvent).detail;
+  if (e.type === 'pdx-submit') pdxSubmit(detail);
+  else pdxSubmitError(detail);
+}
+</script>

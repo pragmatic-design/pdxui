@@ -130,6 +130,7 @@ const PORTED: Record<string, string> = {
     'pdx-toolbar': 'src/toolbar/pdx-toolbar.pdx',
     'pdx-tooltip':'src/tooltip/pdx-tooltip.pdx',
     'pdx-wizard': 'src/wizard/pdx-wizard.pdx',
+    'pdx-form-template': 'src/form-template/pdx-form-template.pdx',
     // Its own module since its move (#1210): it was a second component() in pdx-toggle.ts.
     'pdx-toggle-group': 'src/toggle-group/pdx-toggle-group.pdx',
 };
