@@ -54,6 +54,8 @@ const elementProviders = new WeakMap<HTMLElement, Map<Context<unknown>, unknown>
  * provided signal is writable by whoever injects it.
  */
 export function provide<T>(token: Context<T>, value: T, host?: HTMLElement): void {
+    // A lookup that missed may find this one: the misses kept for this task are forgotten (#1287).
+    misses.clear();
     if (host) {
         let map = elementProviders.get(host);
         if (!map) { map = new Map(); elementProviders.set(host, map); }
@@ -98,11 +100,28 @@ function _parentOrHost(el: Element): HTMLElement | null {
 }
 
 /**
+ * The lookups that found no provider, element → tokens, kept until the microtask after the first one
+ * (#1287). A miss walks every ancestor and sends the protocol's request; `pdx-form-actions` outside a
+ * form asked five times at mount, 4 µs per instance. Within one synchronous mount the ancestors do not
+ * change, so the next lookup of the same token from the same element skips both. A `provide` forgets
+ * them at once, and the next task looks again: a handler sees a provider attached since. Strong
+ * references, held for one microtask: the first miss into an empty map schedules the clear.
+ */
+const misses = new Map<HTMLElement, Set<Context<unknown>>>();
+
+function rememberMiss(from: HTMLElement, key: Context<unknown>): void {
+    const tokens = misses.get(from);
+    if (tokens) { tokens.add(key); return; }
+    if (misses.size === 0) queueMicrotask(() => misses.clear());
+    misses.set(from, new Set([key]));
+}
+
+/**
  * Walk up the DOM tree looking for a provider, ask the context protocol from `from`, then fall back
  * to global.
  */
 function _resolve(key: Context<unknown>, from?: HTMLElement): unknown {
-    if (from) {
+    if (from && !misses.get(from)?.has(key)) {
         // 1. PDX providers on the ancestors (DOM-scoped, nearest wins) — shadow-crossing
         let el: HTMLElement | null = _parentOrHost(from);
         while (el) {
@@ -120,6 +139,7 @@ function _resolve(key: Context<unknown>, from?: HTMLElement): unknown {
         request.subscribe = false;
         from.dispatchEvent(request);
         if (answer !== undefined) return answer;
+        rememberMiss(from, key);
     }
     // 3. Global fallback
     if (globalRegistry.has(key)) return globalRegistry.get(key);
