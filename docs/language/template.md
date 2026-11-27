@@ -1460,6 +1460,11 @@ ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
 #### Semantics
 
 `defer({ trigger, when, prefetch, prefetchWhen, placeholder, loading, error }, loadFn, () => …)`.
+A block whose only triggers are `when (…)`, with no `@placeholder`, `@loading`, `@error` or
+`; prefetch`, is `deferWhen(() => cond, loadFn, () => …)` (#1287): the same rules for that trigger —
+the first time it holds, never removed by it, code that has arrived rendered in the same task, a
+failed load rendering nothing — without the rest of `defer()`. On the server and when hydrating it is
+`defer()`, which both read.
 The block has two phases (#281). The triggers before `;` start the **render**: the body is mounted, and
 its code is loaded first if it has not been. The triggers after `prefetch` start only the **load**: the
 code is fetched and kept, and nothing is rendered. Without `; prefetch` the two start together.

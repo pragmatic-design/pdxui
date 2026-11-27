@@ -25,7 +25,7 @@ import { hasNativeProperty } from './native-properties';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { arrowOf, jsQuote, jsString } from './js-literal';
-import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
+import { deferTriggerOptions, hydrateTriggerOptions, onlyWhenCondition } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey, withRowValue } from './codegen-constant-bindings';
 import { isTextExpression } from './codegen-text-bindings';
@@ -1319,9 +1319,15 @@ class InlineGen {
     }
 
     deferN(node: DeferNode): void {
-        this.imports.add('defer');
         const { code: body, tags: created } = this.block(node.body);
-        const opts = deferTriggerOptions(node.trigger, (e) => callSignals(prefixCtx(e, this.ctx), this.ctx), true);
+        const expr = (e: string) => callSignals(prefixCtx(e, this.ctx), this.ctx);
+        // A block whose only trigger is a `when`, with no placeholder, loading or error, is core's
+        // deferWhen, which carries none of what defer() has for the rest (#1287). defer() is what the
+        // server and a hydration read, so they keep it.
+        const whenOnly = this.ctx.ssr || this.ctx.hydrate || node.placeholder || node.loading || node.error
+            ? null : onlyWhenCondition(node.trigger, expr);
+        this.imports.add(whenOnly ? 'deferWhen' : 'defer');
+        const opts = whenOnly ? [] : deferTriggerOptions(node.trigger, expr, true);
         if (node.placeholder) opts.push(`placeholder:()=>{${this.sub(node.placeholder)}}`);
         if (node.loading) opts.push(`loading:()=>{${this.sub(node.loading)}}`);
         if (node.error) {
@@ -1345,7 +1351,9 @@ class InlineGen {
             load = `__code${n}`;
         }
         const cf = this.v('cf');
-        this.out(`const ${cf}=defer({${opts.join(',')}},${load},()=>{${body}});`);
+        this.out(whenOnly
+            ? `const ${cf}=deferWhen(${whenOnly},${load},()=>{${body}});`
+            : `const ${cf}=defer({${opts.join(',')}},${load},()=>{${body}});`);
         this.place(cf);
     }
 

@@ -92,6 +92,18 @@ export function deferTriggerOptions(raw: string, expr: (source: string) => strin
 }
 
 /**
+ * When `@defer ( … )` holds only `when (…)` triggers — no built-in trigger, no unknown one, no
+ * `; prefetch` — the condition that fires it, as defer() would read it: the first that holds
+ * (#1287). Such a block, with no placeholder, loading or error either, is core's `deferWhen`. Null
+ * for any other.
+ */
+export function onlyWhenCondition(raw: string, expr: (source: string) => string): string | null {
+    const t = parseDeferTriggers(raw);
+    if (t.render.when.length === 0 || t.render.triggers.length > 0 || t.unknown.length > 0 || t.prefetch) return null;
+    return `()=>${t.render.when.map((e) => `(${expr(e)})`).join(' || ')}`;
+}
+
+/**
  * The trigger options of `hydrateOn()` (#160, part 4d): `@defer`'s render phase, `trigger` and
  * `when`. A `@hydrate` loads nothing, so it has no `; prefetch` — reported as not a trigger.
  */

@@ -7,6 +7,7 @@ export { when, whenBlock, each, eachDestructured, eachRow, match, pipe, show, po
 export { whenChain } from './when-chain';
 export { enter, exit, injectTransitionCSS, flipAnimate, recordPositions, listAnimation, blockAnimation } from './transitions';
 export { defer } from './defer';
+export { deferWhen } from './defer-when';
 export { deferCode } from './defer-code';
 export type { TransitionOptions } from './helpers';
 export type { DeferOptions, DeferState } from './defer';
