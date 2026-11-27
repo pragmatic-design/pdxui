@@ -614,7 +614,10 @@ element or `null`.
 - A part whose name nothing reads — not the script (outside `@part`), not a `@host` value, not a
   template expression — has no ref (#1268): no signal and no binding at mount. It keeps its
   `data-part`, its descriptor entry, its manifest entry and its diagnostics. Most parts are only a
-  theme's and a test's, and the ref was a signal at every mount for nothing.
+  theme's and a test's, and the ref was a signal at every mount for nothing. A name a local, a
+  parameter, a destructured binding or a `catch` declares is that variable, in its scope: reading it
+  there is no read of the part (#1287) — `const input = inputEl` beside `@part input` keeps no ref.
+  What the compiler cannot place in a scope, a name on a rune line among them, stays a read.
 - The parts an `@internal` view draws are the parts of the component that imports it (#1110): that
   component declares them, its manifest lists them, and a part only a view draws is not
   `PDX_PART_MISSING`. The view declares none, and a `data-part` it draws that its owner does not declare
