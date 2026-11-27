@@ -182,6 +182,7 @@ export type { TweenConfig, TweenSignal } from './renderer/tween';
 
 // Defer (lazy loading)
 export { defer } from './renderer/defer';
+export { deferWhen } from './renderer/defer-when';
 export { deferCode, type DeferCode } from './renderer/defer-code';
 export type { DeferOptions, DeferState } from './renderer/defer';
 export { hydrateOn, type HydrateOnOptions } from './renderer/hydrate-on';

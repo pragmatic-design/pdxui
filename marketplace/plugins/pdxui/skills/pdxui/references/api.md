@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-506 value exports.
+507 value exports.
 
 ### `__adoptStyles`
 
@@ -1829,6 +1829,17 @@ function deferCode(load: () => Promise<unknown>): DeferCode
 ```
 
 `load`, run at most once until it fails, and known to have arrived once it has.
+
+### `deferWhen`
+
+```ts
+import { deferWhen } from '@pdxui/core';
+
+function deferWhen(when: () => unknown, code: DeferCode | null, render: () => Node | DocumentFragment): DocumentFragment
+```
+
+A block that renders `render()` before its end marker the first time `when()` is truthy, once `code`
+— the block's components, or null when it has none — has arrived.
 
 ### `define`
 

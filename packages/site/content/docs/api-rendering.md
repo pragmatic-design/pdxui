@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 92 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 93 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -492,6 +492,17 @@ function deferCode(load: () => Promise<unknown>): DeferCode
 ```
 
 `load`, run at most once until it fails, and known to have arrived once it has.
+
+## `deferWhen`
+
+```ts
+import { deferWhen } from '@pdxui/core';
+
+function deferWhen(when: () => unknown, code: DeferCode | null, render: () => Node | DocumentFragment): DocumentFragment
+```
+
+A block that renders `render()` before its end marker the first time `when()` is truthy, once `code`
+— the block's components, or null when it has none — has arrived.
 
 ## `delegate`
 
