@@ -9,6 +9,7 @@ import { nodesBetween } from './helpers';
 import type { Dispose } from '../utils/types';
 import { isDeferring, deferredBlock } from './deferred-block';
 import { snippetContent } from './snippet';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * Render the snippet `source()` returns, called with `args()`, between two markers: again whenever the
@@ -23,9 +24,9 @@ export function renderSnippet(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.snippet(source, args, fallback));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('snippet');
-    const end = document.createComment('/snippet');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('snippet');
+    const end = blockDocument().createComment('/snippet');
     frag.appendChild(start);
     frag.appendChild(end);
     followSnippet(start, end, source, args, fallback, null);

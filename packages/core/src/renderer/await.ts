@@ -17,6 +17,7 @@ import { nodesBetween } from './helpers';
 import { errorBoundary } from './error-boundary';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
+import { blockDocument } from '../utils/block-document';
 
 /** `@await`'s `maxMs` ran out with no result. The source is not cancelled; a later result replaces it. */
 export class AwaitTimeoutError extends Error {
@@ -139,9 +140,9 @@ export function awaitBlock<T = unknown>(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.await(source, thenFn, loadingFn, errorFn, options));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('await');
-    const end = document.createComment('/await');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('await');
+    const end = blockDocument().createComment('/await');
     frag.appendChild(start);
     frag.appendChild(end);
     followAwait(start, end, source, thenFn, loadingFn, errorFn, options, null);
@@ -220,8 +221,8 @@ export function followAwait<T>(
         if (branch === 'timeout') {
             return errorFn!(new AwaitTimeoutError(maxMs), retry(isSource(current()) ? () => (current() as AsyncSource).refetch?.() : undefined));
         }
-        if (branch === 'loading') return loadingFn?.() ?? document.createComment('await-loading');
-        if (branch === 'pending') return document.createComment('await-pending');
+        if (branch === 'loading') return loadingFn?.() ?? blockDocument().createComment('await-loading');
+        if (branch === 'pending') return blockDocument().createComment('await-pending');
         const o = outcome();
         return errorFn!(branch.error, retry(o.kind === 'error' ? o.refetch : undefined));
     };

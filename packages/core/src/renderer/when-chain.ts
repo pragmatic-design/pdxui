@@ -13,6 +13,7 @@ import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * Render the branch `select()` picks — `branches[select()]`, or nothing for an index without one —
@@ -25,9 +26,9 @@ export function whenChain(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.chain(select, branches));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('when');
-    const end = document.createComment('/when');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('when');
+    const end = blockDocument().createComment('/when');
     frag.appendChild(start);
     frag.appendChild(end);
     followChain(start, end, select, branches, null);

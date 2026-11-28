@@ -7,6 +7,7 @@ import { nodesBetween } from './helpers';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
 import { projectedIn, projectKept } from './projected';
+import { blockDocument } from '../utils/block-document';
 
 // A boundary's range is the nodes between its two comments. Marking them lets an error find its
 // boundary through the DOM, which is what encloses a component: the handler stack only covers the
@@ -86,9 +87,9 @@ export function errorBoundary(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.boundary(contentFn, fallbackFn, options));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('error-boundary');
-    const end = document.createComment('/error-boundary');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('error-boundary');
+    const end = blockDocument().createComment('/error-boundary');
     frag.appendChild(start);
     frag.appendChild(end);
     followBoundary(start, end, contentFn, fallbackFn, options, null);

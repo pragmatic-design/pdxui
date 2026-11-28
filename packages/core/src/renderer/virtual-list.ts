@@ -22,6 +22,7 @@ import { ListEmpty } from './list-empty';
 import { DEV } from '../utils/env';
 import { isDeferring, deferredBlock } from './deferred-block';
 import { isPaged, listOf, setSize, implicitRole, rowAttributes, DEFAULT_ESTIMATE, ROW_ROLES, KEY_ROLES, type PagedSource } from './virtual-set';
+import { blockDocument } from '../utils/block-document';
 
 export interface VirtualListOptions {
     /** The estimated row size in px (`@virtual(48)`). Without it, the first rendered row is measured. */
@@ -105,10 +106,10 @@ export function eachVirtual<T>(
     const call: VirtualCall<T> = { items, keyFn, render, options };
     // Rendered to a string or hydrating (#930): the call, for the block visitor that writes or adopts it.
     if (isDeferring()) return deferredBlock((v) => v.virtual<T>(call));
-    const frag = document.createDocumentFragment();
+    const frag = blockDocument().createDocumentFragment();
     const nodes: VirtualNodes = {
-        start: document.createComment('virtual'),
-        end: document.createComment('/virtual'),
+        start: blockDocument().createComment('virtual'),
+        end: blockDocument().createComment('/virtual'),
         before: spacerFor(options),
         after: spacerFor(options),
     };

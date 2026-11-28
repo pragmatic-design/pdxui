@@ -16,14 +16,15 @@ import { placePartNode } from './part-nodes';
 import { trackUrgentLoad } from './load-queue';
 import { DEV } from '../utils/env';
 import type { DeferCode } from './defer-code';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * A block that renders `render()` before its end marker the first time `when()` is truthy, once `code`
  * — the block's components, or null when it has none — has arrived.
  */
 export function deferWhen(when: () => unknown, code: DeferCode | null, render: () => Node | DocumentFragment): DocumentFragment {
-    const frag = document.createDocumentFragment();
-    const end = document.createComment('/defer');
+    const frag = blockDocument().createDocumentFragment();
+    const end = blockDocument().createComment('/defer');
     frag.appendChild(end);
     const ready = signal(false);
     let fired = false;

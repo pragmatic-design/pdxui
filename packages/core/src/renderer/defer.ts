@@ -9,6 +9,7 @@ import { DEV } from '../utils/env';
 import { trackUrgentLoad, queuePrefetch } from './load-queue';
 import type { DeferCode } from './defer-code';
 import { isDeferring, deferredBlock } from './deferred-block';
+import { blockDocument } from '../utils/block-document';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -65,9 +66,9 @@ export function defer(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.defer(options, loadFn, renderFn));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('defer');
-    const end = document.createComment('/defer');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('defer');
+    const end = blockDocument().createComment('/defer');
     frag.appendChild(start);
     frag.appendChild(end);
     followDefer(start, end, options, loadFn, renderFn, null);

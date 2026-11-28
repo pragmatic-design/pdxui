@@ -8,6 +8,7 @@
 // hydrated end as the same nodes.
 
 import { isDeferring, deferredBlock } from './deferred-block';
+import { blockDocument } from '../utils/block-document';
 
 /** When the part is taken over: the triggers of `@defer`, as `@defer` reads them. */
 export interface HydrateOnOptions {
@@ -21,9 +22,9 @@ export interface HydrateOnOptions {
 export function hydrateOn(options: HydrateOnOptions, renderFn: () => Node | DocumentFragment): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes or adopts the block.
     if (isDeferring()) return deferredBlock((v) => v.hydrateOn(options, renderFn));
-    const frag = document.createDocumentFragment();
-    frag.appendChild(document.createComment('hydrate'));
+    const frag = blockDocument().createDocumentFragment();
+    frag.appendChild(blockDocument().createComment('hydrate'));
     frag.appendChild(renderFn());
-    frag.appendChild(document.createComment('/hydrate'));
+    frag.appendChild(blockDocument().createComment('/hydrate'));
     return frag;
 }

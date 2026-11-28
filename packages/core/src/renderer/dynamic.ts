@@ -5,6 +5,7 @@ import { effect, onDispose } from '../reactivity/signal';
 import { enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
+import { blockDocument } from '../utils/block-document';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -40,9 +41,9 @@ export function dynamic(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.dynamic(tagFn, propsFn, options));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('dynamic');
-    const end = document.createComment('/dynamic');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('dynamic');
+    const end = blockDocument().createComment('/dynamic');
     frag.appendChild(start);
     frag.appendChild(end);
     followDynamic(end, tagFn, propsFn, options, null);

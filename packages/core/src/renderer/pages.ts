@@ -10,6 +10,7 @@
 //   })}
 
 import { effect } from '../reactivity/signal';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * Render one page at a time, caching previous pages (keep-alive).
@@ -23,8 +24,8 @@ export function pages<K extends string>(
     activePage: () => K,
     pageMap: Record<K, () => Node | DocumentFragment>,
 ): DocumentFragment {
-    const frag = document.createDocumentFragment();
-    const container = document.createElement('div');
+    const frag = blockDocument().createDocumentFragment();
+    const container = blockDocument().createElement('div');
     container.style.display = 'contents'; // transparent wrapper
     frag.appendChild(container);
 
