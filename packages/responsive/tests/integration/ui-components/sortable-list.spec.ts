@@ -169,6 +169,46 @@ test.describe('pdx-sortable-list, reordered from the keyboard in a real browser'
         expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe('Reorder Alpha');
     });
 
+    // The rows are keyed (#1481): the application's write moves the row that was dropped, the same node,
+    // and its handle has the focus again — a browser drops the focus of a node it moves, which happy-dom
+    // does not, so it is asserted here.
+    test('the application applies the drop: the same row moves, and its handle keeps the focus', async ({ page }) => {
+        await open(page);
+        await page.evaluate(() => {
+            const list = document.querySelector('section:not([hidden]) pdx-sortable-list') as HTMLElement & { items: unknown[] };
+            (window as unknown as { __alpha: Element | null }).__alpha = list.querySelector('.pdx-sortable-item');
+            list.addEventListener('pdx-reorder', (e) => {
+                const { from, to } = (e as CustomEvent<{ from: number; to: number }>).detail;
+                const next = [...list.items];
+                next.splice(to, 0, ...next.splice(from, 1));
+                list.items = next;
+            });
+        });
+        await handle(page, 0).focus();
+        await page.keyboard.press('Space');
+        await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('Space');
+
+        await expect.poll(() => rowLabels(page)).toEqual(['Bravo', 'Alpha', 'Charlie']);
+        expect(await page.evaluate(() => {
+            const rows = document.querySelectorAll('section:not([hidden]) pdx-sortable-list .pdx-sortable-item');
+            return rows[1] === (window as unknown as { __alpha: Element | null }).__alpha;
+        }), 'the dropped row was drawn again').toBe(true);
+        await expect.poll(() => page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe('Reorder Alpha');
+    });
+
+    test('a drop the application refuses leaves the rows as they were', async ({ page }) => {
+        await open(page);
+        await handle(page, 0).focus();
+        await page.keyboard.press('Space');
+        await page.keyboard.press('ArrowDown');
+        await page.keyboard.press('Space');
+
+        expect(await page.evaluate(() => window.__sortable.reorders)).toEqual([{ from: 0, to: 1, id: 'a' }]);
+        // Nothing applied it: the list reads as its items still do.
+        expect(await rowLabels(page)).toEqual(LABELS);
+    });
+
     test('what a screen reader is told is a position, not an index', async ({ page }) => {
         await open(page);
         await handle(page, 0).focus();
