@@ -13,6 +13,7 @@ import type { ListAnimation, BlockAnimation } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * Collect every node currently between two markers (exclusive). Used for teardown so that
@@ -87,9 +88,9 @@ export function whenBlock(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.when(condition, thenFn, elseFn, options));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('when');
-    const end = document.createComment('/when');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('when');
+    const end = blockDocument().createComment('/when');
     frag.appendChild(start);
     frag.appendChild(end);
     followWhen(start, end, condition, thenFn, elseFn, options, null);
@@ -295,9 +296,9 @@ export function match<T extends string | number>(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.match(value, cases));
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('match');
-    const end = document.createComment('/match');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('match');
+    const end = blockDocument().createComment('/match');
     frag.appendChild(start);
     frag.appendChild(end);
     followMatch(start, end, value, cases, null);
@@ -370,7 +371,7 @@ export function show(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.show(condition, content));
-    const frag = document.createDocumentFragment();
+    const frag = blockDocument().createDocumentFragment();
     const nodes = content instanceof DocumentFragment
         ? Array.from(content.childNodes)
         : [content];
@@ -381,7 +382,7 @@ export function show(
     // place, and swapped back when shown (#265). It holds no state, so detaching it is safe; an
     // element keeps its node and takes display:none, so its state, focus and component survive.
     const placeholders = new Map<Text, Comment>();
-    for (const n of nodes) if (n instanceof Text) placeholders.set(n, document.createComment('show'));
+    for (const n of nodes) if (n instanceof Text) placeholders.set(n, n.ownerDocument.createComment('show'));
     showNodes(nodes, condition, placeholders);
     return frag;
 }
@@ -435,8 +436,8 @@ export function portal(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.portal(contentFn, target, options));
-    const frag = document.createDocumentFragment();
-    const marker = document.createComment('portal');
+    const frag = blockDocument().createDocumentFragment();
+    const marker = blockDocument().createComment('portal');
     frag.appendChild(marker);
 
     // The target may appear AFTER the mount (an async route/layout): without a retry

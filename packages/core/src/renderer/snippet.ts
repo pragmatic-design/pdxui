@@ -6,6 +6,7 @@
 // `@if` that becomes true later renders like anything else there.
 
 import type { SlotFunction } from './slot';
+import { blockDocument } from '../utils/block-document';
 
 /**
  * The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
@@ -22,7 +23,7 @@ export function declaredSnippet(
     const declared = typeof c[name] === 'function' ? (c[name] as () => unknown)() : undefined;
     if (typeof declared !== 'function') return undefined;
     const snippet = declared as (...a: readonly unknown[]) => Node | null | undefined;
-    return (scope) => snippet(...args(scope)) ?? document.createDocumentFragment();
+    return (scope) => snippet(...args(scope)) ?? blockDocument().createDocumentFragment();
 }
 
 /** What a snippet renders: `fn` called with `values` when it is a function, else the fallback or nothing. */

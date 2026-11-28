@@ -43,7 +43,7 @@ export function projectKept(content: Node, kept: Node[]): Node {
     // A content that is the slot itself has no parent to replace it in: a fragment gives it one.
     let root = content;
     if (content instanceof Element && content.localName === 'slot') {
-        root = document.createDocumentFragment();
+        root = content.ownerDocument.createDocumentFragment();
         root.appendChild(content);
     }
     if (!(root instanceof Element || root instanceof DocumentFragment)) return root;

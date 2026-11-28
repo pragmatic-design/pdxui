@@ -543,7 +543,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // chunks now imports by one more statement (+18 to +35 B each). +1051 B over 472 files against 471;
 // blocking falls 103.1 → 102.5. 486.0 KB measured locally against 484.9 on main; the entry unchanged
 // at 43.7.
-const BUDGET_KB = { entry: 43.7, js: 486.0, css: 67, blocking: 103.1 };
+// entry 43.7 → 43.8 (the owner's OK, on #1287): the block helpers make their fragment and markers in
+// the inert document a block's copy lives in (`blockDocument()`), so an `@if` no longer moves its
+// content into the page's document and back before the component is appended. +22 B gzip in the
+// entry chunk (44737 → 44759 B at level 9), which holds when/match/repeat; the whole js −94 B. On CI,
+// pdx-form-template mounted 1.10× → 0.75× its TypeScript version, pdx-wizard 1.02× → 0.87×.
+const BUDGET_KB = { entry: 43.8, js: 486.0, css: 67, blocking: 103.1 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -13,6 +13,7 @@ import { isDeferring, deferredBlock } from './deferred-block';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
 import type { ListEmpty } from './list-empty';
+import { blockDocument } from '../utils/block-document';
 
 export { LIST_SLICE_THRESHOLD };
 
@@ -152,9 +153,9 @@ export function mountList<T>(
 ): DocumentFragment {
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.list(items, keyFn, renderer, options));
-    const frag = document.createDocumentFragment();
-    const startMarker = document.createComment('repeat-start');
-    const endMarker = document.createComment('repeat-end');
+    const frag = blockDocument().createDocumentFragment();
+    const startMarker = blockDocument().createComment('repeat-start');
+    const endMarker = blockDocument().createComment('repeat-end');
     frag.appendChild(startMarker);
     frag.appendChild(endMarker);
     followList(startMarker, endMarker, items, keyFn, renderer, options, null);

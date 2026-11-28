@@ -19,6 +19,7 @@ import { joinRequest, leaveRequest, supersedeRequest } from './cache';
 import { isRetryableError, retryDelayMs } from '../http/middleware';
 import { DEV } from '../utils/env';
 import { devTrackSource } from '../debug/devtools-registry';
+import { blockDocument } from '../utils/block-document';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -475,9 +476,9 @@ export function resourceWhen<T>(
     res: Resource<T>,
     handlers: ResourceHandlers<T>,
 ): DocumentFragment {
-    const frag = document.createDocumentFragment();
-    const start = document.createComment('resource');
-    const end = document.createComment('/resource');
+    const frag = blockDocument().createDocumentFragment();
+    const start = blockDocument().createComment('resource');
+    const end = blockDocument().createComment('/resource');
     frag.appendChild(start);
     frag.appendChild(end);
 

@@ -70,7 +70,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         const nodes: Node[] = [];
         for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(byPlaceholder.get(n) ?? n);
         const placeholders = new Map<Text, Comment>(hidden);
-        for (const n of nodes) if (n instanceof Text && !placeholders.has(n)) placeholders.set(n, document.createComment('show'));
+        for (const n of nodes) if (n instanceof Text && !placeholders.has(n)) placeholders.set(n, n.ownerDocument.createComment('show'));
         showNodes(nodes, condition, placeholders);
         return next;
     },
