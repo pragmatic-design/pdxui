@@ -101,7 +101,9 @@ export interface SortableA11yOptions {
      * consumer whose rows carry focus or state, and for one whose tests read the DOM rather than a
      * transform. `<pdx-sortable-list>` is that consumer: its handle is a real button, the focus
      * travels inside the node, and a row that is visually somewhere else and structurally where it
-     * was is a row a screen reader reads in the wrong order.
+     * was is a row a screen reader reads in the wrong order. A drop or a cancel puts the node back
+     * where it was lifted from, so the list matches `items` until the consumer writes the move
+     * `onReorder` hands it (#1481).
      */
     preview?: 'transform' | 'reorder';
     /** A class carried by the lifted element for as long as it is lifted. Default: none. */
@@ -346,15 +348,17 @@ export function useSortable<T = unknown>(
     }
 
     /**
-     * End the lift. `restore` puts the item back where it started — Escape, and nothing else.
+     * End the lift: the list is put back as `items` describes it, a drop and a cancel alike.
      *
-     * A drop does NOT restore: the item stays where the arrows left it, and the consumer's
-     * `onReorder` makes that real.
+     * `reorder` moved the node itself, so it goes back to where it was lifted from, keeping the focus
+     * (#1481). A drop then hands the indices to `onReorder`, and the consumer's write moves the row:
+     * left where the arrows put it, a keyed list — which does not read the DOM back — showed an order
+     * its items did not have whenever the consumer refused the move.
      */
-    function endLift(restore: boolean): void {
+    function endLift(): void {
         if (liftedFrom < 0) return;
         if (preview === 'reorder') {
-            if (restore && liftedAt !== liftedFrom) moveNode(liftedAt, liftedFrom);
+            if (liftedAt !== liftedFrom) moveNode(liftedAt, liftedFrom);
         } else {
             for (const child of getChildren()) {
                 child.style.transform = '';
@@ -394,7 +398,7 @@ export function useSortable<T = unknown>(
             const start = liftedFrom;
             const end = liftedAt;
             say('dropped', end);
-            endLift(false);
+            endLift();
             if (start !== end) options.onReorder(start, end);
             return;
         }
@@ -405,7 +409,7 @@ export function useSortable<T = unknown>(
             // the lift.
             e.stopPropagation();
             say('cancelled', liftedAt);
-            endLift(true);
+            endLift();
             return;
         }
 

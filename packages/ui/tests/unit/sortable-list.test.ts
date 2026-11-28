@@ -222,6 +222,57 @@ describe('pdx-sortable-list keeps the focus across the rebuild', () => {
     });
 });
 
+// The rows are a keyed @for (#1481): a reorder the application applies moves the rows it has, an item
+// added leaves the others alone, and a drop the application refuses leaves the rows as `items` says.
+// Rebuilt, a row lost what it holds — the focus, a snippet's input with what was typed in it — and
+// every row was drawn again for one that moved.
+describe('pdx-sortable-list keeps its row nodes', () => {
+    const rowEls = (el: HTMLElement): Element[] => [...el.querySelectorAll('.pdx-sortable-item')];
+    /** Identity, not shape: `toEqual` takes a rebuilt row as the same. */
+    const same = (now: Element[], kept: Element[]) => now.map((r, i) => r === kept[i]);
+
+    it('a reorder the application applies moves the rows, it does not draw them again', async () => {
+        const { el, events } = await mount();
+        const before = rowEls(el);
+        const h = handles(el)[0];
+        press(h, ' ');
+        press(h, 'ArrowDown');
+        press(h, ' ');
+        const { from, to } = events[0];
+        const next = ROWS.map((r) => ({ ...r }));
+        next.splice(to, 0, ...next.splice(from, 1));
+        (el as unknown as { items: unknown[] }).items = next;
+        await tick(30);
+
+        expect(labels(el)).toEqual(['Bravo', 'Alpha', 'Charlie', 'Delta']);
+        expect(same(rowEls(el), [before[1], before[0], before[2], before[3]]), 'the rows were drawn again').toEqual([true, true, true, true]);
+    });
+
+    it('an item added draws one row and keeps the others', async () => {
+        const { el } = await mount();
+        const before = rowEls(el);
+        (el as unknown as { items: unknown[] }).items = [...ROWS.map((r) => ({ ...r })), { id: 'e', label: 'Echo' }];
+        await tick(30);
+
+        expect(labels(el)).toEqual(['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo']);
+        expect(same(rowEls(el).slice(0, 4), before), 'the rows already there were drawn again').toEqual([true, true, true, true]);
+    });
+
+    it('a drop the application refuses leaves the rows in the order of items', async () => {
+        const { el, events } = await mount();
+        const h = handles(el)[0];
+        press(h, ' ');
+        press(h, 'ArrowDown');
+        press(h, ' ');
+        expect(events).toEqual([{ from: 0, to: 1, id: 'a' }]);
+        // The application refuses: it writes the same order back.
+        (el as unknown as { items: unknown[] }).items = ROWS.map((r) => ({ ...r }));
+        await tick(30);
+
+        expect(labels(el), 'the refused move stayed in the DOM').toEqual(['Alpha', 'Bravo', 'Charlie', 'Delta']);
+    });
+});
+
 describe('pdx-sortable-list renders what the caller gives it', () => {
     it('falls back to the index when the items have no label field', async () => {
         const { el } = await mount([{ id: 1 }, { id: 2 }]);

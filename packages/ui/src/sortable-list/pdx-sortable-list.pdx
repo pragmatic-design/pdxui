@@ -1,4 +1,20 @@
-<template></template>
+<template>
+  @if (built) {
+    <div class="pdx-sr-only" :id="helpId">{{ uiString('sortable-list', 'instructions') }}</div>
+    <ul class="pdx-sortable-list" data-part="list" role="list" attach:sortableRows>
+      @for (rows() as it, index; track idOf(it, index)) {
+        <li class="pdx-sortable-item" data-part="item" :data-pdx-key="String(idOf(it, index))">
+          <button type="button" class="pdx-sortable-handle" data-part="handle"
+            :tabindex="index === tabRow() ? 0 : -1"
+            :aria-roledescription="uiString('sortable-list', 'draggable')" :aria-describedby="helpId"
+            :aria-label="format(uiString('sortable-list', 'reorder'), { label: labelOf(it, index) })"
+            :aria-disabled="disabled ? 'true' : null"><span class="pdx-sortable-grip"></span></button>
+          <div class="pdx-sortable-body" data-part="body">@render item?.(it, index) @else {{{ labelOf(it, index) }}}</div>
+        </li>
+      }
+    </ul>
+  }
+</template>
 
 <script>
 /**
@@ -39,12 +55,12 @@
 // the app's language, the strings come from `uiString`, and `labelOf` reads the ITEM rather than
 // the row's text. Those travel as `a11y` options; the state machine does not.
 //
-// Its DOM is built by the script, a frame after mount, as the TypeScript version built it: during a
-// keyboard lift `useSortable` moves the row nodes itself (`preview: 'reorder'`), and a drop leaves
-// them where they went.
-import { useSortable, useRovingTabindex, onDestroy, onNextFrame, generatedId, untracked } from '@pdxui/core';
-import type { Dispose } from '@pdxui/core';
-import { uiString, format, uiAttr } from '../shared/i18n';
+// The rows are a keyed `@for`, drawn a frame after mount (#1481). During a keyboard lift `useSortable`
+// moves the row nodes itself (`preview: 'reorder'`), and a drop puts them back where `items` has them
+// before `pdx-reorder`: the application's write then moves the row, and a write it refuses leaves the
+// list as it was. A row that moved is the same node, with what it holds.
+import { useSortable, useRovingTabindex, onDestroy, onNextFrame, generatedId } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/sortable-list';
@@ -56,8 +72,7 @@ import '@pdxui/design/components/sortable-list';
   axis: { vertical, horizontal } = vertical;
 }
 @state disabled = !!disabled;
-// Every element is built by the script, a frame after mount (#1284).
-@part(external) list, item, handle, body;
+@part list, item, handle, body;
 // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
 @generic T;
 @prop items: T[] = [];
@@ -72,24 +87,22 @@ import '@pdxui/design/components/sortable-list';
 @slot item?: (item: T, index: number);
 /** A row was dropped at another position: `from` and `to` are indices into `items`, `id` the row's `id-field`. The list is not changed: the application moves the item. */
 @event 'pdx-reorder': { from: number; to: number; id: unknown };
-@host el;
-
-let listEl: HTMLElement | null = null;
 const helpId = generatedId('pdx-sortable-help');
-// Kept so they can be disposed. useSortable puts listeners on the DOCUMENT for the duration
-// of a gesture: a host destroyed mid-drag would leave them there, moving nothing, forever.
-const teardown: Dispose[] = [];
-// The list exists: built a frame after mount. A plain flag, so its build does not run the redraw.
-let built = false;
-// Cleared on destroy: a redraw a frame away does not run on a destroyed list, as `ctx.frame` did not.
+// The rows are drawn a frame after mount, as the TypeScript version built them (#1284).
+let built = $signal(false);
+onNextFrame(() => { built = true; });
+// Cleared on destroy: a focus put back a frame away does not run on a destroyed list.
 let alive = true;
+// The id of the row a drop moved, whose handle takes the focus back once the application's write has
+// moved it: a browser drops the focus of a node it moves.
+let refocusId: unknown = undefined;
+// The row whose handle is the list's one Tab stop: the roving tabindex's active one. In the template,
+// so a row drawn later — an item added, the first draw — takes its tabindex with it.
+let activeRow = $signal(0);
 
-// After a rebuild the DOM nodes are new: the handle at this index takes the focus back.
-let refocusIndex = -1;
-
-/** The parent's item snippet, read where the rows draw: one set after mount is the one drawn. */
-function getItemSnippet() {
-  return item;
+/** The Tab stop's row, inside the list as it is now. */
+function tabRow(): number {
+  return Math.min(activeRow as number, Math.max(0, rows().length - 1));
 }
 
 function rows(): unknown[] {
@@ -109,94 +122,35 @@ function idOf(it: unknown, index: number): unknown {
   return (it as Record<string, unknown>)?.[field] ?? index;
 }
 
-function rowEls(): HTMLElement[] {
-  return listEl ? (Array.from(listEl.children) as HTMLElement[]) : [];
-}
-
-// ─── Rendering ─────────────────────────────────────────────────
-
-function buildRow(it: unknown, index: number): HTMLElement {
-  const li = document.createElement('li');
-  li.className = 'pdx-sortable-item';
-  li.dataset.part = 'item';
-  li.dataset.pdxKey = String(idOf(it, index));
-
-  const handleEl = document.createElement('button');
-  handleEl.type = 'button';
-  handleEl.className = 'pdx-sortable-handle';
-  handleEl.dataset.part = 'handle';
-  uiAttr(handleEl, 'aria-roledescription', () => uiString('sortable-list', 'draggable'));
-  handleEl.setAttribute('aria-describedby', helpId);
-  uiAttr(handleEl, 'aria-label', () => format(uiString('sortable-list', 'reorder'), { label: labelOf(it, index) }));
-  if (disabled as boolean) handleEl.setAttribute('aria-disabled', 'true');
-  handleEl.appendChild(document.createElement('span')).className = 'pdx-sortable-grip';
-  li.appendChild(handleEl);
-
-  const bodyEl = document.createElement('div');
-  bodyEl.className = 'pdx-sortable-body';
-  bodyEl.dataset.part = 'body';
-  const snippet = getItemSnippet();
-  if (snippet) bodyEl.appendChild(snippet(it as T, index) ?? document.createDocumentFragment());
-  else bodyEl.textContent = labelOf(it, index);
-  li.appendChild(bodyEl);
-
-  return li;
-}
-
-function rebuild(): void {
-  if (!listEl) return;
-  listEl.replaceChildren(...rows().map(buildRow));
-  if (refocusIndex >= 0) {
-    // A rebuild throws away the node that had the focus. Without this, a keyboard
-    // reorder drops the user back at the top of the page — which is the whole gesture
-    // wasted.
-    rowEls()[refocusIndex]?.querySelector<HTMLElement>('.pdx-sortable-handle')?.focus();
-    refocusIndex = -1;
-  }
-}
-
 // ─── The reorder itself ────────────────────────────────────────
 
 function emitReorder(from: number, to: number): void {
   if (from === to) return;
   const it = rows()[from];
-  refocusIndex = to;
+  refocusId = idOf(it, from);
   pdxReorder({ from, to, id: idOf(it, from) });
 }
 
-// ─── Build ─────────────────────────────────────────────────────
-
-// A frame after mount: a setup a move destroyed does not build again.
-onNextFrame(() => {
+/**
+ * The list's sortable and its roving tabindex, for as long as the list is drawn. useSortable puts
+ * listeners on the DOCUMENT for the duration of a gesture: they go with the list, and so with a host
+ * destroyed mid-drag.
+ */
+function sortableRows(listEl: Element): () => void {
+  const list = listEl as HTMLElement;
   const vertical = (axis as string) !== 'horizontal';
-
-  const help = document.createElement('div');
-  help.id = helpId;
-  help.className = 'pdx-sr-only';
-  help.textContent = uiString('sortable-list', 'instructions');
-  el.appendChild(help);
-
-  listEl = document.createElement('ul');
-  listEl.className = 'pdx-sortable-list';
-  listEl.dataset.part = 'list';
-  listEl.setAttribute('role', 'list');
-  el.appendChild(listEl);
-
-  untracked(() => rebuild());
-
-  const sortable = useSortable(() => listEl, {
-    // The keyboard reorder is the composable's. What travels from
-    // here is only what it cannot know: the item's own label rather than the
-    // row's text, this app's sentences through `uiString`, and the two
-    // presentation choices this component makes — the rows really move, and
-    // the lifted one is marked so the stylesheet can show it.
+  const sortable = useSortable(() => list, {
+    // The keyboard reorder is the composable's. What travels from here is only what it cannot know:
+    // the item's own label rather than the row's text, this app's sentences through `uiString`, and
+    // the two presentation choices this component makes — the rows really move, and the lifted one
+    // is marked so the stylesheet can show it.
     a11y: {
       label: (index) => labelOf(rows()[index], index),
-      // Set on the BUTTON in `buildRow`, where the focus is; on the row as
-      // well it would be announced twice.
+      // Set on the BUTTON in the template, where the focus is; on the row as well it would be
+      // announced twice.
       roleDescription: false,
-      // The component's own help element: one `uiString`, pointed at by
-      // every handle's `aria-describedby`.
+      // The component's own help element: one `uiString`, pointed at by every handle's
+      // `aria-describedby`.
       instructions: false,
       messages: {
         lifted: `${uiString('sortable-list', 'lifted')} ${uiString('sortable-list', 'position')}`,
@@ -213,30 +167,32 @@ onNextFrame(() => {
     handle: (handle as string) || '.pdx-sortable-handle',
     onReorder: emitReorder,
   });
-
-  const roving = useRovingTabindex(() => listEl, {
+  const roving = useRovingTabindex(() => list, {
     orientation: vertical ? 'vertical' : 'horizontal',
     itemSelector: '.pdx-sortable-handle',
     wrap: false,
+    onActiveChange: (_item, index) => { activeRow = index; },
   });
+  return () => { sortable.dispose(); roving.dispose(); };
+}
 
-  teardown.push(sortable.dispose, roving.dispose);
-  built = true;
-});
-
-// The rows redraw a frame after the items, their id or label field, `disabled` or the axis change.
+// A drop's row takes the focus back a frame after the items change, once the keyed list has moved it,
+// unless the focus has gone somewhere else meanwhile.
 $effect(() => {
   void items;
-  void idField;
-  void labelField;
-  void disabled;
-  void axis;
-  if (!built) return;
-  requestAnimationFrame(() => { if (alive) untracked(() => rebuild()); });
+  if (refocusId === undefined) return;
+  const id = refocusId;
+  refocusId = undefined;
+  requestAnimationFrame(() => {
+    if (!alive) return;
+    const active = document.activeElement;
+    if (active && active !== document.body && el.contains(active)) return;
+    const index = rows().findIndex((it, i) => idOf(it, i) === id);
+    const row = el.querySelectorAll<HTMLElement>('.pdx-sortable-item')[index];
+    row?.querySelector<HTMLElement>('.pdx-sortable-handle')?.focus();
+  });
 });
 
-onDestroy(() => {
-  alive = false;
-  for (const dispose of teardown.splice(0)) dispose();
-});
+onDestroy(() => { alive = false; });
+@host el;
 </script>

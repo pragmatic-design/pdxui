@@ -87,6 +87,42 @@ describe('useSortable, from the keyboard', () => {
         s.dispose();
     });
 
+    // A drop leaves the list as `items` still describes it (#1481): the row goes back where it was lifted
+    // from, then `onReorder` hands the indices over, and the application's write moves it. Left where
+    // the arrows put it, a keyed list — which does not read the DOM back — showed an order its items did
+    // not have whenever the application refused the move.
+    it('a drop puts the row back before onReorder, so the list reads as items until the app writes', () => {
+        const { el, rows } = list();
+        const seen: string[][] = [];
+        const s = useSortable(() => el, {
+            items: () => [1, 2, 3, 4],
+            onReorder: () => seen.push(labels(el)),
+            a11y: { preview: 'reorder' },
+        });
+
+        press(rows[0], ' ');
+        press(rows[0], 'ArrowDown');
+        press(rows[0], 'ArrowDown');
+        press(rows[0], ' ');
+        expect(seen, 'onReorder saw the list in the order the arrows left it').toEqual([['Alpha', 'Bravo', 'Charlie', 'Delta']]);
+        expect(labels(el), 'a drop the application did not apply left the rows moved').toEqual(['Alpha', 'Bravo', 'Charlie', 'Delta']);
+        s.dispose();
+    });
+
+    it('the dropped row\'s handle keeps the focus where the row was put back', () => {
+        const { el, rows } = list();
+        const s = useSortable(() => el, {
+            items: () => [1, 2, 3, 4], onReorder: () => {}, a11y: { preview: 'reorder' },
+        });
+        const handle = rows[0].querySelector('button')!;
+        handle.focus();
+        press(rows[0], ' ');
+        press(rows[0], 'ArrowDown');
+        press(rows[0], ' ');
+        expect(document.activeElement, 'the focus left the handle of the row the drop put back').toBe(handle);
+        s.dispose();
+    });
+
     it('Escape puts the row back and reorders nothing', () => {
         const { el, rows } = list();
         const moves: [number, number][] = [];

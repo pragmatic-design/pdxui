@@ -371,7 +371,10 @@ Two of those decide what the lift LOOKS like, and the choice is real:
 - **`preview: 'reorder'`** moves the node, so the list reads in its new order at every step. For a
   row that carries focus or state, and for anything that reads the list rather than looking at it:
   a row displaced by a transform is still, structurally, where it was, and that is the order a
-  screen reader walks. `<pdx-sortable-list>` uses this one.
+  screen reader walks. `<pdx-sortable-list>` uses this one. **A drop puts the row back** where it
+  was lifted from, keeping its focus, and then calls `onReorder`: the list matches `items` until
+  you write the move, so a move you refuse leaves nothing out of place, and a keyed `@for` over the
+  rows moves the row when you do write it.
 
 `liftedClass` is carried by the lifted row for as long as it is lifted, and follows it.
 
