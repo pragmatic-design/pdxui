@@ -7,7 +7,7 @@
 // above does. (A third, pdx-pin-input, was removed for `<pdx-otp-input mask>`, #286.)
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
-import '../../src/form-template/pdx-form-template';
+import '../../src/form-template/pdx-form-template.pdx';
 import '../../src/toggle/pdx-toggle.pdx';
 
 beforeEach(cleanup);

@@ -19,7 +19,7 @@ import type { DataSource, FormSchema, Form, FieldDefinition } from '@pdxui/core'
 import { uiString } from '../shared/i18n';
 import { findRecord } from '../shared/find-record';
 import '../button/pdx-button.pdx'; // rendered by this component, and registered by nobody else
-import '../form-template/pdx-form-template'; // rendered by this component, and registered by nobody else
+import '../form-template/pdx-form-template.pdx'; // rendered by this component, and registered by nobody else
 
 /** Field definitions (FieldDefinition[]). Converted to FormSchema internally. */
 @prop fields: unknown[] | null = null;

@@ -55,7 +55,7 @@
       "import": "./dist/icon/lucide-icons.js"
     },
     "./form-template": {
-      "development": "./src/form-template/pdx-form-template.ts",
+      "development": "./src/form-template/pdx-form-template.pdx",
       "types": "./dist/form-template/pdx-form-template.d.ts",
       "import": "./dist/form-template/pdx-form-template.js"
     },
@@ -684,6 +684,7 @@
     "dist/entity-grid/entity-grid-icons.js",
     "dist/fab/fab-icons.js",
     "dist/field-list/field-list-strings.js",
+    "dist/form-template/form-template-strings.js",
     "dist/icon/icon-setup.js",
     "dist/inline-edit/inline-edit-strings.js",
     "dist/mention/mention-strings.js",
@@ -707,6 +708,7 @@
     "src/entity-grid/entity-grid-icons.ts",
     "src/fab/fab-icons.ts",
     "src/field-list/field-list-strings.ts",
+    "src/form-template/form-template-strings.ts",
     "src/icon/icon-setup.ts",
     "src/inline-edit/inline-edit-strings.ts",
     "src/mention/mention-strings.ts",

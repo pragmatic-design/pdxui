@@ -1,7 +1,7 @@
 /**
  * MANIFEST — pdx-form-template
  *
- * WHAT THE COMPONENT DOES (source: packages/ui/src/form-template/pdx-form-template.ts)
+ * WHAT THE COMPONENT DOES (source: packages/ui/src/form-template/pdx-form-template.pdx)
  * ─────────────────────────────────────────────────────────────────────────────
  * A SCHEMA-DRIVEN form generator. It takes a `FormSchema` (a JSON object) through the
  * `:schema` prop and renders a whole form:

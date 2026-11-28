@@ -15467,7 +15467,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/form-template/pdx-form-template.ts",
+      "path": "src/form-template/pdx-form-template.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -15644,7 +15644,7 @@
           "name": "pdx-form-template",
           "declaration": {
             "name": "PdxFormTemplate",
-            "module": "src/form-template/pdx-form-template.ts"
+            "module": "src/form-template/pdx-form-template.pdx"
           }
         }
       ]

@@ -9,7 +9,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/form-field/pdx-form-field.pdx';
 import '../../src/input/pdx-input.pdx';
 import '../../src/radio-group/pdx-radio-group.pdx';
-import '../../src/form-template/pdx-form-template';
+import '../../src/form-template/pdx-form-template.pdx';
 
 async function mount(html: string): Promise<HTMLElement> {
     document.body.innerHTML = html;

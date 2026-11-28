@@ -153,7 +153,10 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // the values a binding has with the props at their defaults are in the static markup. The trade is
     // the effects: pdx-fieldset written declaratively mounts at 0.83–0.91× its TypeScript version, where
     // it was 1.41×.
-    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 349.0 },
+    // 346.1 after pdx-form-template, the last TypeScript component (#1454; measured here: 345.9, from
+    // 349.0): with no component left written with html``, core's template engine and the helpers only
+    // that path used are no longer in the bundle the library makes.
+    { name: '@pdxui/framework', code: "import { signal } from '@pdxui/framework'; globalThis.out = signal(0);", ceiling: 346.1 },
     // 1.6, from 3.6 (#1246): core's modules that did work at load — viewport, adaptive, online, rtl,
     // the overlay stack, the context protocol, the theme, the splash — left `sideEffects`, and a
     // signal no longer brings them. The same for `@pdxui/core` below.
@@ -181,8 +184,9 @@ const CONSUMERS: { name: string; code: string; ceiling: number }[] = [
     // (measured here: 337.3), as for the entry above. 338.0 after pdx-select (measured here: 337.9), as
     // for the entry above. 338.2 after #1462 (CI's figure), as for the entry above: pdx-tree's
     // in-place expand. 339.9 after #1275 (CI's figure, measured here: 339.8), as for the entry above: a
-    // block's bindings in one effect.
-    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 339.9 },
+    // block's bindings in one effect. 337.0 after pdx-form-template (measured here: 336.8, from 339.9),
+    // as for the entry above: the last component written with html``.
+    { name: '@pdxui/framework/ui', code: "import '@pdxui/framework/ui';", ceiling: 337.0 },
     { name: '@pdxui/core', code: "import { signal } from '@pdxui/core'; globalThis.out = signal(0);", ceiling: 2 },
     // 1.8 against the root's 3.6, since the sub-path has an entry of its own (#1213): the root
     // module's top level, which a bundler keeps, is not in it. Both were 4.3 when it was the root.

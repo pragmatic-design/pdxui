@@ -548,7 +548,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // content into the page's document and back before the component is appended. +22 B gzip in the
 // entry chunk (44737 → 44759 B at level 9), which holds when/match/repeat; the whole js −94 B. On CI,
 // pdx-form-template mounted 1.10× → 0.75× its TypeScript version, pdx-wizard 1.02× → 0.87×.
-const BUDGET_KB = { entry: 43.8, js: 486.0, css: 67, blocking: 103.1 };
+// entry 43.8 → 37.3, js 486.0 → 483.4 and blocking 103.1 → 99.4: pdx-form-template, the last
+// component written in TypeScript, moves to .pdx (#1454). With no component left on html`` and the
+// component() path, nine of core's modules leave the entry: template.ts and template-plan.ts (the
+// html`` engine), host, slots, channel, form-element, attach, gestures, two-way-value. Seven now load
+// with the lazy chunks that still use them (pdx-dropdown-menu's, pdx-bulk-actions', form-element's),
+// two are in no chunk. Measured locally against 43.8 / 486.0 / 102.5 on main.
+const BUDGET_KB = { entry: 37.3, js: 483.4, css: 67, blocking: 99.4 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
